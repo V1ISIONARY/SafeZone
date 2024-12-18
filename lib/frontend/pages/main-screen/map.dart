@@ -4,14 +4,14 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../widgets/bottom_navigation.dart';
 
-class Home extends StatefulWidget {
-  const Home({super.key});
+class Map extends StatefulWidget {
+  const Map({super.key});
 
   @override
-  State<Home> createState() => _HomeState();
+  State<Map> createState() => _MapState();
 }
 
-class _HomeState extends State<Home> {
+class _MapState extends State<Map> {
   
   @override
   Widget build(BuildContext context) {

@@ -4,6 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:safezone/frontend/widgets/contactInfo.dart';
 
 import '../../../resources/schema/colors.dart';
+import '../../../resources/schema/texts.dart';
 import '../../widgets/Dialogs/common_dialog.dart';
 import '../../widgets/bottom_navigation.dart';
 
@@ -25,24 +26,11 @@ class _ContactState extends State<Contact> {
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              "Contact",
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.black
-              ),
+            CategoryText(
+              text: "Contact"
             ),
-            Padding(
-              padding: EdgeInsets.only(top: 2),
-              child: Text(
-                "Section shares key communication details.",
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.black87
-                ),
-              )
+            CategoryDescripText(
+              text: "Section shares key communication details."
             )
           ],
         ),
@@ -90,7 +78,7 @@ class _ContactState extends State<Contact> {
                     ),
                   ),
                   hintText: "Search",
-                  hintStyle: TextStyle(color: Colors.grey, fontSize: 16),
+                  hintStyle: TextStyle(color: Colors.grey, fontSize: 15),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(5.0), 
                     borderSide: BorderSide.none, 
@@ -99,7 +87,6 @@ class _ContactState extends State<Contact> {
                 ),
                 style: TextStyle(fontSize: 16), 
                 onChanged: (text) {
-                 
                 },
               ),
             ),

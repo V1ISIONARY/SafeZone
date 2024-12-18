@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+import '../../resources/schema/texts.dart';
+
 class Contactinfo extends StatelessWidget {
   const Contactinfo({
     super.key
@@ -22,7 +24,7 @@ class Contactinfo extends StatelessWidget {
             ),
           ),
           Padding(
-            padding: EdgeInsets.only(top: 10, bottom: 20),
+            padding: EdgeInsets.only(top: 10, bottom: 15),
             child: Divider(
               height: 1,
               color: Colors.black12,
@@ -33,21 +35,11 @@ class Contactinfo extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  "Miro Asuncion",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                    fontSize: 15
-                  ),
+                PrimaryText(
+                  text: "Miro Asuncion"
                 ),
-                Text(
-                  "(+63) 970 815 2371",
-                  style: TextStyle(
-                    fontWeight: FontWeight.w500,
-                    color: Colors.black,
-                    fontSize: 11
-                  ),
+                DescriptionText(
+                  text: "(+63) 970 815 2371"
                 )
               ],
             ),
