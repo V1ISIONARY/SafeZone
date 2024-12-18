@@ -1,8 +1,10 @@
 // ignore_for_file: prefer_const_constructors
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:safezone/frontend/widgets/contactInfo.dart';
 
 import '../../../resources/schema/colors.dart';
+import '../../widgets/Dialogs/common_dialog.dart';
 import '../../widgets/bottom_navigation.dart';
 
 class Contact extends StatefulWidget {
@@ -26,26 +28,39 @@ class _ContactState extends State<Contact> {
             Text(
               "Contact",
               style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w900,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
                 color: Colors.black
               ),
             ),
-            Text(
-              "Section shares key communication details.",
-              style: TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w500,
-                color: Colors.black54
-              ),
+            Padding(
+              padding: EdgeInsets.only(top: 2),
+              child: Text(
+                "Section shares key communication details.",
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.black87
+                ),
+              )
             )
           ],
         ),
         actions: [
-          Padding(
-            padding: EdgeInsets.only(right: 20),
-            child: SvgPicture.asset(
-              "lib/resources/svg/add.svg"
+          GestureDetector(
+            onTap: (){
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return CurvedAlertDialog(); // Display the custom dialog
+                },
+              );
+            },
+            child: Padding(
+              padding: EdgeInsets.only(right: 20),
+              child: SvgPicture.asset(
+                "lib/resources/svg/add.svg"
+              )
             )
           )
         ],
@@ -65,39 +80,30 @@ class _ContactState extends State<Contact> {
               child: TextField(
                 decoration: InputDecoration(
                   filled: true,
-                  fillColor: Color(0xFFF1F1F1), // Background color for the TextField
+                  fillColor: Color(0xFFF1F1F1), 
                   prefixIcon: Padding(
-                    padding: EdgeInsets.only(left: 20, right: 10), // Adjust icon padding
+                    padding: EdgeInsets.only(left: 20, right: 10), 
                     child: Icon(
                       Icons.search,
-                      color: Colors.grey, // Use a better visible color for the icon
+                      size: 20,
+                      color: Colors.grey, 
                     ),
                   ),
-                  hintText: "Search", // Placeholder text
+                  hintText: "Search",
                   hintStyle: TextStyle(color: Colors.grey, fontSize: 16),
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10.0), // Curved borders
-                    borderSide: BorderSide.none, // No border
+                    borderRadius: BorderRadius.circular(5.0), 
+                    borderSide: BorderSide.none, 
                   ),
-                  contentPadding: EdgeInsets.symmetric(vertical: 15.0), // Padding inside the field
+                  contentPadding: EdgeInsets.symmetric(vertical: 15.0),
                 ),
-                style: TextStyle(fontSize: 16), // Style for user-typed text
+                style: TextStyle(fontSize: 16), 
                 onChanged: (text) {
-                  // Handle text changes if needed
+                 
                 },
               ),
             ),
-            Padding(
-              padding: EdgeInsets.only(top: 20),
-              child: Container(
-                width: double.infinity,
-                height: 130,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  color: Colors.black12,
-                ),
-              ),
-            )
+            Contactinfo()
           ],
         ),
       ),
