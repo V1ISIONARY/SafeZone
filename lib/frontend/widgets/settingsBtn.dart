@@ -26,64 +26,65 @@ class Settingsbtn extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      margin: EdgeInsets.symmetric(
-        vertical: 15
-      ),
-      child: Stack(
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Container(
-                height: 27,
-                width: 27,
-                margin: EdgeInsets.only(right: 17),
-                child: SvgPicture.asset(
-                  svgIcon
+    return GestureDetector(
+      onTap: (){
+        Navigator.push(
+          context,
+          PageTransition(
+            child: _getPageForNavigation(navigateTo),
+            type: PageTransitionType.rightToLeft,
+            duration: Duration(milliseconds: 200)
+          )
+        );
+      },
+      child: Container(
+        width: double.infinity,
+        margin: EdgeInsets.symmetric(
+          vertical: 15
+        ),
+        child: Stack(
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Container(
+                  height: 25,
+                  width: 25,
+                  margin: EdgeInsets.only(right: 17),
+                  child: SvgPicture.asset(
+                    svgIcon,
+                    color: const Color.fromARGB(179, 0, 0, 0),
+                  )
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    PrimaryText(
+                      text: title
+                    ),
+                    DescriptionText(
+                      text: description,
+                    )
+                  ],
                 )
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  PrimaryText(
-                    text: title
-                  ),
-                  DescriptionText(
-                    text: description,
-                  )
-                ],
-              )
-            ],
-          ),
-          Positioned(
-            right: -10,
-            top: 5,
-            bottom: 5,
-            child: GestureDetector(
-              onTap: (){
-                Navigator.push(
-                  context,
-                  PageTransition(
-                    child: _getPageForNavigation(navigateTo),
-                    type: PageTransitionType.rightToLeft,
-                    duration: Duration(milliseconds: 200)
-                  )
-                );
-              },
+              ],
+            ),
+            Positioned(
+              right: -10,
+              top: 5,
+              bottom: 5,
               child: Container(
                 height: 20,
                 width: 20,
                 margin: EdgeInsets.only(right: 17),
                 child: SvgPicture.asset(
                   'lib/resources/svg/proceed.svg',
-                  color: Colors.black,
+                  color: const Color.fromARGB(179, 0, 0, 0),
                 )
               )
             )
-          )
-        ],
+          ],
+        )
       )
     );
   }

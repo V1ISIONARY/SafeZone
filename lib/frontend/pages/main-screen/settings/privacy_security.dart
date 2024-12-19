@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../../resources/schema/texts.dart';
+
 class PrivacySecurity extends StatefulWidget {
   const PrivacySecurity({
     super.key
@@ -15,6 +17,10 @@ class _PrivacySecurityState extends State<PrivacySecurity> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
+        centerTitle: true,
+        title: CategoryText(
+          text: "Privacy Security"
+        ),
       ),
     );
   }

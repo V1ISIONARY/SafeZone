@@ -15,6 +15,7 @@ class _MapState extends State<Map> {
   
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 216, 216, 216),
       body: Container(
@@ -162,8 +163,7 @@ class _MapState extends State<Map> {
             )
           ],
         ),
-      ),
-      bottomNavigationBar: BottomNavigationWidget()
+      )
     );
   }
 }
