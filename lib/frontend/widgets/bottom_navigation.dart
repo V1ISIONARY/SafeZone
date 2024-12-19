@@ -32,7 +32,7 @@ class _BottomNavigationWidgetState extends State<BottomNavigationWidget> {
     return Scaffold(
       body: _pages[_selectedIndex],
       bottomNavigationBar: Container(
-        height: 70,
+        height: 60,
         decoration: BoxDecoration(
           color: Colors.white,
           boxShadow: const [
@@ -45,7 +45,7 @@ class _BottomNavigationWidgetState extends State<BottomNavigationWidget> {
         ),
         child: Center(
           child: Container(
-            height: 45,
+            height: 40,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -78,12 +78,12 @@ class _BottomNavigationWidgetState extends State<BottomNavigationWidget> {
       },
       child: Container(
         height: double.infinity,
-        width: 60,
+        width: 50,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              height: 23,
+              height: 20,
               width: double.infinity,
               child: SvgPicture.asset(
                 iconPath,
@@ -100,7 +100,7 @@ class _BottomNavigationWidgetState extends State<BottomNavigationWidget> {
                     overflow: TextOverflow.visible,
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      fontSize: 10,
+                      fontSize: 9,
                       fontWeight: isSelected ? FontWeight.bold : FontWeight.bold,
                       color: isSelected ? widgetPricolor : Colors.black45,
                     ),

@@ -3,9 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:safezone/frontend/widgets/contactInfo.dart';
 
-import '../../../resources/schema/texts.dart';
 import '../../widgets/Dialogs/common_dialog.dart';
-import '../../widgets/bottom_navigation.dart';
 
 class Contact extends StatefulWidget {
   const Contact({super.key});
@@ -22,16 +20,13 @@ class _ContactState extends State<Contact> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         centerTitle: false,
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            CategoryText(
-              text: "Contact"
-            ),
-            CategoryDescripText(
-              text: "Section shares key communication details."
-            )
-          ],
+        title: Text(
+          "Contact",
+          style: TextStyle(
+            fontSize: 15,
+            fontWeight: FontWeight.bold,
+            color: Colors.black
+          ),
         ),
         actions: [
           GestureDetector(
@@ -59,7 +54,6 @@ class _ContactState extends State<Contact> {
         child: ListView(
           children: [
             Container(
-              margin: EdgeInsets.only(top: 10),
               decoration: BoxDecoration(
                 color: const Color.fromARGB(255, 216, 216, 216), // Fixed background color
                 borderRadius: BorderRadius.circular(10.0),
