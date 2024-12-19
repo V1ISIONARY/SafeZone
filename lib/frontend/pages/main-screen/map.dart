@@ -89,7 +89,9 @@ class _MapState extends State<Map> {
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         GestureDetector(
-                          onTap: () {},
+                          onTap: () {
+                            context.push('/sos-page'); // palagay lang
+                          },
                           child: Container(
                             width: 50,
                             height: 50,

@@ -5,6 +5,9 @@ import 'package:safezone/frontend/pages/main-screen/report-danger-zone/report_su
 import 'package:safezone/frontend/pages/main-screen/report-danger-zone/reports_history.dart';
 import 'package:safezone/frontend/pages/main-screen/report-danger-zone/submit_report.dart';
 import 'package:safezone/frontend/pages/main-screen/safe-zone/mark_safe_zone.dart';
+import 'package:safezone/frontend/pages/main-screen/sos/sos.dart';
+import 'package:safezone/frontend/pages/main-screen/sos/sos_countdown.dart';
+import 'package:safezone/frontend/pages/main-screen/sos/sos_success.dart';
 
 final GoRouter appRouter = GoRouter(routes: [
   GoRoute(
@@ -26,4 +29,10 @@ final GoRouter appRouter = GoRouter(routes: [
   GoRoute(
       path: '/mark-safe-zone',
       builder: (context, state) => const MarkSafeZone()),
+  GoRoute(path: '/sos-page', builder: (context, state) => const SosPage()),
+  GoRoute(
+      path: '/sos-countdown',
+      builder: (context, state) => const SosCountdown()),
+  GoRoute(
+      path: '/sos-success', builder: (context, state) => const SosSuccess()),
 ]);
