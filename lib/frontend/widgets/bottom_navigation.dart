@@ -1,76 +1,108 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:safezone/resources/schema/colors.dart';
+import 'package:safezone/frontend/pages/main-screen/map.dart';
+import 'package:safezone/frontend/pages/main-screen/contact.dart';
+import 'package:safezone/frontend/pages/main-screen/notification.dart';
+import 'package:safezone/frontend/pages/main-screen/settings/main-settings.dart';
 
-class BottomNavigationWidget extends StatelessWidget {
+class BottomNavigationWidget extends StatefulWidget {
+  @override
+  _BottomNavigationWidgetState createState() => _BottomNavigationWidgetState();
+}
+
+class _BottomNavigationWidgetState extends State<BottomNavigationWidget> {
+  int _selectedIndex = 0;
+
+  final List<Widget> _pages = [
+    Map(),
+    Contact(),
+    Notif(),
+    Settings(),
+  ];
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 80,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: const [
-          BoxShadow(
-            color: Colors.grey,
-            blurRadius: 2,
-            offset: Offset(1, 1),
-          ),
-        ],
-      ),
-      child: Center(
-        child: Container(
-          height: 50,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Expanded(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    _buildIconItem("Map", "lib/resources/svg/map.svg", () {}),
-                    _buildIconItem("Contacts", "lib/resources/svg/contacts.svg", () {}),
-                    _buildEmptyItem(),
-                    _buildIconItem("Notification", "lib/resources/svg/notification.svg", () {}),
-                    _buildIconItem("Settings", "lib/resources/svg/settings.svg", () {}),
-                  ],
+    return Scaffold(
+      body: _pages[_selectedIndex],
+      bottomNavigationBar: Container(
+        height: 70,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: const [
+            BoxShadow(
+              color: Colors.grey,
+              blurRadius: 2,
+              offset: Offset(1, 1),
+            ),
+          ],
+        ),
+        child: Center(
+          child: Container(
+            height: 45,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Expanded(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      _buildIconItem("Map", "lib/resources/svg/map.svg", 0),
+                      _buildIconItem("Contacts", "lib/resources/svg/contacts.svg", 1),
+                      _buildEmptyItem(),
+                      _buildIconItem("Notification", "lib/resources/svg/notification.svg", 2),
+                      _buildIconItem("Settings", "lib/resources/svg/settings.svg", 3),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  // Widget for building the icon with label
-  Widget _buildIconItem(String label, String iconPath, Function onTap) {
+  Widget _buildIconItem(String label, String iconPath, int index) {
+    bool isSelected = _selectedIndex == index;
+
     return GestureDetector(
-      onTap: (){},
+      onTap: () {
+        _onItemTapped(index); // Update selected index
+      },
       child: Container(
         height: double.infinity,
-        width: 60, // Adjust the width to better accommodate the label
+        width: 60,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              height: 25,
+              height: 23,
               width: double.infinity,
               child: SvgPicture.asset(
                 iconPath,
+                color: isSelected ? widgetPricolor : Colors.black45,
               ),
             ),
             Padding(
-              padding: EdgeInsets.only(top: 10),
+              padding: EdgeInsets.only(top: 5),
               child: Flexible(
                 child: Container(
                   width: double.infinity,
                   child: Text(
                     label,
-                    overflow: TextOverflow.visible, // Allow text to be visible without clipping
-                    textAlign: TextAlign.center, // Center the text
+                    overflow: TextOverflow.visible,
+                    textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 10,
-                      fontWeight: label == "Map" ? FontWeight.w600 : FontWeight.normal,
-                      color: label == "Map" ? Colors.black : Colors.black45,
+                      fontWeight: isSelected ? FontWeight.bold : FontWeight.bold,
+                      color: isSelected ? widgetPricolor : Colors.black45,
                     ),
                   ),
                 ),
@@ -82,7 +114,6 @@ class BottomNavigationWidget extends StatelessWidget {
     );
   }
 
-  // Widget for the empty item (e.g. space between icons)
   Widget _buildEmptyItem() {
     return GestureDetector(
       onTap: () {},
@@ -92,4 +123,5 @@ class BottomNavigationWidget extends StatelessWidget {
       ),
     );
   }
+
 }

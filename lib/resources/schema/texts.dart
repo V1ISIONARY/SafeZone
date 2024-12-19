@@ -16,7 +16,7 @@ class CategoryText extends StatelessWidget {
       Text(
         text,
         style: TextStyle(
-          fontSize: 17,
+          fontSize: 15,
           fontWeight: FontWeight.bold,
           color: Colors.black
         ),
@@ -41,7 +41,7 @@ class CategoryDescripText extends StatelessWidget {
       Text(
         text,
         style: TextStyle(
-          fontSize: 12,
+          fontSize: 10,
           fontWeight: FontWeight.w500,
           color: Colors.black45
         ),
@@ -66,9 +66,9 @@ class PrimaryText extends StatelessWidget {
       Text(
         text,
         style: TextStyle(
-          fontWeight: FontWeight.bold,
+          fontWeight: FontWeight.w500,
           color: primary_textColor,
-          fontSize: 15
+          fontSize: 14
         ),
       )
     );
@@ -93,7 +93,7 @@ class DescriptionText extends StatelessWidget {
         style: TextStyle(
           fontWeight: FontWeight.w500,
           color: description_textColor,
-          fontSize: 10
+          fontSize: 9
         ),
       )
     );

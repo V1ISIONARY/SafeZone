@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:safezone/frontend/widgets/contactInfo.dart';
 
-import '../../../resources/schema/colors.dart';
 import '../../../resources/schema/texts.dart';
 import '../../widgets/Dialogs/common_dialog.dart';
 import '../../widgets/bottom_navigation.dart';
@@ -62,7 +61,7 @@ class _ContactState extends State<Contact> {
             Container(
               margin: EdgeInsets.only(top: 10),
               decoration: BoxDecoration(
-                color: Colors.white, // Fixed background color
+                color: const Color.fromARGB(255, 216, 216, 216), // Fixed background color
                 borderRadius: BorderRadius.circular(10.0),
               ),
               child: TextField(
@@ -93,8 +92,7 @@ class _ContactState extends State<Contact> {
             Contactinfo()
           ],
         ),
-      ),
-      bottomNavigationBar: BottomNavigationWidget()
+      )
     );
   }
 }

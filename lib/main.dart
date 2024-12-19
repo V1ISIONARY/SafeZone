@@ -1,7 +1,7 @@
 // ignore_for_file: prefer_const_constructors
 import 'package:flutter/material.dart';
 import 'package:safezone/frontend/pages/main-screen/map.dart';
-import 'package:safezone/frontend/pages/main-screen/settings/main-settings.dart';
+import 'package:safezone/frontend/widgets/bottom_navigation.dart';
 
 void main() {
   runApp(const MyApp());
@@ -13,7 +13,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: Settings()
+      home: BottomNavigationWidget()
     );
   }
 }

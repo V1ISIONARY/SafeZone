@@ -22,12 +22,11 @@ class _SettingsState extends State<Settings> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
         centerTitle: false,
         title: Text(
-          "My Account",
+          "Account",
           style: TextStyle(
-            fontSize: 18,
+            fontSize: 15,
             fontWeight: FontWeight.bold,
             color: Colors.black
           ),
@@ -38,7 +37,6 @@ class _SettingsState extends State<Settings> {
         child: ListView(
           children: [
             Container(
-              margin: EdgeInsets.only(top: 20),
               width: double.infinity,
               height: 130,
               decoration: BoxDecoration(
@@ -93,11 +91,12 @@ class _SettingsState extends State<Settings> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Container(
-                        height: 27,
-                        width: 27,
+                        height: 25,
+                        width: 25,
                         margin: EdgeInsets.only(right: 17),
                         child: SvgPicture.asset(
-                          'lib/resources/svg/notification-outline.svg'
+                          'lib/resources/svg/notification-outline.svg',
+                          color: const Color.fromARGB(179, 0, 0, 0),
                         )
                       ),
                       Column(
@@ -124,7 +123,7 @@ class _SettingsState extends State<Settings> {
                         });
                       },
                       child: Container(
-                        height: 20,
+                        height: 15,
                         width: 40, // Wider to accommodate the circle toggle
                         padding: EdgeInsets.symmetric(horizontal: 2), // Padding for inner circle
                         decoration: BoxDecoration(
@@ -190,7 +189,6 @@ class _SettingsState extends State<Settings> {
           ],
         ),
       ),
-      bottomNavigationBar: BottomNavigationWidget()
     );
   }
 }
