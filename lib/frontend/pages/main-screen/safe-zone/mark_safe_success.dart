@@ -3,14 +3,14 @@ import 'package:go_router/go_router.dart';
 import 'package:safezone/frontend/widgets/custom_button.dart';
 import 'package:safezone/resources/schema/colors.dart';
 
-class ReportSuccess extends StatefulWidget {
-  const ReportSuccess({super.key});
+class MarkSafeSuccess extends StatefulWidget {
+  const MarkSafeSuccess({super.key});
 
   @override
-  State<ReportSuccess> createState() => _ReportSuccessState();
+  State<MarkSafeSuccess> createState() => _MarkSafeSuccessState();
 }
 
-class _ReportSuccessState extends State<ReportSuccess> {
+class _MarkSafeSuccessState extends State<MarkSafeSuccess> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -19,7 +19,8 @@ class _ReportSuccessState extends State<ReportSuccess> {
       ),
       body: Center(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20.0),
+          padding:
+              const EdgeInsets.symmetric(horizontal: 20.0), 
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -32,17 +33,18 @@ class _ReportSuccessState extends State<ReportSuccess> {
               ),
               const SizedBox(height: 30),
               const Text(
-                "Thank you for sharing! Your report helps protect women and keep our community safe. We truly appreciate your effort in making the world a safer place for everyone.",
+                "Thank you for helping keep the community safe! Your safe zone submission is under review and will be verified shortly.",
                 textAlign: TextAlign.center,
                 style: TextStyle(color: textColor, fontSize: 15),
               ),
               const Spacer(),
               CustomButton(
-                  text: "Back to Home",
-                  isOutlined: true,
-                  onPressed: () {
-                    context.push('/');
-                  }),
+                text: "Back to Home",
+                isOutlined: true,
+                onPressed: () {
+                  context.push('/');
+                },
+              ),
               const SizedBox(height: 30),
             ],
           ),

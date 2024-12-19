@@ -46,7 +46,7 @@ class _SosCountdownState extends State<SosCountdown> {
             mainAxisSize: MainAxisSize.min,
             children: [
               const Text(
-                "Tap or hold to send SOS",
+                "Double tap to cancel",
                 style: TextStyle(
                     color: bgColor,
                     fontSize: 20,
@@ -64,7 +64,7 @@ class _SosCountdownState extends State<SosCountdown> {
               ),
               const SizedBox(height: 60),
               const Text(
-                "Your SOS will be sent to your trusted circle. Check who’s in your circle",
+                "Cancel the SOS alert by double tapping within 5 seconds.",
                 textAlign: TextAlign.center,
                 style: TextStyle(color: bgColor, fontSize: 15),
               ),

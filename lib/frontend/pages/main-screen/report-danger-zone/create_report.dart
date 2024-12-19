@@ -39,7 +39,6 @@ class _CreateReportState extends State<CreateReport> {
                     ),
                   ),
                   const SizedBox(width: 8),
-                  // Text
                   const Flexible(
                     child: Text(
                       'Help others stay safe by providing details about the incident and location.',
