@@ -2,8 +2,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-import '../../widgets/bottom_navigation.dart';
-
 class Map extends StatefulWidget {
   const Map({super.key});
 
@@ -79,6 +77,7 @@ class _MapState extends State<Map> {
                 ),
               ),
             ),
+            
             Positioned(
               right: 20,
               bottom: 20,
