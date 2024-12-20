@@ -12,6 +12,10 @@ class Notif extends StatefulWidget {
 class _NotifState extends State<Notif> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold();
+    return Scaffold(
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+      ),
+    );
   }
 }

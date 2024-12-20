@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:safezone/resources/schema/colors.dart';
 
 class CategoryText extends StatelessWidget {
@@ -15,9 +16,9 @@ class CategoryText extends StatelessWidget {
     return (
       Text(
         text,
-        style: TextStyle(
+        style: GoogleFonts.poppins(
           fontSize: 15,
-          fontWeight: FontWeight.bold,
+          fontWeight: FontWeight.w500,
           color: Colors.black
         ),
       )
@@ -40,7 +41,7 @@ class CategoryDescripText extends StatelessWidget {
     return (
       Text(
         text,
-        style: TextStyle(
+        style: GoogleFonts.poppins(
           fontSize: 10,
           fontWeight: FontWeight.w500,
           color: Colors.black45
@@ -65,7 +66,7 @@ class PrimaryText extends StatelessWidget {
     return (
       Text(
         text,
-        style: TextStyle(
+        style: GoogleFonts.poppins(
           fontWeight: FontWeight.w500,
           color: primary_textColor,
           fontSize: 14
@@ -90,7 +91,7 @@ class DescriptionText extends StatelessWidget {
     return (
       Text(
         text,
-        style: TextStyle(
+        style: GoogleFonts.poppins(
           fontWeight: FontWeight.w500,
           color: description_textColor,
           fontSize: 9

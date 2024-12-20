@@ -90,10 +90,10 @@ class _CreateReportState extends State<CreateReport> {
                 },
               ),
               CustomButton(
-                  text: "Continue",
-                  onPressed: () {
-                    context.push('/review-report');
-                  })
+                text: "Continue",
+                onPressed: () {
+                  context.push('/review-report');
+                })
             ],
           ),
         ),

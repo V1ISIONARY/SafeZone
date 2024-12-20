@@ -1,5 +1,4 @@
 import 'package:go_router/go_router.dart';
-import 'package:safezone/frontend/pages/main-screen/map.dart';
 import 'package:safezone/frontend/pages/main-screen/report-danger-zone/create_report.dart';
 import 'package:safezone/frontend/pages/main-screen/report-danger-zone/report_success.dart';
 import 'package:safezone/frontend/pages/main-screen/report-danger-zone/reports_history.dart';
@@ -9,11 +8,12 @@ import 'package:safezone/frontend/pages/main-screen/safe-zone/mark_safe_zone.dar
 import 'package:safezone/frontend/pages/main-screen/sos/sos.dart';
 import 'package:safezone/frontend/pages/main-screen/sos/sos_countdown.dart';
 import 'package:safezone/frontend/pages/main-screen/sos/sos_success.dart';
+import 'package:safezone/frontend/widgets/bottom_navigation.dart';
 
 final GoRouter appRouter = GoRouter(routes: [
   GoRoute(
     path: '/',
-    builder: (context, state) => const Map(),
+    builder: (context, state) => BottomNavigationWidget(),
   ),
   GoRoute(
       path: '/create-report',
