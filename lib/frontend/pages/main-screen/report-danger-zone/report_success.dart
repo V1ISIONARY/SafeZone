@@ -43,6 +43,12 @@ class _ReportSuccessState extends State<ReportSuccess> {
                   onPressed: () {
                     context.push('/');
                   }),
+              CustomButton(
+                  text: "Go to reports history",
+                  isOutlined: true,
+                  onPressed: () {
+                    context.push('/reports-history');
+                  }),
               const SizedBox(height: 30),
             ],
           ),

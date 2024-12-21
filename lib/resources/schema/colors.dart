@@ -18,3 +18,5 @@ const bgColor = Color(0xffFEFEFE);
 const formFieldColor = Color(0xffF0F0F0);
 const labelFormFieldColor = Color(0xff5C5C5C);
 const textColor = Color(0xFF3A3A3A);
+const dangerStatusColor = Color(0xffDA5C56);
+const pendingStatusColor = Color(0xffE5A836);
