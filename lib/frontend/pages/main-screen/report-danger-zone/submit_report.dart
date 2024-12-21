@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:safezone/frontend/widgets/custom_button.dart';
 import 'package:safezone/frontend/widgets/report-danger-zone/text_row.dart';
 import 'package:safezone/resources/schema/colors.dart';
+import 'package:safezone/resources/schema/texts.dart';
 
 class ReviewReport extends StatefulWidget {
   const ReviewReport({super.key});
@@ -16,7 +17,9 @@ class _ReviewReportState extends State<ReviewReport> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Review Your Report"),
+        backgroundColor: Colors.white,
+        centerTitle: true,
+        title: const CategoryText(text: "Review Your Report"),
       ),
       body: SingleChildScrollView(
         child: Padding(

@@ -37,7 +37,15 @@ class _SosCountdownState extends State<SosCountdown> {
       backgroundColor: btnColor,
       appBar: AppBar(
         backgroundColor: btnColor,
-        title: const Text("SOS Sent", style: TextStyle(color: bgColor),),
+        centerTitle: true,
+        title: const Text(
+          "SOS",
+          style: TextStyle(
+            color: bgColor,
+            fontSize: 15,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
       ),
       body: Center(
         child: Padding(
@@ -48,10 +56,10 @@ class _SosCountdownState extends State<SosCountdown> {
               const Text(
                 "Double tap to cancel",
                 style: TextStyle(
-                    color: bgColor,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    ),
+                  color: bgColor,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const SizedBox(height: 60),
               Text(

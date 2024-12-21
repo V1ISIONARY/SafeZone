@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:safezone/frontend/widgets/custom_button.dart';
 import 'package:safezone/frontend/widgets/report-danger-zone/multiple_images.dart';
 import 'package:safezone/frontend/widgets/text_field_widget.dart';
+import 'package:safezone/resources/schema/texts.dart';
 
 class CreateReport extends StatefulWidget {
   const CreateReport({super.key});
@@ -21,7 +22,9 @@ class _CreateReportState extends State<CreateReport> {
         TextEditingController();
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Report an Incident"),
+        backgroundColor: Colors.white,
+        centerTitle: true,
+        title: const CategoryText(text: "Report an Incident"),
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -90,10 +93,10 @@ class _CreateReportState extends State<CreateReport> {
                 },
               ),
               CustomButton(
-                text: "Continue",
-                onPressed: () {
-                  context.push('/review-report');
-                })
+                  text: "Continue",
+                  onPressed: () {
+                    context.push('/review-report');
+                  })
             ],
           ),
         ),

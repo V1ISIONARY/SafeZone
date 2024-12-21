@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:safezone/frontend/widgets/custom_button.dart';
 import 'package:safezone/resources/schema/colors.dart';
+import 'package:safezone/resources/schema/texts.dart';
 
 class MarkSafeSuccess extends StatefulWidget {
   const MarkSafeSuccess({super.key});
@@ -15,7 +16,9 @@ class _MarkSafeSuccessState extends State<MarkSafeSuccess> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(""),
+        backgroundColor: Colors.white,
+        centerTitle: true,
+        title: const CategoryText(text: ""),
       ),
       body: Center(
         child: Padding(
