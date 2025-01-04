@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:safezone/frontend/widgets/sos_button.dart';
+import 'package:safezone/frontend/widgets/buttons/sos_button.dart';
 import 'package:safezone/resources/schema/colors.dart';
 import 'package:safezone/resources/schema/texts.dart';
 

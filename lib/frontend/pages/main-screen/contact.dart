@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:safezone/frontend/widgets/contactInfo.dart';
 
-import '../../widgets/Dialogs/common_dialog.dart';
+import '../../widgets/dialogs/common_dialog.dart';
 
 class Contact extends StatefulWidget {
   const Contact({super.key});

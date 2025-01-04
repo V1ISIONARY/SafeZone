@@ -1,9 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
-import 'package:safezone/frontend/widgets/custom_button.dart';
+import 'package:safezone/frontend/widgets/buttons/custom_button.dart';
 import 'package:safezone/resources/schema/colors.dart';
-import '../../widgets/bottom_navigation.dart';
 
 class Map extends StatefulWidget {
   const Map({super.key});
@@ -13,15 +15,40 @@ class Map extends StatefulWidget {
 }
 
 class _MapState extends State<Map> {
+  final Completer<GoogleMapController> _controller = Completer();
+  static const LatLng sourceLocation = LatLng(16.043859, 120.335182);
+  static const LatLng destinationLocation = LatLng(16.053859, 120.335182);
+
+  void getPolyPoints() async {
+
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 216, 216, 216),
-      body: Container(
+      body: SizedBox(
         width: double.infinity,
         height: double.infinity,
         child: Stack(
           children: [
+            // Google Map as the background
+            GoogleMap(
+              initialCameraPosition: const CameraPosition(
+                target: sourceLocation,
+                zoom: 14.4746,
+              ),
+              markers: {
+                const Marker(markerId: MarkerId("source"), position: sourceLocation),
+                const Marker(
+                    markerId: MarkerId("destination"),
+                    position: destinationLocation),
+              },
+              onMapCreated: (controller) {
+                _controller.complete(controller);
+              },
+            ),
+            // Foreground widgets
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -39,9 +66,10 @@ class _MapState extends State<Map> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Padding(
-                          padding: const EdgeInsets.only(top: 20.0),
+                          padding: const EdgeInsets.only(top: 10.0),
                           child: Container(
-                              margin: const EdgeInsets.symmetric(horizontal: 30),
+                              margin:
+                                  const EdgeInsets.symmetric(horizontal: 30),
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(20.0),
                                 boxShadow: const [
@@ -77,7 +105,7 @@ class _MapState extends State<Map> {
                                       ),
                                       contentPadding:
                                           const EdgeInsets.symmetric(
-                                              vertical: 15.0), // Adjust padding
+                                              vertical: 10.0), // Adjust padding
                                     ),
                                     style: const TextStyle(
                                         fontSize:
@@ -95,6 +123,7 @@ class _MapState extends State<Map> {
                 )
               ],
             ),
+            // Floating buttons
             Positioned(
               right: 20,
               bottom: 20,
@@ -106,7 +135,7 @@ class _MapState extends State<Map> {
                   children: [
                     GestureDetector(
                       onTap: () {
-                        context.push('/sos-page'); // palagay lang
+                        context.push('/sos-page');
                       },
                       child: Container(
                         width: 50,
@@ -130,8 +159,7 @@ class _MapState extends State<Map> {
                     ),
                     GestureDetector(
                       onTap: () {
-                        _showCreateReportDialog(
-                            context); 
+                        _showCreateReportDialog(context);
                       },
                       child: Container(
                         width: 50,
@@ -155,8 +183,7 @@ class _MapState extends State<Map> {
                     ),
                     GestureDetector(
                       onTap: () {
-                        _showMarkSafeDialog(
-                            context); 
+                        _showMarkSafeDialog(context);
                       },
                       child: Container(
                         width: 50,
@@ -181,7 +208,7 @@ class _MapState extends State<Map> {
                   ],
                 ),
               ),
-            )
+            ),
           ],
         ),
       ),

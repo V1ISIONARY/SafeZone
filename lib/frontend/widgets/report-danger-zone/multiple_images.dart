@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:safezone/frontend/widgets/report-danger-zone/image_helper.dart';
-import 'package:dotted_border/dotted_border.dart';
 
 class MultipleImages extends StatefulWidget {
   final Function(List<File>) onImagesSelected;

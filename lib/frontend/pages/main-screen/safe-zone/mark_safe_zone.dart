@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:safezone/frontend/widgets/custom_button.dart';
-import 'package:safezone/frontend/widgets/custom_radio_button.dart';
+import 'package:safezone/frontend/widgets/buttons/custom_button.dart';
+import 'package:safezone/frontend/widgets/buttons/custom_radio_button.dart';
 import 'package:safezone/frontend/widgets/text_field_widget.dart';
 import 'package:safezone/resources/schema/colors.dart';
 import 'package:safezone/resources/schema/texts.dart';

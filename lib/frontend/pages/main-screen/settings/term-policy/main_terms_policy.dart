@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../../resources/schema/texts.dart';
-import '../../../../widgets/terms_policyBtn.dart';
+import '../../../../widgets/buttons/terms_policyBtn.dart';
 
 class TermsPolicy extends StatelessWidget {
   

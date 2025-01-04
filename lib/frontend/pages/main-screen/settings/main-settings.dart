@@ -4,7 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:safezone/resources/schema/colors.dart';
 import 'package:safezone/resources/schema/texts.dart';
 
-import '../../../widgets/settings_btn.dart';
+import '../../../widgets/buttons/settings_btn.dart';
 
 class Settings extends StatefulWidget {
   const Settings({super.key});

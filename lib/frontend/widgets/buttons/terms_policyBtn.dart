@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:page_transition/page_transition.dart';
 
-import '../../resources/schema/texts.dart';
-import '../pages/main-screen/settings/term-policy/community_standards.dart';
-import '../pages/main-screen/settings/term-policy/privacy_policy.dart';
-import '../pages/main-screen/settings/term-policy/terms_service.dart';
+import '../../../resources/schema/texts.dart';
+import '../../pages/main-screen/settings/term-policy/community_standards.dart';
+import '../../pages/main-screen/settings/term-policy/privacy_policy.dart';
+import '../../pages/main-screen/settings/term-policy/terms_service.dart';
 
 class TermsPolicyBtn extends StatelessWidget {
 

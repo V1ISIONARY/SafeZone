@@ -4,10 +4,10 @@ import 'package:page_transition/page_transition.dart';
 import 'package:safezone/frontend/pages/main-screen/settings/about.dart';
 import 'package:safezone/frontend/pages/main-screen/settings/user_guide.dart';
 
-import '../../resources/schema/texts.dart';
-import '../pages/authentication/account_details.dart';
-import '../pages/main-screen/settings/privacy_security.dart';
-import '../pages/main-screen/settings/term-policy/main_terms_policy.dart';
+import '../../../resources/schema/texts.dart';
+import '../../pages/authentication/account_details.dart';
+import '../../pages/main-screen/settings/privacy_security.dart';
+import '../../pages/main-screen/settings/term-policy/main_terms_policy.dart';
 
 class Settingsbtn extends StatelessWidget {
   

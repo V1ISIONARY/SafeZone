@@ -15,10 +15,10 @@ class _BottomNavigationWidgetState extends State<BottomNavigationWidget> {
   int _selectedIndex = 0;
 
   final List<Widget> _pages = [
-    Map(),
-    Contact(),
-    Notif(),
-    Settings(),
+    const Map(),
+    const Contact(),
+    const Notif(),
+    const Settings(),
   ];
 
   void _onItemTapped(int index) {
@@ -33,9 +33,9 @@ class _BottomNavigationWidgetState extends State<BottomNavigationWidget> {
       body: _pages[_selectedIndex],
       bottomNavigationBar: Container(
         height: 60,
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           color: Colors.white,
-          boxShadow: const [
+          boxShadow: [
             BoxShadow(
               color: Colors.grey,
               blurRadius: 2,

@@ -17,12 +17,20 @@ class ReportsCard extends StatelessWidget {
   Widget build(BuildContext context) {
     Color statusColor;
     String statusText;
-    switch (status) {
-      case "Verified":
-        statusColor = dangerStatusColor;
+    switch (status) { 
+      case "verified":
+        statusColor = greenStatusColor;
         statusText = "Verified - Danger Zone";
         break;
-      case "Pending":
+      case "under review":
+        statusColor = pendingStatusColor;
+        statusText = "Under Review";
+        break;
+      case "rejected":
+        statusColor = dangerStatusColor;
+        statusText = "Rejected";
+        break;
+      case "pending":
         statusColor = pendingStatusColor;
         statusText = "Pending Verification";
         break;
@@ -32,7 +40,7 @@ class ReportsCard extends StatelessWidget {
     }
 
     return Container(
-      margin: EdgeInsets.symmetric(vertical: 5),
+      margin: const EdgeInsets.symmetric(vertical: 5),
       padding: const EdgeInsets.all(20),
       decoration: const BoxDecoration(
         color: Color(0xffFDFDFD),
