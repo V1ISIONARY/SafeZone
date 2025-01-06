@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:safezone/frontend/widgets/reports_card.dart';
 import 'package:safezone/resources/schema/colors.dart';
 import 'package:safezone/resources/schema/texts.dart';
@@ -45,11 +46,33 @@ class _ReportsHistoryState extends State<ReportsHistory> {
                 ],
               ),
               const SizedBox(height: 20),
-              const ReportsCard(
-                  status: "Verified - Danger Zone",
-                  location:
-                      "28WV+R2R, Arellano St, Downtown District, Dagupan, 2400 Pangasinan",
-                  timeAndDate: "December 17, 2024 || 1:48 pm"),
+              Slidable(
+                // startActionPane:
+                //     ActionPane(motion: const DrawerMotion(), children: [
+                //   SlidableAction(
+                //     onPressed: ((context) {
+                //       // do something
+                //     }),
+                //     icon: Icons.phone,
+                //   )
+                // ]),
+                endActionPane:
+                    ActionPane(motion: const DrawerMotion(), children: [
+                  SlidableAction(
+                    onPressed: ((context) {
+                      // do something
+                    }),
+                    icon: Icons.delete,
+                    foregroundColor: Colors.white,
+                    // backgroundColor: dangerStatusColor,
+                  )
+                ]),
+                child: const ReportsCard(
+                    status: "Verified - Danger Zone",
+                    location:
+                        "28WV+R2R, Arellano St, Downtown District, Dagupan, 2400 Pangasinan",
+                    timeAndDate: "December 17, 2024 || 1:48 pm"),
+              ),
               const ReportsCard(
                   status: "Verified - Danger Zone",
                   location:

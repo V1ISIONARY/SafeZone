@@ -32,7 +32,6 @@ class _MapState extends State<Map> {
         height: double.infinity,
         child: Stack(
           children: [
-            // Google Map as the background
             GoogleMap(
               initialCameraPosition: const CameraPosition(
                 target: sourceLocation,
@@ -48,7 +47,6 @@ class _MapState extends State<Map> {
                 _controller.complete(controller);
               },
             ),
-            // Foreground widgets
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -66,7 +64,7 @@ class _MapState extends State<Map> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Padding(
-                          padding: const EdgeInsets.only(top: 10.0),
+                          padding: const EdgeInsets.only(top: 5.0),
                           child: Container(
                               margin:
                                   const EdgeInsets.symmetric(horizontal: 30),
@@ -86,30 +84,30 @@ class _MapState extends State<Map> {
                                     decoration: InputDecoration(
                                       filled: true,
                                       fillColor:
-                                          Colors.white, // Background color
+                                          Colors.white, 
                                       prefixIcon: const Padding(
                                           padding: EdgeInsets.only(
                                               left: 20, right: 10),
                                           child: Icon(Icons.search,
                                               color: Colors
-                                                  .grey)), // Icon stays visible
+                                                  .grey)),
                                       hintText:
-                                          "Search", // Placeholder text disappears on typing
+                                          "Search", 
                                       hintStyle: const TextStyle(
                                           color: Colors.grey, fontSize: 16),
                                       border: OutlineInputBorder(
                                         borderRadius:
                                             BorderRadius.circular(20.0),
                                         borderSide:
-                                            BorderSide.none, // No border
+                                            BorderSide.none, 
                                       ),
                                       contentPadding:
                                           const EdgeInsets.symmetric(
-                                              vertical: 10.0), // Adjust padding
+                                              vertical: 10.0),
                                     ),
                                     style: const TextStyle(
                                         fontSize:
-                                            16), // Style for the typed text
+                                            16), 
                                     onChanged: (text) {
                                       // Handle text changes if needed
                                     },

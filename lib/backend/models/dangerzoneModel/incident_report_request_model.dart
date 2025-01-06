@@ -1,17 +1,19 @@
-class IncidentReportModel {
-  int? id;
-  int? userId;
-  int? dangerZoneId;
-  String? description;
-  String? reportDate; 
-  String? reportTime; 
-  List<String>? images;
-  String? reportTimestamp;
-  String? status;
+class IncidentReportRequestModel {
+  final int userId;
+  final int dangerZoneId;
+  final String description;
+  final String reportDate;
+  final String reportTime;
+  final List<String>? images;
+  final String reportTimestamp;
+  final String status;
   final String updatedAt;
+  final double latitude;
+  final double longitude;
+  final double radius;
+  final String name;
 
-  IncidentReportModel({
-    required this.id,
+  IncidentReportRequestModel({
     required this.userId,
     required this.dangerZoneId,
     required this.description,
@@ -19,13 +21,16 @@ class IncidentReportModel {
     required this.reportTime,
     this.images,
     required this.reportTimestamp,
-    this.status,
+    required this.status,
     required this.updatedAt,
+    required this.latitude,
+    required this.longitude,
+    required this.radius,
+    required this.name,
   });
 
-  factory IncidentReportModel.fromJson(Map<String, dynamic> json) {
-    return IncidentReportModel(
-      id: json['id'],
+  factory IncidentReportRequestModel.fromJson(Map<String, dynamic> json) {
+    return IncidentReportRequestModel(
       userId: json['user_id'],
       dangerZoneId: json['danger_zone_id'],
       description: json['description'],
@@ -35,12 +40,15 @@ class IncidentReportModel {
       reportTimestamp: json['report_timestamp'],
       status: json['status'],
       updatedAt: json['updated_at'],
+      latitude: json['latitude'],
+      longitude: json['longitude'],
+      radius: json['radius'],
+      name: json['name'],
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'id': id,
       'user_id': userId,
       'danger_zone_id': dangerZoneId,
       'description': description,
@@ -50,7 +58,10 @@ class IncidentReportModel {
       'report_timestamp': reportTimestamp,
       'status': status,
       'updated_at': updatedAt,
+      'latitude': latitude,
+      'longitude': longitude,
+      'radius': radius,
+      'name': name,
     };
   }
 }
-
