@@ -4,6 +4,7 @@ class CircleModel {
 
   CircleModel({
     required this.id,
+    // 
     required this.userId,
   });
 
