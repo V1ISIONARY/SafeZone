@@ -1,5 +1,11 @@
 // ignore_for_file: prefer_const_constructors
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart'; // Import BLoC package
+import 'package:go_router/go_router.dart';
+import 'package:safezone/backend/apiservice/authApi/auth_impl.dart';
+import 'package:safezone/backend/bloc/authBloc/auth_bloc.dart';
+import 'package:safezone/backend/bloc/authBloc/auth_event.dart';
+import 'package:safezone/backend/bloc/authBloc/auth_state.dart';
 import 'package:safezone/frontend/pages/authentication/register.dart';
 
 class Login extends StatefulWidget {
@@ -12,6 +18,16 @@ class Login extends StatefulWidget {
 class _LoginState extends State<Login> {
   bool _passwordVisible = false;
   bool _rememberMe = false;
+
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+
+  @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -70,9 +86,10 @@ class _LoginState extends State<Login> {
             ),
             SizedBox(height: 8),
             TextField(
+              controller: emailController,
               decoration: InputDecoration(
                 hintText: "safezone@gmail.com",
-                labelText: "Email address or username",
+                labelText: "Email address",
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
@@ -90,6 +107,8 @@ class _LoginState extends State<Login> {
             ),
             SizedBox(height: 8),
             TextField(
+              controller:
+                  passwordController, // Link TextController to the TextField
               obscureText: !_passwordVisible,
               decoration: InputDecoration(
                 hintText: "Enter Password",
@@ -141,7 +160,14 @@ class _LoginState extends State<Login> {
             ),
             const SizedBox(height: 20),
             ElevatedButton(
-              onPressed: () {},
+              onPressed: () {
+                final email = emailController.text;
+                final password = passwordController.text;
+
+                context.read<AuthenticationBloc>().add(
+                      UserLogin(email, password),
+                    );
+              },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Color(0xFFEF8D88),
                 padding: EdgeInsets.symmetric(vertical: 15),
@@ -178,6 +204,18 @@ class _LoginState extends State<Login> {
                   ),
                 ),
               ],
+            ),
+            BlocListener<AuthenticationBloc, AuthenticationState>(
+              listener: (context, state) {
+                if (state is LoginSuccess) {
+                  GoRouter.of(context).go('/home');
+                } else if (state is LoginFailed) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Login failed: ${state.message}')),
+                  );
+                }
+              },
+              child: Container(),
             ),
           ],
         ),
