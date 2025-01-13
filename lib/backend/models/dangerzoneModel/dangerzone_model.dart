@@ -48,3 +48,32 @@ class DangerZoneModel {
     };
   }
 }
+
+class DangerZone {
+  final int id;
+  final bool isVerified;
+  final double latitude;
+  final double longitude;
+  final int radius;
+  final String name;
+
+  DangerZone({
+    required this.id,
+    required this.isVerified,
+    required this.latitude,
+    required this.longitude,
+    required this.radius,
+    required this.name,
+  });
+
+  factory DangerZone.fromJson(Map<String, dynamic> json) {
+    return DangerZone(
+      id: json['id'],
+      isVerified: json['is_verified'],
+      latitude: json['latitude'].toDouble(),
+      longitude: json['longitude'].toDouble(),
+      radius: json['radius'],
+      name: json['name'],
+    );
+  }
+}
