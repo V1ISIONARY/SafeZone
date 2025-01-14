@@ -6,7 +6,8 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthenticationImplementation extends AuthenticationRepository {
-  static const String baseUrl = 'http://127.0.0.1:8000';
+  //static const String baseUrl = 'http://127.0.0.1:8000';
+  static const String baseUrl = 'http://10.0.2.2:8000';
 
   @override
   Future<void> userLogin(String email, String password) async {
@@ -25,8 +26,11 @@ class AuthenticationImplementation extends AuthenticationRepository {
       final data = jsonDecode(response.body);
 
       final SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setInt('id', data['user_id']);
       await prefs.setString('username', data['username']);
       await prefs.setString('email', data['email']);
+      await prefs.setString('password', "123123");
+      await prefs.setString('phone', "0099");
       await prefs.setString('address', data['profile']['address']);
       await prefs.setString('first_name', data['profile']['first_name']);
       await prefs.setString('last_name', data['profile']['last_name']);

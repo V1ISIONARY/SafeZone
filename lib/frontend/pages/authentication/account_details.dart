@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:safezone/frontend/widgets/account_display.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../resources/schema/colors.dart';
 import '../../../resources/schema/texts.dart';
@@ -14,6 +15,38 @@ class AccountDetails extends StatefulWidget {
 }
 
 class _AccountDetailsState extends State<AccountDetails> {
+  String username = '';
+  String email = '';
+  String firstName = '';
+  String lastName = '';
+  String phone = '';
+  String password = '';
+  String address = '';
+  bool isAdmin = false;
+  bool isGirl = false;
+  bool isVerified = false;
+
+  Future<void> loadUserData() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      username = prefs.getString('username') ?? 'User';
+      password = prefs.getString('password') ?? '*****';
+      phone = prefs.getString('phone') ?? 'Phone Number not set';
+      email = prefs.getString('email') ?? 'user@example.com';
+      firstName = prefs.getString('first_name') ?? 'First Name';
+      lastName = prefs.getString('last_name') ?? 'Last Name';
+      address = prefs.getString('address') ?? 'Address not set';
+      isAdmin = prefs.getBool('is_admin') ?? false;
+      isGirl = prefs.getBool('is_girl') ?? false;
+      isVerified = prefs.getBool('is_verified') ?? false;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    loadUserData(); 
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -59,7 +92,7 @@ class _AccountDetailsState extends State<AccountDetails> {
                       ),
                       SizedBox(height: 5),
                       CategoryText(
-                        text: "Jaira Solis"
+                        text: "$firstName $lastName"
                       ),
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
@@ -131,22 +164,22 @@ class _AccountDetailsState extends State<AccountDetails> {
                     AccountDisplay(
                       title: "Password", 
                       svgIcon: "lib/resources/svg/password.svg", 
-                      data: "Squk1*****"
+                      data: password
                     ),
                     AccountDisplay(
                       title: "Phone", 
                       svgIcon: "lib/resources/svg/phone.svg", 
-                      data: "(+63) 970 815 2371"
+                      data: phone
                     ),
                     AccountDisplay(
                       title: "Email", 
                       svgIcon: "lib/resources/svg/mail.svg", 
-                      data: "j1loui***@gmail.com"
+                      data: email
                     ),
                     AccountDisplay(
                       title: "Location", 
                       svgIcon: "lib/resources/svg/location.svg", 
-                      data: "Pangasinan, Dagupan City, Pantal"
+                      data: address
                     )
                   ],
                 )

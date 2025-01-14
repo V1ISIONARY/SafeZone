@@ -7,6 +7,7 @@ import 'package:safezone/backend/bloc/authBloc/auth_bloc.dart';
 import 'package:safezone/backend/bloc/authBloc/auth_event.dart';
 import 'package:safezone/backend/bloc/authBloc/auth_state.dart';
 import 'package:safezone/frontend/pages/authentication/register.dart';
+import 'package:safezone/frontend/widgets/bottom_navigation.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -208,10 +209,21 @@ class _LoginState extends State<Login> {
             BlocListener<AuthenticationBloc, AuthenticationState>(
               listener: (context, state) {
                 if (state is LoginSuccess) {
-                  GoRouter.of(context).go('/home');
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => BottomNavigationWidget()),
+                  );
                 } else if (state is LoginFailed) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text('Login failed: ${state.message}')),
+                  );
+                } else if (state is LoginLoading) {
+                  showDialog(
+                    context: context,
+                    barrierDismissible: false,
+                    builder: (context) => Center(
+                      child: CircularProgressIndicator(),
+                    ),
                   );
                 }
               },

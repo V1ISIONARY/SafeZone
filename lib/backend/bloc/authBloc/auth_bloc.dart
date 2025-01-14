@@ -14,7 +14,6 @@ class AuthenticationBloc
   AuthenticationBloc(this._authrepo) : super(AuthenticationInitial()) {
     //BLOC BY MIRO
     on<UserLogin>((event, emit) async {
-      final SharedPreferences login = await SharedPreferences.getInstance();
       emit(LoginLoading());
       try {
         await _authrepo.userLogin(event.email, event.password);
