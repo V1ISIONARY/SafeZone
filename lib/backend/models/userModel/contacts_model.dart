@@ -2,21 +2,21 @@ class ContactsModel {
   final int id;
   final int userId;
   final String phoneNumber;
-  final String email;
+  final String name;
 
   ContactsModel({
     required this.id,
     required this.userId,
     required this.phoneNumber,
-    required this.email,
+    required this.name,
   });
 
   factory ContactsModel.fromJson(Map<String, dynamic> json) {
     return ContactsModel(
-      id: json['id'],
-      userId: json['user_id'],
+      id: json['id'] ?? 0,
+      userId: json['user_id'] ?? 0,
       phoneNumber: json['phone_number'].toString(),
-      email: json['email'],
+      name: json['name'] ?? "",
     );
   }
   Map<String, dynamic> toJson() {
@@ -24,7 +24,7 @@ class ContactsModel {
       'id': id,
       'user_id': userId,
       'phone_number': phoneNumber,
-      'email': email,
+      'name': name,
     };
   }
 }

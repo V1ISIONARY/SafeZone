@@ -29,11 +29,12 @@ class ContactImplementation extends ContactRepository {
   @override
   Future<List<ContactsModel>> getContacts(int id) async {
     final response = await http
-        .post(Uri.parse('$baseUrl/contacts/get-user-contacts/?user_id=$id'));
+        .get(Uri.parse('$baseUrl/contacts/get-user-contacts/?user_id=$id'));
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       List<dynamic> contactJson = data;
+      print(contactJson);
       return contactJson.map((json) => ContactsModel.fromJson(json)).toList();
     } else {
       throw Exception('Invalid input');

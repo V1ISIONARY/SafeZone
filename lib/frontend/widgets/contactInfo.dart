@@ -3,42 +3,45 @@ import 'package:flutter/material.dart';
 import '../../resources/schema/texts.dart';
 
 class Contactinfo extends StatelessWidget {
-  const Contactinfo({super.key});
+  final String name;
+  final String phone;
+
+  const Contactinfo({super.key, required this.name, required this.phone});
 
   @override
   Widget build(BuildContext context) {
-    return const Padding(
-      padding: EdgeInsets.only(top: 20),
+    return Padding(
+      padding: const EdgeInsets.only(top: 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            "A",
-            style: TextStyle(
-                fontWeight: FontWeight.w600,
-                color: Colors.black54,
-                fontSize: 13),
-          ),
           Padding(
-              padding: EdgeInsets.only(top: 10, bottom: 15),
-              child: Divider(
-                height: 1,
-                color: Colors.black12,
-              )),
-          Padding(
-            padding: EdgeInsets.only(bottom: 20),
+            padding: const EdgeInsets.only(bottom: 20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                PrimaryText(text: "Miro Asuncion"),
-                DescriptionText(text: "(+63) 970 815 2371")
+                Text(
+                  name,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black87,
+                    fontSize: 16,
+                  ),
+                ),
+                Text(
+                  phone,
+                  style: const TextStyle(
+                    color: Colors.black54,
+                    fontSize: 14,
+                  ),
+                ),
               ],
             ),
           ),
-          Divider(
+          const Divider(
             height: 1,
             color: Colors.black12,
-          )
+          ),
         ],
       ),
     );
