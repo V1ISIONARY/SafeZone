@@ -83,7 +83,7 @@ class _BottomNavigationWidgetState extends State<BottomNavigationWidget> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              height: 20,
+              height: 17,
               width: double.infinity,
               child: SvgPicture.asset(
                 iconPath,
@@ -91,7 +91,7 @@ class _BottomNavigationWidgetState extends State<BottomNavigationWidget> {
               ),
             ),
             Padding(
-              padding: EdgeInsets.only(top: 5),
+              padding: EdgeInsets.only(top: 7),
               child: Flexible(
                 child: Container(
                   width: double.infinity,
@@ -101,7 +101,7 @@ class _BottomNavigationWidgetState extends State<BottomNavigationWidget> {
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 9,
-                      fontWeight: isSelected ? FontWeight.bold : FontWeight.bold,
+                      fontWeight: isSelected ? FontWeight.bold : FontWeight.w400,
                       color: isSelected ? widgetPricolor : Colors.black45,
                     ),
                   ),
