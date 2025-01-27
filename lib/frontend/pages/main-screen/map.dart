@@ -9,6 +9,7 @@ import 'package:safezone/frontend/widgets/buttons/custom_button.dart';
 import 'package:safezone/resources/schema/colors.dart';
 import 'dart:ui' as ui;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class Map extends StatefulWidget {
   const Map({super.key});
@@ -209,97 +210,183 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
   }
 
   void _showFirstRunDialog() {
+  final PageController _pageController = PageController();
+
   showDialog(
     context: context,
-    barrierDismissible: false, // Prevent closing the dialog by tapping outside
-    barrierColor: Colors.black.withOpacity(0.5), // Dim the background
+    barrierColor: Colors.black.withOpacity(0.5),
     builder: (BuildContext context) {
       return AlertDialog(
-        backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10), // Rounded corners
-        ),
-        content: Container(
-          width: 250, // Adjust width as needed
-          height: 240, // Set height to accommodate the content
-          child: PageView(
-            // PageView to swipe left and right
-            children: [
-              // Page 1: Content A
-              Column(
-                mainAxisSize: MainAxisSize.min,
+        backgroundColor: Colors.transparent,
+        content: SizedBox(
+        width: 250,
+        height: 330,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 250,
+              height: 280,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                color: Colors.white,
+              ),
+              clipBehavior: Clip.hardEdge,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Container(
-                    height: 150,
-                    width: double.infinity,
-                    color: Colors.white10,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(5),
-                      child: Image.asset(
-                        'lib/resources/images/location.png', // Path to your image
-                        fit: BoxFit.cover,
-                      ),
+                  Expanded(
+                    child: PageView(
+                      controller: _pageController,
+                      children: [
+                        Column(
+                          children: [
+                            Container(
+                              height: 180,
+                              width: double.infinity,
+                              child: ClipRRect(
+                                child: Image.asset(
+                                  'lib/resources/images/location.png',
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            ),
+                            Container(
+                              height: 80,
+                              margin: EdgeInsets.symmetric(horizontal: 20),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    'Live Tracking',
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                      color: widgetPricolor,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  Text(
+                                    'With more than 1700 partners worldwide, ship anywhere in the world.',
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      color: Colors.black38,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ],
+                              ),
+                            )
+                          ],
+                        ),
+                        Column(
+                          children: [
+                            Container(
+                              height: 180,
+                              width: double.infinity,
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(5),
+                                child: Image.asset(
+                                  'lib/resources/images/zones.png',
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            ),
+                            Container(
+                              height: 80,
+                              margin: EdgeInsets.symmetric(horizontal: 20),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    'Zones',
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                      color: widgetPricolor,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  SizedBox(height: 5),
+                                  Text(
+                                    'Being mindful of safe zones and danger zones is essential for your safety.',
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w300,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        Column(
+                          children: [
+                            Container(
+                              height: 180,
+                              width: double.infinity,
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(5),
+                                child: Image.asset(
+                                  'lib/resources/images/zones.png',
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            ),
+                            Container(
+                              height: 80,
+                              margin: EdgeInsets.symmetric(horizontal: 20),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    'Zones',
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                      color: widgetPricolor,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  SizedBox(height: 5),
+                                  Text(
+                                    'Being mindful of safe zones and danger zones is essential for your safety.',
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w300,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
-                  ),
-                  SizedBox(height: 10),
-                  Text(
-                    'Live Tracking',
-                    style: TextStyle(
-                      fontSize: 20,
-                      color: widgetPricolor,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  SizedBox(height: 5),
-                  Text(
-                    'With more than 1700 partners worldwide, ship anywhere in the world.',
-                    style: TextStyle(
-                      fontSize: 10,
-                      fontWeight: FontWeight.w300,
-                    ),
-                    textAlign: TextAlign.center,
                   ),
                 ],
               ),
-              // Page 2: Content B
-              Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    height: 150,
-                    width: double.infinity,
-                    color: Colors.white10,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(5),
-                      child: Image.asset(
-                        'lib/resources/images/location.png', // Change image path for second content
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 10),
-                  Text(
-                    'Tracking Details',
-                    style: TextStyle(
-                      fontSize: 20,
-                      color: widgetPricolor,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  SizedBox(height: 5),
-                  Text(
-                    'Details about the tracking, location, and progress of the shipment.',
-                    style: TextStyle(
-                      fontSize: 10,
-                      fontWeight: FontWeight.w300,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: 20),
+              child: SmoothPageIndicator(
+                controller: _pageController,
+                count: 3,
+                effect: WormEffect(
+                  dotHeight: 8,
+                  dotWidth: 8,
+                  spacing: 8,
+                  dotColor: Colors.grey,
+                  activeDotColor: Colors.white,
+                ),
               ),
-            ],
-          ),
-        ),
+            ),
+          ],
+        ),)
       );
     },
   );
