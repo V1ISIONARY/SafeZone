@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:safezone/resources/schema/colors.dart';
 import 'package:safezone/resources/schema/texts.dart';
 
@@ -51,6 +52,99 @@ class _SettingsState extends State<Settings> {
                     offset: Offset(1, 1),
                   ),
                 ],
+              ),
+              child: Stack(
+                children: [
+                  Positioned(
+                    left: 0,
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          width: 130,
+                          height: 130,
+                          color: Colors.white,
+                          child: ClipRRect(
+                            child: Image.asset(
+                              'lib/resources/images/location.png',
+                              fit: BoxFit.cover,
+                            )
+                          )
+                        ),
+                        Container(
+                          width: 150,
+                          height: 130,
+                          child: Stack(
+                            children: [
+                              Positioned(
+                                top: 15,
+                                left: 10,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'LOUISE ROMERO',
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w500,
+                                        color: Colors.white
+                                      ),
+                                    ),
+                                    Text(
+                                      '(+63) 970 815 2371',
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 9,
+                                        fontWeight: FontWeight.w400,
+                                        color: Colors.white70
+                                      ),
+                                    ),
+                                  ],
+                                )
+                              ),
+                              Positioned(
+                                bottom: 15,
+                                left: 10,
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Container(
+                                      width: 13,
+                                      height: 13,
+                                      child: SvgPicture.asset(
+                                        'lib/resources/svg/verified.svg',
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    SizedBox(width: 5),
+                                    Text(
+                                      'Verified at Safezone',
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w400,
+                                        color: Colors.white70
+                                      ),
+                                    )
+                                  ],
+                                )
+                              )
+                            ],
+                          ),
+                        )
+                      ]
+                    )
+                  ),
+                  Positioned(
+                    right: 0,
+                    child: Container(
+                      width: 130,
+                      height: 130,
+                      child: SvgPicture.asset(
+                        'lib/resources/svg/lines.svg'
+                      ),
+                    )
+                  )
+                ]
               ),
             ),
             Padding(
