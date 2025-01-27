@@ -8,6 +8,7 @@ import 'package:go_router/go_router.dart';
 import 'package:safezone/frontend/widgets/buttons/custom_button.dart';
 import 'package:safezone/resources/schema/colors.dart';
 import 'dart:ui' as ui;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Map extends StatefulWidget {
   const Map({super.key});
@@ -47,6 +48,8 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
+
+    _checkFirstRun();
 
     _createCustomMarker();
 
@@ -194,6 +197,114 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
 
   }
 
+  // Check if it's the first run
+  Future<void> _checkFirstRun() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool? isFirstRun = prefs.getBool('isFirstRun');
+    
+    if (isFirstRun == null || isFirstRun) {
+      _showFirstRunDialog();
+      prefs.setBool('isFirstRun', false);  // Set the flag so it doesn't show again
+    }
+  }
+
+  void _showFirstRunDialog() {
+  showDialog(
+    context: context,
+    barrierDismissible: false, // Prevent closing the dialog by tapping outside
+    barrierColor: Colors.black.withOpacity(0.5), // Dim the background
+    builder: (BuildContext context) {
+      return AlertDialog(
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10), // Rounded corners
+        ),
+        content: Container(
+          width: 250, // Adjust width as needed
+          height: 240, // Set height to accommodate the content
+          child: PageView(
+            // PageView to swipe left and right
+            children: [
+              // Page 1: Content A
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    height: 150,
+                    width: double.infinity,
+                    color: Colors.white10,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(5),
+                      child: Image.asset(
+                        'lib/resources/images/location.png', // Path to your image
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  Text(
+                    'Live Tracking',
+                    style: TextStyle(
+                      fontSize: 20,
+                      color: widgetPricolor,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  SizedBox(height: 5),
+                  Text(
+                    'With more than 1700 partners worldwide, ship anywhere in the world.',
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w300,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+              // Page 2: Content B
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    height: 150,
+                    width: double.infinity,
+                    color: Colors.white10,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(5),
+                      child: Image.asset(
+                        'lib/resources/images/location.png', // Change image path for second content
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  Text(
+                    'Tracking Details',
+                    style: TextStyle(
+                      fontSize: 20,
+                      color: widgetPricolor,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  SizedBox(height: 5),
+                  Text(
+                    'Details about the tracking, location, and progress of the shipment.',
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w300,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      );
+    },
+  );
+}
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -270,14 +381,14 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
                             height: 40,
                             width: double.infinity,
                             decoration: BoxDecoration(
-                          boxShadow: const [
-                            BoxShadow(
-                              color: Colors.grey,
-                              blurRadius: 2,
-                              offset: Offset(1, 1),
+                              boxShadow: const [
+                                BoxShadow(
+                                  color: Colors.grey,
+                                  blurRadius: 2,
+                                  offset: Offset(1, 1),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
                             child: Stack(
                               children: [
                                 Positioned.fill(
@@ -327,12 +438,36 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
                                           child: AnimatedBuilder(
                                             animation: _controllerFade,
                                             builder: (context, child) {
-                                              return Text(
-                                                "Search for near",
-                                                style: TextStyle(
-                                                  color: _colorAnimation.value,
-                                                  fontSize: 13,
-                                                ),
+                                              return Row(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  Transform.translate(
+                                                    offset: Offset(-5, -10), 
+                                                    child: Container(
+                                                      height: 40,
+                                                      width: 40,
+                                                      alignment: Alignment.center,
+                                                      color: Colors.transparent,
+                                                      child: SvgPicture.asset(
+                                                        'lib/resources/svg/search.svg',
+                                                        color: _colorAnimation.value,
+                                                        height: 20,
+                                                        width: 20,
+                                                        fit: BoxFit.contain,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  Transform.translate(
+                                                    offset: Offset(-5, 0), 
+                                                    child: Text(
+                                                      "Search for near",
+                                                      style: TextStyle(
+                                                        color: _colorAnimation.value,
+                                                        fontSize: 13,
+                                                      ),
+                                                    )
+                                                  )
+                                                ]
                                               );
                                             },
                                           ),
@@ -350,7 +485,7 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
                                               child: Text(
                                                 hints[_currentHintIndex],
                                                 style: TextStyle(
-                                                  color: _hintColorAnimation.value, // Color changes during animation
+                                                  color: _hintColorAnimation.value, 
                                                   fontSize: 13,
                                                 ),
                                               ),
@@ -373,9 +508,9 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
                                       color: Colors.transparent, 
                                       child: SvgPicture.asset(
                                         'lib/resources/svg/mic.svg',
-                                        color: Colors.black38,
-                                        height: 25, 
-                                        width: 25,
+                                        color: Colors.black87,
+                                        height: 22, 
+                                        width: 22,
                                         fit: BoxFit.contain,
                                       ),
                                     ),
@@ -469,7 +604,7 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
                         ),
                         child: Center(
                           child: SvgPicture.asset(
-                              "lib/resources/svg/safezone.svg"),
+                            "lib/resources/svg/safezone.svg"),
                         ),
                       ),
                     ),

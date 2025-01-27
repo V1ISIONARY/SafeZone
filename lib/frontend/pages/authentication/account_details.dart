@@ -64,7 +64,7 @@ class _AccountDetailsState extends State<AccountDetails> {
           children: [
             Container(
               width: double.infinity,
-              height: 220,
+              height: 250,
               decoration: BoxDecoration(
                 color: const Color.fromARGB(255, 240, 240, 240),
                 borderRadius: BorderRadius.circular(5),
@@ -89,8 +89,14 @@ class _AccountDetailsState extends State<AccountDetails> {
                           color: Colors.black38,
                           shape: BoxShape.circle
                         ),
+                        child: ClipRRect(
+                          child: Image.asset(
+                            'lib/resources/images/miro.png',
+                            fit: BoxFit.cover,
+                          )
+                        )
                       ),
-                      SizedBox(height: 5),
+                      SizedBox(height: 10),
                       CategoryText(
                         text: "$firstName $lastName"
                       ),
@@ -150,7 +156,7 @@ class _AccountDetailsState extends State<AccountDetails> {
             Container(
               width: double.infinity,
               decoration: BoxDecoration(
-                color: const Color.fromARGB(255, 240, 240, 240),
+                color: const Color.fromARGB(255, 245, 245, 245),
                 borderRadius: BorderRadius.circular(5),
               ),
               child: Container(
@@ -166,15 +172,27 @@ class _AccountDetailsState extends State<AccountDetails> {
                       svgIcon: "lib/resources/svg/password.svg", 
                       data: password
                     ),
+                    Divider(
+                      height: 0.5,
+                      color: Colors.white,
+                    ),
                     AccountDisplay(
                       title: "Phone", 
                       svgIcon: "lib/resources/svg/phone.svg", 
                       data: phone
                     ),
+                    Divider(
+                      height: 0.5,
+                      color: Colors.white,
+                    ),
                     AccountDisplay(
                       title: "Email", 
                       svgIcon: "lib/resources/svg/mail.svg", 
                       data: email
+                    ),
+                    Divider(
+                      height: 0.5,
+                      color: Colors.white,
                     ),
                     AccountDisplay(
                       title: "Location", 
@@ -199,7 +217,7 @@ class _AccountDetailsState extends State<AccountDetails> {
             Container(
               width: double.infinity,
               decoration: BoxDecoration(
-                color: const Color.fromARGB(255, 240, 240, 240),
+                color: const Color.fromARGB(255, 245, 245, 245),
                 borderRadius: BorderRadius.circular(5),
               ),
               child: Container(
@@ -215,6 +233,10 @@ class _AccountDetailsState extends State<AccountDetails> {
                       svgIcon: "lib/resources/svg/two-step.svg", 
                       data: "Enable"
                     ),
+                    Divider(
+                      height: 0.5,
+                      color: Colors.white,
+                    ),
                     AccountDisplay(
                       title: "Alerts for Suspicious Activity", 
                       svgIcon: "lib/resources/svg/two-step.svg", 
@@ -223,6 +245,34 @@ class _AccountDetailsState extends State<AccountDetails> {
                   ]
                 )
               )
+            ),
+            Container(
+              height: 300,
+              width: double.infinity,
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(
+                      'SafeZone',
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w400,
+                        color: Colors.black
+                      ),
+                    ),
+                    Text(
+                      'Hello World Negah',
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w300,
+                        color: Colors.black
+                      ),
+                    )
+                  ],
+                ),
+              ),
             )
           ]
         )
