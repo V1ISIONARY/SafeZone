@@ -15,6 +15,7 @@ import 'package:safezone/frontend/pages/main-screen/sos/sos_success.dart';
 import 'package:safezone/frontend/widgets/bottom_navigation.dart';
 
 final GoRouter appRouter = GoRouter(
+  initialLocation: '/',
   routes: [
     GoRoute(
       path: '/register',

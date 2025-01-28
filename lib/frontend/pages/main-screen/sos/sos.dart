@@ -6,7 +6,6 @@ import 'package:safezone/resources/schema/texts.dart';
 
 class SosPage extends StatefulWidget {
   const SosPage({super.key});
-
   @override
   State<SosPage> createState() => _SosPageState();
 }

@@ -441,6 +441,7 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
               zoomControlsEnabled: false, 
               myLocationEnabled: false, 
               myLocationButtonEnabled: false, 
+              mapType: MapType.terrain,
             ),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -616,7 +617,7 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
             // Floating buttons
             Positioned(
               right: 20,
-              bottom: 20,
+              bottom: 80,
               child: SizedBox(
                 width: 60,
                 height: 200,
@@ -643,7 +644,9 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
                         ),
                         child: Center(
                           child:
-                              SvgPicture.asset("lib/resources/svg/connect.svg"),
+                            SvgPicture.asset("lib/resources/svg/connect.svg",
+                            color: Colors.blue
+                          ),
                         ),
                       ),
                     ),
@@ -667,7 +670,9 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
                         ),
                         child: Center(
                           child: SvgPicture.asset(
-                              "lib/resources/svg/dangerzone.svg"),
+                            "lib/resources/svg/dangerzone.svg",
+                            color: widgetPricolor,
+                          ),
                         ),
                       ),
                     ),
@@ -691,7 +696,9 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
                         ),
                         child: Center(
                           child: SvgPicture.asset(
-                            "lib/resources/svg/safezone.svg"),
+                            "lib/resources/svg/safezone.svg",
+                            color: Colors.green
+                          ),
                         ),
                       ),
                     ),

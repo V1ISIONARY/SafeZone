@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:safezone/resources/schema/colors.dart';
 import 'package:safezone/frontend/pages/main-screen/map.dart';
 import 'package:safezone/frontend/pages/main-screen/contact.dart';
@@ -16,7 +17,7 @@ class _BottomNavigationWidgetState extends State<BottomNavigationWidget> {
 
   final List<Widget> _pages = [
     const Map(),
-    const Contact(),
+    const Contact(UserToken: 's',),
     const Notif(),
     const Settings(),
   ];
@@ -30,41 +31,101 @@ class _BottomNavigationWidgetState extends State<BottomNavigationWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _pages[_selectedIndex],
-      bottomNavigationBar: Container(
-        height: 60,
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey,
-              blurRadius: 2,
-              offset: Offset(1, 1),
-            ),
-          ],
-        ),
-        child: Center(
-          child: Container(
-            height: 40,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Expanded(
+      body: Stack(
+        children: [
+          _pages[_selectedIndex],
+          Positioned(
+            bottom: 0,
+            right: 0,
+            left: 0,
+            child: Container(
+              height: 70,
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey,
+                    blurRadius: 2,
+                    offset: Offset(1, 1),
+                  ),
+                ],
+              ),
+              child: Center(
+                child: Container(
+                  height: 70,
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      _buildIconItem("Map", "lib/resources/svg/map.svg", 0),
-                      _buildIconItem("Contacts", "lib/resources/svg/contacts.svg", 1),
-                      _buildEmptyItem(),
-                      _buildIconItem("Notification", "lib/resources/svg/notification.svg", 2),
-                      _buildIconItem("Settings", "lib/resources/svg/settings.svg", 3),
+                      Expanded(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.only(top: 15),
+                              child: _buildIconItem("Map", "lib/resources/svg/map.svg", 0),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.only(top: 15),
+                              child: _buildIconItem("Contacts", "lib/resources/svg/contacts.svg", 1),
+                            ),
+                            Stack(
+                              children: [
+                                // The grey container moved upwards by 40 pixels
+                                Transform.translate(
+                                  offset: Offset(0, -25),  // Offset it upwards by 40 pixels
+                                  child: GestureDetector(
+                                    onTap: (){
+                                      context.push('/sos-countdown');
+                                    },
+                                    child: Container(
+                                      width: 70,
+                                      height: 150,  // The height of the grey container
+                                      decoration: BoxDecoration(
+                                        color: const Color.fromARGB(255, 217, 212, 212),
+                                        shape: BoxShape.circle
+                                      ),
+                                      // Center the white container inside the grey one
+                                      child: Center(
+                                        child: Container(
+                                          width: 50,
+                                          height: 50,
+                                          decoration: BoxDecoration(
+                                            color: widgetPricolor,
+                                            shape: BoxShape.circle
+                                          ),
+                                          child: Center(
+                                            child: Text(
+                                              'SOS',
+                                              style: TextStyle(
+                                                color: Colors.white
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Padding(
+                              padding: EdgeInsets.only(top: 15),
+                              child: _buildIconItem("Notification", "lib/resources/svg/notification.svg", 2),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.only(top: 15),
+                              child: _buildIconItem("Settings", "lib/resources/svg/settings.svg", 3),
+                            ),
+                          ],
+                        ),
+                      ),
                     ],
                   ),
                 ),
-              ],
-            ),
-          ),
-        ),
+              ),
+            )
+          )
+        ],
       ),
     );
   }

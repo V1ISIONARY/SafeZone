@@ -17,6 +17,14 @@ class Settings extends StatefulWidget {
 class _SettingsState extends State<Settings> {
 
   bool isToggled = false;
+
+  int selectedItem = 0; 
+
+  void onItemTap(int index) {
+    setState(() {
+      selectedItem = index;
+    });
+  }
   
   @override
   Widget build(BuildContext context) {
@@ -160,20 +168,35 @@ class _SettingsState extends State<Settings> {
             ),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
+              children: [
                 CategoryText(
                   text: "User Preference"
                 ),
                 CategoryDescripText(
                   text: "Select the appropriate map design for your application."
+                ),
+                Container(
+                  margin: EdgeInsets.symmetric(vertical: 20),
+                  width: double.infinity,
+                  height: 120,
+                  color: Colors.transparent,
+                  child: Center(
+                    child: Container(
+                      height: 100,
+                      width: double.infinity,
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          _buildItem(0, 'Default', 'lib/resources/images/terrain.png'),
+                          _buildItem(1, 'Satellite', 'lib/resources/images/satellite.png'),
+                          _buildItem(2, 'Terrain', 'lib/resources/images/terrain.png'),
+                        ],
+                      ),
+                    ),
+                  ),
                 )
               ],
-            ),
-            Container(
-              margin: EdgeInsets.symmetric(vertical: 20),
-              width: double.infinity,
-              height: 130,
-              color: Colors.transparent,
             ),
             Container(
               width: double.infinity,
@@ -287,4 +310,50 @@ class _SettingsState extends State<Settings> {
       ),
     );
   }
+
+  Widget _buildItem(int index, String label, String imgStyle) {
+    
+    bool isSelected = selectedItem == index; 
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        GestureDetector(
+          onTap: () => onItemTap(index), // Handle tap
+          child: Container(
+            width: 80,
+            height: 80,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              border: isSelected
+                  ? Border.all(
+                      color: Colors.grey,
+                      width: 3,
+                    )
+                  : null, 
+              color: Colors.grey,
+            ),
+            clipBehavior: Clip.hardEdge,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: Image.asset(
+                imgStyle,
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+        ),
+        Text(
+          label,
+          style: TextStyle(
+            fontWeight: FontWeight.w500,
+            color: isSelected ? Colors.black : Colors.black54, 
+            fontSize: 10,
+          ),
+        ),
+      ],
+    );
+  }
+
 }
