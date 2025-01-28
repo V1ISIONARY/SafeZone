@@ -1,24 +1,33 @@
 class CircleModel {
   final int id;
-  final int userId;
+  final String name;
+  final bool isActive;
+  final String createdAt;
 
   CircleModel({
     required this.id,
-    // 
-    required this.userId,
+    required this.name,
+    required this.isActive,
+    required this.createdAt,
   });
 
+  // Factory method to create CircleModel from JSON
   factory CircleModel.fromJson(Map<String, dynamic> json) {
     return CircleModel(
       id: json['id'],
-      userId: json['user_id'],
+      name: json['name'],
+      isActive: json['is_active'],
+      createdAt: json['created_at'],
     );
   }
 
+  // Method to convert CircleModel to JSON
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'user_id': userId,
+      'name': name,
+      'is_active': isActive,
+      'created_at': createdAt,
     };
   }
 }
