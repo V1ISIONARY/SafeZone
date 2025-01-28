@@ -32,9 +32,9 @@ class MyApp extends StatelessWidget {
   const MyApp({super.key});
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
       debugShowCheckedModeBanner: false,
-      home: BottomNavigationWidget(),
+      routerConfig: appRouter,
       theme: AppTheme.lightTheme,
       title: "SafeZone",
     );
