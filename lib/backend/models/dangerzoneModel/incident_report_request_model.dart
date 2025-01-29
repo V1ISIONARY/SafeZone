@@ -1,32 +1,34 @@
 class IncidentReportRequestModel {
-  final int userId;
-  final int dangerZoneId;
-  final String description;
-  final String reportDate;
-  final String reportTime;
+  final int? id;
+  final int? userId;
+  final int? dangerZoneId;
+  final String? description;
+  final String? reportDate;
+  final String? reportTime;
   final List<String>? images;
-  final String reportTimestamp;
-  final String status;
-  final String updatedAt;
-  final double latitude;
-  final double longitude;
-  final double radius;
-  final String name;
+  final String? reportTimestamp;
+  final String? status;
+  final String? updatedAt;
+  final double? latitude;
+  final double? longitude;
+  final double? radius;
+  final String? name;
 
   IncidentReportRequestModel({
-    required this.userId,
-    required this.dangerZoneId,
-    required this.description,
-    required this.reportDate,
-    required this.reportTime,
+    this.id,
+    this.userId,
+    this.dangerZoneId,
+    this.description,
+    this.reportDate,
+    this.reportTime,
     this.images,
-    required this.reportTimestamp,
-    required this.status,
-    required this.updatedAt,
-    required this.latitude,
-    required this.longitude,
-    required this.radius,
-    required this.name,
+    this.reportTimestamp,
+    this.status,
+    this.updatedAt,
+    this.latitude,
+    this.longitude,
+    this.radius,
+    this.name,
   });
 
   factory IncidentReportRequestModel.fromJson(Map<String, dynamic> json) {

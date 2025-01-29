@@ -3,12 +3,15 @@ import 'package:safezone/backend/models/dangerzoneModel/incident_report_model.da
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:safezone/backend/models/dangerzoneModel/incident_report_request_model.dart';
 import 'package:safezone/backend/models/dangerzoneModel/status_update_model.dart';
 
-final _apiUrl = "${dotenv.env['API_URL']}/incident-report";
+// final _apiUrl = "${dotenv.env['API_URL']}/incident-report";
 
 class IncidentRepositoryImpl implements IncidentReportRepository {
   // GET
+
+  static const String _apiUrl = 'http://10.0.2.2:8000/incident-report';
 
   @override
   Future<List<IncidentResponse>> getIncidentReports() async {
@@ -36,54 +39,54 @@ class IncidentRepositoryImpl implements IncidentReportRepository {
   }
 
   @override
-  Future<List<IncidentReportModel>> getIncidentReportsByDangerZoneId(
+  Future<List<IncidentResponse>> getIncidentReportsByDangerZoneId(
       int id) async {
     final response =
         await http.get(Uri.parse('$_apiUrl/get-incident-reports/$id'));
 
     if (response.statusCode == 200) {
       final List<dynamic> data = jsonDecode(response.body);
-      return data.map((json) => IncidentReportModel.fromJson(json)).toList();
+      return data.map((json) => IncidentResponse.fromJson(json)).toList();
     } else {
       throw Exception('Failed to load incident reports');
     }
   }
 
   @override
-  Future<List<IncidentReportModel>> getIncidentReportByStatus(
+  Future<List<IncidentResponse>> getIncidentReportByStatus(
       String status) async {
     final response = await http
         .get(Uri.parse('$_apiUrl/get-incident-reports-status/$status'));
 
     if (response.statusCode == 200) {
       final List<dynamic> data = jsonDecode(response.body);
-      return data.map((json) => IncidentReportModel.fromJson(json)).toList();
+      return data.map((json) => IncidentResponse.fromJson(json)).toList();
     } else {
       throw Exception('Failed to load incident reports');
     }
   }
 
   @override
-  Future<List<IncidentReportModel>> getIncidentReportsByUserId(int id) async {
+  Future<List<IncidentResponse>> getIncidentReportsByUserId(int id) async {
     final response =
         await http.get(Uri.parse('$_apiUrl/get-incident-reports-user/$id'));
 
     if (response.statusCode == 200) {
       final List<dynamic> data = jsonDecode(response.body);
-      return data.map((json) => IncidentReportModel.fromJson(json)).toList();
+      return data.map((json) => IncidentResponse.fromJson(json)).toList();
     } else {
       throw Exception('Failed to load incident reports');
     }
   }
 
   @override
-  Future<List<StatusUpdate>> getIncidentStatus(int id) async {
+  Future<List<StatusHistory>> getIncidentStatus(int id) async {
     final response = await http
         .get(Uri.parse('$_apiUrl/incident-reports/$id/status-history'));
 
     if (response.statusCode == 200) {
       final List<dynamic> data = jsonDecode(response.body);
-      return data.map((json) => StatusUpdate.fromJson(json)).toList();
+      return data.map((json) => StatusHistory.fromJson(json)).toList();
     } else {
       throw Exception('Failed to load incident status');
     }
@@ -92,8 +95,8 @@ class IncidentRepositoryImpl implements IncidentReportRepository {
   // POST
 
   @override
-  Future<IncidentReportModel> createIncidentReport(
-      IncidentReportModel incidentReport) async {
+  Future<IncidentReportRequestModel> createIncidentReport(
+      IncidentReportRequestModel incidentReport) async {
     final response = await http.post(
       Uri.parse('$_apiUrl/create-incident-report'),
       headers: <String, String>{
@@ -104,7 +107,7 @@ class IncidentRepositoryImpl implements IncidentReportRepository {
 
     if (response.statusCode == 201) {
       final data = jsonDecode(response.body);
-      return IncidentReportModel.fromJson(data);
+      return IncidentReportRequestModel.fromJson(data);
     } else {
       throw Exception('Failed to create incident report');
     }
@@ -113,8 +116,8 @@ class IncidentRepositoryImpl implements IncidentReportRepository {
   // PUT
 
   @override
-  Future<IncidentReportModel> updateIncidentReport(
-      IncidentReportModel incidentReport) async {
+  Future<IncidentReportRequestModel> updateIncidentReport(
+      IncidentReportRequestModel incidentReport) async {
     final response = await http.put(
       Uri.parse('$_apiUrl/update-incident-report/${incidentReport.id}'),
       headers: <String, String>{
@@ -125,7 +128,7 @@ class IncidentRepositoryImpl implements IncidentReportRepository {
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
-      return IncidentReportModel.fromJson(data);
+      return IncidentReportRequestModel.fromJson(data);
     } else {
       throw Exception('Failed to update incident report');
     }
