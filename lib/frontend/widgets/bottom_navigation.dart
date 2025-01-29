@@ -16,10 +16,10 @@ class _BottomNavigationWidgetState extends State<BottomNavigationWidget> {
   int _selectedIndex = 0;
 
   final List<Widget> _pages = [
-    const Map(),
-    const Contact(UserToken: 's',),
-    const Notif(),
-    const Settings(),
+    const Map(UserToken: 'guess'),
+    const Contact(UserToken: 'guess'),
+    const Notif(UserToken: 'guess'),
+    const Settings(UserToken: 'guess'),
   ];
 
   void _onItemTapped(int index) {

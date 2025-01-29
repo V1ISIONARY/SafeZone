@@ -12,7 +12,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class Map extends StatefulWidget {
-  const Map({super.key});
+
+  final String UserToken;
+  
+  const Map({
+    super.key,
+    required this.UserToken
+  });
 
   @override
   State<Map> createState() => _MapState();
@@ -615,97 +621,99 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
               ],
             ),
             // Floating buttons
-            Positioned(
-              right: 20,
-              bottom: 80,
-              child: SizedBox(
-                width: 60,
-                height: 200,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        context.push('/sos-page');
-                      },
-                      child: Container(
-                        width: 50,
-                        height: 50,
-                        decoration: const BoxDecoration(
-                          color: Colors.white,
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey,
-                              blurRadius: 2,
-                              offset: Offset(1, 1),
+            widget.UserToken == 'guess'
+              ? SizedBox()
+              : Positioned(
+                right: 20,
+                bottom: 80,
+                child: SizedBox(
+                  width: 60,
+                  height: 200,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          context.push('/sos-page');
+                        },
+                        child: Container(
+                          width: 50,
+                          height: 50,
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey,
+                                blurRadius: 2,
+                                offset: Offset(1, 1),
+                              ),
+                            ],
+                          ),
+                          child: Center(
+                            child:
+                              SvgPicture.asset("lib/resources/svg/connect.svg",
+                              color: Colors.blue
                             ),
-                          ],
-                        ),
-                        child: Center(
-                          child:
-                            SvgPicture.asset("lib/resources/svg/connect.svg",
-                            color: Colors.blue
                           ),
                         ),
                       ),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        _showCreateReportDialog(context);
-                      },
-                      child: Container(
-                        width: 50,
-                        height: 50,
-                        decoration: const BoxDecoration(
-                          color: Colors.white,
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey,
-                              blurRadius: 2,
-                              offset: Offset(1, 1),
+                      GestureDetector(
+                        onTap: () {
+                          _showCreateReportDialog(context);
+                        },
+                        child: Container(
+                          width: 50,
+                          height: 50,
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey,
+                                blurRadius: 2,
+                                offset: Offset(1, 1),
+                              ),
+                            ],
+                          ),
+                          child: Center(
+                            child: SvgPicture.asset(
+                              "lib/resources/svg/dangerzone.svg",
+                              color: widgetPricolor,
                             ),
-                          ],
-                        ),
-                        child: Center(
-                          child: SvgPicture.asset(
-                            "lib/resources/svg/dangerzone.svg",
-                            color: widgetPricolor,
                           ),
                         ),
                       ),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        _showMarkSafeDialog(context);
-                      },
-                      child: Container(
-                        width: 50,
-                        height: 50,
-                        decoration: const BoxDecoration(
-                          color: Colors.white,
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey,
-                              blurRadius: 2,
-                              offset: Offset(1, 1),
+                      GestureDetector(
+                        onTap: () {
+                          _showMarkSafeDialog(context);
+                        },
+                        child: Container(
+                          width: 50,
+                          height: 50,
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey,
+                                blurRadius: 2,
+                                offset: Offset(1, 1),
+                              ),
+                            ],
+                          ),
+                          child: Center(
+                            child: SvgPicture.asset(
+                              "lib/resources/svg/safezone.svg",
+                              color: Colors.green
                             ),
-                          ],
-                        ),
-                        child: Center(
-                          child: SvgPicture.asset(
-                            "lib/resources/svg/safezone.svg",
-                            color: Colors.green
                           ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ),
           ],
         ),
       ),

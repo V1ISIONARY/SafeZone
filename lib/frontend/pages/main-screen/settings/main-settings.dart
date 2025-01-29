@@ -8,7 +8,13 @@ import 'package:safezone/resources/schema/texts.dart';
 import '../../../widgets/buttons/settings_btn.dart';
 
 class Settings extends StatefulWidget {
-  const Settings({super.key});
+
+  final String UserToken;
+  
+  const Settings({
+    super.key,
+    required this.UserToken
+  });
 
   @override
   State<Settings> createState() => _SettingsState();
@@ -23,6 +29,14 @@ class _SettingsState extends State<Settings> {
   void onItemTap(int index) {
     setState(() {
       selectedItem = index;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _showSnackBar();
     });
   }
   
@@ -90,51 +104,102 @@ class _SettingsState extends State<Settings> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(
-                                      'LOUISE ROMERO',
-                                      style: GoogleFonts.poppins(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.w500,
-                                        color: Colors.white
-                                      ),
-                                    ),
-                                    Text(
-                                      '(+63) 970 815 2371',
-                                      style: GoogleFonts.poppins(
-                                        fontSize: 9,
-                                        fontWeight: FontWeight.w400,
-                                        color: Colors.white70
-                                      ),
-                                    ),
+                                    widget.UserToken == 'guess'
+                                      ? Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              'Guess',
+                                              style: GoogleFonts.poppins(
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.w500,
+                                                color: Colors.white
+                                              ),
+                                            ),
+                                            Text(
+                                              'Unknown Number',
+                                              style: GoogleFonts.poppins(
+                                                fontSize: 9,
+                                                fontWeight: FontWeight.w400,
+                                                color: Colors.white70
+                                              ),
+                                            ),
+                                          ]
+                                        )
+                                      : Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              'Louise Romero',
+                                              style: GoogleFonts.poppins(
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.w500,
+                                                color: Colors.white
+                                              ),
+                                            ),
+                                            Text(
+                                              '(+63) 970 815 2371',
+                                              style: GoogleFonts.poppins(
+                                                fontSize: 9,
+                                                fontWeight: FontWeight.w400,
+                                                color: Colors.white70
+                                              ),
+                                            ),
+                                          ]
+                                        )
                                   ],
                                 )
                               ),
                               Positioned(
                                 bottom: 15,
                                 left: 10,
-                                child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Container(
-                                      width: 13,
-                                      height: 13,
-                                      child: SvgPicture.asset(
-                                        'lib/resources/svg/verified.svg',
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                    SizedBox(width: 5),
-                                    Text(
-                                      'Verified at Safezone',
-                                      style: GoogleFonts.poppins(
-                                        fontSize: 10,
-                                        fontWeight: FontWeight.w400,
-                                        color: Colors.white70
-                                      ),
+                                child: widget.UserToken == 'guess'
+                                  ? Row(
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Container(
+                                          width: 13,
+                                          height: 13,
+                                          child: SvgPicture.asset(
+                                            'lib/resources/svg/verified.svg',
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                        SizedBox(width: 5),
+                                        Text(
+                                          'Not Verified',
+                                          style: GoogleFonts.poppins(
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.w400,
+                                            color: Colors.white70
+                                          ),
+                                        )
+                                      ],
                                     )
-                                  ],
-                                )
+                                  : Row(
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Container(
+                                          width: 13,
+                                          height: 13,
+                                          child: SvgPicture.asset(
+                                            'lib/resources/svg/verified.svg',
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                        SizedBox(width: 5),
+                                        Text(
+                                          'Verified at Safezone',
+                                          style: GoogleFonts.poppins(
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.w400,
+                                            color: Colors.white70
+                                          ),
+                                        )
+                                      ],
+                                    )
                               )
                             ],
                           ),
@@ -159,12 +224,14 @@ class _SettingsState extends State<Settings> {
               padding: EdgeInsets.symmetric(
                 vertical: 10
               ),
-              child: Settingsbtn(
-                title: 'Account Details',
-                svgIcon: 'lib/resources/svg/account.svg',
-                navigateTo: 'AccountDetails',
-                description: 'Protecting personal data and ensuring safety from threats.',
-              )
+              child: widget.UserToken == 'guess'
+                ? SizedBox()
+                :Settingsbtn(
+                  title: 'Account Details',
+                  svgIcon: 'lib/resources/svg/account.svg',
+                  navigateTo: 'AccountDetails',
+                  description: 'Protecting personal data and ensuring safety from threats.',
+                )
             ),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -198,75 +265,77 @@ class _SettingsState extends State<Settings> {
                 )
               ],
             ),
-            Container(
-              width: double.infinity,
-              margin: EdgeInsets.only(
-                top: 10,
-                bottom: 25
-              ),
-              child: Stack(
-                children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Container(
-                        height: 25,
-                        width: 25,
-                        margin: EdgeInsets.only(right: 17),
-                        child: SvgPicture.asset(
-                          'lib/resources/svg/notification-outline.svg',
-                          color: const Color.fromARGB(179, 0, 0, 0),
-                        )
-                      ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          PrimaryText(
-                            text: "Notification"
-                          ),
-                          DescriptionText(
-                            text: "Control your notification",
+            widget.UserToken == 'guess'
+              ? SizedBox()
+              : Container(
+                width: double.infinity,
+                margin: EdgeInsets.only(
+                  top: 10,
+                  bottom: 25
+                ),
+                child: Stack(
+                  children: [
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Container(
+                          height: 25,
+                          width: 25,
+                          margin: EdgeInsets.only(right: 17),
+                          child: SvgPicture.asset(
+                            'lib/resources/svg/notification-outline.svg',
+                            color: const Color.fromARGB(179, 0, 0, 0),
                           )
-                        ],
-                      )
-                    ],
-                  ),
-                  Positioned(
-                    right: 0,
-                    top: 5,
-                    bottom: 5,
-                    child: GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          isToggled = !isToggled; // Toggle the state
-                        });
-                      },
-                      child: Container(
-                        height: 15,
-                        width: 40, // Wider to accommodate the circle toggle
-                        padding: EdgeInsets.symmetric(horizontal: 2), // Padding for inner circle
-                        decoration: BoxDecoration(
-                          color: isToggled ? widgetPricolor : widgetSeccolor, // Toggle background color
-                          borderRadius: BorderRadius.circular(10), // Rounded edges for toggle
                         ),
-                        child: AnimatedAlign(
-                          duration: Duration(milliseconds: 200), // Smooth animation for toggle
-                          alignment: isToggled ? Alignment.centerRight : Alignment.centerLeft,
-                          child: Container(
-                            height: 16,
-                            width: 16,
-                            decoration: BoxDecoration(
-                              color: Colors.white, // Circle color
-                              shape: BoxShape.circle, // Makes the inner container a circle
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            PrimaryText(
+                              text: "Notification"
+                            ),
+                            DescriptionText(
+                              text: "Control your notification",
+                            )
+                          ],
+                        )
+                      ],
+                    ),
+                    Positioned(
+                      right: 0,
+                      top: 5,
+                      bottom: 5,
+                      child: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            isToggled = !isToggled; // Toggle the state
+                          });
+                        },
+                        child: Container(
+                          height: 15,
+                          width: 40, // Wider to accommodate the circle toggle
+                          padding: EdgeInsets.symmetric(horizontal: 2), // Padding for inner circle
+                          decoration: BoxDecoration(
+                            color: isToggled ? widgetPricolor : widgetSeccolor, // Toggle background color
+                            borderRadius: BorderRadius.circular(10), // Rounded edges for toggle
+                          ),
+                          child: AnimatedAlign(
+                            duration: Duration(milliseconds: 200), // Smooth animation for toggle
+                            alignment: isToggled ? Alignment.centerRight : Alignment.centerLeft,
+                            child: Container(
+                              height: 16,
+                              width: 16,
+                              decoration: BoxDecoration(
+                                color: Colors.white, // Circle color
+                                shape: BoxShape.circle, // Makes the inner container a circle
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                  )
-                ],
-              )
-            ),
+                    )
+                  ],
+                )
+              ),
             Text(
               "Settings",
               style: TextStyle(
@@ -275,12 +344,14 @@ class _SettingsState extends State<Settings> {
                 color: Colors.black
               ),
             ),
-            Settingsbtn(
-              title: 'Privacy and Security',
-              svgIcon: 'lib/resources/svg/privacy_security.svg',
-              navigateTo: 'PrivacySecurity',
-              description: 'Protecting personal data and ensuring safety from threats.',
-            ),
+            widget.UserToken == 'guess'
+              ? SizedBox()
+              : Settingsbtn(
+                title: 'Privacy and Security',
+                svgIcon: 'lib/resources/svg/privacy_security.svg',
+                navigateTo: 'PrivacySecurity',
+                description: 'Protecting personal data and ensuring safety from threats.',
+              ),
             Settingsbtn(
               title: 'Terms and Policy',
               svgIcon: 'lib/resources/svg/law.svg',
@@ -299,16 +370,44 @@ class _SettingsState extends State<Settings> {
               navigateTo: 'About',
               description: 'An overview of who we are and what we do.',
             ),
-            Settingsbtn(
-              title: 'Logout',
-              svgIcon: 'lib/resources/svg/logout.svg',
-              navigateTo: '',
-              description: 'Hello love GoodBye',
-            ),
+            widget.UserToken == 'guess'
+              ? Settingsbtn(
+                title: 'Sign In',
+                svgIcon: 'lib/resources/svg/logout.svg',
+                navigateTo: '',
+                description: 'Hello love GoodBye',
+              )
+              : Settingsbtn(
+                title: 'Logout',
+                svgIcon: 'lib/resources/svg/logout.svg',
+                navigateTo: '',
+                description: 'Hello love GoodBye',
+              ),
           ],
         ),
       ),
     );
+  }
+
+  void _showSnackBar() {
+    final snackBar = SnackBar(
+      content: Text(
+        'You need to sign in to access all feature.',
+        style: TextStyle(color: Colors.white),
+      ),
+      duration: Duration(seconds: 5),
+      behavior: SnackBarBehavior.floating, // Allows movement via margin
+      backgroundColor: widgetPricolor,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+      ),
+      margin: EdgeInsets.only(
+        bottom: 90, // Adjust this value to move it higher
+        left: 16,
+        right: 16,
+      ),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
   Widget _buildItem(int index, String label, String imgStyle) {
