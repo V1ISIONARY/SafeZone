@@ -1,4 +1,4 @@
 class VercelUrl {
   static const String mainUrl =
-      'https://safezone-flask-d0e2ioyrf-faokunns-projects.vercel.app';
+      'https://safezone-flask-kd1qw80t2-faokunns-projects.vercel.app';
 }

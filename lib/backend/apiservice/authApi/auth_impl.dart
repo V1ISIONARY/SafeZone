@@ -13,6 +13,7 @@ class AuthenticationImplementation extends AuthenticationRepository {
       Uri.parse('$baseUrl/login'),
       headers: {
         'Content-Type': 'application/json',
+        'Accept': 'application/json'
       },
       body: jsonEncode({
         'email': email,
@@ -58,6 +59,7 @@ class AuthenticationImplementation extends AuthenticationRepository {
       Uri.parse('$baseUrl/create_account'),
       headers: {
         'Content-Type': 'application/json',
+        'Accept': 'application/json'
       },
       body: jsonEncode({
         'username': username,

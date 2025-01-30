@@ -13,6 +13,7 @@ class CircleImplementation extends CircleRepository {
       Uri.parse('$baseUrl/view_user_circles?user_id=$userId'),
       headers: {
         'Content-Type': 'application/json',
+        'Accept': 'application/json'
       },
     );
 
@@ -34,6 +35,7 @@ class CircleImplementation extends CircleRepository {
       Uri.parse('$baseUrl/create_circle'),
       headers: {
         'Content-Type': 'application/json',
+        'Accept': 'application/json'
       },
       body: jsonEncode({
         'name': name,
@@ -57,6 +59,7 @@ class CircleImplementation extends CircleRepository {
       Uri.parse('$baseUrl/add_member'),
       headers: {
         'Content-Type': 'application/json',
+        'Accept': 'application/json'
       },
       body: jsonEncode({
         'circle_id': circleId,
@@ -77,6 +80,7 @@ class CircleImplementation extends CircleRepository {
       Uri.parse('$baseUrl/remove_member'),
       headers: {
         'Content-Type': 'application/json',
+        'Accept': 'application/json'
       },
       body: jsonEncode({
         'circle_id': circleId,
@@ -97,6 +101,7 @@ class CircleImplementation extends CircleRepository {
       Uri.parse('$baseUrl/delete_circle'),
       headers: {
         'Content-Type': 'application/json',
+        'Accept': 'application/json'
       },
       body: jsonEncode({
         'circle_id': circleId,
@@ -115,6 +120,7 @@ class CircleImplementation extends CircleRepository {
       Uri.parse('$baseUrl/view_members?circle_id=$circleId'),
       headers: {
         'Content-Type': 'application/json',
+        'Accept': 'application/json'
       },
     );
 

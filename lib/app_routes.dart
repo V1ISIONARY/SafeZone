@@ -23,8 +23,8 @@ final GoRouter appRouter = GoRouter(
     ),
     GoRoute(
       path: '/',
-      // builder: (context, state) => const Login(),
-      builder: (context, state) => BottomNavigationWidget(),
+      builder: (context, state) => const Login(),
+      //builder: (context, state) => BottomNavigationWidget(),
     ),
     GoRoute(
       path: '/home',

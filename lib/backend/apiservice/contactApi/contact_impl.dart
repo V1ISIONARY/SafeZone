@@ -14,6 +14,7 @@ class ContactImplementation extends ContactRepository {
       Uri.parse('$baseUrl/create_contact/$userId'),
       headers: {
         'Content-Type': 'application/json',
+        'Accept': 'application/json'
       },
       body: jsonEncode({'phone_number': phone, 'name': name}),
     );
@@ -30,7 +31,6 @@ class ContactImplementation extends ContactRepository {
   @override
   Future<List<ContactsModel>> getContacts(int id) async {
     final response = await http.get(Uri.parse('$baseUrl/get_contacts/$id'));
-
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       List<dynamic> contactJson = data;
