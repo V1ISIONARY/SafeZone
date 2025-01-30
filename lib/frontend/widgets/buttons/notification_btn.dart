@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:page_transition/page_transition.dart';
-import 'package:safezone/frontend/pages/main-screen/notification/reports_history.dart';
+import 'package:safezone/frontend/pages/main-screen/notification/reports/reports_history.dart';
 import '../../../resources/schema/texts.dart';
 
 class NotificationBtn extends StatelessWidget {

@@ -247,7 +247,7 @@ class _ContactState extends State<Contact> with SingleTickerProviderStateMixin {
                       Text(
                         'You need to sign in to your account to access all features.',
                         style: TextStyle(
-                          color: Colors.white,
+                          color: Colors.white60,
                           fontSize: 10,
                         ),
                         textAlign: TextAlign.center,
