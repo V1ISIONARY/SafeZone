@@ -2,8 +2,11 @@
 import 'package:flutter/material.dart';
 import 'package:safezone/backend/apiservice/contactApi/contact_impl.dart';
 import 'package:safezone/backend/apiservice/contactApi/contact_repo.dart';
+import 'package:safezone/backend/apiservice/incident_reportApi/incident_report_impl.dart';
+import 'package:safezone/backend/apiservice/incident_reportApi/incident_report_repo.dart';
 import 'package:safezone/backend/bloc/contactBloc/contact_bloc.dart';
 import 'package:safezone/backend/cubic/notification.dart';
+import 'package:safezone/backend/bloc/incident_report/incident_report_bloc.dart';
 import 'package:safezone/frontend/widgets/bottom_navigation.dart';
 //import 'package:safezone/app_routes.dart';
 import 'package:safezone/frontend/pages/introduction/splash_screen.dart';
@@ -21,11 +24,14 @@ void main() {
           create: (_) => AuthenticationBloc(AuthenticationImplementation()),
         ),
         BlocProvider(
-          create: (_) => ContactBloc(ContactImplementation()), // Add ContactBloc
+          create: (_) => ContactBloc(ContactImplementation()),
         ),
         BlocProvider(
-          create: (_) => NotificationCubit(), // Add ContactBloc
+          create: (_) => NotificationCubit(),
         ),
+        BlocProvider(
+          create: (_) => IncidentReportBloc(IncidentRepositoryImpl()),
+        )
       ],
       child: const MyApp(),
     ),

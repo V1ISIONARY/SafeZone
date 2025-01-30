@@ -36,3 +36,10 @@ class CircleDeletedState extends CircleState {
 
   CircleDeletedState({required this.message});
 }
+
+// New state for viewing members of a circle
+class CircleMembersLoadedState extends CircleState {
+  final List<Map<String, dynamic>> members;
+
+  CircleMembersLoadedState({required this.members});
+}

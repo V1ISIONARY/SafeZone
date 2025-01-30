@@ -3,41 +3,56 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 import 'package:safezone/backend/models/userModel/contacts_model.dart';
+import 'package:safezone/backend/apiservice/vercelUrl.dart';
 
 class ContactImplementation extends ContactRepository {
-  //static const String baseUrl = 'http://127.0.0.1:8000';
-  static const String baseUrl = 'http://10.0.2.2:8000';
+  static const String baseUrl = '${VercelUrl.mainUrl}/contacts';
 
   @override
   Future<void> addContact(int userId, String name, String phone) async {
     final response = await http.post(
-      Uri.parse('$baseUrl/contacts/create-contact/?user_id=$userId'),
+      Uri.parse('$baseUrl/create_contact/$userId'),
       headers: {
         'Content-Type': 'application/json',
       },
       body: jsonEncode({'phone_number': phone, 'name': name}),
     );
 
-    if (response.statusCode == 204) {
+    if (response.statusCode == 201) {
       final data = jsonDecode(response.body);
-      return data;
+      print('Contact created: ${data['message']}');
     } else {
-      throw Exception('Invalid input');
+      final errorMessage = jsonDecode(response.body)['error'];
+      throw Exception('Failed to create contact: $errorMessage');
     }
   }
 
   @override
   Future<List<ContactsModel>> getContacts(int id) async {
-    final response = await http
-        .get(Uri.parse('$baseUrl/contacts/get-user-contacts/?user_id=$id'));
+    final response = await http.get(Uri.parse('$baseUrl/get_contacts/$id'));
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       List<dynamic> contactJson = data;
-      print(contactJson);
       return contactJson.map((json) => ContactsModel.fromJson(json)).toList();
     } else {
-      throw Exception('Invalid input');
+      final errorMessage = jsonDecode(response.body)['error'];
+      throw Exception('Failed to load contacts: $errorMessage');
+    }
+  }
+
+  @override
+  Future<void> deleteContact(int userId, int contactId) async {
+    final response = await http.delete(
+      Uri.parse('$baseUrl/delete_contact/$userId/$contactId'),
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      print('Contact deleted: ${data['message']}');
+    } else {
+      final errorMessage = jsonDecode(response.body)['error'];
+      throw Exception('Failed to delete contact: $errorMessage');
     }
   }
 }

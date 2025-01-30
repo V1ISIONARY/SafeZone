@@ -1,15 +1,16 @@
 import 'package:http/http.dart' as http;
+import 'package:safezone/backend/apiservice/circleApi/circle_repo.dart';
 import 'dart:convert';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:safezone/backend/models/userModel/circle_model.dart';
+import 'package:safezone/backend/apiservice/vercelUrl.dart';
 
-class CircleImplementation {
-  static const String baseUrl = 'http://10.0.2.2:8000'; 
-
+class CircleImplementation extends CircleRepository {
+  static const String baseUrl = '${VercelUrl.mainUrl}/circle';
+  @override
   // Fetch circles for a specific user
   Future<List<CircleModel>> getUserCircles(int userId) async {
     final response = await http.get(
-      Uri.parse('$baseUrl/circle/get-user-circles/?user_id=$userId'),
+      Uri.parse('$baseUrl/view_user_circles?user_id=$userId'),
       headers: {
         'Content-Type': 'application/json',
       },
@@ -17,23 +18,26 @@ class CircleImplementation {
 
     if (response.statusCode == 200) {
       final List<dynamic> data = jsonDecode(response.body);
-      return data.map((circleJson) => CircleModel.fromJson(circleJson)).toList();
+      return data
+          .map((circleJson) => CircleModel.fromJson(circleJson))
+          .toList();
     } else {
       print("Failed to fetch user circles");
       throw Exception('Failed to load circles');
     }
   }
 
+  @override
   // Create a new circle
   Future<CircleModel> createCircle(String name, int userId) async {
     final response = await http.post(
-      Uri.parse('$baseUrl/circle/create-circle/'),
+      Uri.parse('$baseUrl/create_circle'),
       headers: {
         'Content-Type': 'application/json',
       },
       body: jsonEncode({
         'name': name,
-        'user_id': userId,  // Assuming the user ID is required to create a circle
+        'user_id': userId,
       }),
     );
 
@@ -46,10 +50,11 @@ class CircleImplementation {
     }
   }
 
+  @override
   // Add a member to a circle
   Future<void> addMemberToCircle(int circleId, int userId) async {
     final response = await http.post(
-      Uri.parse('$baseUrl/circle/add-member-to-circle/'),
+      Uri.parse('$baseUrl/add_member'),
       headers: {
         'Content-Type': 'application/json',
       },
@@ -65,10 +70,11 @@ class CircleImplementation {
     }
   }
 
+  @override
   // Remove a member from a circle
   Future<void> removeMemberFromCircle(int circleId, int userId) async {
-    final response = await http.delete(
-      Uri.parse('$baseUrl/circle/remove-member-from-circle/'),
+    final response = await http.post(
+      Uri.parse('$baseUrl/remove_member'),
       headers: {
         'Content-Type': 'application/json',
       },
@@ -84,10 +90,11 @@ class CircleImplementation {
     }
   }
 
+  @override
   // Delete a circle
   Future<void> deleteCircle(int circleId) async {
     final response = await http.delete(
-      Uri.parse('$baseUrl/circle/delete-circle/'),
+      Uri.parse('$baseUrl/delete_circle'),
       headers: {
         'Content-Type': 'application/json',
       },
@@ -101,12 +108,23 @@ class CircleImplementation {
       throw Exception('Failed to delete circle');
     }
   }
-}
 
-void viewSharedPreferences() async {
-  final SharedPreferences prefs = await SharedPreferences.getInstance();
-  final keys = prefs.getKeys();
-  for (String key in keys) {
-    print('$key: ${prefs.get(key)}');
+  @override
+  Future<List<Map<String, dynamic>>> viewMembers(int circleId) async {
+    final response = await http.get(
+      Uri.parse('$baseUrl/view_members?circle_id=$circleId'),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      // Assuming the response contains an array of member objects
+      return List<Map<String, dynamic>>.from(data['members']);
+    } else {
+      print("Failed to view members");
+      throw Exception('Failed to view members');
+    }
   }
 }

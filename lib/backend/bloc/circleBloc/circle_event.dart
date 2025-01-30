@@ -33,3 +33,10 @@ class DeleteCircleEvent extends CircleEvent {
 
   DeleteCircleEvent({required this.circleId});
 }
+
+// New event for fetching members of a circle
+class FetchMembersEvent extends CircleEvent {
+  final int circleId;
+
+  FetchMembersEvent({required this.circleId});
+}
