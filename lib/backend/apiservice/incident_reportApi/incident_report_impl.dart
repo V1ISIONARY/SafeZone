@@ -1,25 +1,22 @@
 import 'package:safezone/backend/apiservice/incident_reportApi/incident_report_repo.dart';
+import 'package:safezone/backend/apiservice/vercelUrl.dart';
 import 'package:safezone/backend/models/dangerzoneModel/incident_report_model.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:safezone/backend/models/dangerzoneModel/incident_report_request_model.dart';
 import 'package:safezone/backend/models/dangerzoneModel/status_update_model.dart';
 
-// final _apiUrl = "${dotenv.env['API_URL']}/incident-report";
-
 class IncidentRepositoryImpl implements IncidentReportRepository {
+  static const String _apiUrl = '${VercelUrl.mainUrl}/incident-reports';
   // GET
 
-  static const String _apiUrl = 'http://10.0.2.2:8000/incident-report';
-
   @override
-  Future<List<IncidentResponse>> getIncidentReports() async {
-    final response = await http.get(Uri.parse('$_apiUrl/incident-reports'));
+  Future<List<IncidentReportModel>> getIncidentReports() async {
+    final response = await http.get(Uri.parse('$_apiUrl/incidents'));
 
     if (response.statusCode == 200) {
       final List<dynamic> data = jsonDecode(response.body);
-      return data.map((json) => IncidentResponse.fromJson(json)).toList();
+      return data.map((json) => IncidentReportModel.fromJson(json)).toList();
     } else {
       throw Exception('Failed to load incident reports');
     }
@@ -27,8 +24,7 @@ class IncidentRepositoryImpl implements IncidentReportRepository {
 
   @override
   Future<IncidentReportModel> getIncidentReport(int id) async {
-    final response =
-        await http.get(Uri.parse('$_apiUrl/get-incident-report/$id'));
+    final response = await http.get(Uri.parse('$_apiUrl/incident/$id'));
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
@@ -39,41 +35,42 @@ class IncidentRepositoryImpl implements IncidentReportRepository {
   }
 
   @override
-  Future<List<IncidentResponse>> getIncidentReportsByDangerZoneId(
+  Future<List<IncidentReportModel>> getIncidentReportsByDangerZoneId(
       int id) async {
     final response =
-        await http.get(Uri.parse('$_apiUrl/get-incident-reports/$id'));
+        await http.get(Uri.parse('$_apiUrl/incidents/danger_zone/$id'));
 
     if (response.statusCode == 200) {
       final List<dynamic> data = jsonDecode(response.body);
-      return data.map((json) => IncidentResponse.fromJson(json)).toList();
+      return data.map((json) => IncidentReportModel.fromJson(json)).toList();
     } else {
       throw Exception('Failed to load incident reports');
     }
   }
 
   @override
-  Future<List<IncidentResponse>> getIncidentReportByStatus(
+  Future<List<IncidentReportModel>> getIncidentReportByStatus(
       String status) async {
-    final response = await http
-        .get(Uri.parse('$_apiUrl/get-incident-reports-status/$status'));
+    final response =
+        await http.get(Uri.parse('$_apiUrl/incidents/status/$status'));
 
     if (response.statusCode == 200) {
       final List<dynamic> data = jsonDecode(response.body);
-      return data.map((json) => IncidentResponse.fromJson(json)).toList();
+      return data.map((json) => IncidentReportModel.fromJson(json)).toList();
     } else {
       throw Exception('Failed to load incident reports');
     }
   }
 
   @override
-  Future<List<IncidentResponse>> getIncidentReportsByUserId(int id) async {
-    final response =
-        await http.get(Uri.parse('$_apiUrl/get-incident-reports-user/$id'));
+  Future<List<IncidentReportModel>> getIncidentReportsByUserId(int id) async {
+    final response = await http.get(Uri.parse('$_apiUrl/incidents/user/$id'));
+    print('Status Code: ${response.statusCode}');
+    print('Response Body: ${response.body}');
 
     if (response.statusCode == 200) {
       final List<dynamic> data = jsonDecode(response.body);
-      return data.map((json) => IncidentResponse.fromJson(json)).toList();
+      return data.map((json) => IncidentReportModel.fromJson(json)).toList();
     } else {
       throw Exception('Failed to load incident reports');
     }
@@ -81,8 +78,8 @@ class IncidentRepositoryImpl implements IncidentReportRepository {
 
   @override
   Future<List<StatusHistory>> getIncidentStatus(int id) async {
-    final response = await http
-        .get(Uri.parse('$_apiUrl/incident-reports/$id/status-history'));
+    final response =
+        await http.get(Uri.parse('$_apiUrl/incident/$id/status-history'));
 
     if (response.statusCode == 200) {
       final List<dynamic> data = jsonDecode(response.body);
@@ -98,7 +95,7 @@ class IncidentRepositoryImpl implements IncidentReportRepository {
   Future<IncidentReportRequestModel> createIncidentReport(
       IncidentReportRequestModel incidentReport) async {
     final response = await http.post(
-      Uri.parse('$_apiUrl/create-incident-report'),
+      Uri.parse('$_apiUrl/incident'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
@@ -119,7 +116,7 @@ class IncidentRepositoryImpl implements IncidentReportRepository {
   Future<IncidentReportRequestModel> updateIncidentReport(
       IncidentReportRequestModel incidentReport) async {
     final response = await http.put(
-      Uri.parse('$_apiUrl/update-incident-report/${incidentReport.id}'),
+      Uri.parse('$_apiUrl/incident/${incidentReport.id}'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
@@ -138,8 +135,7 @@ class IncidentRepositoryImpl implements IncidentReportRepository {
 
   @override
   Future<void> deleteIncidentReport(int id) async {
-    final response =
-        await http.delete(Uri.parse('$_apiUrl/delete-incident-report/$id'));
+    final response = await http.delete(Uri.parse('$_apiUrl/incident/$id'));
 
     if (response.statusCode != 204) {
       throw Exception('Failed to delete incident report');
