@@ -14,7 +14,7 @@ class IncidentReportInitial extends IncidentReportState {}
 class IncidentReportLoading extends IncidentReportState {}
 
 class IncidentReportLoaded extends IncidentReportState {
-  final List<IncidentResponse> incidentReports;
+  final List<IncidentReportModel> incidentReports;
 
   const IncidentReportLoaded(this.incidentReports);
 

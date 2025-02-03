@@ -3,8 +3,8 @@ class IncidentReportModel {
   int? userId;
   int? dangerZoneId;
   String? description;
-  String? reportDate; 
-  String? reportTime; 
+  String? reportDate;
+  String? reportTime;
   List<String>? images;
   String? reportTimestamp;
   String? status;
@@ -59,7 +59,7 @@ class DangerZoneModel {
   final bool isVerified;
   final double latitude;
   final double longitude;
-  final int radius;
+  final double radius;
   final String name;
 
   DangerZoneModel({
@@ -77,7 +77,7 @@ class DangerZoneModel {
       isVerified: json['is_verified'],
       latitude: json['latitude'].toDouble(),
       longitude: json['longitude'].toDouble(),
-      radius: json['radius'],
+      radius: json['radius'].toDouble(),
       name: json['name'],
     );
   }

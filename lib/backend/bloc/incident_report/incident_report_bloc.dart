@@ -2,7 +2,6 @@ import 'package:bloc/bloc.dart';
 import 'package:safezone/backend/apiservice/incident_reportApi/incident_report_repo.dart';
 import 'package:safezone/backend/bloc/incident_report/incident_report_event.dart';
 import 'package:safezone/backend/bloc/incident_report/incident_report_state.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class IncidentReportBloc
     extends Bloc<IncidentReportEvent, IncidentReportState> {
@@ -56,24 +55,36 @@ class IncidentReportBloc
       }
     });
 
+    // on<FetchIncidentReportsByUserId>((event, emit) async {
+    //   try {
+    //     emit(IncidentReportLoading());
+
+    //     final SharedPreferences prefs = await SharedPreferences.getInstance();
+    //     final int? userId = prefs.getInt('id');
+
+    //     if (userId == null) {
+    //       emit(const IncidentReportError("User ID not found in SharedPreferences"));
+    //       return;
+    //     }
+
+    //     final incidentReports =
+    //         await _incidentReportRepository.getIncidentReportsByUserId(userId);
+
+    //     emit(IncidentReportLoaded(incidentReports));
+    //   } catch (e) {
+    //     emit(IncidentReportError(e.toString()));
+    //   }
+    // });
+
     on<FetchIncidentReportsByUserId>((event, emit) async {
+      emit(IncidentReportLoading());
       try {
-        emit(IncidentReportLoading());
-
-        final SharedPreferences prefs = await SharedPreferences.getInstance();
-        final int? userId = prefs.getInt('id');
-
-        if (userId == null) {
-          emit(const IncidentReportError("User ID not found in SharedPreferences"));
-          return;
-        }
-
-        final incidentReports =
-            await _incidentReportRepository.getIncidentReportsByUserId(userId);
-
-        emit(IncidentReportLoaded(incidentReports));
+        // Fetch data here and emit success or error state
+        final reports = await _incidentReportRepository
+            .getIncidentReportsByUserId(event.userId);
+        emit(IncidentReportLoaded(reports));
       } catch (e) {
-        emit(IncidentReportError(e.toString()));
+        emit(IncidentReportError('Failed to load reports'));
       }
     });
 

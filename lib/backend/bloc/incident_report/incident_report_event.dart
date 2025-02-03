@@ -38,12 +38,12 @@ class FetchIncidentReportByStatus extends IncidentReportEvent {
 }
 
 class FetchIncidentReportsByUserId extends IncidentReportEvent {
-  final int id;
+  final int userId;
 
-  const FetchIncidentReportsByUserId(this.id);
+  const FetchIncidentReportsByUserId(this.userId);
 
   @override
-  List<Object?> get props => [id];
+  List<Object?> get props => [userId];
 }
 
 class FetchIncidentStatus extends IncidentReportEvent {
