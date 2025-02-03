@@ -1,16 +1,20 @@
 import 'dart:async';
-import 'dart:typed_data';
+// import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:safezone/backend/bloc/dangerzoneBloc/dangerzone_bloc.dart';
+import 'package:safezone/backend/bloc/dangerzoneBloc/dangerzone_event.dart';
+import 'package:safezone/backend/bloc/dangerzoneBloc/dangerzone_state.dart';
 import 'package:safezone/backend/services/first_run_service.dart';
 import 'package:safezone/frontend/utils/marker_utils.dart';
 import 'package:safezone/frontend/widgets/dialogs/dialogs.dart';
 import 'package:safezone/frontend/widgets/dialogs/first_run_dialog.dart';
 import 'package:safezone/resources/schema/colors.dart';
-import 'dart:ui' as ui;
+// import 'dart:ui' as ui;
 import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 
 class Map extends StatefulWidget {
@@ -26,6 +30,7 @@ class Map extends StatefulWidget {
 
 class _MapState extends State<Map> with TickerProviderStateMixin {
   Set<Marker> markers = {};
+  Set<Circle> circles = {};
   static const LatLng sourceLocation = LatLng(16.043859, 120.335182);
 
   final Completer<GoogleMapController> _mapController = Completer();
@@ -38,7 +43,7 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
   BitmapDescriptor? customMarker;
 
   late PageController _pageController;
-  late GoogleMapController googleMapController;
+  GoogleMapController? googleMapController;
   late AnimationController _controller;
   late Animation<Offset> _hintAnimation;
   late Animation<Color?> _hintColorAnimation;
@@ -47,7 +52,7 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
   late Animation<Color?> _colorAnimation;
   late TextEditingController _textEditingController;
   late AnimationController _mapCategoryHint;
-  bool _isFadedOut = false;
+  // bool _isFadedOut = false;
 
   final List<String> hints = [
     'Barangay',
@@ -62,6 +67,7 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
   void initState() {
     super.initState();
     _pageController = PageController();
+    context.read<DangerZoneBloc>().add(FetchDangerZones());
     _fetchLocation();
     _checkFirstRun();
     _createCustomMarker();
@@ -100,7 +106,7 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
 
     _focusNode = FocusNode();
     _textEditingController = TextEditingController();
-    _changeHintText();
+    _changeHintText(); // TODO: Fix error
 
     _focusNode.addListener(() {
       if (_focusNode.hasFocus && _textEditingController.text.isEmpty) {
@@ -118,25 +124,17 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
         await MarkerUtils.createCustomMarker(context, widgetPricolor);
   }
 
-  Future<ui.Image> _loadImage(String assetPath) async {
-    final ByteData data = await DefaultAssetBundle.of(context).load(assetPath);
-    final ui.Codec codec =
-        await ui.instantiateImageCodec(data.buffer.asUint8List());
-    final ui.FrameInfo frameInfo = await codec.getNextFrame();
-    return frameInfo.image;
-  }
+  // void _toggleTextVisibility() {
+  //   if (_isFadedOut) {
+  //     _controllerFade.reverse();
+  //   } else {
+  //     _controllerFade.forward();
+  //   }
 
-  void _toggleTextVisibility() {
-    if (_isFadedOut) {
-      _controllerFade.reverse();
-    } else {
-      _controllerFade.forward();
-    }
-
-    setState(() {
-      _isFadedOut = !_isFadedOut;
-    });
-  }
+  //   setState(() {
+  //     _isFadedOut = !_isFadedOut;
+  //   });
+  // }
 
   void getPolyPoints() async {}
 
@@ -144,15 +142,21 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
     Future.delayed(const Duration(seconds: 2), () {
       if (!_focusNode.hasFocus && _textEditingController.text.isEmpty) {
         _controller.forward().then((_) {
-          setState(() {
-            _currentHintIndex = (_currentHintIndex + 1) % hints.length;
-          });
+          if (mounted) {
+            setState(() {
+              _currentHintIndex = (_currentHintIndex + 1) % hints.length;
+            });
+          }
           _controller.reverse().then((_) {
-            _changeHintText();
+            if (mounted) {
+              _changeHintText();
+            }
           });
         });
       } else {
-        _changeHintText();
+        if (mounted) {
+          _changeHintText();
+        }
       }
     });
   }
@@ -181,17 +185,19 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
   Future<void> _fetchLocation() async {
     Position position = await getCurrentLocation();
 
-    googleMapController.animateCamera(CameraUpdate.newCameraPosition(
-        CameraPosition(
-            target: LatLng(position.latitude, position.longitude),
-            zoom: 14.0)));
-    markers.clear();
-    markers.add(Marker(
-      markerId: const MarkerId("My Location"),
-      position: LatLng(position.latitude, position.longitude),
-      icon: customMarker!,
-      infoWindow: const InfoWindow(title: 'My Location'),
-    ));
+    if (googleMapController != null) {
+      googleMapController!.animateCamera(CameraUpdate.newCameraPosition(
+          CameraPosition(
+              target: LatLng(position.latitude, position.longitude),
+              zoom: 14.0)));
+      markers.clear();
+      markers.add(Marker(
+        markerId: const MarkerId("My Location"),
+        position: LatLng(position.latitude, position.longitude),
+        icon: customMarker!,
+        infoWindow: const InfoWindow(title: 'My Location'),
+      ));
+    }
   }
 
   Future<Position> getCurrentLocation() async {
@@ -228,40 +234,78 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
         height: double.infinity,
         child: Stack(
           children: [
-            GoogleMap(
-              initialCameraPosition: const CameraPosition(
-                target: sourceLocation,
-                zoom: 14.0,
-              ),
-              markers: markers,
-              onMapCreated: (GoogleMapController controller) async {
-                googleMapController = controller;
-                String style = '''
-                [
-                  {
-                    "featureType": "poi.business",
-                    "elementType": "labels",
-                    "stylers": [
-                      { "visibility": "off" }
-                    ]
-                  },
-                  {
-                    "featureType": "poi",
-                    "elementType": "labels.text",
-                    "stylers": [
-                      { "visibility": "off" }
-                    ]
+            BlocBuilder<DangerZoneBloc, DangerZoneState>(
+              builder: (context, state) {
+                if (state is DangerZonesLoading) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (state is DangerZonesLoaded) {
+                  markers.clear();
+                  circles.clear();
+                  for (var dangerZone in state.dangerZones) { 
+                    // markers.add(
+                    //   Marker(
+                    //     markerId: MarkerId(dangerZone.id.toString()),
+                    //     position:
+                    //         LatLng(dangerZone.latitude, dangerZone.longitude),
+                    //     infoWindow: InfoWindow(
+                    //       title: dangerZone.name,
+                    //       // snippet: "Radius: ${dangerZone.radius} meters",
+                    //     ),
+                    //   ),
+                    // );
+                    circles.add( // TODO: add gesture detector thatll show incident reports in that specific zone, gotta mod the BE pa
+                      Circle(
+                        circleId: CircleId(dangerZone.id.toString()),
+                        center:
+                            LatLng(dangerZone.latitude, dangerZone.longitude),
+                        radius: dangerZone.radius,
+                        strokeWidth: 2,
+                        strokeColor: Colors.red,
+                        fillColor: Colors.red.withOpacity(0.2),
+                      ),
+                    );
                   }
-                ]
-                ''';
-                controller.setMapStyle(style);
-                _mapController.complete(controller);
+                } else if (state is DangerZonesError) {
+                  return Center(child: Text(state.message));
+                }
+
+                return GoogleMap(
+                  initialCameraPosition: const CameraPosition(
+                    target: sourceLocation,
+                    zoom: 14.0,
+                  ),
+                  markers: markers,
+                  circles: circles,
+                  onMapCreated: (GoogleMapController controller) async {
+                    googleMapController = controller;
+                    String style = '''
+                            [
+                              {
+                                "featureType": "poi.business",
+                                "elementType": "labels",
+                                "stylers": [
+                                  { "visibility": "off" }
+                                ]
+                              },
+                              {
+                                "featureType": "poi",
+                                "elementType": "labels.text",
+                                "stylers": [
+                                  { "visibility": "off" }
+                                ]
+                              }
+                            ]
+                            ''';
+                    controller.setMapStyle(style);
+                    _mapController.complete(controller);
+                  },
+                  mapToolbarEnabled: false,
+                  zoomControlsEnabled: false,
+                  myLocationEnabled: false,
+                  myLocationButtonEnabled: false,
+                  mapType: MapType.terrain,
+                );
               },
-              mapToolbarEnabled: false,
-              zoomControlsEnabled: false,
-              myLocationEnabled: false,
-              myLocationButtonEnabled: false,
-              mapType: MapType.terrain,
             ),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,

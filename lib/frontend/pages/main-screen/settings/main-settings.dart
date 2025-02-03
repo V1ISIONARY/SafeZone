@@ -380,7 +380,7 @@ class _SettingsState extends State<Settings> {
               : Settingsbtn(
                 title: 'Logout',
                 svgIcon: 'lib/resources/svg/logout.svg',
-                navigateTo: '',
+                navigateTo: 'Login',
                 description: 'Hello love GoodBye',
               ),
           ],

@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../resources/schema/texts.dart';
-
 class Contactinfo extends StatelessWidget {
   final String name;
   final String phone;

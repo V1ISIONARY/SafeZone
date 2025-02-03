@@ -8,24 +8,43 @@ class MarkerUtils {
       BuildContext context, Color widgetPricolor) async {
     final ui.PictureRecorder pictureRecorder = ui.PictureRecorder();
     final Canvas canvas = Canvas(pictureRecorder);
-    const double pinWidth = 60;
-    const double pinHeight = 90;
-    const double imageSize = 40;
+    // const double pinWidth = 60;
+    // const double pinHeight = 90;
+    // const double imageSize = 40;
+
+    const double pinWidth = 100;
+    const double pinHeight = 160;
+    const double imageSize = 75;
 
     final Paint pinPaint = Paint()..color = widgetPricolor;
+    // final Path pinPath = Path()
+    //   ..moveTo(pinWidth / 2, pinHeight)
+    //   ..lineTo(0, pinHeight / 3)
+    //   ..arcToPoint(
+    //     Offset(pinWidth, pinHeight / 3),
+    //     radius: Radius.circular(pinWidth / 5),
+    //     clockwise: true,
+    //   )
+    //   ..close();
+    // canvas.drawPath(pinPath, pinPaint);
+
     final Path pinPath = Path()
-      ..moveTo(pinWidth / 2, pinHeight)
-      ..lineTo(0, pinHeight / 3)
+      ..moveTo(pinWidth / 2, pinHeight) // Start at the bottom center
+      ..quadraticBezierTo(0, pinHeight * 0.75, 0,
+          pinHeight / 3) // Left curve (slightly rounded)
       ..arcToPoint(
-        Offset(pinWidth, pinHeight / 3),
-        radius: Radius.circular(pinWidth / 5),
+        Offset(pinWidth, pinHeight / 3), // Right curve
+        radius: Radius.circular(pinWidth / 4), // Slight curve at the top
         clockwise: true,
       )
+      ..quadraticBezierTo(pinWidth, pinHeight * 0.75, pinWidth / 2,
+          pinHeight) // Right curve (slightly rounded)
       ..close();
+
     canvas.drawPath(pinPath, pinPaint);
 
     final Rect imageRect = Rect.fromCircle(
-      center: Offset(pinWidth / 2, pinHeight / 3 - imageSize / 10),
+      center: Offset(pinWidth / 2, pinHeight / 3),
       radius: imageSize / 2,
     );
 

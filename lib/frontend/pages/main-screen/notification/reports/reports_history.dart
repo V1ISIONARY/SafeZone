@@ -17,22 +17,38 @@ class ReportsHistory extends StatefulWidget {
 }
 
 class _ReportsHistoryState extends State<ReportsHistory> {
+  late final IncidentReportBloc _incidentReportBloc;
+
   @override
   void initState() {
     super.initState();
-    _loadReports();
+    _incidentReportBloc = BlocProvider.of<IncidentReportBloc>(context);
+    // if (_incidentReportBloc == null) {
+    //   print("Error: IncidentReportBloc not found.");
+    // } else {
+    //   print("IncidentReportBloc found.");
+    // }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadReports();
+    });
   }
 
   Future<void> _loadReports() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    final int? userId = prefs.getInt('id');
+    try {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final int? userId = prefs.getInt('id');
 
-    if (userId != null) {
-      context
-          .read<IncidentReportBloc>()
-          .add(FetchIncidentReportsByUserId(userId));
-    } else {
-      print("User ID not found in SharedPreferences");
+      if (userId != null) {
+        print('User ID: $userId');
+        if (mounted) {
+          _incidentReportBloc.add(FetchIncidentReportsByUserId(userId));
+          print('Fetching reports for user ID: $userId');
+        }
+      } else {
+        print("User ID not found in SharedPreferences");
+      }
+    } catch (e) {
+      print("Error loading SharedPreferences: $e");
     }
   }
 
@@ -69,16 +85,15 @@ class _ReportsHistoryState extends State<ReportsHistory> {
               ],
             ),
             const SizedBox(height: 20),
-
-            // BlocBuilder to listen to IncidentReportBloc state
             Expanded(
               child: BlocBuilder<IncidentReportBloc, IncidentReportState>(
                 builder: (context, state) {
+                  print('State: $state');
                   if (state is IncidentReportLoading) {
                     return const Center(child: CircularProgressIndicator());
                   } else if (state is IncidentReportLoaded) {
                     final reports = state.incidentReports;
-
+                    print('Reports loaded: ${reports.length}');
                     if (reports.isEmpty) {
                       return const Center(child: Text("No reports found."));
                     }
@@ -97,17 +112,14 @@ class _ReportsHistoryState extends State<ReportsHistory> {
                                 }),
                                 icon: Icons.delete,
                                 foregroundColor: Colors.white,
-                                // backgroundColor: dangerStatusColor,
                               )
                             ],
                           ),
                           child: ReportsCard(
-                            status: report.incidentReport.status ?? "Unknown",
-                            location: report.incidentReport.description ??
-                                "No description",
+                            status: report.status ?? "Unknown",
+                            location: report.description ?? "No description",
                             timeAndDate:
-                                report.incidentReport.reportTimestamp ??
-                                    "No timestamp",
+                                report.reportTimestamp ?? "No timestamp",
                           ),
                         );
                       },
