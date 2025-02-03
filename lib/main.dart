@@ -1,15 +1,13 @@
 // ignore_for_file: prefer_const_constructors
 import 'package:flutter/material.dart';
 import 'package:safezone/backend/apiservice/contactApi/contact_impl.dart';
-import 'package:safezone/backend/apiservice/contactApi/contact_repo.dart';
+import 'package:safezone/backend/apiservice/dangerzoneApi/dangerzone_impl.dart';
 import 'package:safezone/backend/apiservice/incident_reportApi/incident_report_impl.dart';
-import 'package:safezone/backend/apiservice/incident_reportApi/incident_report_repo.dart';
 import 'package:safezone/backend/bloc/contactBloc/contact_bloc.dart';
+import 'package:safezone/backend/bloc/dangerzoneBloc/dangerzone_bloc.dart';
+import 'package:safezone/backend/bloc/dangerzoneBloc/dangerzone_event.dart';
 import 'package:safezone/backend/cubic/notification.dart';
 import 'package:safezone/backend/bloc/incident_report/incident_report_bloc.dart';
-import 'package:safezone/frontend/widgets/bottom_navigation.dart';
-//import 'package:safezone/app_routes.dart';
-import 'package:safezone/frontend/pages/introduction/splash_screen.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:safezone/backend/apiservice/authApi/auth_impl.dart';
 import 'package:safezone/backend/bloc/authBloc/auth_bloc.dart';
@@ -17,6 +15,8 @@ import 'package:safezone/app_routes.dart';
 import 'package:safezone/resources/schema/app_theme.dart';
 
 void main() {
+  // await dotenv.load(fileName: ".env");
+
   runApp(
     MultiBlocProvider(
       providers: [
@@ -31,7 +31,12 @@ void main() {
         ),
         BlocProvider(
           create: (_) => IncidentReportBloc(IncidentRepositoryImpl()),
-        )
+        ),
+        BlocProvider(
+          create: (_) => DangerZoneBloc(
+            dangerZoneRepository: DangerZoneRepositoryImpl(),
+          )..add(FetchDangerZones()),
+        ),
       ],
       child: const MyApp(),
     ),
