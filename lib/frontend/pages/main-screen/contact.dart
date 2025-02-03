@@ -6,7 +6,7 @@ import 'package:safezone/backend/bloc/contactBloc/contact_bloc.dart';
 import 'package:safezone/backend/bloc/contactBloc/contact_event.dart';
 import 'package:safezone/backend/bloc/contactBloc/contact_state.dart';
 import 'package:safezone/backend/models/userModel/contacts_model.dart';
-import 'package:safezone/frontend/widgets/contactInfo.dart';
+import 'package:safezone/frontend/widgets/contact_info.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../widgets/dialogs/common_dialog.dart';

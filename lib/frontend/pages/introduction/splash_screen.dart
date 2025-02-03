@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:safezone/frontend/pages/introduction/onboarding_screen.dart';
 
@@ -44,7 +43,7 @@ class _SplashScreenState extends State<SplashScreen>
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Image.asset(
-              'assets/images/logo.jpg',
+              'lib/resources/svg/logo.jpg',
               width: 150,
               height: 150,
             ),

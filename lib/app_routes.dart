@@ -3,10 +3,10 @@ import 'package:safezone/frontend/pages/authentication/register.dart';
 import 'package:safezone/backend/models/dangerzoneModel/incident_report_model.dart';
 import 'package:safezone/frontend/pages/authentication/login.dart';
 import 'package:safezone/frontend/pages/main-screen/notification/reports/reports_history_information.dart';
-import 'package:safezone/frontend/pages/main-screen/report-danger-zone/create_report.dart';
-import 'package:safezone/frontend/pages/main-screen/report-danger-zone/report_success.dart';
 import 'package:safezone/frontend/pages/main-screen/notification/reports/reports_history.dart';
-import 'package:safezone/frontend/pages/main-screen/report-danger-zone/submit_report.dart';
+import 'package:safezone/frontend/pages/main-screen/report-incident/create_report.dart';
+import 'package:safezone/frontend/pages/main-screen/report-incident/report_success.dart';
+import 'package:safezone/frontend/pages/main-screen/report-incident/submit_report.dart';
 import 'package:safezone/frontend/pages/main-screen/safe-zone/mark_safe_success.dart';
 import 'package:safezone/frontend/pages/main-screen/safe-zone/mark_safe_zone.dart';
 import 'package:safezone/frontend/pages/main-screen/sos/sos.dart';
@@ -23,8 +23,8 @@ final GoRouter appRouter = GoRouter(
     ),
     GoRoute(
       path: '/',
-      builder: (context, state) => const Login(),
-      //builder: (context, state) => BottomNavigationWidget(),
+      // builder: (context, state) => const Login(),
+      builder: (context, state) => BottomNavigationWidget(),
     ),
     GoRoute(
       path: '/home',

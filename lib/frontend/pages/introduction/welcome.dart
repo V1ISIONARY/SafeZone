@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:safezone/frontend/widgets/fade.dart';
 
 class Welcome extends StatefulWidget {
   const Welcome({super.key});

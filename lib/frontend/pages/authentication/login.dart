@@ -1,8 +1,6 @@
 // ignore_for_file: prefer_const_constructors
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart'; // Import BLoC package
-import 'package:go_router/go_router.dart';
-import 'package:safezone/backend/apiservice/authApi/auth_impl.dart';
 import 'package:safezone/backend/bloc/authBloc/auth_bloc.dart';
 import 'package:safezone/backend/bloc/authBloc/auth_event.dart';
 import 'package:safezone/backend/bloc/authBloc/auth_state.dart';
@@ -43,7 +41,7 @@ class _LoginState extends State<Login> {
             Align(
               alignment: Alignment.topLeft,
               child: Image.asset(
-                'assets/images/logo.jpg',
+                'lib/resources/svg/logo.jpg', 
                 height: 60,
               ),
             ),
