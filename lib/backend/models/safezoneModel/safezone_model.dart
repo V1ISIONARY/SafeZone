@@ -1,10 +1,16 @@
 class SafeZoneModel {
-  final int id;
-  final bool isVerified;
-  final double latitude;
-  final double longitude;
-  final double radius;
-  final String name;
+  int id;
+  int? userId;
+  bool? isVerified;
+  double? latitude;
+  double? longitude;
+  double? radius;
+  String? name;
+  int? scale;
+  String? description;
+  String? timeOfDay;
+  String? frequency;
+  String? reportTimestamp;
 
   SafeZoneModel({
     required this.id,
@@ -13,6 +19,11 @@ class SafeZoneModel {
     required this.longitude,
     required this.radius,
     required this.name,
+    required this.scale,
+    required this.description,
+    required this.timeOfDay,
+    required this.frequency,
+    required this.reportTimestamp,
   });
 
   factory SafeZoneModel.fromJson(Map<String, dynamic> json) {
@@ -23,6 +34,11 @@ class SafeZoneModel {
       longitude: json['longitude'],
       radius: json['radius'],
       name: json['name'],
+      scale: json['scale'],
+      description: json['description'],
+      timeOfDay: json['time_of_day'],
+      frequency: json['frequency'],
+      reportTimestamp: json['report_timestamp'],
     );
   }
 
@@ -34,6 +50,11 @@ class SafeZoneModel {
       'longitude': longitude,
       'radius': radius,
       'name': name,
+      'scale': scale,
+      'description': description,
+      'time_of_day': timeOfDay,
+      'frequency': frequency,
+      'report_timestamp': reportTimestamp,
     };
   }
 }

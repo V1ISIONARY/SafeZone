@@ -2,7 +2,7 @@ import 'package:http/http.dart' as http;
 import 'package:safezone/backend/apiservice/circleApi/circle_repo.dart';
 import 'dart:convert';
 import 'package:safezone/backend/models/userModel/circle_model.dart';
-import 'package:safezone/backend/apiservice/vercelUrl.dart';
+import 'package:safezone/backend/apiservice/vercel_url.dart';
 
 class CircleImplementation extends CircleRepository {
   static const String baseUrl = '${VercelUrl.mainUrl}/circle';

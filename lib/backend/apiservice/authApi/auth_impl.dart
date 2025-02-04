@@ -2,7 +2,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:safezone/backend/apiservice/authApi/auth_repo.dart';
-import 'package:safezone/backend/apiservice/vercelUrl.dart';
+import 'package:safezone/backend/apiservice/vercel_url.dart';
 
 class AuthenticationImplementation extends AuthenticationRepository {
   static const String baseUrl = '${VercelUrl.mainUrl}/user';
