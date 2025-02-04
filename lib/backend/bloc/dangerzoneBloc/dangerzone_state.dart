@@ -19,6 +19,15 @@ class DangerZonesLoaded extends DangerZoneState {
   List<Object> get props => [dangerZones];
 }
 
+class DangerZoneLoaded extends DangerZoneState {
+  final DangerZoneModel dangerZone;
+
+  const DangerZoneLoaded(this.dangerZone);
+
+  @override
+  List<Object> get props => [dangerZone];
+}
+
 class DangerZonesError extends DangerZoneState {
   final String message;
 

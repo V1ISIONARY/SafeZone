@@ -3,9 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:safezone/backend/apiservice/contactApi/contact_impl.dart';
 import 'package:safezone/backend/apiservice/dangerzoneApi/dangerzone_impl.dart';
 import 'package:safezone/backend/apiservice/incident_reportApi/incident_report_impl.dart';
+import 'package:safezone/backend/apiservice/safezoneApi/safezone_impl.dart';
 import 'package:safezone/backend/bloc/contactBloc/contact_bloc.dart';
 import 'package:safezone/backend/bloc/dangerzoneBloc/dangerzone_bloc.dart';
 import 'package:safezone/backend/bloc/dangerzoneBloc/dangerzone_event.dart';
+import 'package:safezone/backend/bloc/mapBloc/map_bloc.dart';
+import 'package:safezone/backend/bloc/mapBloc/map_event.dart';
+import 'package:safezone/backend/bloc/safezoneBloc/safezone_bloc.dart';
 import 'package:safezone/backend/cubic/notification.dart';
 import 'package:safezone/backend/bloc/incident_report/incident_report_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -36,6 +40,17 @@ void main() {
           create: (_) => DangerZoneBloc(
             dangerZoneRepository: DangerZoneRepositoryImpl(),
           )..add(FetchDangerZones()),
+        ),
+        BlocProvider(
+          create: (_) => SafeZoneBloc(
+            safeZoneRepository: SafeZoneRepositoryImpl(),
+          ),
+        ),
+        BlocProvider(
+          create: (_) => MapBloc(
+            safeZoneRepository: SafeZoneRepositoryImpl(),
+            dangerZoneRepository: DangerZoneRepositoryImpl(),
+          )..add(FetchMapData()),
         ),
       ],
       child: const MyApp(),

@@ -9,6 +9,8 @@ import 'package:go_router/go_router.dart';
 import 'package:safezone/backend/bloc/dangerzoneBloc/dangerzone_bloc.dart';
 import 'package:safezone/backend/bloc/dangerzoneBloc/dangerzone_event.dart';
 import 'package:safezone/backend/bloc/dangerzoneBloc/dangerzone_state.dart';
+import 'package:safezone/backend/bloc/mapBloc/map_bloc.dart';
+import 'package:safezone/backend/bloc/mapBloc/map_state.dart';
 import 'package:safezone/backend/services/first_run_service.dart';
 import 'package:safezone/frontend/utils/marker_utils.dart';
 import 'package:safezone/frontend/widgets/dialogs/dialogs.dart';
@@ -234,11 +236,11 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
         height: double.infinity,
         child: Stack(
           children: [
-            BlocBuilder<DangerZoneBloc, DangerZoneState>(
+            BlocBuilder<MapBloc, MapState>(
               builder: (context, state) {
-                if (state is DangerZonesLoading) {
+                if (state is MapLoading) {
                   return const Center(child: CircularProgressIndicator());
-                } else if (state is DangerZonesLoaded) {
+                } else if (state is MapDataLoaded) {
                   markers.clear();
                   circles.clear();
                   for (var dangerZone in state.dangerZones) { 
@@ -265,7 +267,32 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
                       ),
                     );
                   }
-                } else if (state is DangerZonesError) {
+                  for (var safeZone in state.safeZones) {
+                    // markers.add(
+                    //   Marker(
+                    //     markerId: MarkerId(dangerZone.id.toString()),
+                    //     position:
+                    //         LatLng(dangerZone.latitude, dangerZone.longitude),
+                    //     infoWindow: InfoWindow(
+                    //       title: dangerZone.name,
+                    //       // snippet: "Radius: ${dangerZone.radius} meters",
+                    //     ),
+                    //   ),
+                    // );
+                    circles.add(
+                      // TODO: add gesture detector thatll show incident reports in that specific zone, gotta mod the BE pa
+                      Circle(
+                        circleId: CircleId(safeZone.id.toString()),
+                        center:
+                            LatLng(safeZone.latitude!, safeZone.longitude!),
+                        radius: safeZone.radius!,
+                        strokeWidth: 2,
+                        strokeColor: Colors.green,
+                        fillColor: Colors.green.withOpacity(0.2),
+                      ),
+                    );
+                  }
+                } else if (state is MapError) {
                   return Center(child: Text(state.message));
                 }
 
