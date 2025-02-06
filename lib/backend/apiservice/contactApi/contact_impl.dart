@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 import 'package:safezone/backend/models/userModel/contacts_model.dart';
-import 'package:safezone/backend/apiservice/vercelUrl.dart';
+import 'package:safezone/backend/apiservice/vercel_url.dart';
 
 class ContactImplementation extends ContactRepository {
   static const String baseUrl = '${VercelUrl.mainUrl}/contacts';

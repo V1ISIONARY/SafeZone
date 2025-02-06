@@ -9,6 +9,7 @@ class DangerZoneBloc extends Bloc<DangerZoneEvent, DangerZoneState> {
   DangerZoneBloc({required this.dangerZoneRepository})
       : super(DangerZonesLoading()) {
     on<FetchDangerZones>(_onFetchDangerZones);
+    on<FetchDangerZoneById>(_onFetchDangerZoneById);
   }
 
   Future<void> _onFetchDangerZones(
@@ -17,6 +18,17 @@ class DangerZoneBloc extends Bloc<DangerZoneEvent, DangerZoneState> {
     try {
       final dangerZones = await dangerZoneRepository.getDangerZones();
       emit(DangerZonesLoaded(dangerZones));
+    } catch (e) {
+      emit(DangerZonesError(e.toString()));
+    }
+  }
+
+  Future<void> _onFetchDangerZoneById(
+      FetchDangerZoneById event, Emitter<DangerZoneState> emit) async {
+    emit(DangerZonesLoading());
+    try {
+      final safeZone = await dangerZoneRepository.getDangerZone(event.id);
+      emit(DangerZoneLoaded(safeZone));
     } catch (e) {
       emit(DangerZonesError(e.toString()));
     }
