@@ -32,7 +32,7 @@ class Map extends StatefulWidget {
 class _MapState extends State<Map> with TickerProviderStateMixin {
   Set<Marker> markers = {};
   Set<Circle> circles = {};
-  static const LatLng sourceLocation = LatLng(16.043859, 120.335182);
+  static const LatLng sourceLocation = LatLng(16.0471, 120.3425);
 
   final Completer<GoogleMapController> _mapController = Completer();
   final GlobalKey _searchKey = GlobalKey();
@@ -125,18 +125,6 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
         await MarkerUtils.createCustomMarker(context, widgetPricolor);
   }
 
-  // void _toggleTextVisibility() {
-  //   if (_isFadedOut) {
-  //     _controllerFade.reverse();
-  //   } else {
-  //     _controllerFade.forward();
-  //   }
-
-  //   setState(() {
-  //     _isFadedOut = !_isFadedOut;
-  //   });
-  // }
-
   void getPolyPoints() async {}
 
   void _changeHintText() {
@@ -174,16 +162,21 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
 
     if (googleMapController != null) {
       googleMapController!.animateCamera(CameraUpdate.newCameraPosition(
-          CameraPosition(
-              target: LatLng(position.latitude, position.longitude),
-              zoom: 14.0)));
-      markers.clear();
-      markers.add(Marker(
-        markerId: const MarkerId("My Location"),
-        position: LatLng(position.latitude, position.longitude),
-        icon: customMarker!,
-        infoWindow: const InfoWindow(title: 'My Location'),
+        CameraPosition(
+          target: LatLng(position.latitude, position.longitude),
+          zoom: 14.0,
+        ),
       ));
+
+      setState(() {
+        markers.clear();
+        markers.add(Marker(
+          markerId: const MarkerId("My Location"),
+          position: LatLng(position.latitude, position.longitude),
+          icon: customMarker!,
+          infoWindow: const InfoWindow(title: 'My Location'),
+        ));
+      });
     }
   }
 
@@ -228,19 +221,9 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
                 } else if (state is MapDataLoaded) {
                   markers.clear();
                   circles.clear();
-                  for (var dangerZone in state.dangerZones) { 
-                    // markers.add(
-                    //   Marker(
-                    //     markerId: MarkerId(dangerZone.id.toString()),
-                    //     position:
-                    //         LatLng(dangerZone.latitude, dangerZone.longitude),
-                    //     infoWindow: InfoWindow(
-                    //       title: dangerZone.name,
-                    //       // snippet: "Radius: ${dangerZone.radius} meters",
-                    //     ),
-                    //   ),
-                    // );
-                    circles.add( // TODO: add gesture detector thatll show incident reports in that specific zone, gotta mod the BE pa
+                  for (var dangerZone in state.dangerZones) {
+                    circles.add(
+                      // TODO: add gesture detector thatll show incident reports in that specific zone, gotta mod the BE pa
                       Circle(
                         circleId: CircleId(dangerZone.id.toString()),
                         center:
@@ -265,11 +248,9 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
                     //   ),
                     // );
                     circles.add(
-                      // TODO: add gesture detector thatll show incident reports in that specific zone, gotta mod the BE pa
                       Circle(
                         circleId: CircleId(safeZone.id.toString()),
-                        center:
-                            LatLng(safeZone.latitude!, safeZone.longitude!),
+                        center: LatLng(safeZone.latitude!, safeZone.longitude!),
                         radius: safeZone.radius!,
                         strokeWidth: 2,
                         strokeColor: Colors.green,
@@ -286,7 +267,15 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
                     target: sourceLocation,
                     zoom: 14.0,
                   ),
-                  markers: markers,
+                  markers: {
+                    if (customMarker != null)
+                      Marker(
+                        markerId: const MarkerId('source'),
+                        position: sourceLocation,
+                        icon: customMarker!,
+                        infoWindow: const InfoWindow(title: 'Source Location'),
+                      ),
+                  },
                   circles: circles,
                   onMapCreated: (GoogleMapController controller) async {
                     googleMapController = controller;
@@ -310,6 +299,8 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
                             ''';
                     controller.setMapStyle(style);
                     _mapController.complete(controller);
+
+                    _fetchLocation();
                   },
                   mapToolbarEnabled: false,
                   zoomControlsEnabled: false,

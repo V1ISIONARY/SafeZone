@@ -60,8 +60,8 @@ class SafeZoneRepositoryImpl implements SafeZoneRepository {
 
   @override
   Future<List<StatusHistory>> getStatusHistory(int safeZoneId) async {
-    final response = await http
-        .get(Uri.parse('$_apiUrl/incident/$safeZoneId/status_history')); // TODO: change api url of this one
+    final response = await http.get(Uri.parse(
+        '$_apiUrl/incident/$safeZoneId/status_history')); // TODO: change api url of this one
 
     if (response.statusCode == 200) {
       final List<dynamic> data = jsonDecode(response.body);
@@ -70,7 +70,7 @@ class SafeZoneRepositoryImpl implements SafeZoneRepository {
       throw Exception('Failed to load status history');
     }
   }
- 
+
   // POST
 
   @override
@@ -82,6 +82,9 @@ class SafeZoneRepositoryImpl implements SafeZoneRepository {
       },
       body: jsonEncode(safeZone.toJson()),
     );
+
+    print("Response Status Code: ${response.statusCode}");
+    print("Response Body: ${response.body}");
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);

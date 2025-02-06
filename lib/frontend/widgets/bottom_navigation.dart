@@ -15,19 +15,19 @@ class BottomNavigationWidget extends StatefulWidget {
 class _BottomNavigationWidgetState extends State<BottomNavigationWidget> {
   int _selectedIndex = 0;
 
-  final List<Widget> _pages = [
-    const Map(UserToken: 'guess'),
-    const Contact(UserToken: 'guess'),
-    const Notif(UserToken: 'guess', initialPage: 0,),
-    const Settings(UserToken: 'guess'),
-  ];
-  
   // final List<Widget> _pages = [
-  //   const Map(UserToken: 'who'),
-  //   const Contact(UserToken: 'who'),
-  //   const Notif(UserToken: 'who', initialPage: 1),
-  //   const Settings(UserToken: 'who'),
+  //   const Map(UserToken: 'guess'),
+  //   const Contact(UserToken: 'guess'),
+  //   const Notif(UserToken: 'guess', initialPage: 0,),
+  //   const Settings(UserToken: 'guess'),
   // ];
+
+  final List<Widget> _pages = [
+    const Map(UserToken: 'who'),
+    const Contact(UserToken: 'who'),
+    const Notif(UserToken: 'who', initialPage: 1),
+    const Settings(UserToken: 'who'),
+  ];
 
   void _onItemTapped(int index) {
     setState(() {
@@ -42,69 +42,72 @@ class _BottomNavigationWidgetState extends State<BottomNavigationWidget> {
         children: [
           _pages[_selectedIndex],
           Positioned(
-            bottom: 0,
-            right: 0,
-            left: 0,
-            child: Container(
-              height: 70,
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey,
-                    blurRadius: 2,
-                    offset: Offset(1, 1),
-                  ),
-                ],
-              ),
-              child: Center(
-                child: Container(
-                  height: 70,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Expanded(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            Padding(
-                              padding: EdgeInsets.only(top: 15),
-                              child: _buildIconItem("Map", "lib/resources/svg/map.svg", 0),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.only(top: 15),
-                              child: _buildIconItem("Contacts", "lib/resources/svg/contacts.svg", 1),
-                            ),
-                            Stack(
-                              children: [
-                                // The grey container moved upwards by 40 pixels
-                                Transform.translate(
-                                  offset: Offset(0, -25),  // Offset it upwards by 40 pixels
-                                  child: GestureDetector(
-                                    onTap: (){
-                                      context.push('/sos-countdown');
-                                    },
-                                    child: Container(
-                                      width: 70,
-                                      height: 150,  // The height of the grey container
-                                      decoration: BoxDecoration(
-                                        color: const Color.fromARGB(255, 217, 212, 212),
-                                        shape: BoxShape.circle
-                                      ),
-                                      // Center the white container inside the grey one
-                                      child: Center(
-                                        child: Container(
-                                          width: 50,
-                                          height: 50,
-                                          decoration: BoxDecoration(
-                                            color: widgetPricolor,
-                                            shape: BoxShape.circle
-                                          ),
-                                          child: Center(
-                                            child: Text(
-                                              'SOS',
-                                              style: TextStyle(
-                                                color: Colors.white
+              bottom: 0,
+              right: 0,
+              left: 0,
+              child: Container(
+                height: 70,
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey,
+                      blurRadius: 2,
+                      offset: Offset(1, 1),
+                    ),
+                  ],
+                ),
+                child: Center(
+                  child: Container(
+                    height: 70,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Expanded(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              Padding(
+                                padding: EdgeInsets.only(top: 15),
+                                child: _buildIconItem(
+                                    "Map", "lib/resources/svg/map.svg", 0),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.only(top: 15),
+                                child: _buildIconItem("Contacts",
+                                    "lib/resources/svg/contacts.svg", 1),
+                              ),
+                              Stack(
+                                children: [
+                                  // The grey container moved upwards by 40 pixels
+                                  Transform.translate(
+                                    offset: Offset(0,
+                                        -25), // Offset it upwards by 40 pixels
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        context.push('/sos-countdown');
+                                      },
+                                      child: Container(
+                                        width: 70,
+                                        height:
+                                            150, // The height of the grey container
+                                        decoration: BoxDecoration(
+                                            color: const Color.fromARGB(
+                                                255, 217, 212, 212),
+                                            shape: BoxShape.circle),
+                                        // Center the white container inside the grey one
+                                        child: Center(
+                                          child: Container(
+                                            width: 50,
+                                            height: 50,
+                                            decoration: BoxDecoration(
+                                                color: widgetPricolor,
+                                                shape: BoxShape.circle),
+                                            child: Center(
+                                              child: Text(
+                                                'SOS',
+                                                style: TextStyle(
+                                                    color: Colors.white),
                                               ),
                                             ),
                                           ),
@@ -112,26 +115,26 @@ class _BottomNavigationWidgetState extends State<BottomNavigationWidget> {
                                       ),
                                     ),
                                   ),
-                                ),
-                              ],
-                            ),
-                            Padding(
-                              padding: EdgeInsets.only(top: 15),
-                              child: _buildIconItem("Notification", "lib/resources/svg/notification.svg", 2),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.only(top: 15),
-                              child: _buildIconItem("Settings", "lib/resources/svg/settings.svg", 3),
-                            ),
-                          ],
+                                ],
+                              ),
+                              Padding(
+                                padding: EdgeInsets.only(top: 15),
+                                child: _buildIconItem("Notification",
+                                    "lib/resources/svg/notification.svg", 2),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.only(top: 15),
+                                child: _buildIconItem("Settings",
+                                    "lib/resources/svg/settings.svg", 3),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            )
-          )
+              ))
         ],
       ),
     );
@@ -169,7 +172,8 @@ class _BottomNavigationWidgetState extends State<BottomNavigationWidget> {
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 9,
-                      fontWeight: isSelected ? FontWeight.bold : FontWeight.w400,
+                      fontWeight:
+                          isSelected ? FontWeight.bold : FontWeight.w400,
                       color: isSelected ? widgetPricolor : Colors.black45,
                     ),
                   ),
@@ -191,5 +195,4 @@ class _BottomNavigationWidgetState extends State<BottomNavigationWidget> {
       ),
     );
   }
-
 }

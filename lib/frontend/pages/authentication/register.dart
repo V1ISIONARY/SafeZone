@@ -359,6 +359,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 isGirl: selectedGender == 'Female',
                 isVerified: true,
               ));
+
+              context.push('/login');
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFFEF8D88),

@@ -159,7 +159,7 @@ class _NotifState extends State<Notif> with SingleTickerProviderStateMixin {
           ),
           body: Column(
             children: [
-              Padding(
+              const Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
                 child: NotificationBtn(
                   title: "Reports History",
