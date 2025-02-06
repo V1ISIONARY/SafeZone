@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:safezone/backend/bloc/mapBloc/map_bloc.dart';
+import 'package:safezone/backend/bloc/mapBloc/map_event.dart';
 import 'package:safezone/frontend/widgets/buttons/custom_button.dart';
 import 'package:safezone/resources/schema/colors.dart';
 import 'package:safezone/resources/schema/texts.dart';
@@ -22,8 +25,7 @@ class _MarkSafeSuccessState extends State<MarkSafeSuccess> {
       ),
       body: Center(
         child: Padding(
-          padding:
-              const EdgeInsets.symmetric(horizontal: 20.0), 
+          padding: const EdgeInsets.symmetric(horizontal: 20.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -45,7 +47,8 @@ class _MarkSafeSuccessState extends State<MarkSafeSuccess> {
                 text: "Back to Home",
                 isOutlined: true,
                 onPressed: () {
-                  context.push('/');
+                  context.push('/home');
+                  context.read<MapBloc>().add(FetchMapData());
                 },
               ),
               const SizedBox(height: 30),

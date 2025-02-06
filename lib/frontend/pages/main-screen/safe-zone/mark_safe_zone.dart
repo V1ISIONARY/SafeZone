@@ -1,10 +1,17 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:intl/intl.dart';
+import 'package:safezone/backend/models/safezoneModel/safezone_model.dart';
 import 'package:safezone/frontend/widgets/buttons/custom_button.dart';
 import 'package:safezone/frontend/widgets/buttons/custom_radio_button.dart';
 import 'package:safezone/frontend/widgets/text_field_widget.dart';
 import 'package:safezone/resources/schema/colors.dart';
 import 'package:safezone/resources/schema/texts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MarkSafeZone extends StatefulWidget {
   const MarkSafeZone({super.key});
@@ -18,6 +25,31 @@ class _MarkSafeZoneState extends State<MarkSafeZone> {
   int selectedRating = 0;
   String selectedTime = "Daytime";
   String selectedOften = "Daily";
+  int? userId;
+  String reportTimestamp = "";
+
+  final Completer<GoogleMapController> _mapController = Completer();
+  LatLng? _pinnedLocation;
+  final Set<Marker> _markers = {};
+
+  @override
+  initState() {
+    super.initState();
+    _loadID();
+    reportTimestamp =
+        DateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").format(DateTime.now().toUtc());
+  }
+
+  Future<void> _loadID() async {
+    try {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      setState(() {
+        userId = prefs.getInt('id');
+      });
+    } catch (e) {
+      print("Error loading SharedPreferences: $e");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,19 +65,60 @@ class _MarkSafeZoneState extends State<MarkSafeZone> {
           child: Column(
             children: [
               const Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text("Pin the location of the safe zone")),
+                alignment: Alignment.centerLeft,
+                child: Text("Pin the location of the safe zone"),
+              ),
               const SizedBox(height: 10),
               Container(
                 height: 215,
                 width: 350,
-                color: const Color.fromARGB(54, 96, 125, 139),
+                decoration: BoxDecoration(
+                  color: const Color.fromARGB(54, 96, 125, 139),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: GoogleMap(
+                    initialCameraPosition: const CameraPosition(
+                      target: LatLng(16.043859, 120.335182),
+                      zoom: 14.0,
+                    ),
+                    markers: _markers,
+                    onMapCreated: (GoogleMapController controller) {
+                      _mapController.complete(controller);
+                    },
+                    onTap: (LatLng location) {
+                      setState(() {
+                        _pinnedLocation = location;
+                        _markers.clear();
+                        _markers.add(
+                          Marker(
+                            markerId: const MarkerId("pinned_location"),
+                            position: location,
+                            infoWindow: const InfoWindow(title: "Safe Zone"),
+                          ),
+                        );
+                      });
+                    },
+                    zoomGesturesEnabled: true,
+                    scrollGesturesEnabled: true,
+                    rotateGesturesEnabled: true,
+                    tiltGesturesEnabled: true,
+                  ),
+                ),
               ),
+              const SizedBox(height: 10),
+              if (_pinnedLocation != null)
+                Text(
+                  "Pinned Location: ${_pinnedLocation!.latitude}, ${_pinnedLocation!.longitude}",
+                  style: const TextStyle(fontSize: 12, color: Colors.grey),
+                ),
               const SizedBox(height: 30),
               const Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                      "On a scale of 1 to 5, how would you rate the safety of this area?")),
+                alignment: Alignment.centerLeft,
+                child: Text(
+                    "On a scale of 1 to 5, how would you rate the safety of this area?"),
+              ),
               const SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -89,20 +162,22 @@ class _MarkSafeZoneState extends State<MarkSafeZone> {
               ),
               const SizedBox(height: 30),
               const Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text("Why did you give this rating?")),
+                alignment: Alignment.centerLeft,
+                child: Text("Why did you give this rating?"),
+              ),
               const SizedBox(height: 20),
               TextFieldWidget.buildTextField(
-                  controller: _descriptionController,
-                  label: "Description",
-                  hint: "Enter details about the safe zone",
-                  maxLines: 5,
-                  minLines: 5),
+                controller: _descriptionController,
+                label: "Description",
+                hint: "Enter details about the safe zone",
+                maxLines: 5,
+                minLines: 5,
+              ),
               const SizedBox(height: 20),
               const Align(
-                  alignment: Alignment.centerLeft,
-                  child:
-                      Text("What time of day do you feel this area is safe?")),
+                alignment: Alignment.centerLeft,
+                child: Text("What time of day do you feel this area is safe?"),
+              ),
               const SizedBox(height: 10),
               Column(
                 children: [
@@ -140,8 +215,9 @@ class _MarkSafeZoneState extends State<MarkSafeZone> {
               ),
               const SizedBox(height: 20),
               const Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text("How often do you visit this area?")),
+                alignment: Alignment.centerLeft,
+                child: Text("How often do you visit this area?"),
+              ),
               const SizedBox(height: 10),
               Column(
                 children: [
@@ -189,10 +265,33 @@ class _MarkSafeZoneState extends State<MarkSafeZone> {
               ),
               const SizedBox(height: 30),
               CustomButton(
-                  text: "Submit",
-                  onPressed: () {
-                    context.push('/mark-safe-zone-success');
-                  }),
+                text: "Submit",
+                onPressed: () {
+                  if (_pinnedLocation == null) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text("Please pin a location on the map."),
+                      ),
+                    );
+                  } else {
+                    print("Report Timestamp: $reportTimestamp");
+                    SafeZoneModel safeZone = SafeZoneModel(
+                      userId: userId!,
+                      latitude: _pinnedLocation!.latitude,
+                      longitude: _pinnedLocation!.longitude,
+                      radius: 100,
+                      scale: selectedRating,
+                      name: "Safe Zone",
+                      description: _descriptionController.text,
+                      timeOfDay: selectedTime,
+                      frequency: selectedOften,
+                      reportTimestamp: reportTimestamp,
+                    );
+
+                    context.push('/review-safe-zone', extra: safeZone);
+                  }
+                },
+              ),
             ],
           ),
         ),
