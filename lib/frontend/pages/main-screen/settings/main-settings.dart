@@ -36,7 +36,7 @@ class _SettingsState extends State<Settings> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _showSnackBar();
+      // _showSnackBar();
     });
   }
   
@@ -374,8 +374,8 @@ class _SettingsState extends State<Settings> {
               ? Settingsbtn(
                 title: 'Sign In',
                 svgIcon: 'lib/resources/svg/logout.svg',
-                navigateTo: '',
-                description: 'Hello love GoodBye',
+                navigateTo: 'Starter',
+                description: 'Start your journey now!',
               )
               : Settingsbtn(
                 title: 'Logout',
@@ -383,6 +383,40 @@ class _SettingsState extends State<Settings> {
                 navigateTo: 'Login',
                 description: 'Hello love GoodBye',
               ),
+            Container(
+              width: double.infinity,
+              margin: EdgeInsets.symmetric(vertical: 60),
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    SvgPicture.asset(
+                        'lib/resources/svg/visionary.svg',
+                        height: 50,
+                        width: 50,
+                    ),
+                    Text(
+                      'Safezone',
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w400,
+                        color: Colors.black
+                      ),
+                    ),
+                    Text(
+                      'Developed by Visionary Org',
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w300,
+                        color: Colors.black38
+                      ),
+                    )
+                  ],
+                ),
+              ),
+            ),
+            SizedBox(height: 100)
           ],
         ),
       ),

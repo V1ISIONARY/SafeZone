@@ -14,7 +14,6 @@ import 'package:safezone/backend/bloc/mapBloc/map_state.dart';
 import 'package:safezone/backend/services/first_run_service.dart';
 import 'package:safezone/frontend/utils/marker_utils.dart';
 import 'package:safezone/frontend/widgets/dialogs/dialogs.dart';
-import 'package:safezone/frontend/widgets/dialogs/first_run_dialog.dart';
 import 'package:safezone/resources/schema/colors.dart';
 // import 'dart:ui' as ui;
 import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
@@ -165,23 +164,9 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
 
   Future<void> _checkFirstRun() async {
     if (await FirstRunService.isFirstRun()) {
-      await _showFirstRunDialog();
       await _createTutorial();
       await FirstRunService.setFirstRunCompleted();
     }
-  }
-
-  Future<void> _showFirstRunDialog() async {
-    await showDialog(
-      context: context,
-      barrierColor: Colors.black.withOpacity(0.5),
-      builder: (BuildContext context) {
-        return FirstRunDialog(
-          pageController: _pageController,
-          widgetPricolor: widgetPricolor,
-        );
-      },
-    );
   }
 
   Future<void> _fetchLocation() async {

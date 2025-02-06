@@ -1,63 +1,80 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:safezone/frontend/pages/introduction/onboarding_screen.dart';
+import 'package:flutter_svg/svg.dart';
+import 'dart:async';
+
+import 'package:page_transition/page_transition.dart';
+
+import '../../../resources/schema/colors.dart';
+import '../../widgets/bottom_navigation.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
   @override
-  State<SplashScreen> createState() => _SplashScreenState();
+  _SplashScreenState createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen>
-    with SingleTickerProviderStateMixin {
+class _SplashScreenState extends State<SplashScreen> {
+  
   @override
   void initState() {
     super.initState();
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
-
-    Future.delayed(Duration(seconds: 2), () {
-      Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => OnboardingScreen()));
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Future.delayed(const Duration(seconds: 5), () {
+        if (mounted) {
+          Navigator.push(
+            context,
+            PageTransition(
+              // child: const Starter(),
+              child: BottomNavigationWidget(), 
+              type: PageTransitionType.fade,
+              duration: Duration(milliseconds: 300),
+            ),
+          );
+        }
+      });
     });
-  }
-
-  @override
-  void dispose() {
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
-        overlays: SystemUiOverlay.values);
-    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: Container(
         width: double.infinity,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+        height: double.infinity,
+        color: Colors.white,
+        child: Stack(
           children: [
-            Image.asset(
-              'lib/resources/svg/logo.jpg',
-              width: 150,
-              height: 150,
-            ),
-            SizedBox(height: 37),
-            Text(
-              'SafeZone',
-              style: GoogleFonts.poppins(
-                fontSize: 20,
-                fontWeight: FontWeight.w500,
-                color: const Color(0xFFEF8D88),
+            Center(
+              child: Container(
+                width: 130,
+                height: 130,
+                color: Colors.transparent,
+                child: SvgPicture.asset(
+                  'lib/resources/svg/logo.svg',
+                  fit: BoxFit.cover,
+                ),
               ),
+            ),
+            Positioned(
+              bottom: 30,
+              left: 0,
+              right: 0,
+              child: Center(
+                child: GestureDetector(
+                  child: Text(
+                    'Visionary 0.0.1',
+                    style: TextStyle(
+                      color: widgetPricolor,
+                      fontSize: 8
+                    ),
+                  ),
+                )
+              )
             )
           ],
-        ),
+        )
       ),
     );
   }

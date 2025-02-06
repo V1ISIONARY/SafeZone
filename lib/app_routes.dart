@@ -2,6 +2,7 @@ import 'package:go_router/go_router.dart';
 import 'package:safezone/frontend/pages/authentication/register.dart';
 import 'package:safezone/backend/models/dangerzoneModel/incident_report_model.dart';
 import 'package:safezone/frontend/pages/authentication/login.dart';
+import 'package:safezone/frontend/pages/introduction/splash_screen.dart';
 import 'package:safezone/frontend/pages/main-screen/notification/reports/reports_history_information.dart';
 import 'package:safezone/frontend/pages/main-screen/notification/reports/reports_history.dart';
 import 'package:safezone/frontend/pages/main-screen/report-incident/create_report.dart';
@@ -23,8 +24,7 @@ final GoRouter appRouter = GoRouter(
     ),
     GoRoute(
       path: '/',
-      // builder: (context, state) => const Login(),
-      builder: (context, state) => BottomNavigationWidget(),
+      builder: (context, state) => const SplashScreen(),
     ),
     GoRoute(
       path: '/home',
