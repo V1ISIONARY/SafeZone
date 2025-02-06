@@ -29,8 +29,8 @@ class About extends StatelessWidget {
             ),
             SizedBox(height: 10),
             Text(
-              'Our mission at SafeZone is to [brief mission statement]. We are a group of dedicated students from University of Pangasinan, striving to make a difference with our innovative application.',
-              textAlign: TextAlign.center,
+              'We aim to design, develop, and test the SafeZone application to enhance women\'s safety in public areas by addressing the shortcomings of existing safety protocols. Our goal is to create a comprehensive solution featuring real-time location monitoring, SOS alerts, safe area finders, and user notifications.  We are dedicated to rigorous testing to ensure the application meets user needs and remains reliable in emergencies. Committed to promoting gender equality, we strive to improve women\'s safety through innovative and user-focused design. Guided by inclusivity and innovation, our efforts aim to create a lasting and meaningful impact on society.',
+              textAlign: TextAlign.justify,
             ),
             Divider(height: 30, thickness: 1),
             Text(
