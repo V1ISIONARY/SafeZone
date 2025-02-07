@@ -43,7 +43,7 @@ class _OvalBtnState extends State<OvalBtn> {
           child: Text(
             widget.text, 
             style: TextStyle(
-              fontSize: 13,
+              fontSize: 12,
               color: Colors.white,
             ),
           ),

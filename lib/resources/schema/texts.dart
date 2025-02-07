@@ -17,7 +17,7 @@ class CategoryText extends StatelessWidget {
       Text(
         text,
         style: GoogleFonts.poppins(
-          fontSize: 15,
+          fontSize: 13,
           fontWeight: FontWeight.w500,
           color: Colors.black
         ),
@@ -28,26 +28,39 @@ class CategoryText extends StatelessWidget {
 }
 
 class CategoryDescripText extends StatelessWidget {
-
   final String text;
+  final String? alignment;
 
   const CategoryDescripText({
     super.key,
-    required this.text
+    required this.text,
+    this.alignment,
   });
 
   @override
   Widget build(BuildContext context) {
-    return (
-      Text(
-        text,
-        style: GoogleFonts.poppins(
-          fontSize: 10,
-          fontWeight: FontWeight.w500,
-          color: Colors.black45
-        ),
-      )
+    return Text(
+      text,
+      style: GoogleFonts.poppins(
+        fontSize: 9,
+        fontWeight: FontWeight.w500,
+        color: Colors.black45,
+      ),
+      textAlign: _getTextAlignment(),
     );
+  }
+
+  TextAlign _getTextAlignment() {
+    switch (alignment?.toLowerCase()) {
+      case "right":
+        return TextAlign.right;
+      case "center":
+        return TextAlign.center;
+      case "left":
+        return TextAlign.left;
+      default:
+        return TextAlign.start; 
+    }
   }
 
 }
@@ -69,7 +82,7 @@ class PrimaryText extends StatelessWidget {
         style: GoogleFonts.poppins(
           fontWeight: FontWeight.w500,
           color: primary_textColor,
-          fontSize: 14
+          fontSize: 11
         ),
       )
     );
@@ -94,7 +107,7 @@ class DescriptionText extends StatelessWidget {
         style: GoogleFonts.poppins(
           fontWeight: FontWeight.w500,
           color: description_textColor,
-          fontSize: 9
+          fontSize: 8
         ),
       )
     );

@@ -1,5 +1,6 @@
-// ignore_for_file: prefer_const_constructors
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:safezone/backend/apiservice/contactApi/contact_impl.dart';
 import 'package:safezone/backend/apiservice/dangerzoneApi/dangerzone_impl.dart';
 import 'package:safezone/backend/apiservice/incident_reportApi/incident_report_impl.dart';
@@ -12,17 +13,27 @@ import 'package:safezone/backend/bloc/mapBloc/map_event.dart';
 import 'package:safezone/backend/bloc/safezoneBloc/safezone_bloc.dart';
 import 'package:safezone/backend/cubic/notification.dart';
 import 'package:safezone/backend/bloc/incident_report/incident_report_bloc.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:safezone/backend/apiservice/authApi/auth_impl.dart';
 import 'package:safezone/backend/bloc/authBloc/auth_bloc.dart';
 import 'package:safezone/app_routes.dart';
 import 'package:safezone/resources/schema/app_theme.dart';
 
-void main() {
-  // await dotenv.load(fileName: ".env");
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
 
-  runApp(
-    MultiBlocProvider(
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  bool isFirstRun = prefs.getBool('isFirstRun') ?? true;
+
+  runApp(MyApp(isFirstRun: isFirstRun));
+}
+
+class MyApp extends StatelessWidget {
+  final bool isFirstRun;
+  const MyApp({super.key, required this.isFirstRun});
+
+  @override
+  Widget build(BuildContext context) {
+    return MultiBlocProvider(
       providers: [
         BlocProvider(
           create: (_) => AuthenticationBloc(AuthenticationImplementation()),
@@ -53,20 +64,12 @@ void main() {
           )..add(FetchMapData()),
         ),
       ],
-      child: const MyApp(),
-    ),
-  );
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp.router(
-      debugShowCheckedModeBanner: false,
-      routerConfig: appRouter,
-      theme: AppTheme.lightTheme,
-      title: "SafeZone",
+      child: MaterialApp.router(
+        debugShowCheckedModeBanner: false,
+        routerConfig: appRouter(isFirstRun),
+        theme: AppTheme.lightTheme,
+        title: "SafeZone",
+      ),
     );
   }
 }

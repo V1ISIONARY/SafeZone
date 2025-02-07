@@ -207,58 +207,58 @@ class _ContactState extends State<Contact> with SingleTickerProviderStateMixin {
         ),
         widget.UserToken == 'guess'
           ? GestureDetector(
-            onTap: _startShake,
-            child: Container(
-              width: double.infinity,
-              height: double.infinity,
-              color: Colors.black38,
-              child: Center(
-                child: Container(
-                  width: 200,
-                  color: Colors.transparent,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      AnimatedBuilder(
-                        animation: _animation,
-                        builder: (context, child) {
-                          return Transform.translate(
-                            offset: Offset(_animation.value, 0),
-                            child: Container(
-                              width: 150,
-                              height: 130,
-                              child: Image.asset(
-                                'lib/resources/images/lock.png',
-                                fit: BoxFit.cover,
+              onTap: _startShake,
+              child: Container(
+                width: double.infinity,
+                height: double.infinity,
+                color: Colors.black38,
+                child: Center(
+                  child: Container(
+                    width: 200,
+                    color: Colors.transparent,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        AnimatedBuilder(
+                          animation: _animation,
+                          builder: (context, child) {
+                            return Transform.translate(
+                              offset: Offset(_animation.value, 0),
+                              child: SizedBox(
+                                width: 130,
+                                height: 110,
+                                child: Image.asset(
+                                  'lib/resources/images/lock.png',
+                                  fit: BoxFit.cover,
+                                ),
                               ),
-                            ),
-                          );
-                        }
-                      ),
-                      Text(
-                        'Lock',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 23,
+                            );
+                          },
                         ),
-                        textAlign: TextAlign.center,
-                      ),
-                      Text(
-                        'You need to sign in to your account to access all features.',
-                        style: TextStyle(
-                          color: Colors.white60,
-                          fontSize: 10,
+                        const Text(
+                          'Lock',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 15,
+                          ),
+                          textAlign: TextAlign.center,
                         ),
-                        textAlign: TextAlign.center,
-                      )
-                    ]
-                  )
+                        const Text(
+                          'You need to sign in to your account to access all features.',
+                          style: TextStyle(
+                            color: Colors.white60,
+                            fontSize: 9,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
-            ) 
-          )
-          : SizedBox(),
+            )
+          : const SizedBox(),
       ]
     );
   }

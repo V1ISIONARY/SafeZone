@@ -29,15 +29,16 @@ class Settingsbtn extends StatelessWidget {
     return GestureDetector(
         onTap: () {
           Navigator.push(
-              context,
-              PageTransition(
-                  child: _getPageForNavigation(navigateTo),
-                  type: PageTransitionType.rightToLeft,
-                  duration: Duration(milliseconds: 200)));
+            context,
+            PageTransition(
+                child: _getPageForNavigation(navigateTo),
+                type: PageTransitionType.rightToLeft,
+                duration: Duration(milliseconds: 200)));
         },
         child: Container(
             width: double.infinity,
-            margin: EdgeInsets.symmetric(vertical: 15),
+            color: Colors.white,
+            margin: const EdgeInsets.symmetric(vertical: 15),
             child: Stack(
               children: [
                 Row(
