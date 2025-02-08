@@ -49,7 +49,7 @@ class _SettingsState extends State<Settings> {
         backgroundColor: Colors.white,
         centerTitle: false,
         title: Text(
-          "Account",
+          "My Account",
           style: TextStyle(
             fontSize: 15,
             fontWeight: FontWeight.bold,
@@ -245,11 +245,11 @@ class _SettingsState extends State<Settings> {
                 Container(
                   margin: EdgeInsets.symmetric(vertical: 20),
                   width: double.infinity,
-                  height: 120,
+                  height: 90,
                   color: Colors.transparent,
                   child: Center(
                     child: Container(
-                      height: 100,
+                      height: 80,
                       width: double.infinity,
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -336,13 +336,8 @@ class _SettingsState extends State<Settings> {
                   ],
                 )
               ),
-            Text(
-              "Settings",
-              style: TextStyle(
-                fontSize: 17,
-                fontWeight: FontWeight.bold,
-                color: Colors.black
-              ),
+            CategoryText(
+              text: "Settings"
             ),
             widget.UserToken == 'guess'
               ? SizedBox()
@@ -396,21 +391,11 @@ class _SettingsState extends State<Settings> {
                         height: 50,
                         width: 50,
                     ),
-                    Text(
-                      'Safezone',
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w400,
-                        color: Colors.black
-                      ),
+                    CategoryText(
+                      text: "Safezone"
                     ),
-                    Text(
-                      'Developed by Visionary Org',
-                      style: TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w300,
-                        color: Colors.black38
-                      ),
+                    CategoryDescripText(
+                      text: 'Developed by Visionary Org' 
                     )
                   ],
                 ),
@@ -455,13 +440,13 @@ class _SettingsState extends State<Settings> {
         GestureDetector(
           onTap: () => onItemTap(index), // Handle tap
           child: Container(
-            width: 80,
-            height: 80,
+            width: 60,
+            height: 60,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
               border: isSelected
                   ? Border.all(
-                      color: Colors.grey,
+                      color: widgetPricolor,
                       width: 3,
                     )
                   : null, 

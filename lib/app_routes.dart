@@ -15,9 +15,17 @@ import 'package:safezone/frontend/pages/main-screen/sos/sos_countdown.dart';
 import 'package:safezone/frontend/pages/main-screen/sos/sos_success.dart';
 import 'package:safezone/frontend/widgets/bottom_navigation.dart';
 
-final GoRouter appRouter = GoRouter(
+GoRouter appRouter(bool isFirstRun) => GoRouter(
   initialLocation: '/',
   routes: [
+    GoRoute(
+      path: '/',
+      builder: (context, state) => isFirstRun ? const SplashScreen() : BottomNavigationWidget(),
+    ),
+    GoRoute(
+      path: '/home',
+      builder: (context, state) => BottomNavigationWidget(),
+    ),
     GoRoute(
       path: '/register',
       builder: (context, state) => const RegisterScreen(),
@@ -25,14 +33,6 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: '/login',
       builder: (context, state) => const Login(),
-    ),
-    GoRoute(
-      path: '/',
-      builder: (context, state) => const SplashScreen(),
-    ),
-    GoRoute(
-      path: '/home',
-      builder: (context, state) => BottomNavigationWidget(),
     ),
     GoRoute(
       path: '/create-report',

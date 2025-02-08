@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:safezone/frontend/pages/authentication/register.dart';
+import 'package:safezone/frontend/widgets/bottom_navigation.dart';
+import 'package:safezone/resources/schema/texts.dart';
 
 import '../../../resources/schema/colors.dart';
 
@@ -143,8 +145,8 @@ class _SlidesState extends State<Slides> {
                                   padding: const EdgeInsets.symmetric(horizontal: 5),
                                   child:Center(
                                     child: Container(
-                                      width: 10,
-                                      height: 10,
+                                      width: 8,
+                                      height: 8,
                                       decoration: BoxDecoration(
                                         shape: BoxShape.circle,
                                         color: index == currentPage
@@ -249,11 +251,10 @@ class Page1 extends StatelessWidget {
         ),
         Padding(
           padding: EdgeInsets.only(top: 40, right: 50, left: 50),
-          child: Text(
-            "Being aware of safe and danger zones is crucial for recognizing risks and staying protected.",
-            style: TextStyle(fontSize: 13, color: Colors.black38),
-            textAlign: TextAlign.center,
-          ),
+          child: CategoryDescripText(
+            text: "being aware of safe and danger zones is crucial for recognizing risks and staying protected.",
+            alignment: 'center', 
+          )
         ),
         Container(
           height: 150,
@@ -310,11 +311,10 @@ class Page2 extends StatelessWidget {
         ),
         Padding(
           padding: EdgeInsets.only(top: 40, right: 50, left: 50),
-          child: Text(
-            "provides real-time updates for better monitoring, quick decisions, and improved control.",
-            style: TextStyle(fontSize: 13, color: Colors.black38),
-            textAlign: TextAlign.center,
-          ),
+          child: CategoryDescripText(
+            text: "provides real-time updates for better monitoring, quick decisions, and improved control.",
+            alignment: 'center', 
+          )
         ),
         Container(
           height: 150,
@@ -371,11 +371,10 @@ class Page3 extends StatelessWidget {
         ),
         Padding(
           padding: EdgeInsets.only(top: 40, right: 50, left: 50),
-          child: Text(
-            "means we are dedicated to ensuring your protection and peace of mind at all times.",
-            style: TextStyle(fontSize: 13, color: Colors.black38),
-            textAlign: TextAlign.center,
-          ),
+          child: CategoryDescripText(
+            text: "means we are dedicated to ensuring your protection and peace of mind at all times.",
+            alignment: 'center', 
+          )
         ),
         Container(
           height: 150,

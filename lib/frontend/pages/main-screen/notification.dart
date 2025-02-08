@@ -5,6 +5,7 @@ import 'package:safezone/frontend/pages/main-screen/notification/all.dart';
 import 'package:safezone/frontend/pages/main-screen/notification/read.dart';
 import 'package:safezone/frontend/pages/main-screen/notification/unread.dart';
 import 'package:safezone/frontend/widgets/buttons/notification_btn.dart';
+import 'package:safezone/resources/schema/colors.dart';
 
 class Notif extends StatefulWidget {
   final String UserToken;
@@ -110,25 +111,26 @@ class _NotifState extends State<Notif> with SingleTickerProviderStateMixin {
                     ),
                   ),
                   Padding(
-                      padding: const EdgeInsets.only(top: 10),
-                      child: Container(
-                        height: 3,
-                        width: double.infinity,
-                        child: Center(
-                          child: Container(
-                            width: double.infinity,
-                            height: 0.5,
-                            color: Colors.black38,
-                            child: isSelected
-                                ? Container(
-                                    width: double.infinity,
-                                    height: 2.0,
-                                    color: Colors.black,
-                                  )
-                                : SizedBox(),
-                          ),
+                    padding: const EdgeInsets.only(top: 10), 
+                    child:Container(
+                      height: 4,
+                      width: double.infinity,
+                      child: Center(
+                        child: Container(
+                          width: double.infinity,
+                          height: 0.5,
+                          color: Colors.black38,
+                          child: isSelected
+                            ? Container(
+                              width: double.infinity, 
+                              height: 5.0,
+                              color: widgetPricolor, 
+                            )
+                          : SizedBox(), 
                         ),
-                      ))
+                      ),
+                    )
+                  )
                 ],
               );
             },
@@ -202,8 +204,8 @@ class _NotifState extends State<Notif> with SingleTickerProviderStateMixin {
                               return Transform.translate(
                                 offset: Offset(_animation.value, 0),
                                 child: SizedBox(
-                                  width: 150,
-                                  height: 130,
+                                  width: 130,
+                                  height: 110,
                                   child: Image.asset(
                                     'lib/resources/images/lock.png',
                                     fit: BoxFit.cover,
@@ -216,7 +218,7 @@ class _NotifState extends State<Notif> with SingleTickerProviderStateMixin {
                             'Lock',
                             style: TextStyle(
                               color: Colors.white,
-                              fontSize: 23,
+                              fontSize: 15,
                             ),
                             textAlign: TextAlign.center,
                           ),
@@ -224,7 +226,7 @@ class _NotifState extends State<Notif> with SingleTickerProviderStateMixin {
                             'You need to sign in to your account to access all features.',
                             style: TextStyle(
                               color: Colors.white60,
-                              fontSize: 10,
+                              fontSize: 9,
                             ),
                             textAlign: TextAlign.center,
                           ),

@@ -48,9 +48,9 @@ class About extends StatelessWidget {
             ),
             SizedBox(height: 10),
             buildTeamMember('Asuncion, Miro R.', 'Project Manager/Backend Developer', '[Short bio]'),
-            buildTeamMember('Maylan, Glaiza Darlene T.', 'Document Writer, Designer ', '[Short bio]'),
-            buildTeamMember('Romero, Justine Louise V.', 'Designer, Backend Developer ', '[Short bio]'),
-            buildTeamMember('Solis, Jaira Fredniecole B.', 'Designer, Frontend Developer', '[Short bio]'),
+            buildTeamMember('Maylan, Glaiza Darlene T.', 'Document Writer, Frontend Developer ', '[Short bio]'),
+            buildTeamMember('Romero, Justine Louise V.', 'Frontend Developer, Backend Developer ', '[Short bio]'),
+            buildTeamMember('Solis, Jaira Fredniecole B.', 'Frontend Developer, Backend Developer', '[Short bio]'),
             Divider(height: 30, thickness: 1),
             Text(
               'Our Values',
@@ -73,7 +73,7 @@ class About extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(role),
-          SizedBox(height: 4),  // Adds space between role and bio
+          SizedBox(height: 4), 
           Text(bio),
         ],
       ),

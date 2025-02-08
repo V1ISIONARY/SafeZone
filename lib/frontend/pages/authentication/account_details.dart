@@ -246,34 +246,6 @@ class _AccountDetailsState extends State<AccountDetails> {
                 )
               )
             ),
-            Container(
-              height: 300,
-              width: double.infinity,
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Text(
-                      'SafeZone',
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w400,
-                        color: Colors.black
-                      ),
-                    ),
-                    Text(
-                      'Hello World Negah',
-                      style: TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w300,
-                        color: Colors.black
-                      ),
-                    )
-                  ],
-                ),
-              ),
-            )
           ]
         )
       )

@@ -38,54 +38,55 @@ class TermsPolicyBtn extends StatelessWidget {
           ),
         ],
       ),
-      child: Container(
-        margin: EdgeInsets.symmetric(horizontal: 15),
+      child: GestureDetector(
+        onTap: (){
+          Navigator.push(
+            context,
+            PageTransition(
+              child: _getPageForNavigation(navigateTo),
+              type: PageTransitionType.rightToLeft,
+              duration: Duration(milliseconds: 200)
+            )
+          );
+        },
         child: Container(
-          width: double.infinity,
-          margin: EdgeInsets.symmetric(
-            vertical: 15
-          ),
-          child: Stack(
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Container(
-                    height: 27,
-                    width: 27,
-                    margin: EdgeInsets.only(right: 17),
-                    child: SvgPicture.asset(
-                      svgIcon
+          margin: EdgeInsets.symmetric(horizontal: 15),
+          color: Colors.white,
+          child: Container(
+            width: double.infinity,
+            margin: EdgeInsets.symmetric(
+              vertical: 15
+            ),
+            child: Stack(
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Container(
+                      height: 27,
+                      width: 27,
+                      margin: EdgeInsets.only(right: 17),
+                      child: SvgPicture.asset(
+                        svgIcon
+                      )
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        PrimaryText(
+                          text: title
+                        ),
+                        DescriptionText(
+                          text: description,
+                        )
+                      ],
                     )
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      PrimaryText(
-                        text: title
-                      ),
-                      DescriptionText(
-                        text: description,
-                      )
-                    ],
-                  )
-                ],
-              ),
-              Positioned(
-                right: -10,
-                top: 5,
-                bottom: 5,
-                child: GestureDetector(
-                  onTap: (){
-                    Navigator.push(
-                      context,
-                      PageTransition(
-                        child: _getPageForNavigation(navigateTo),
-                        type: PageTransitionType.rightToLeft,
-                        duration: Duration(milliseconds: 200)
-                      )
-                    );
-                  },
+                  ],
+                ),
+                Positioned(
+                  right: -10,
+                  top: 5,
+                  bottom: 5,
                   child: Container(
                     height: 20,
                     width: 20,
@@ -96,11 +97,11 @@ class TermsPolicyBtn extends StatelessWidget {
                     )
                   )
                 )
-              )
-            ],
+              ],
+            )
           )
         )
-      ),
+      )
     );
   }
 
