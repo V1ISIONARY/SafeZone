@@ -41,7 +41,7 @@ class _LoginState extends State<Login> {
             Align(
               alignment: Alignment.topLeft,
               child: Image.asset(
-                'lib/resources/svg/logo.jpg', 
+                'lib/resources/svg/logo.svg', 
                 height: 60,
               ),
             ),

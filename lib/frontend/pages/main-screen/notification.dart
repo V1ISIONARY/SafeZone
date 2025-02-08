@@ -31,11 +31,7 @@ class _NotifState extends State<Notif> with SingleTickerProviderStateMixin {
     super.initState();
 
     pageController = PageController(initialPage: widget.initialPage);
-    topLevelPages = [
-      All(), 
-      Read(), 
-      Unread()
-    ];
+    topLevelPages = [All(), Read(), Unread()];
 
     _controller = AnimationController(
       vsync: this,
@@ -110,31 +106,29 @@ class _NotifState extends State<Notif> with SingleTickerProviderStateMixin {
                     indicator,
                     style: TextStyle(
                       fontSize: 10,
-                      color: isSelected? Colors.black : Colors.black38,
+                      color: isSelected ? Colors.black : Colors.black38,
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.only(top: 10), 
-                    child:Container(
-                      height: 3,
-                      width: double.infinity,
-                      child: Center(
-                        child: Container(
-                          width: double.infinity,
-                          height: 0.5,
-                          color: Colors.black38,
-                          child: isSelected
-                              ? Container(
-                                width: double.infinity, 
-                                height: 2.0,
-                                color: Colors.black, 
-                              
-                            )
-                          : SizedBox(), 
+                      padding: const EdgeInsets.only(top: 10),
+                      child: Container(
+                        height: 3,
+                        width: double.infinity,
+                        child: Center(
+                          child: Container(
+                            width: double.infinity,
+                            height: 0.5,
+                            color: Colors.black38,
+                            child: isSelected
+                                ? Container(
+                                    width: double.infinity,
+                                    height: 2.0,
+                                    color: Colors.black,
+                                  )
+                                : SizedBox(),
+                          ),
                         ),
-                      ),
-                    )
-                  )
+                      ))
                 ],
               );
             },
@@ -154,18 +148,32 @@ class _NotifState extends State<Notif> with SingleTickerProviderStateMixin {
             backgroundColor: Colors.white,
             title: const Text(
               "Notification",
-              style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.black),
+              style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black),
             ),
           ),
           body: Column(
             children: [
               const Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                padding: EdgeInsets.symmetric(horizontal: 8.0),
                 child: NotificationBtn(
-                  title: "Reports History",
+                  title: "My Incident Reports",
                   svgIcon: "lib/resources/svg/report_notif.svg",
                   navigateTo: "Reports",
-                  description: "Check the status and details of your submitted reports",
+                  description:
+                      "Check the status and details of your submitted reports",
+                ),
+              ),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 8.0),
+                child: NotificationBtn(
+                  title: "My Safe Zones",
+                  svgIcon: "lib/resources/svg/safe.png",
+                  navigateTo: "Safezone",
+                  description:
+                      "Check the status and details of your submitted safe zones",
                 ),
               ),
               _bodyNavigator(context),

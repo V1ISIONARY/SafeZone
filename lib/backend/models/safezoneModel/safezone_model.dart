@@ -10,6 +10,7 @@ class SafeZoneModel {
   String? description;
   String? timeOfDay;
   String? frequency;
+  String? status;
   String? reportTimestamp;
 
   SafeZoneModel({
@@ -24,6 +25,7 @@ class SafeZoneModel {
     this.description,
     this.timeOfDay,
     this.frequency,
+    this.status,
     this.reportTimestamp,
   });
 
@@ -40,6 +42,7 @@ class SafeZoneModel {
       description: json['description'],
       timeOfDay: json['time_of_day'],
       frequency: json['frequency'],
+      status: json['status'],
       reportTimestamp: json['report_timestamp'],
     );
   }
@@ -57,6 +60,7 @@ class SafeZoneModel {
       'description': description,
       'time_of_day': timeOfDay,
       'frequency': frequency,
+      'status': status,
       'report_timestamp': reportTimestamp,
     };
   }
