@@ -280,7 +280,7 @@ class _MarkSafeZoneState extends State<MarkSafeZone> {
                       latitude: _pinnedLocation!.latitude,
                       longitude: _pinnedLocation!.longitude,
                       radius: 100,
-                      scale: selectedRating,
+                      scale: selectedRating.toDouble(),
                       name: "Safe Zone",
                       description: _descriptionController.text,
                       timeOfDay: selectedTime,

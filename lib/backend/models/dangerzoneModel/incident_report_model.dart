@@ -9,6 +9,7 @@ class IncidentReportModel {
   String? reportTimestamp;
   String? status;
   final String updatedAt;
+  final DangerZoneModel? dangerZone;
 
   IncidentReportModel({
     required this.id,
@@ -21,6 +22,7 @@ class IncidentReportModel {
     required this.reportTimestamp,
     this.status,
     required this.updatedAt,
+    this.dangerZone,
   });
 
   factory IncidentReportModel.fromJson(Map<String, dynamic> json) {
@@ -35,6 +37,9 @@ class IncidentReportModel {
       reportTimestamp: json['report_timestamp'],
       status: json['status'],
       updatedAt: json['updated_at'],
+      dangerZone: json['danger_zone'] != null
+          ? DangerZoneModel.fromJson(json['danger_zone'])
+          : null,
     );
   }
 
@@ -83,19 +88,19 @@ class DangerZoneModel {
   }
 }
 
-class IncidentResponse {
-  final IncidentReportModel incidentReport;
-  final DangerZoneModel dangerZone;
+// class IncidentResponse {
+//   final IncidentReportModel incidentReport;
+//   final DangerZoneModel dangerZone;
 
-  IncidentResponse({
-    required this.incidentReport,
-    required this.dangerZone,
-  });
+//   IncidentResponse({
+//     required this.incidentReport,
+//     required this.dangerZone,
+//   });
 
-  factory IncidentResponse.fromJson(Map<String, dynamic> json) {
-    return IncidentResponse(
-      incidentReport: IncidentReportModel.fromJson(json['incident_report']),
-      dangerZone: DangerZoneModel.fromJson(json['danger_zone']),
-    );
-  }
-}
+//   factory IncidentResponse.fromJson(Map<String, dynamic> json) {
+//     return IncidentResponse(
+//       incidentReport: IncidentReportModel.fromJson(json['incident_report']),
+//       dangerZone: DangerZoneModel.fromJson(json['danger_zone']),
+//     );
+//   }
+// }

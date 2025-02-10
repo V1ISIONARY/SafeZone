@@ -56,8 +56,8 @@ GoRouter appRouter(bool isFirstRun) => GoRouter(
         GoRoute(
           path: '/reports-history-details',
           builder: (context, state) {
-            final reportInfo = state.extra as IncidentReportModel;
-            return ReportsHistoryDetails(reportInfo: reportInfo);
+            final incidentReport = state.extra as IncidentReportModel;
+            return ReportsHistoryDetails(reportInfo: incidentReport);
           },
         ),
         GoRoute(

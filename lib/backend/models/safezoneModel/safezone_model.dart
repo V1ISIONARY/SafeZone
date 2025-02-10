@@ -6,7 +6,7 @@ class SafeZoneModel {
   double? longitude;
   double? radius;
   String? name;
-  int? scale;
+  double? scale;
   String? description;
   String? timeOfDay;
   String? frequency;

@@ -12,7 +12,6 @@ import 'package:safezone/frontend/widgets/buttons/custom_button.dart';
 import 'package:safezone/frontend/widgets/report-danger-zone/text_row.dart';
 import 'package:safezone/resources/schema/colors.dart';
 import 'package:safezone/resources/schema/texts.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class ReviewSafezone extends StatefulWidget {
   const ReviewSafezone({super.key, required this.safeZone});

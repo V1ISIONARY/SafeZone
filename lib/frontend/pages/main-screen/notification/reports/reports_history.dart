@@ -5,7 +5,7 @@ import 'package:safezone/backend/bloc/incident_report/incident_report_bloc.dart'
 import 'package:safezone/backend/bloc/incident_report/incident_report_event.dart';
 import 'package:safezone/backend/bloc/incident_report/incident_report_state.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:safezone/frontend/widgets/reports_card.dart';
+import 'package:safezone/frontend/widgets/reports_history_card.dart';
 import 'package:safezone/resources/schema/colors.dart';
 import 'package:safezone/resources/schema/texts.dart';
 
@@ -58,7 +58,7 @@ class _ReportsHistoryState extends State<ReportsHistory> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         centerTitle: true,
-        title: const CategoryText(text: "Reports History"),
+        title: const CategoryText(text: "My Incident Reports"),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -116,10 +116,7 @@ class _ReportsHistoryState extends State<ReportsHistory> {
                             ],
                           ),
                           child: ReportsCard(
-                            status: report.status ?? "Unknown",
-                            location: report.description ?? "No description",
-                            timeAndDate:
-                                report.reportTimestamp ?? "No timestamp",
+                            incidentReport: report,
                           ),
                         );
                       },

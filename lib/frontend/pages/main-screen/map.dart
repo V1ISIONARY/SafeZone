@@ -1,3 +1,5 @@
+// ignore_for_file: unused_field
+
 import 'dart:async';
 // import 'dart:typed_data';
 import 'package:flutter/material.dart';
@@ -8,7 +10,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:safezone/backend/bloc/dangerzoneBloc/dangerzone_bloc.dart';
 import 'package:safezone/backend/bloc/dangerzoneBloc/dangerzone_event.dart';
-import 'package:safezone/backend/bloc/dangerzoneBloc/dangerzone_state.dart';
 import 'package:safezone/backend/bloc/mapBloc/map_bloc.dart';
 import 'package:safezone/backend/bloc/mapBloc/map_state.dart';
 import 'package:safezone/backend/services/first_run_service.dart';

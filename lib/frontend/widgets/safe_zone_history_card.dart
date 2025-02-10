@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:safezone/resources/schema/colors.dart';
 
-class ReportsCard extends StatelessWidget {
+class SafezoneHistoryCard extends StatelessWidget {
   final String status; // TODO: to change accdg sa model
   final String location;
   final String timeAndDate;
 
-  const ReportsCard({
+  const SafezoneHistoryCard({
     super.key,
     required this.status,
     required this.location,
@@ -17,10 +17,10 @@ class ReportsCard extends StatelessWidget {
   Widget build(BuildContext context) {
     Color statusColor;
     String statusText;
-    switch (status) { 
+    switch (status) {
       case "verified":
         statusColor = greenStatusColor;
-        statusText = "Verified - Danger Zone";
+        statusText = "Verified - Safe Zone";
         break;
       case "under review":
         statusColor = pendingStatusColor;
@@ -40,6 +40,7 @@ class ReportsCard extends StatelessWidget {
     }
 
     return Container(
+      width: double.infinity,
       margin: const EdgeInsets.symmetric(vertical: 5),
       padding: const EdgeInsets.all(20),
       decoration: const BoxDecoration(

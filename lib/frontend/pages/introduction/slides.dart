@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:safezone/frontend/pages/authentication/register.dart';
-import 'package:safezone/frontend/widgets/bottom_navigation.dart';
 import 'package:safezone/resources/schema/texts.dart';
 
 import '../../../resources/schema/colors.dart';

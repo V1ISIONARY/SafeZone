@@ -1,14 +1,14 @@
+// ignore_for_file: avoid_print
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:safezone/backend/bloc/incident_report/incident_report_bloc.dart';
-import 'package:safezone/backend/bloc/incident_report/incident_report_event.dart';
-import 'package:safezone/backend/bloc/incident_report/incident_report_state.dart';
 import 'package:safezone/backend/bloc/safezoneBloc/safezone_bloc.dart';
 import 'package:safezone/backend/bloc/safezoneBloc/safezone_event.dart';
 import 'package:safezone/backend/bloc/safezoneBloc/safezone_state.dart';
+import 'package:safezone/frontend/widgets/safe_zone_history_card.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:safezone/frontend/widgets/reports_card.dart';
+import 'package:safezone/frontend/widgets/reports_history_card.dart';
 import 'package:safezone/resources/schema/colors.dart';
 import 'package:safezone/resources/schema/texts.dart';
 
@@ -113,7 +113,7 @@ class _SafezoneHistoryState extends State<SafezoneHistory> {
                               )
                             ],
                           ),
-                          child: ReportsCard(
+                          child: SafezoneHistoryCard(
                             status: report.status ?? "Unknown",
                             location: report.description ?? "No description",
                             timeAndDate:
