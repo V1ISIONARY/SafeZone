@@ -135,8 +135,7 @@ class _ReportsHistoryDetailsState extends State<ReportsHistoryDetails> {
                       width: double.infinity,
                       margin: const EdgeInsets.only(bottom: 15),
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 16), 
+                          horizontal: 16, vertical: 16),
                       decoration: const BoxDecoration(
                         color: Colors.white,
                       ),
@@ -182,8 +181,7 @@ class _ReportsHistoryDetailsState extends State<ReportsHistoryDetails> {
                       width: double.infinity,
                       margin: const EdgeInsets.only(bottom: 15),
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 16), 
+                          horizontal: 16, vertical: 16),
                       decoration: const BoxDecoration(
                         color: Colors.white,
                       ),
@@ -227,7 +225,7 @@ class _ReportsHistoryDetailsState extends State<ReportsHistoryDetails> {
                                 "Incident Report",
                             style: const TextStyle(
                                 fontSize: 15,
-                                fontWeight: FontWeight.bold,
+                                fontWeight: FontWeight.w700,
                                 color: textColor),
                           ),
                           const SizedBox(height: 20),
@@ -267,17 +265,16 @@ class _ReportsHistoryDetailsState extends State<ReportsHistoryDetails> {
                                           const NeverScrollableScrollPhysics(),
                                       gridDelegate:
                                           const SliverGridDelegateWithFixedCrossAxisCount(
-                                        crossAxisCount:
-                                            2, 
-                                        crossAxisSpacing: 10,
-                                        mainAxisSpacing: 10,
-                                      ),
+                                              crossAxisCount: 2,
+                                              crossAxisSpacing: 10,
+                                              mainAxisSpacing: 10,
+                                              childAspectRatio: 1.5),
                                       itemCount:
                                           widget.reportInfo.images!.length,
                                       itemBuilder: (context, index) {
                                         return ClipRRect(
                                           borderRadius:
-                                              BorderRadius.circular(10),
+                                              BorderRadius.circular(3),
                                           child: InstaImageViewer(
                                             child: Image.network(
                                               widget.reportInfo.images![index],

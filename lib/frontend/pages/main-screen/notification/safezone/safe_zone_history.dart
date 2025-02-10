@@ -99,7 +99,7 @@ class _SafezoneHistoryState extends State<SafezoneHistory> {
                     return ListView.builder(
                       itemCount: safezones.length,
                       itemBuilder: (context, index) {
-                        final report = safezones[index];
+                        final safezone = safezones[index];
                         return Slidable(
                           endActionPane: ActionPane(
                             motion: const DrawerMotion(),
@@ -114,10 +114,7 @@ class _SafezoneHistoryState extends State<SafezoneHistory> {
                             ],
                           ),
                           child: SafezoneHistoryCard(
-                            status: report.status ?? "Unknown",
-                            location: report.description ?? "No description",
-                            timeAndDate:
-                                report.reportTimestamp ?? "No timestamp",
+                            safeZone: safezone,
                           ),
                         );
                       },

@@ -6,6 +6,7 @@ import 'package:safezone/frontend/pages/authentication/login.dart';
 import 'package:safezone/frontend/pages/introduction/splash_screen.dart';
 import 'package:safezone/frontend/pages/main-screen/notification/reports/reports_history_information.dart';
 import 'package:safezone/frontend/pages/main-screen/notification/reports/reports_history.dart';
+import 'package:safezone/frontend/pages/main-screen/notification/safezone/safe_zone_history_information.dart';
 import 'package:safezone/frontend/pages/main-screen/report-incident/create_report.dart';
 import 'package:safezone/frontend/pages/main-screen/report-incident/report_success.dart';
 import 'package:safezone/frontend/pages/main-screen/report-incident/submit_report.dart';
@@ -69,6 +70,13 @@ GoRouter appRouter(bool isFirstRun) => GoRouter(
           builder: (context, state) {
             final safeZone = state.extra as SafeZoneModel;
             return ReviewSafezone(safeZone: safeZone);
+          },
+        ),
+        GoRoute(
+          path: '/safezone-history-details',
+          builder: (context, state) {
+            final safezone = state.extra as SafeZoneModel;
+            return SafeZoneHistoryDetails(safezonemodel: safezone);
           },
         ),
         GoRoute(
