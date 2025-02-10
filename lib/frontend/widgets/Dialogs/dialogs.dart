@@ -99,7 +99,7 @@ void showMarkSafeDialog(BuildContext context) {
               ),
               const SizedBox(height: 20),
               CustomButton(
-                text: "Confirm Safe Zone",
+                text: "Create safe zone",
                 onPressed: () {
                   context.push('/mark-safe-zone');
                 },
@@ -114,4 +114,3 @@ void showMarkSafeDialog(BuildContext context) {
     },
   );
 }
-
