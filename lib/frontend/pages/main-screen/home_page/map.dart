@@ -1,7 +1,6 @@
 // ignore_for_file: unused_field
 
 import 'dart:async';
-// import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
@@ -16,7 +15,6 @@ import 'package:safezone/backend/services/first_run_service.dart';
 import 'package:safezone/frontend/utils/marker_utils.dart';
 import 'package:safezone/frontend/widgets/dialogs/dialogs.dart';
 import 'package:safezone/resources/schema/colors.dart';
-// import 'dart:ui' as ui;
 import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 
 class Map extends StatefulWidget {
@@ -42,7 +40,11 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
   final GlobalKey _reportKey = GlobalKey();
   final GlobalKey _safeKey = GlobalKey();
 
+  bool _showMarkers = true;
+
   BitmapDescriptor? customMarker;
+  BitmapDescriptor? customDangerZoneMarker;
+  BitmapDescriptor? customSafeZoneMarker;
 
   late PageController _pageController;
   GoogleMapController? googleMapController;
@@ -122,8 +124,26 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
   }
 
   Future<void> _createCustomMarker() async {
-    customMarker =
-        await MarkerUtils.createCustomMarker(context, widgetPricolor);
+    try {
+      customMarker =
+          await MarkerUtils.createCustomMarker(context, widgetPricolor);
+      customDangerZoneMarker = await MarkerUtils.resizeMarker(
+        'lib/resources/images/dangerzone.png',
+        58,
+        86,
+      );
+      customSafeZoneMarker = await MarkerUtils.resizeMarker(
+        'lib/resources/images/safezone.png',
+        58,
+        86,
+      );
+
+      if (mounted) {
+        setState(() {});
+      }
+    } catch (e) {
+      print("Error loading markers: $e");
+    }
   }
 
   void getPolyPoints() async {}
@@ -206,6 +226,69 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
     return position;
   }
 
+  void updateMarkers(MapState state) {
+    if (_showMarkers) {
+      markers.clear();
+      circles.clear();
+
+      if (state is MapDataLoaded) {
+        if (customDangerZoneMarker == null || customSafeZoneMarker == null) {
+          return;
+        }
+
+        for (var dangerZone in state.dangerZones) {
+          markers.add(
+            Marker(
+              markerId: MarkerId(dangerZone.id.toString()),
+              icon: customDangerZoneMarker!,
+              position: LatLng(dangerZone.latitude, dangerZone.longitude),
+              infoWindow: InfoWindow(
+                title: dangerZone.name,
+              ),
+            ),
+          );
+          circles.add(
+            Circle(
+              circleId: CircleId(dangerZone.id.toString()),
+              center: LatLng(dangerZone.latitude, dangerZone.longitude),
+              radius: dangerZone.radius,
+              strokeWidth: 1,
+              strokeColor: Colors.transparent,
+              fillColor: Colors.red.withOpacity(0.1),
+            ),
+          );
+        }
+
+        for (var safeZone in state.safeZones) {
+          markers.add(
+            Marker(
+              markerId: MarkerId(safeZone.id.toString()),
+              icon: customSafeZoneMarker!,
+              position: LatLng(safeZone.latitude!, safeZone.longitude!),
+              infoWindow: InfoWindow(
+                title: safeZone.name,
+                snippet: "${safeZone.radius}",
+              ),
+            ),
+          );
+          circles.add(
+            Circle(
+              circleId: CircleId(safeZone.id.toString()),
+              center: LatLng(safeZone.latitude!, safeZone.longitude!),
+              radius: safeZone.radius!,
+              strokeWidth: 1,
+              strokeColor: Colors.transparent,
+              fillColor: Colors.green.withOpacity(0.1),
+            ),
+          );
+        }
+      }
+    } else {
+      markers.clear();
+      circles.clear();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -220,45 +303,7 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
                 if (state is MapLoading) {
                   return const Center(child: CircularProgressIndicator());
                 } else if (state is MapDataLoaded) {
-                  markers.clear();
-                  circles.clear();
-                  for (var dangerZone in state.dangerZones) {
-                    circles.add(
-                      // TODO: add gesture detector thatll show incident reports in that specific zone, gotta mod the BE pa
-                      Circle(
-                        circleId: CircleId(dangerZone.id.toString()),
-                        center:
-                            LatLng(dangerZone.latitude, dangerZone.longitude),
-                        radius: dangerZone.radius,
-                        strokeWidth: 2,
-                        strokeColor: Colors.red,
-                        fillColor: Colors.red.withOpacity(0.2),
-                      ),
-                    );
-                  }
-                  for (var safeZone in state.safeZones) {
-                    // markers.add(
-                    //   Marker(
-                    //     markerId: MarkerId(dangerZone.id.toString()),
-                    //     position:
-                    //         LatLng(dangerZone.latitude, dangerZone.longitude),
-                    //     infoWindow: InfoWindow(
-                    //       title: dangerZone.name,
-                    //       // snippet: "Radius: ${dangerZone.radius} meters",
-                    //     ),
-                    //   ),
-                    // );
-                    circles.add(
-                      Circle(
-                        circleId: CircleId(safeZone.id.toString()),
-                        center: LatLng(safeZone.latitude!, safeZone.longitude!),
-                        radius: safeZone.radius!,
-                        strokeWidth: 2,
-                        strokeColor: Colors.green,
-                        fillColor: Colors.green.withOpacity(0.2),
-                      ),
-                    );
-                  }
+                  updateMarkers(state);
                 } else if (state is MapError) {
                   return Center(child: Text(state.message));
                 }
@@ -268,15 +313,16 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
                     target: sourceLocation,
                     zoom: 14.0,
                   ),
-                  markers: {
-                    if (customMarker != null)
-                      Marker(
-                        markerId: const MarkerId('source'),
-                        position: sourceLocation,
-                        icon: customMarker!,
-                        infoWindow: const InfoWindow(title: 'Source Location'),
-                      ),
-                  },
+                  // markers: {
+                  //   if (customMarker != null)
+                  //     Marker(
+                  //       markerId: const MarkerId('source'),
+                  //       position: sourceLocation,
+                  //       icon: customMarker!,
+                  //       infoWindow: const InfoWindow(title: 'Source Location'),
+                  //     ),
+                  // },
+                  markers: _showMarkers ? markers : {},
                   circles: circles,
                   onMapCreated: (GoogleMapController controller) async {
                     googleMapController = controller;
@@ -366,7 +412,7 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
                                           const EdgeInsets.symmetric(
                                               horizontal: 12.0,
                                               vertical:
-                                                  12.0), // Padding adjustment
+                                                  12.0), 
                                       border: OutlineInputBorder(
                                         borderRadius:
                                             BorderRadius.circular(5.0),
@@ -492,7 +538,7 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
                                           fit: BoxFit.contain,
                                         ),
                                       ),
-                                    ))
+                                    )),
                               ],
                             ),
                           ),
@@ -503,6 +549,41 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
                 )
               ],
             ),
+            Positioned(
+              left: 20,
+              bottom: 91,
+              child: GestureDetector(
+                onTap: () {
+                  setState(() {
+                    _showMarkers = !_showMarkers;
+                  });
+                },
+                child: Container(
+                  width: 50,
+                  height: 50,
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey,
+                        blurRadius: 2,
+                        offset: Offset(1, 1),
+                      ),
+                    ],
+                  ),
+                  child: Center(
+                    child: Icon(
+                      _showMarkers
+                          ? Icons.visibility
+                          : Icons.visibility_off, 
+                      color: labelFormFieldColor,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+
             // Floating buttons
             widget.UserToken == 'guess'
                 ? const SizedBox()
