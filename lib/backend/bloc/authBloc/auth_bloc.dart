@@ -1,12 +1,7 @@
-import 'dart:async';
 import 'package:bloc/bloc.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-import 'package:meta/meta.dart';
 import 'package:safezone/backend/apiservice/authApi/auth_repo.dart';
 import 'package:safezone/backend/bloc/authBloc/auth_event.dart';
 import 'package:safezone/backend/bloc/authBloc/auth_state.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthenticationBloc
     extends Bloc<AuthenticationEvent, AuthenticationState> {

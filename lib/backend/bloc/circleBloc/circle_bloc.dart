@@ -1,7 +1,5 @@
-import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:safezone/backend/apiservice/circleApi/circle_impl.dart';
-import 'package:safezone/backend/models/userModel/circle_model.dart';
 import 'circle_event.dart';
 import 'circle_state.dart';
 

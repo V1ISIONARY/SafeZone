@@ -1,3 +1,5 @@
+// ignore_for_file: override_on_non_overriding_member
+
 import 'package:http/http.dart' as http;
 import 'package:safezone/backend/apiservice/circleApi/circle_repo.dart';
 import 'dart:convert';

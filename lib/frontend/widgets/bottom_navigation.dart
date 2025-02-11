@@ -186,13 +186,13 @@ class _BottomNavigationWidgetState extends State<BottomNavigationWidget> {
     );
   }
 
-  Widget _buildEmptyItem() {
-    return GestureDetector(
-      onTap: () {},
-      child: Container(
-        height: double.infinity,
-        width: 40,
-      ),
-    );
-  }
+  // Widget _buildEmptyItem() {
+  //   return GestureDetector(
+  //     onTap: () {},
+  //     child: Container(
+  //       height: double.infinity,
+  //       width: 40,
+  //     ),
+  //   );
+  // }
 }

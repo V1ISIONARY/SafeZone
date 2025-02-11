@@ -1,3 +1,5 @@
+// ignore_for_file: unused_local_variable
+
 import 'package:bloc/bloc.dart';
 import 'package:safezone/backend/apiservice/incident_reportApi/incident_report_repo.dart';
 import 'package:safezone/backend/bloc/incident_report/incident_report_event.dart';

@@ -8,7 +8,6 @@ import 'package:safezone/backend/bloc/safezoneBloc/safezone_event.dart';
 import 'package:safezone/backend/bloc/safezoneBloc/safezone_state.dart';
 import 'package:safezone/frontend/widgets/safe_zone_history_card.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:safezone/frontend/widgets/reports_history_card.dart';
 import 'package:safezone/resources/schema/colors.dart';
 import 'package:safezone/resources/schema/texts.dart';
 
