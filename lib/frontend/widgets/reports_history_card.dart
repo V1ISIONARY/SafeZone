@@ -61,9 +61,9 @@ class ReportsCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              decoration: BoxDecoration(
-                color: statusColor, // Use the dynamic color here
-                borderRadius: const BorderRadius.all(Radius.circular(10)),
+              decoration: const BoxDecoration(
+                color: Color.fromARGB(255, 243, 243, 243), // Use the dynamic color here
+                borderRadius: BorderRadius.all(Radius.circular(10)),
               ),
               child: Padding(
                 padding: const EdgeInsets.only(
@@ -71,7 +71,7 @@ class ReportsCard extends StatelessWidget {
                 child: Text(
                   statusText,
                   style:
-                      const TextStyle(fontSize: 15, color: Color(0xffFDFDFD)),
+                      TextStyle(fontSize: 15, color: statusColor),
                 ),
               ),
             ),

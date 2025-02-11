@@ -115,6 +115,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
+  // TODO: add validations
+
   Widget _buildEmailStep() {
     return Padding(
       padding: const EdgeInsets.all(20),

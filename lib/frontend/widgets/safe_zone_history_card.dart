@@ -58,17 +58,16 @@ class SafezoneHistoryCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              decoration: BoxDecoration(
-                color: statusColor, // Use the dynamic color here
-                borderRadius: const BorderRadius.all(Radius.circular(10)),
+              decoration: const BoxDecoration(
+                color: Color.fromARGB(255, 243, 243, 243),
+                borderRadius: BorderRadius.all(Radius.circular(10)),
               ),
               child: Padding(
                 padding: const EdgeInsets.only(
                     top: 3.0, bottom: 3.0, right: 8, left: 8),
                 child: Text(
                   statusText,
-                  style:
-                      const TextStyle(fontSize: 15, color: Color(0xffFDFDFD)),
+                  style: TextStyle(fontSize: 15, color: statusColor),
                 ),
               ),
             ),

@@ -101,7 +101,7 @@ class _LoginState extends State<Login> {
                       color: Color(0xFF5C5C5C),
                     ),
                   ),
-                  SizedBox(height: 8),
+                  SizedBox(height: 8),   // TODO: add validations
                   TextField(
                     controller: emailController,
                     style: TextStyle(

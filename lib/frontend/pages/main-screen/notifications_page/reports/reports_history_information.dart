@@ -27,28 +27,33 @@ class _ReportsHistoryDetailsState extends State<ReportsHistoryDetails> {
     switch (status.toLowerCase()) {
       case 'verified':
         return const LinearGradient(
-          colors: [Color(0xFF1E7F4E), Color(0xFF29933C), Color(0xFF36C070)],
+          colors: [Color.fromARGB(179, 19, 151, 85), Color.fromARGB(171, 13, 110, 61), Color.fromARGB(206, 9, 75, 42)
+          ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         );
       case 'under review':
         return const LinearGradient(
-          colors: [Color(0xFF113A61), Color(0xFF2B73B6), Color(0xFF367CE5)],
+          colors: [Color.fromARGB(190, 41, 96, 179), Color.fromARGB(186, 19, 76, 129), Color.fromARGB(216, 13, 57, 99)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         );
       case 'rejected':
         return const LinearGradient(
-          colors: [Color(0xFFE53636), Color(0xFFB62B2B), Color(0xFF7F1E1E)],
+          colors: [
+            Color.fromARGB(204, 146, 24, 24),
+            Color.fromARGB(211, 131, 20, 20),
+            Color.fromARGB(255, 94, 16, 16)
+          ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         );
       case 'pending':
         return const LinearGradient(
           colors: [
-            Color(0xFFE5A836),
-            Color(0xFFB6852B),
-            Color.fromARGB(204, 127, 93, 30)
+            Color.fromARGB(239, 156, 114, 35),
+            Color.fromARGB(223, 122, 88, 24),
+            Color.fromARGB(204, 109, 78, 21)
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,

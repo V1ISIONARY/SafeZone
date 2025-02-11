@@ -226,69 +226,6 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
     return position;
   }
 
-  void updateMarkers(MapState state) {
-    if (_showMarkers) {
-      markers.clear();
-      circles.clear();
-
-      if (state is MapDataLoaded) {
-        if (customDangerZoneMarker == null || customSafeZoneMarker == null) {
-          return;
-        }
-
-        for (var dangerZone in state.dangerZones) {
-          markers.add(
-            Marker(
-              markerId: MarkerId(dangerZone.id.toString()),
-              icon: customDangerZoneMarker!,
-              position: LatLng(dangerZone.latitude, dangerZone.longitude),
-              infoWindow: InfoWindow(
-                title: dangerZone.name,
-              ),
-            ),
-          );
-          circles.add(
-            Circle(
-              circleId: CircleId(dangerZone.id.toString()),
-              center: LatLng(dangerZone.latitude, dangerZone.longitude),
-              radius: dangerZone.radius,
-              strokeWidth: 1,
-              strokeColor: Colors.transparent,
-              fillColor: Colors.red.withOpacity(0.1),
-            ),
-          );
-        }
-
-        for (var safeZone in state.safeZones) {
-          markers.add(
-            Marker(
-              markerId: MarkerId(safeZone.id.toString()),
-              icon: customSafeZoneMarker!,
-              position: LatLng(safeZone.latitude!, safeZone.longitude!),
-              infoWindow: InfoWindow(
-                title: safeZone.name,
-                snippet: "${safeZone.radius}",
-              ),
-            ),
-          );
-          circles.add(
-            Circle(
-              circleId: CircleId(safeZone.id.toString()),
-              center: LatLng(safeZone.latitude!, safeZone.longitude!),
-              radius: safeZone.radius!,
-              strokeWidth: 1,
-              strokeColor: Colors.transparent,
-              fillColor: Colors.green.withOpacity(0.1),
-            ),
-          );
-        }
-      }
-    } else {
-      markers.clear();
-      circles.clear();
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -303,7 +240,57 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
                 if (state is MapLoading) {
                   return const Center(child: CircularProgressIndicator());
                 } else if (state is MapDataLoaded) {
-                  updateMarkers(state);
+                  markers.clear();
+                  circles.clear();
+                  for (var dangerZone in state.dangerZones) {
+                    markers.add(
+                      Marker(
+                        markerId: MarkerId(dangerZone.id.toString()),
+                        icon: customDangerZoneMarker!,
+                        position:
+                            LatLng(dangerZone.latitude, dangerZone.longitude),
+                        infoWindow: InfoWindow(
+                          title: dangerZone.name,
+                        ),
+                      ),
+                    );
+                    circles.add(
+                      // TODO: add gesture detector thatll show incident reports in that specific zone, gotta mod the BE pa
+                      Circle(
+                        circleId: CircleId(dangerZone.id.toString()),
+                        center:
+                            LatLng(dangerZone.latitude, dangerZone.longitude),
+                        radius: dangerZone.radius,
+                        strokeWidth: 1,
+                        strokeColor: Colors.transparent,
+                        fillColor: Colors.red.withOpacity(0.1),
+                      ),
+                    );
+                  }
+                  for (var safeZone in state.safeZones) {
+                    markers.add(
+                      Marker(
+                        markerId: MarkerId(safeZone.id.toString()),
+                        icon: customSafeZoneMarker!,
+                        position:
+                            LatLng(safeZone.latitude!, safeZone.longitude!),
+                        infoWindow: InfoWindow(
+                          title: safeZone.name,
+                          snippet: "${safeZone.radius}",
+                        ),
+                      ),
+                    );
+                    circles.add(
+                      Circle(
+                        circleId: CircleId(safeZone.id.toString()),
+                        center: LatLng(safeZone.latitude!, safeZone.longitude!),
+                        radius: safeZone.radius!,
+                        strokeWidth: 1,
+                        strokeColor: Colors.transparent,
+                        fillColor: Colors.green.withOpacity(0.1),
+                      ),
+                    );
+                  }
                 } else if (state is MapError) {
                   return Center(child: Text(state.message));
                 }
@@ -412,7 +399,7 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
                                           const EdgeInsets.symmetric(
                                               horizontal: 12.0,
                                               vertical:
-                                                  12.0), 
+                                                  12.0), // Padding adjustment
                                       border: OutlineInputBorder(
                                         borderRadius:
                                             BorderRadius.circular(5.0),
@@ -574,16 +561,13 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
                   ),
                   child: Center(
                     child: Icon(
-                      _showMarkers
-                          ? Icons.visibility
-                          : Icons.visibility_off, 
+                      _showMarkers ? Icons.visibility : Icons.visibility_off,
                       color: labelFormFieldColor,
                     ),
                   ),
                 ),
               ),
             ),
-
             // Floating buttons
             widget.UserToken == 'guess'
                 ? const SizedBox()
