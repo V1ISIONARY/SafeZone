@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:safezone/backend/cubic/notification.dart';
-import 'package:safezone/frontend/pages/main-screen/notification/all.dart';
-import 'package:safezone/frontend/pages/main-screen/notification/read.dart';
-import 'package:safezone/frontend/pages/main-screen/notification/unread.dart';
+import 'package:safezone/frontend/pages/main-screen/notifications_page/all.dart';
+import 'package:safezone/frontend/pages/main-screen/notifications_page/read.dart';
+import 'package:safezone/frontend/pages/main-screen/notifications_page/unread.dart';
 import 'package:safezone/frontend/widgets/buttons/notification_btn.dart';
 import 'package:safezone/resources/schema/colors.dart';
 

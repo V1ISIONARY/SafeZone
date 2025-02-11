@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:safezone/resources/schema/colors.dart';
-import 'package:safezone/frontend/pages/main-screen/map.dart';
-import 'package:safezone/frontend/pages/main-screen/contact.dart';
-import 'package:safezone/frontend/pages/main-screen/notification.dart';
-import 'package:safezone/frontend/pages/main-screen/settings/main-settings.dart';
+import 'package:safezone/frontend/pages/main-screen/home_page/map.dart';
+import 'package:safezone/frontend/pages/main-screen/contacts_page/contact.dart';
+import 'package:safezone/frontend/pages/main-screen/notifications_page/notification.dart';
+import 'package:safezone/frontend/pages/main-screen/settings_page/main-settings.dart';
 
 class BottomNavigationWidget extends StatefulWidget {
   @override

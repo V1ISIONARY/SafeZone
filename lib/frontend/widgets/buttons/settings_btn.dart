@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:safezone/frontend/pages/authentication/login.dart';
-import 'package:safezone/frontend/pages/main-screen/settings/about.dart';
-import 'package:safezone/frontend/pages/main-screen/settings/user_guide.dart';
+import 'package:safezone/frontend/pages/main-screen/settings_page/about.dart';
+import 'package:safezone/frontend/pages/main-screen/settings_page/user_guide.dart';
 
 import '../../../resources/schema/texts.dart';
 import '../../pages/authentication/account_details.dart';
 import '../../pages/introduction/starter.dart';
-import '../../pages/main-screen/settings/privacy_security.dart';
-import '../../pages/main-screen/settings/term-policy/main_terms_policy.dart';
+import '../../pages/main-screen/settings_page/privacy_security.dart';
+import '../../pages/main-screen/settings_page/term-policy/main_terms_policy.dart';
 
 class Settingsbtn extends StatelessWidget {
   final String title;

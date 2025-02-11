@@ -9,7 +9,7 @@ import 'package:safezone/backend/models/userModel/contacts_model.dart';
 import 'package:safezone/frontend/widgets/contact_info.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../widgets/dialogs/common_dialog.dart';
+import '../../../widgets/dialogs/common_dialog.dart';
 
 class Contact extends StatefulWidget {
 
