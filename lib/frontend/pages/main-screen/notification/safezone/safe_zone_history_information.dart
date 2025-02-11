@@ -5,6 +5,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart' as gmaps;
 import 'package:go_router/go_router.dart';
 import 'package:safezone/backend/models/safezoneModel/safezone_model.dart';
+import 'package:safezone/frontend/widgets/buttons/custom_radio_button.dart';
 import 'package:safezone/frontend/widgets/texts/history_information.dart';
 import 'package:safezone/resources/schema/colors.dart';
 import 'package:safezone/resources/schema/texts.dart';
@@ -177,7 +178,6 @@ class _SafeZoneHistoryDetailsState extends State<SafeZoneHistoryDetails> {
                   ),
                   Container(
                       width: double.infinity,
-                      margin: const EdgeInsets.only(bottom: 15),
                       padding: const EdgeInsets.symmetric(
                           horizontal: 16, vertical: 16),
                       decoration: const BoxDecoration(
@@ -223,6 +223,45 @@ class _SafeZoneHistoryDetailsState extends State<SafeZoneHistoryDetails> {
                                 fontWeight: FontWeight.bold,
                                 color: textColor),
                           ),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: List.generate(5, (index) {
+                              int ratingValue = index + 1;
+                              return Container(
+                                margin: const EdgeInsets.all(3),
+                                width: 60,
+                                height: 50,
+                                decoration: BoxDecoration(
+                                  color:
+                                      widget.safezonemodel.scale == ratingValue
+                                          ? btnColor.withOpacity(0.1)
+                                          : bgColor,
+                                  border: Border.all(
+                                    color: widget.safezonemodel.scale ==
+                                            ratingValue
+                                        ? btnColor
+                                        : const Color(0xff707070)
+                                            .withOpacity(0.5),
+                                    width: 1.5,
+                                  ),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    ratingValue.toString(),
+                                    style: const TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w400,
+                                      color: textColor,
+                                    ),
+                                  ),
+                                ),
+                              );
+                            }),
+                          ),
                           const SizedBox(height: 20),
                           Align(
                             alignment: Alignment.centerLeft,
@@ -232,14 +271,99 @@ class _SafeZoneHistoryDetailsState extends State<SafeZoneHistoryDetails> {
                                   fontSize: 13, color: textColor),
                             ),
                           ),
-                          const SizedBox(height: 12),
-                          HistoryInformationText(
-                            text: "Date",
-                            data: widget.safezonemodel.reportTimestamp!,
-                          ),
                           const SizedBox(height: 20),
+                          const Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              "What time of day do you feel this area is safe?",
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: textColor,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Column(
+                            children: [
+                              CustomRadioButton(
+                                value: "Daytime",
+                                groupValue: widget.safezonemodel.timeOfDay!,
+                                label: "Daytime",
+                                onChanged: null,
+                              ),
+                              CustomRadioButton(
+                                value: "Nighttime",
+                                groupValue: widget.safezonemodel.timeOfDay!,
+                                label: "Nighttime",
+                                onChanged: null,
+                              ),
+                              CustomRadioButton(
+                                value: "Both",
+                                groupValue: widget.safezonemodel.timeOfDay!,
+                                label: "Both",
+                                onChanged: null,
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
+                          const Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              "How often do you visit this area?",
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: textColor,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Column(
+                            children: [
+                              CustomRadioButton(
+                                value: "Daily",
+                                groupValue: widget.safezonemodel.frequency!,
+                                label: "Daily",
+                                onChanged: null,
+                              ),
+                              CustomRadioButton(
+                                value: "Weekly",
+                                groupValue: widget.safezonemodel.frequency!,
+                                label: "Weekly",
+                                onChanged: null,
+                              ),
+                              CustomRadioButton(
+                                value: "Occasionally",
+                                groupValue: widget.safezonemodel.frequency!,
+                                label: "Occasionally",
+                                onChanged: null,
+                              ),
+                              CustomRadioButton(
+                                value: "Rarely",
+                                groupValue: widget.safezonemodel.frequency!,
+                                label: "Rarely",
+                                onChanged: null,
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 10),
                         ],
                       )),
+                  const SizedBox(
+                    height: 1,
+                  ),
+                  Container(
+                    width: double.infinity,
+                    margin: const EdgeInsets.only(bottom: 15),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 16),
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                    ),
+                    child: HistoryInformationText(
+                      text: "Date",
+                      data: widget.safezonemodel.reportTimestamp!,
+                    ),
+                  ),
                 ],
               ),
             ),

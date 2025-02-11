@@ -29,7 +29,7 @@ class CustomRadioButton extends StatelessWidget {
           ),
           Text(
             label,
-            style: const TextStyle(fontSize: 15),
+            style: const TextStyle(fontSize: 13),
           ),
         ],
       ),
