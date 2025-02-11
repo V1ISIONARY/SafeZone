@@ -41,6 +41,7 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
   final GlobalKey _safeKey = GlobalKey();
 
   bool _showMarkers = true;
+  bool _showOptions = false;
 
   BitmapDescriptor? customMarker;
   BitmapDescriptor? customDangerZoneMarker;
@@ -549,9 +550,10 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
                 )
               ],
             ),
+            // if (_showOptions)
             Positioned(
               left: 20,
-              bottom: 150,
+              bottom: 155,
               child: GestureDetector(
                 onTap: () {
                   setState(() {
@@ -560,61 +562,41 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
                         : MapType.normal;
                   });
                 },
-                child: Container(
-                  width: 50,
-                  height: 50,
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey,
-                        blurRadius: 2,
-                        offset: Offset(1, 1),
-                      ),
-                    ],
-                  ),
-                  child: const Center(
-                    child: Icon(
-                      Icons.map,
-                      color: labelFormFieldColor,
-                    ),
-                  ),
-                ),
+                child: _buildButton(Icons.map),
               ),
             ),
+
+            // if (_showOptions)
             Positioned(
               left: 20,
-              bottom: 91,
+              bottom: 92,
               child: GestureDetector(
                 onTap: () {
                   setState(() {
                     _showMarkers = !_showMarkers;
                   });
                 },
-                child: Container(
-                  width: 50,
-                  height: 50,
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey,
-                        blurRadius: 2,
-                        offset: Offset(1, 1),
-                      ),
-                    ],
-                  ),
-                  child: Center(
-                    child: Icon(
-                      _showMarkers ? Icons.visibility : Icons.visibility_off,
-                      color: labelFormFieldColor,
-                    ),
-                  ),
-                ),
+                child: _buildButton(
+                    _showMarkers ? Icons.visibility : Icons.visibility_off),
               ),
             ),
+
+            // Positioned(
+            //   left: 20,
+            //   bottom: 92,
+            //   child: GestureDetector(
+            //     onTap: () {
+            //       setState(() {
+            //         _showOptions = !_showOptions;
+            //       });
+            //     },
+            //     child: AnimatedRotation(
+            //       turns: _showOptions ? 0.5 : 0, // Rotates the arrow
+            //       duration: const Duration(milliseconds: 300),
+            //       child: _buildButton(Icons.keyboard_arrow_down),
+            //     ),
+            //   ),
+            // ),
             // Floating buttons
             widget.UserToken == 'guess'
                 ? const SizedBox()
@@ -843,4 +825,29 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
       tutorial.show(context: context);
     });
   }
+}
+
+Widget _buildButton(IconData icon) {
+  return Container(
+    width: 50,
+    height: 50,
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius:
+          BorderRadius.circular(10), // Square shape with rounded corners
+      boxShadow: const [
+        BoxShadow(
+          color: Colors.grey,
+          blurRadius: 2,
+          offset: Offset(1, 1),
+        ),
+      ],
+    ),
+    child: Center(
+      child: Icon(
+        icon,
+        color: labelFormFieldColor,
+      ),
+    ),
+  );
 }
