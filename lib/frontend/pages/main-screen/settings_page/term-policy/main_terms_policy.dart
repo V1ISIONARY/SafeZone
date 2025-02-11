@@ -15,14 +15,14 @@ class TermsPolicy extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.white,
         centerTitle: true,
-        title: CategoryText(
+        title: const CategoryText(
           text: "Terms & Policy"
         ),
       ),
       body: Container(
-        margin: EdgeInsets.only(top: 20, left: 15, right: 15),
+        margin: const EdgeInsets.only(top: 20, left: 15, right: 15),
         child: ListView(
-          children: [
+          children: const [
             TermsPolicyBtn(
               title: 'Terms of Service',
               svgIcon: 'lib/resources/svg/documents.svg',

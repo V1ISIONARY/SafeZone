@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:safezone/resources/schema/colors.dart';
 
 class CommunityStandards extends StatefulWidget {
   const CommunityStandards({super.key});
@@ -76,10 +77,7 @@ class _SectionTitle extends StatelessWidget {
       child: Text(
         title,
         style: const TextStyle(
-          fontSize: 18,
-          fontWeight: FontWeight.bold,
-          color: Colors.black,
-        ),
+            color: textColor, fontSize: 15, fontWeight: FontWeight.bold),
       ),
     );
   }
@@ -95,10 +93,7 @@ class _SectionContent extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 12.0),
       child: Text(
         content,
-        style: const TextStyle(
-          fontSize: 16,
-          color: Colors.black87,
-        ),
+        style: const TextStyle(color: labelFormFieldColor, fontSize: 15),
       ),
     );
   }
