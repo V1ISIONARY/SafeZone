@@ -7,6 +7,7 @@ import 'package:safezone/backend/bloc/contactBloc/contact_event.dart';
 import 'package:safezone/backend/bloc/contactBloc/contact_state.dart';
 import 'package:safezone/backend/models/userModel/contacts_model.dart';
 import 'package:safezone/frontend/widgets/contact_info.dart';
+import 'package:safezone/resources/schema/colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../widgets/dialogs/common_dialog.dart';
@@ -47,12 +48,12 @@ class _ContactState extends State<Contact> with SingleTickerProviderStateMixin {
     super.initState();
 
     widget.UserToken == 'guess'
-      ? SizedBox()
+      ? const SizedBox()
       : loadUserId();
 
     _controller = AnimationController(
       vsync: this,
-      duration: Duration(milliseconds: 500),
+      duration: const Duration(milliseconds: 500),
     )..addStatusListener((status) {
         if (status == AnimationStatus.completed) {
           _controller.reset();
@@ -88,12 +89,12 @@ class _ContactState extends State<Contact> with SingleTickerProviderStateMixin {
             automaticallyImplyLeading: false,
             backgroundColor: Colors.white,
             centerTitle: false,
-            title: Text(
+            title: const Text(
               "Contact",
               style: TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.bold,
-                color: Colors.black,
+                color: textColor,
               ),
             ),
             actions: [
@@ -102,19 +103,19 @@ class _ContactState extends State<Contact> with SingleTickerProviderStateMixin {
                   showDialog(
                     context: context,
                     builder: (BuildContext context) {
-                      return CurvedAlertDialog(); // Display the custom dialog
+                      return const CurvedAlertDialog(); // Display the custom dialog
                     },
                   );
                 },
                 child: Padding(
-                  padding: EdgeInsets.only(right: 20),
+                  padding: const EdgeInsets.only(right: 20),
                   child: SvgPicture.asset("lib/resources/svg/add.svg"),
                 ),
               ),
             ],
           ),
           body: Container(
-            margin: EdgeInsets.symmetric(horizontal: 15),
+            margin: const EdgeInsets.symmetric(horizontal: 15),
             child: Stack(
               children:[
                 Column(
@@ -129,8 +130,8 @@ class _ContactState extends State<Contact> with SingleTickerProviderStateMixin {
                       child: TextField(
                         decoration: InputDecoration(
                           filled: true,
-                          fillColor: Color(0xFFF1F1F1),
-                          prefixIcon: Padding(
+                          fillColor: const Color(0xFFF1F1F1),
+                          prefixIcon: const Padding(
                             padding: EdgeInsets.only(left: 20, right: 10),
                             child: Icon(
                               Icons.search,
@@ -139,14 +140,14 @@ class _ContactState extends State<Contact> with SingleTickerProviderStateMixin {
                             ),
                           ),
                           hintText: "Search",
-                          hintStyle: TextStyle(color: Colors.grey, fontSize: 13),
+                          hintStyle: const TextStyle(color: Colors.grey, fontSize: 13),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(5.0),
                             borderSide: BorderSide.none,
                           ),
-                          contentPadding: EdgeInsets.symmetric(vertical: 15.0),
+                          contentPadding: const EdgeInsets.symmetric(vertical: 15.0),
                         ),
-                        style: TextStyle(fontSize: 13),
+                        style: const TextStyle(fontSize: 13),
                         onChanged: (text) {},
                       ),
                     ),
@@ -157,7 +158,7 @@ class _ContactState extends State<Contact> with SingleTickerProviderStateMixin {
                           return Expanded(
                             child: Center(
                               child: Transform.translate(
-                                offset: Offset(0, -60), 
+                                offset: const Offset(0, -60), 
                                 child: Lottie.asset(
                                   'lib/resources/lottie/loading.json',
                                   width: 150,
@@ -182,7 +183,7 @@ class _ContactState extends State<Contact> with SingleTickerProviderStateMixin {
                             ),
                           );
                         } else if (state is ContactError) {
-                          return Center(
+                          return const Center(
                             // child: Text(
                             //   state.error,
                             //   style: const TextStyle(color: Colors.red),
@@ -191,8 +192,8 @@ class _ContactState extends State<Contact> with SingleTickerProviderStateMixin {
                         } else {
                           return Expanded(
                             child: widget.UserToken == 'guess'
-                            ? SizedBox()
-                            : Center(
+                            ? const SizedBox()
+                            : const Center(
                                 child: Text("No contacts found."),
                               )
                           );

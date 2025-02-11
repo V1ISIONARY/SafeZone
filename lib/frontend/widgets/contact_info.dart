@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:safezone/resources/schema/colors.dart';
 
 class Contactinfo extends StatelessWidget {
   final String name;
@@ -21,16 +22,14 @@ class Contactinfo extends StatelessWidget {
                 Text(
                   name,
                   style: const TextStyle(
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black87,
-                    fontSize: 16,
+                    color: textColor, fontSize: 15
                   ),
                 ),
+                const SizedBox(height: 5,),
                 Text(
                   phone,
                   style: const TextStyle(
-                    color: Colors.black54,
-                    fontSize: 14,
+                    color: labelFormFieldColor, fontSize: 13
                   ),
                 ),
               ],

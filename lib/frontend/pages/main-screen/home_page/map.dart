@@ -46,6 +46,7 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
   BitmapDescriptor? customDangerZoneMarker;
   BitmapDescriptor? customSafeZoneMarker;
 
+  MapType _currentMapType = MapType.normal;
   late PageController _pageController;
   GoogleMapController? googleMapController;
   late AnimationController _controller;
@@ -246,7 +247,10 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
                     markers.add(
                       Marker(
                         markerId: MarkerId(dangerZone.id.toString()),
-                        icon: customDangerZoneMarker!,
+                        icon:
+                            customDangerZoneMarker!, // TODO: fix this null thing bug
+                        // icon: customDangerZoneMarker ??
+                        //     BitmapDescriptor.defaultMarker,
                         position:
                             LatLng(dangerZone.latitude, dangerZone.longitude),
                         infoWindow: InfoWindow(
@@ -271,7 +275,8 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
                     markers.add(
                       Marker(
                         markerId: MarkerId(safeZone.id.toString()),
-                        icon: customSafeZoneMarker!,
+                        icon: customSafeZoneMarker ??
+                            BitmapDescriptor.defaultMarker,
                         position:
                             LatLng(safeZone.latitude!, safeZone.longitude!),
                         infoWindow: InfoWindow(
@@ -300,6 +305,7 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
                     target: sourceLocation,
                     zoom: 14.0,
                   ),
+                  mapType: _currentMapType,
                   // markers: {
                   //   if (customMarker != null)
                   //     Marker(
@@ -309,7 +315,17 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
                   //       infoWindow: const InfoWindow(title: 'Source Location'),
                   //     ),
                   // },
-                  markers: _showMarkers ? markers : {},
+                  // markers: _showMarkers ? markers : {},
+                  markers: {
+                    Marker(
+                      markerId: const MarkerId('source'),
+                      position: sourceLocation,
+                      icon: customMarker ?? BitmapDescriptor.defaultMarker,
+                      infoWindow: const InfoWindow(title: 'Source Location'),
+                    ),
+                    if (_showMarkers) ...markers,
+                  },
+
                   circles: circles,
                   onMapCreated: (GoogleMapController controller) async {
                     googleMapController = controller;
@@ -340,7 +356,6 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
                   zoomControlsEnabled: false,
                   myLocationEnabled: false,
                   myLocationButtonEnabled: false,
-                  mapType: MapType.terrain,
                 );
               },
             ),
@@ -363,7 +378,7 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
                     ),
                     margin: const EdgeInsets.symmetric(horizontal: 20),
                     child: Center(
-                      child: Container(
+                      child: SizedBox(
                         height: 50,
                         child: Center(
                           child: Container(
@@ -397,9 +412,7 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
                                       ),
                                       contentPadding:
                                           const EdgeInsets.symmetric(
-                                              horizontal: 12.0,
-                                              vertical:
-                                                  12.0), // Padding adjustment
+                                              horizontal: 12.0, vertical: 12.0),
                                       border: OutlineInputBorder(
                                         borderRadius:
                                             BorderRadius.circular(5.0),
@@ -535,6 +548,40 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
                   ),
                 )
               ],
+            ),
+            Positioned(
+              left: 20,
+              bottom: 150,
+              child: GestureDetector(
+                onTap: () {
+                  setState(() {
+                    _currentMapType = _currentMapType == MapType.normal
+                        ? MapType.satellite
+                        : MapType.normal;
+                  });
+                },
+                child: Container(
+                  width: 50,
+                  height: 50,
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey,
+                        blurRadius: 2,
+                        offset: Offset(1, 1),
+                      ),
+                    ],
+                  ),
+                  child: const Center(
+                    child: Icon(
+                      Icons.map,
+                      color: labelFormFieldColor,
+                    ),
+                  ),
+                ),
+              ),
             ),
             Positioned(
               left: 20,
