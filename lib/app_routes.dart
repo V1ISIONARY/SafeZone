@@ -1,5 +1,9 @@
 import 'package:go_router/go_router.dart';
 import 'package:safezone/backend/models/safezoneModel/safezone_model.dart';
+import 'package:safezone/frontend/pages/admin/admin_reports.dart';
+import 'package:safezone/frontend/pages/admin/admin_reports_details.dart';
+import 'package:safezone/frontend/pages/admin/admin_safezone_details.dart';
+import 'package:safezone/frontend/pages/admin/admin_safezones.dart';
 import 'package:safezone/frontend/pages/authentication/register.dart';
 import 'package:safezone/backend/models/dangerzoneModel/incident_report_model.dart';
 import 'package:safezone/frontend/pages/authentication/login.dart';
@@ -94,6 +98,30 @@ GoRouter appRouter(bool isFirstRun) => GoRouter(
         GoRoute(
           path: '/sos-success',
           builder: (context, state) => const SosSuccess(),
+        ),
+
+        // ADMIN ROUTES
+        GoRoute(
+          path: '/admin-safezones',
+          builder: (context, state) => const AdminSafezones(),
+        ),
+        GoRoute(
+          path: '/admin-reports',
+          builder: (context, state) => const AdminReports(),
+        ),
+        GoRoute(
+          path: '/admin-reports-details',
+          builder: (context, state) {
+            final incidentReport = state.extra as IncidentReportModel;
+            return AdminReportsDetails(reportInfo: incidentReport);
+          },
+        ),
+        GoRoute(
+          path: '/admin-safezone-details',
+          builder: (context, state) {
+            final safezone = state.extra as SafeZoneModel;
+            return AdminSafezoneDetails(safezonemodel: safezone);
+          },
         ),
       ],
     );
