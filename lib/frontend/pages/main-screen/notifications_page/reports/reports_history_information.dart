@@ -27,14 +27,21 @@ class _ReportsHistoryDetailsState extends State<ReportsHistoryDetails> {
     switch (status.toLowerCase()) {
       case 'verified':
         return const LinearGradient(
-          colors: [Color.fromARGB(179, 19, 151, 85), Color.fromARGB(171, 13, 110, 61), Color.fromARGB(206, 9, 75, 42)
+          colors: [
+            Color.fromARGB(179, 19, 151, 85),
+            Color.fromARGB(171, 13, 110, 61),
+            Color.fromARGB(206, 9, 75, 42)
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         );
       case 'under review':
         return const LinearGradient(
-          colors: [Color.fromARGB(190, 41, 96, 179), Color.fromARGB(186, 19, 76, 129), Color.fromARGB(216, 13, 57, 99)],
+          colors: [
+            Color.fromARGB(190, 41, 96, 179),
+            Color.fromARGB(186, 19, 76, 129),
+            Color.fromARGB(216, 13, 57, 99)
+          ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         );
@@ -133,8 +140,8 @@ class _ReportsHistoryDetailsState extends State<ReportsHistoryDetails> {
                   ),
                   GestureDetector(
                     onTap: () {
-                      GoRouter.of(context)
-                          .push('/report-status', extra: widget.reportInfo);
+                      GoRouter.of(context).push('/reports-status-history',
+                          extra: widget.reportInfo);
                     },
                     child: Container(
                       width: double.infinity,

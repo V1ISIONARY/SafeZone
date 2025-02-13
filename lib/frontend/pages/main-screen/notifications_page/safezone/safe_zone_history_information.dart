@@ -94,7 +94,7 @@ class _SafeZoneHistoryDetailsState extends State<SafeZoneHistoryDetails> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         centerTitle: true,
-        title: const CategoryText(text: "Safe zone Details"),
+        title: const CategoryText(text: "Safe Zone Details"),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -139,7 +139,7 @@ class _SafeZoneHistoryDetailsState extends State<SafeZoneHistoryDetails> {
                   ),
                   GestureDetector(
                     onTap: () {
-                      GoRouter.of(context).push('/safezone-status',
+                      GoRouter.of(context).push('/safezone-status-history',
                           extra: widget.safezonemodel);
                     },
                     child: Container(
