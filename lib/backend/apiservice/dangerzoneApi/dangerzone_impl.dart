@@ -20,6 +20,18 @@ class DangerZoneRepositoryImpl implements DangerZoneRepository {
   }
 
   @override
+  Future<List<DangerZoneModel>> getVerifiedDangerZones() async {
+    final response =
+        await http.get(Uri.parse('$_apiUrl/verified-danger-zones'));
+    if (response.statusCode == 200) {
+      final List<dynamic> data = jsonDecode(response.body);
+      return data.map((json) => DangerZoneModel.fromJson(json)).toList();
+    } else {
+      throw Exception('Failed to load danger zones');
+    }
+  }
+
+  @override
   Future<DangerZoneModel> getDangerZone(int id) async {
     final response = await http.get(Uri.parse('$_apiUrl/get-danger-zone/$id'));
     if (response.statusCode == 200) {

@@ -16,7 +16,7 @@ class DangerZoneBloc extends Bloc<DangerZoneEvent, DangerZoneState> {
       FetchDangerZones event, Emitter<DangerZoneState> emit) async {
     emit(DangerZonesLoading());
     try {
-      final dangerZones = await dangerZoneRepository.getDangerZones();
+      final dangerZones = await dangerZoneRepository.getVerifiedDangerZones();
       emit(DangerZonesLoaded(dangerZones));
     } catch (e) {
       emit(DangerZonesError(e.toString()));

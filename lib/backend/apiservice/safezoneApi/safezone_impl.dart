@@ -11,8 +11,8 @@ class SafeZoneRepositoryImpl implements SafeZoneRepository {
   // GET
 
   @override
-  Future<List<SafeZoneModel>> getSafeZones() async {
-    final response = await http.get(Uri.parse('$_apiUrl/safe-zones'));
+  Future<List<SafeZoneModel>> getVerifiedSafeZones() async {
+    final response = await http.get(Uri.parse('$_apiUrl/verified-safe-zones'));
 
     if (response.statusCode == 200) {
       final List<dynamic> data = jsonDecode(response.body);

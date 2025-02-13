@@ -22,7 +22,7 @@ class SafeZoneBloc extends Bloc<SafeZoneEvent, SafeZoneState> {
       FetchSafeZones event, Emitter<SafeZoneState> emit) async {
     emit(SafeZoneLoading());
     try {
-      final safeZones = await safeZoneRepository.getSafeZones();
+      final safeZones = await safeZoneRepository.getVerifiedSafeZones();
       emit(SafeZonesLoaded(safeZones));
     } catch (e) {
       emit(SafeZoneError(e.toString()));

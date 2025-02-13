@@ -3,7 +3,7 @@ import 'package:safezone/backend/models/safezoneModel/safezone_model.dart';
 
 abstract class SafeZoneRepository {
   // GET
-  Future<List<SafeZoneModel>> getSafeZones();
+  Future<List<SafeZoneModel>> getVerifiedSafeZones();
   Future<SafeZoneModel> getSafeZoneById(int id);
   Future<List<SafeZoneModel>> getSafeZonesByStatus(String status);
   Future<List<SafeZoneModel>> getSafeZonesByUserId(int userId);

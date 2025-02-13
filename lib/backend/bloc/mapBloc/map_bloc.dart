@@ -20,10 +20,10 @@ class MapBloc extends Bloc<MapPageEvent, MapState> {
     emit(MapLoading());
     try {
       // Fetch safe zones
-      final safeZones = await safeZoneRepository.getSafeZones();
+      final safeZones = await safeZoneRepository.getVerifiedSafeZones();
 
       // Fetch danger zones
-      final dangerZones = await dangerZoneRepository.getDangerZones();
+      final dangerZones = await dangerZoneRepository.getVerifiedDangerZones();
 
       // Emit combined data
       emit(MapDataLoaded(safeZones, dangerZones));
