@@ -1,3 +1,5 @@
+import 'package:safezone/backend/models/dangerzoneModel/status_update_model.dart';
+
 class IncidentReportModel {
   int? id;
   int? userId;
@@ -8,8 +10,9 @@ class IncidentReportModel {
   List<String>? images;
   String? reportTimestamp;
   String? status;
-  final String updatedAt;
-  final DangerZoneModel? dangerZone;
+  String updatedAt;
+  DangerZoneModel? dangerZone;
+  List<IncidentReportStatusHistoryModel>? statusHistory;
 
   IncidentReportModel({
     required this.id,
@@ -23,6 +26,7 @@ class IncidentReportModel {
     this.status,
     required this.updatedAt,
     this.dangerZone,
+    this.statusHistory,
   });
 
   factory IncidentReportModel.fromJson(Map<String, dynamic> json) {
@@ -40,6 +44,11 @@ class IncidentReportModel {
       dangerZone: json['danger_zone'] != null
           ? DangerZoneModel.fromJson(json['danger_zone'])
           : null,
+      statusHistory: json['status_history'] != null
+          ? (json['status_history'] as List)
+              .map((e) => IncidentReportStatusHistoryModel.fromJson(e))
+              .toList()
+          : [],
     );
   }
 
@@ -55,6 +64,7 @@ class IncidentReportModel {
       'report_timestamp': reportTimestamp,
       'status': status,
       'updated_at': updatedAt,
+      'status_history': statusHistory?.map((e) => e.toJson()).toList(),
     };
   }
 }

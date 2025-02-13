@@ -51,3 +51,39 @@ class StatusHistory {
     };
   }
 }
+
+class IncidentReportStatusHistoryModel {
+  final int id;
+  final int incidentReportId;
+  final String status;
+  final String timestamp;
+  final String? remarks;
+
+  IncidentReportStatusHistoryModel({
+    required this.id,
+    required this.incidentReportId,
+    required this.status,
+    required this.timestamp,
+    this.remarks,
+  });
+
+  factory IncidentReportStatusHistoryModel.fromJson(Map<String, dynamic> json) {
+    return IncidentReportStatusHistoryModel(
+      id: json['id'],
+      incidentReportId: json['incident_report_id'],
+      status: json['status'],
+      timestamp: json['timestamp'],
+      remarks: json['remarks'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'incident_report_id': incidentReportId,
+      'status': status,
+      'timestamp': timestamp,
+      'remarks': remarks,
+    };
+  }
+}
