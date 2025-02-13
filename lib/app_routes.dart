@@ -11,6 +11,7 @@ import 'package:safezone/frontend/pages/authentication/login.dart';
 import 'package:safezone/frontend/pages/introduction/splash_screen.dart';
 import 'package:safezone/frontend/pages/main-screen/notifications_page/reports/reports_history_information.dart';
 import 'package:safezone/frontend/pages/main-screen/notifications_page/reports/reports_history.dart';
+import 'package:safezone/frontend/pages/main-screen/notifications_page/reports/reports_status_history.dart';
 import 'package:safezone/frontend/pages/main-screen/notifications_page/safezone/safe_zone_history_information.dart';
 import 'package:safezone/frontend/pages/main-screen/home_page/report-incident/create_report.dart';
 import 'package:safezone/frontend/pages/main-screen/home_page/report-incident/report_success.dart';
@@ -18,6 +19,7 @@ import 'package:safezone/frontend/pages/main-screen/home_page/report-incident/su
 import 'package:safezone/frontend/pages/main-screen/home_page/safe-zone/mark_safe_success.dart';
 import 'package:safezone/frontend/pages/main-screen/home_page/safe-zone/mark_safe_zone.dart';
 import 'package:safezone/frontend/pages/main-screen/home_page/safe-zone/review_safe_zone.dart';
+import 'package:safezone/frontend/pages/main-screen/notifications_page/safezone/safe_zone_status_history.dart';
 import 'package:safezone/frontend/pages/main-screen/sos_page/sos.dart';
 import 'package:safezone/frontend/pages/main-screen/sos_page/sos_countdown.dart';
 import 'package:safezone/frontend/pages/main-screen/sos_page/sos_success.dart';
@@ -67,6 +69,13 @@ GoRouter appRouter(bool isFirstRun) => GoRouter(
           },
         ),
         GoRoute(
+          path: '/reports-status-history',
+          builder: (context, state) {
+            final incidentReport = state.extra as IncidentReportModel;
+            return ReportsStatusHistory(reportInfo: incidentReport);
+          },
+        ),
+        GoRoute(
           path: '/mark-safe-zone',
           builder: (context, state) => const MarkSafeZone(),
         ),
@@ -82,6 +91,13 @@ GoRouter appRouter(bool isFirstRun) => GoRouter(
           builder: (context, state) {
             final safezone = state.extra as SafeZoneModel;
             return SafeZoneHistoryDetails(safezonemodel: safezone);
+          },
+        ),
+        GoRoute(
+          path: '/safezone-status-history',
+          builder: (context, state) {
+            final safezone = state.extra as SafeZoneModel;
+            return SafeZoneStatusHistory(safezonemodel: safezone);
           },
         ),
         GoRoute(
@@ -128,5 +144,6 @@ GoRouter appRouter(bool isFirstRun) => GoRouter(
             return AdminSafezoneDetails(safezonemodel: safezone);
           },
         ),
+
       ],
     );
