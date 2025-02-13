@@ -1,5 +1,6 @@
 import 'package:go_router/go_router.dart';
 import 'package:safezone/backend/models/safezoneModel/safezone_model.dart';
+import 'package:safezone/frontend/pages/admin/admin_initial_screen.dart';
 import 'package:safezone/frontend/pages/admin/admin_reports.dart';
 import 'package:safezone/frontend/pages/admin/admin_reports_details.dart';
 import 'package:safezone/frontend/pages/admin/admin_safezone_details.dart';
@@ -101,6 +102,10 @@ GoRouter appRouter(bool isFirstRun) => GoRouter(
         ),
 
         // ADMIN ROUTES
+        GoRoute(
+          path: '/admin-initial-screen',
+          builder: (context, state) => const AdminInitialScreen(),
+        ),
         GoRoute(
           path: '/admin-safezones',
           builder: (context, state) => const AdminSafezones(),
