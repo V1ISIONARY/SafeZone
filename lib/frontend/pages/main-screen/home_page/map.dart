@@ -550,37 +550,51 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
                 )
               ],
             ),
-            // if (_showOptions)
             Positioned(
-              left: 20,
-              bottom: 155,
-              child: GestureDetector(
-                onTap: () {
-                  setState(() {
-                    _currentMapType = _currentMapType == MapType.normal
-                        ? MapType.satellite
-                        : MapType.normal;
-                  });
-                },
-                child: _buildButton(Icons.map),
+              bottom: 100,
+              left: 15,
+              child: Row(
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _currentMapType = _currentMapType == MapType.normal
+                            ? MapType.satellite
+                            : MapType.normal;
+                      });
+                    },
+                    child: Container(
+                      width: 50,
+                      height: 50,
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey,
+                            blurRadius: 2,
+                            offset: Offset(1, 1),
+                          ),
+                        ],
+                      ),
+                      child: Center(
+                        child: _buildButton(Icons.map),
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 10,),
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _showMarkers = !_showMarkers;
+                      });
+                    },
+                    child: _buildButton(
+                        _showMarkers ? Icons.visibility : Icons.visibility_off),
+                  ),
+                ]
               ),
             ),
-
-            // if (_showOptions)
-            Positioned(
-              left: 20,
-              bottom: 92,
-              child: GestureDetector(
-                onTap: () {
-                  setState(() {
-                    _showMarkers = !_showMarkers;
-                  });
-                },
-                child: _buildButton(
-                    _showMarkers ? Icons.visibility : Icons.visibility_off),
-              ),
-            ),
-
             // Positioned(
             //   left: 20,
             //   bottom: 92,

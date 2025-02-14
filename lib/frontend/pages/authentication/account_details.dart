@@ -53,7 +53,21 @@ class _AccountDetailsState extends State<AccountDetails> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
+        automaticallyImplyLeading: false,
         centerTitle: true,
+        leading: GestureDetector(
+          onTap: () {
+            Navigator.pop(context);
+          },
+          child: Container(
+            margin: EdgeInsets.all(15),
+            decoration: BoxDecoration(
+              border: Border.all(width: 1, color: Colors.black),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(Icons.arrow_back, color: Colors.black, size: 10),
+          ),
+        ),
         title: CategoryText(
           text: "Account Details"
         ),

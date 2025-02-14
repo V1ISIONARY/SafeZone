@@ -220,24 +220,37 @@ class _SettingsState extends State<Settings> {
                 ]
               ),
             ),
-            Padding(
-              padding: EdgeInsets.symmetric(
-                vertical: 10
+            widget.UserToken == 'guess'
+              ? SizedBox()
+              : Column (
+                children: [
+                  Padding(
+                    padding: EdgeInsets.only(top: 10),
+                    child: Settingsbtn(
+                      title: 'Account Details',
+                      svgIcon: 'lib/resources/svg/account.svg',
+                      navigateTo: 'AccountDetails',
+                      description: 'Protecting personal data and ensuring safety from threats.',
+                    ),
+                  ),
+                  widget.UserToken == 'admin' 
+                    ? Container()
+                    : Settingsbtn(
+                      title: 'Report Analytics',
+                      svgIcon: 'lib/resources/svg/monitor.svg',
+                      navigateTo: 'Analytics',
+                      description: 'Report Analytics delivers data insights with reports and dashboards.',
+                    )
+                ]
               ),
-              child: widget.UserToken == 'guess'
-                ? SizedBox()
-                :Settingsbtn(
-                  title: 'Account Details',
-                  svgIcon: 'lib/resources/svg/account.svg',
-                  navigateTo: 'AccountDetails',
-                  description: 'Protecting personal data and ensuring safety from threats.',
-                )
-            ),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                CategoryText(
-                  text: "User Preference"
+                Padding(
+                  padding: EdgeInsets.only(top: 10),
+                  child: CategoryText(
+                    text: "User Preference"
+                  ),
                 ),
                 CategoryDescripText(
                   text: "Select the appropriate map design for your application."

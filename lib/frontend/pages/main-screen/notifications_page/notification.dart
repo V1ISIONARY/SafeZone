@@ -32,7 +32,7 @@ class _NotifState extends State<Notif> with SingleTickerProviderStateMixin {
     super.initState();
 
     pageController = PageController(initialPage: widget.initialPage);
-    topLevelPages = [All(), Read(), Unread()];
+    topLevelPages = [All(userToken: widget.UserToken), Read(userToken: widget.UserToken), Unread(userToken: widget.UserToken)];
 
     _controller = AnimationController(
       vsync: this,

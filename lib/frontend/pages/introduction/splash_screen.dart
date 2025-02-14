@@ -32,7 +32,7 @@ class _SplashScreenState extends State<SplashScreen> {
         Navigator.push(
           context,
           PageTransition(
-            child: isFirstRun ? const Starter() : BottomNavigationWidget(),
+            child: isFirstRun ? const Starter() : BottomNavigationWidget(userToken: 'guess',),
             type: PageTransitionType.fade,
             duration: const Duration(milliseconds: 300),
           ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:safezone/frontend/pages/admin/admin_initial_screen.dart';
 import 'package:safezone/frontend/pages/authentication/login.dart';
 import 'package:safezone/frontend/pages/main-screen/settings_page/about.dart';
 import 'package:safezone/frontend/pages/main-screen/settings_page/user_guide.dart';
@@ -89,6 +90,8 @@ class Settingsbtn extends StatelessWidget {
         return const TermsPolicy();
       case "UserGuide":
         return const UserGuide();
+      case "Analytics":
+        return const AdminInitialScreen(); 
       case "About":
         return const About();
       case "Starter":

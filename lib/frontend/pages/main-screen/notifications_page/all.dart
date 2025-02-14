@@ -2,7 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:safezone/resources/schema/colors.dart';
 
 class All extends StatefulWidget {
-  const All({super.key});
+  final String userToken;
+  const All({
+    super.key,
+    required this.userToken
+  });
 
   @override
   State<All> createState() => _AllState();
@@ -30,20 +34,40 @@ class _AllState extends State<All> {
   }
 
   Widget _buildPlaceholder() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Image.asset(
-          'lib/resources/images/notif1.png',
-          width: 150,
-          height: 150,
-        ),
-        const SizedBox(height: 20),
-        const Text(
-          "No notifications",
-          style: TextStyle(fontSize: 16, color: Colors.grey),
-        ),
-      ],
+    return widget.userToken == 'guess' 
+    ? Container()
+    : Transform.translate(
+      offset: Offset(0, -50),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            width: 150,
+            height: 150,
+            child: Image.asset(
+              'lib/resources/images/notif1.png',
+              width: 150,
+              height: 150,
+            ) 
+          ),
+          const Text(
+            'Empty Notification',
+            style: TextStyle(
+              color: Colors.black,
+              fontSize: 15,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const Text(
+            'this is no new notification, check back later.',
+            style: TextStyle(
+              color: Colors.black54,
+              fontSize: 9,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
     );
   }
 }

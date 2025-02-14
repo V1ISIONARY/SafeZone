@@ -285,7 +285,7 @@ class _LoginState extends State<Login> {
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => BottomNavigationWidget()),
+                              builder: (context) => BottomNavigationWidget(userToken: 'who')),
                         );
                       }
                     },

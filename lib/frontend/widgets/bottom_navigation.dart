@@ -8,6 +8,10 @@ import 'package:safezone/frontend/pages/main-screen/notifications_page/notificat
 import 'package:safezone/frontend/pages/main-screen/settings_page/main-settings.dart';
 
 class BottomNavigationWidget extends StatefulWidget {
+  final String userToken;
+
+  const BottomNavigationWidget({Key? key, required this.userToken}) : super(key: key);
+
   @override
   _BottomNavigationWidgetState createState() => _BottomNavigationWidgetState();
 }
@@ -15,19 +19,18 @@ class BottomNavigationWidget extends StatefulWidget {
 class _BottomNavigationWidgetState extends State<BottomNavigationWidget> {
   int _selectedIndex = 0;
 
-  // final List<Widget> _pages = [
-  //   const Map(UserToken: 'guess'),
-  //   const Contact(UserToken: 'guess'),
-  //   const Notif(UserToken: 'guess', initialPage: 0,),
-  //   const Settings(UserToken: 'guess'),
-  // ];
+  late List<Widget> _pages;
 
-  final List<Widget> _pages = [
-    const Map(UserToken: 'who'),
-    const Contact(UserToken: 'who'),
-    const Notif(UserToken: 'who', initialPage: 1),
-    const Settings(UserToken: 'who'),
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _pages = [
+      Map(UserToken: widget.userToken),
+      Contact(UserToken: widget.userToken),
+      Notif(UserToken: widget.userToken, initialPage: 0),
+      Settings(UserToken: widget.userToken),
+    ];
+  }
 
   void _onItemTapped(int index) {
     setState(() {

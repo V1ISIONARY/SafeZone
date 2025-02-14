@@ -31,11 +31,11 @@ GoRouter appRouter(bool isFirstRun) => GoRouter(
         GoRoute(
           path: '/',
           builder: (context, state) =>
-              isFirstRun ? const SplashScreen() : BottomNavigationWidget(),
+              isFirstRun ? const SplashScreen() : BottomNavigationWidget(userToken: 'guess'),
         ),
         GoRoute(
           path: '/home',
-          builder: (context, state) => BottomNavigationWidget(),
+          builder: (context, state) => BottomNavigationWidget(userToken: 'guess'),
         ),
         GoRoute(
           path: '/register',

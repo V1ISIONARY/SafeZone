@@ -77,18 +77,24 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
+        backgroundColor: Colors.white,
         automaticallyImplyLeading: false,
-        centerTitle: false,
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            AppbarText(
-              title: 'SafeZone',
-              alignment: 'start',
-              textColor: Colors.black,
+        centerTitle: true,
+        title: const CategoryText(
+          text: "Reports Analytics"
+        ),
+        leading: GestureDetector(
+          onTap: () {
+            Navigator.pop(context);
+          },
+          child: Container(
+            margin: EdgeInsets.all(15),
+            decoration: BoxDecoration(
+              border: Border.all(width: 1, color: Colors.black),
+              shape: BoxShape.circle,
             ),
-            DescriptionText(text: 'Analytics')
-          ],
+            child: Icon(Icons.arrow_back, color: Colors.black, size: 10),
+          ),
         ),
       ),
       body: ListView(
