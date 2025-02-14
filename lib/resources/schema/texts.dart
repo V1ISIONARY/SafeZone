@@ -114,3 +114,42 @@ class DescriptionText extends StatelessWidget {
   }
 
 }
+
+class AppbarText extends StatelessWidget {
+
+  final String title;
+  final String? alignment;
+  final Color textColor;
+  const AppbarText({
+    super.key,
+    required this.title,
+    this.alignment,
+    required this.textColor
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      title,
+      style: TextStyle(
+        color: textColor,
+        fontSize: 15
+      ),
+      textAlign: _getTextAlignment(),
+    );
+  }
+
+  TextAlign _getTextAlignment() {
+    switch (alignment?.toLowerCase()) {
+      case "right":
+        return TextAlign.right;
+      case "center":
+        return TextAlign.center;
+      case "left":
+        return TextAlign.left;
+      default:
+        return TextAlign.start; 
+    }
+  }
+
+}
