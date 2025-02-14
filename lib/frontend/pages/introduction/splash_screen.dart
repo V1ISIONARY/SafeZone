@@ -32,7 +32,11 @@ class _SplashScreenState extends State<SplashScreen> {
         Navigator.push(
           context,
           PageTransition(
-            child: isFirstRun ? const Starter() : BottomNavigationWidget(userToken: 'guess',),
+            child: isFirstRun
+                ? const Starter()
+                : BottomNavigationWidget(
+                    userToken: 'guess',
+                  ),
             type: PageTransitionType.fade,
             duration: const Duration(milliseconds: 300),
           ),
@@ -52,7 +56,7 @@ class _SplashScreenState extends State<SplashScreen> {
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        color: widgetPricolor,
+        color: Colors.white,
         child: Stack(
           children: [
             Center(
@@ -72,10 +76,10 @@ class _SplashScreenState extends State<SplashScreen> {
               right: 0,
               child: Center(
                 child: GestureDetector(
-                  child: const Text(
+                  child: Text(
                     'Visionary 0.0.1',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: widgetPricolor,
                       fontSize: 8,
                     ),
                   ),

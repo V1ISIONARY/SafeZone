@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:page_transition/page_transition.dart';
-import 'package:safezone/frontend/pages/admin/admin_initial_screen.dart';
+import 'package:safezone/frontend/pages/admin/main-analytics.dart';
 import 'package:safezone/frontend/pages/authentication/login.dart';
 import 'package:safezone/frontend/pages/main-screen/settings_page/about.dart';
 import 'package:safezone/frontend/pages/main-screen/settings_page/user_guide.dart';
@@ -30,11 +30,11 @@ class Settingsbtn extends StatelessWidget {
     return GestureDetector(
         onTap: () {
           Navigator.push(
-            context,
-            PageTransition(
-                child: _getPageForNavigation(navigateTo),
-                type: PageTransitionType.rightToLeft,
-                duration: Duration(milliseconds: 200)));
+              context,
+              PageTransition(
+                  child: _getPageForNavigation(navigateTo),
+                  type: PageTransitionType.rightToLeft,
+                  duration: Duration(milliseconds: 200)));
         },
         child: Container(
             width: double.infinity,
@@ -91,7 +91,7 @@ class Settingsbtn extends StatelessWidget {
       case "UserGuide":
         return const UserGuide();
       case "Analytics":
-        return const AdminInitialScreen(); 
+        return const MainAnalytics(initialPage: 0);
       case "About":
         return const About();
       case "Starter":

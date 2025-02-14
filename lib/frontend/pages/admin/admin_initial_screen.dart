@@ -6,7 +6,8 @@ import '../../../resources/schema/texts.dart';
 import '../../widgets/buttons/percentage_average.dart';
 
 class AdminInitialScreen extends StatefulWidget {
-  const AdminInitialScreen({super.key});
+  final int? initialPage;
+  const AdminInitialScreen({super.key, this.initialPage});
 
   @override
   State<AdminInitialScreen> createState() => _AdminInitialScreenState();
@@ -76,29 +77,8 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        automaticallyImplyLeading: false,
-        centerTitle: true,
-        title: const CategoryText(
-          text: "Reports Analytics"
-        ),
-        leading: GestureDetector(
-          onTap: () {
-            Navigator.pop(context);
-          },
-          child: Container(
-            margin: EdgeInsets.all(15),
-            decoration: BoxDecoration(
-              border: Border.all(width: 1, color: Colors.black),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(Icons.arrow_back, color: Colors.black, size: 10),
-          ),
-        ),
-      ),
       body: ListView(
-        padding: const EdgeInsets.symmetric(horizontal: 15),
+        padding: const EdgeInsets.only(left: 15, right: 15, top: 15),
         children: [
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -120,8 +100,12 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> {
                             category,
                             style: TextStyle(
                               fontSize: 10,
-                              fontWeight: selectedCategory == category ? FontWeight.w500 : FontWeight.w300,
-                              color: selectedCategory == category ? widgetPricolor : Colors.black38,
+                              fontWeight: selectedCategory == category
+                                  ? FontWeight.w500
+                                  : FontWeight.w300,
+                              color: selectedCategory == category
+                                  ? widgetPricolor
+                                  : Colors.black38,
                             ),
                           ),
                         ),
@@ -138,7 +122,8 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> {
                     borderRadius: BorderRadius.circular(5),
                     color: const Color.fromARGB(10, 0, 0, 0),
                   ),
-                  padding: const EdgeInsets.only(right: 20, top: 20, bottom: 15),
+                  padding:
+                      const EdgeInsets.only(right: 20, top: 20, bottom: 15),
                   child: LineChart(
                     LineChartData(
                       titlesData: FlTitlesData(
@@ -157,8 +142,10 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> {
                             interval: 1,
                           ),
                         ),
-                        topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                        rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                        topTitles: AxisTitles(
+                            sideTitles: SideTitles(showTitles: false)),
+                        rightTitles: AxisTitles(
+                            sideTitles: SideTitles(showTitles: false)),
                       ),
                       borderData: FlBorderData(show: false),
                       gridData: FlGridData(show: true),
@@ -182,9 +169,13 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> {
             padding: const EdgeInsets.only(top: 15),
             child: Row(
               children: [
-                Expanded(child: PercentageAverage(count: 236, title: 'Total Reports')),
+                Expanded(
+                    child:
+                        PercentageAverage(count: 236, title: 'Total Reports')),
                 const SizedBox(width: 10),
-                Expanded(child: PercentageAverage(count: 236, title: 'Total Reviews')),
+                Expanded(
+                    child:
+                        PercentageAverage(count: 236, title: 'Total Reviews')),
               ],
             ),
           ),

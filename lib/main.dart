@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:safezone/backend/cubic/analytics.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:safezone/backend/apiservice/contactApi/contact_impl.dart';
@@ -43,6 +44,9 @@ class MyApp extends StatelessWidget {
         ),
         BlocProvider(
           create: (_) => NotificationCubit(),
+        ),
+        BlocProvider(
+          create: (_) => AnalyticsCubic(),
         ),
         BlocProvider(
           create: (_) => IncidentReportBloc(IncidentRepositoryImpl()),

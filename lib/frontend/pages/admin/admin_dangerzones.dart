@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:safezone/frontend/widgets/buttons/identifiedZone.dart';
 
-import '../../widgets/buttons/userinfomartion.dart';
+import '../../widgets/buttons/identifiedZone.dart';
 
-class AdminSafezones extends StatefulWidget {
-  const AdminSafezones({super.key});
+class AdminDangerzones extends StatefulWidget {
+  const AdminDangerzones({super.key});
 
   @override
-  State<AdminSafezones> createState() => _AdminSafezonesState();
+  State<AdminDangerzones> createState() => _AdminDangerzonesState();
 }
 
-class _AdminSafezonesState extends State<AdminSafezones> {
+class _AdminDangerzonesState extends State<AdminDangerzones> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -19,14 +18,6 @@ class _AdminSafezonesState extends State<AdminSafezones> {
         margin: EdgeInsets.only(top: 15, left: 15, right: 15),
         child: ListView(
           children: [
-            IdentifiedZone(
-                name: "Miro Abnormal",
-                profileImage: '',
-                location: 'Pantal, Dagupan City, Pangasinan'),
-            IdentifiedZone(
-                name: "Miro Abnormal",
-                profileImage: '',
-                location: 'Pantal, Dagupan City, Pangasinan'),
             IdentifiedZone(
                 name: "Miro Abnormal",
                 profileImage: '',
