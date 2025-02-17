@@ -31,6 +31,25 @@ class CircleImplementation extends CircleRepository {
   }
 
   @override
+  Future<Map<String, dynamic>> generateCircleCode(int circleId) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/generate_code'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: jsonEncode({'circle_id': circleId}),
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      return {'code': data['code'], 'expiry': data['expires_at']};
+    } else {
+      throw Exception('Failed to generate code');
+    }
+  }
+
+  @override
   // Create a new circle
   Future<CircleModel> createCircle(String name, int userId) async {
     final response = await http.post(
@@ -55,23 +74,25 @@ class CircleImplementation extends CircleRepository {
   }
 
   @override
-  // Add a member to a circle
-  Future<void> addMemberToCircle(int circleId, int userId) async {
+  // Join a circle using a code
+  Future<void> joinCircle(int userId, String code) async {
     final response = await http.post(
-      Uri.parse('$baseUrl/add_member'),
+      Uri.parse('$baseUrl/join_circle'),
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json'
       },
       body: jsonEncode({
-        'circle_id': circleId,
         'user_id': userId,
+        'code': code,
       }),
     );
 
-    if (response.statusCode != 200) {
-      print("Failed to add member to circle");
-      throw Exception('Failed to add member to circle');
+    if (response.statusCode == 200) {
+      print("User joined the circle successfully");
+    } else {
+      print("Failed to join the circle: ${response.body}");
+      throw Exception('Failed to join the circle');
     }
   }
 

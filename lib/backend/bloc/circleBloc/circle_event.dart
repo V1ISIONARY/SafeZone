@@ -15,10 +15,10 @@ class CreateCircleEvent extends CircleEvent {
 }
 
 class AddMemberEvent extends CircleEvent {
-  final int circleId;
+  final String code;
   final int userId;
 
-  AddMemberEvent({required this.circleId, required this.userId});
+  AddMemberEvent({required this.code, required this.userId});
 }
 
 class RemoveMemberEvent extends CircleEvent {
@@ -39,4 +39,10 @@ class FetchMembersEvent extends CircleEvent {
   final int circleId;
 
   FetchMembersEvent({required this.circleId});
+}
+
+class GenerateCodeEvent extends CircleEvent {
+  final int circleId;
+
+  GenerateCodeEvent({required this.circleId});
 }

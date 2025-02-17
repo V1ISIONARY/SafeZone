@@ -43,3 +43,10 @@ class CircleMembersLoadedState extends CircleState {
 
   CircleMembersLoadedState({required this.members});
 }
+
+class CircleCodeGeneratedState extends CircleState {
+  final String code;
+  final String expiry;
+
+  CircleCodeGeneratedState({required this.code, required this.expiry});
+}

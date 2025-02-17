@@ -37,8 +37,10 @@ class CircleBloc extends Bloc<CircleEvent, CircleState> {
     on<AddMemberEvent>((event, emit) async {
       emit(CircleLoadingState());
       try {
-        await _circleImplementation.addMemberToCircle(
-            event.circleId, event.userId);
+        await _circleImplementation.joinCircle(
+          event.userId,
+          event.code,
+        );
         emit(CircleUpdatedState(message: 'Member added successfully'));
       } catch (e) {
         emit(CircleErrorState(message: 'Error adding member: ${e.toString()}'));
@@ -79,6 +81,22 @@ class CircleBloc extends Bloc<CircleEvent, CircleState> {
       } catch (e) {
         emit(CircleErrorState(
             message: 'Error fetching members: ${e.toString()}'));
+      }
+    });
+// Generate a circle code
+    on<GenerateCodeEvent>((event, emit) async {
+      emit(CircleLoadingState());
+      try {
+        final response =
+            await _circleImplementation.generateCircleCode(event.circleId);
+        emit(CircleCodeGeneratedState(
+          code: response['code'],
+          expiry: response['expiry'],
+        ));
+      } catch (e) {
+        emit(CircleErrorState(
+          message: 'Error generating code: ${e.toString()}',
+        ));
       }
     });
   }
