@@ -11,9 +11,11 @@ import 'package:safezone/resources/schema/colors.dart';
 import 'package:safezone/resources/schema/texts.dart';
 
 class AdminSafezoneDetails extends StatefulWidget {
-  const AdminSafezoneDetails({super.key, required this.safezonemodel});
+  const AdminSafezoneDetails(
+      {super.key, required this.safezonemodel, required this.address});
 
   final SafeZoneModel safezonemodel;
+  final String address;
 
   @override
   State<AdminSafezoneDetails> createState() => _AdminSafezoneDetailsState();
@@ -139,7 +141,7 @@ class _AdminSafezoneDetailsState extends State<AdminSafezoneDetails> {
                   ),
                   GestureDetector(
                     onTap: () {
-                      GoRouter.of(context).push('/safezone-status',
+                      GoRouter.of(context).push('/safezone-status-history',
                           extra: widget.safezonemodel);
                     },
                     child: Container(
@@ -236,8 +238,33 @@ class _AdminSafezoneDetailsState extends State<AdminSafezoneDetails> {
                                 color: textColor),
                           ),
                           const SizedBox(
-                            height: 20,
+                            height: 10,
                           ),
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: const BoxDecoration(
+                                color: Color.fromARGB(5, 0, 0, 0)),
+                            child: Wrap(
+                              children: [
+                                const Text("Location: ",
+                                    style: TextStyle(
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w400,
+                                        color: Colors.black87)),
+                                Container(
+                                  height: 10,
+                                ),
+                                Text(
+                                  widget.address,
+                                  style: const TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w400,
+                                      color: Colors.black87),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 20),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: List.generate(5, (index) {
