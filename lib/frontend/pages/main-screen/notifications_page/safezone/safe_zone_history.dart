@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:safezone/backend/bloc/safezoneBloc/safezone_bloc.dart';
 import 'package:safezone/backend/bloc/safezoneBloc/safezone_event.dart';
 import 'package:safezone/backend/bloc/safezoneBloc/safezone_state.dart';
-import 'package:safezone/frontend/widgets/safe_zone_history_card.dart';
+import 'package:safezone/frontend/widgets/cards/safe_zone_history_card.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:safezone/resources/schema/colors.dart';
 import 'package:safezone/resources/schema/texts.dart';
