@@ -4,7 +4,7 @@ import 'package:safezone/backend/bloc/incident_report/incident_report_bloc.dart'
 import 'package:safezone/backend/bloc/incident_report/incident_report_event.dart';
 import 'package:safezone/backend/bloc/incident_report/incident_report_state.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:safezone/frontend/widgets/reports_history_card.dart';
+import 'package:safezone/frontend/widgets/cards/reports_history_card.dart';
 import 'package:safezone/resources/schema/colors.dart';
 import 'package:safezone/resources/schema/texts.dart';
 

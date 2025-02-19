@@ -1,11 +1,13 @@
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:safezone/backend/apiservice/authApi/auth_repo.dart';
-import 'package:safezone/backend/apiservice/vercel_url.dart';
 
 class AuthenticationImplementation extends AuthenticationRepository {
-  static const String baseUrl = '${VercelUrl.mainUrl}/user';
+  // static const String baseUrl = '${VercelUrl.mainUrl}/user';
+  final baseUrl = "${dotenv.env['API_URL']}/user";
+
 
   @override
   Future<void> userLogin(String email, String password) async {

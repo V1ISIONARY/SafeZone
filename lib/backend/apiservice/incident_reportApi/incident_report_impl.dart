@@ -1,5 +1,5 @@
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:safezone/backend/apiservice/incident_reportApi/incident_report_repo.dart';
-import 'package:safezone/backend/apiservice/vercel_url.dart';
 import 'package:safezone/backend/models/dangerzoneModel/incident_report_model.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -7,7 +7,9 @@ import 'package:safezone/backend/models/dangerzoneModel/incident_report_request_
 import 'package:safezone/backend/models/dangerzoneModel/status_update_model.dart';
 
 class IncidentRepositoryImpl implements IncidentReportRepository {
-  static const String _apiUrl = '${VercelUrl.mainUrl}/incident-reports';
+  // static const String _apiUrl = '${VercelUrl.mainUrl}/incident-reports';
+    final _apiUrl = "${dotenv.env['API_URL']}/incident-reports";
+
   // GET
 
   @override

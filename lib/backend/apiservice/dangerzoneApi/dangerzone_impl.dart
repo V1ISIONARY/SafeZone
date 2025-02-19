@@ -1,11 +1,14 @@
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:safezone/backend/apiservice/dangerzoneApi/dangerzone_repo.dart';
-import 'package:safezone/backend/apiservice/vercel_url.dart';
 import 'package:safezone/backend/models/dangerzoneModel/incident_report_model.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class DangerZoneRepositoryImpl implements DangerZoneRepository {
-  static const String _apiUrl = '${VercelUrl.mainUrl}/danger-zone';
+  // static const String _apiUrl = '${VercelUrl.mainUrl}/danger-zone';
+  final _apiUrl = "${dotenv.env['API_URL']}/danger-zone";
+
+
   // GET
 
   @override

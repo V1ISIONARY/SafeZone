@@ -1,13 +1,16 @@
 // ignore_for_file: override_on_non_overriding_member
 
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:safezone/backend/apiservice/circleApi/circle_repo.dart';
 import 'dart:convert';
 import 'package:safezone/backend/models/userModel/circle_model.dart';
-import 'package:safezone/backend/apiservice/vercel_url.dart';
 
 class CircleImplementation extends CircleRepository {
-  static const String baseUrl = '${VercelUrl.mainUrl}/circle';
+  // static const String baseUrl = '${VercelUrl.mainUrl}/circle';
+    final baseUrl = "${dotenv.env['API_URL']}/circle";
+
+  
   @override
   // Fetch circles for a specific user
   Future<List<CircleModel>> getUserCircles(int userId) async {
