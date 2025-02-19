@@ -58,6 +58,7 @@ dependencies:
   insta_image_viewer: ^1.0.4
   timeline_tile: ^2.0.0
   fl_chart: ^0.63.0
+  geocoding: ^3.0.0
 
 flutter_launcher_icons:
   android: "launcher_icon"
