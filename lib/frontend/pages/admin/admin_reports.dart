@@ -7,11 +7,7 @@ import 'package:http/http.dart' as http;
 import 'package:safezone/backend/bloc/incident_report/incident_report_bloc.dart';
 import 'package:safezone/backend/bloc/incident_report/incident_report_event.dart';
 import 'package:safezone/backend/bloc/incident_report/incident_report_state.dart';
-import 'package:safezone/backend/bloc/safezoneBloc/safezone_bloc.dart';
-import 'package:safezone/backend/bloc/safezoneBloc/safezone_event.dart';
-import 'package:safezone/backend/bloc/safezoneBloc/safezone_state.dart';
 import 'package:safezone/frontend/widgets/cards/admin_reports_card.dart';
-import 'package:safezone/frontend/widgets/cards/admin_safezones_card.dart';
 import 'package:safezone/resources/schema/colors.dart';
 
 class AdminReports extends StatefulWidget {
@@ -101,24 +97,35 @@ class _AdminReportsState extends State<AdminReports> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                DropdownButton<String>(
-                  value: _selectedFilter,
-                  icon: const Icon(Icons.arrow_drop_down),
-                  onChanged: (String? newValue) {
-                    if (newValue != null) {
-                      setState(() {
-                        _selectedFilter = newValue;
-                      });
-                    }
-                  },
-                  items: _categories
-                      .map<DropdownMenuItem<String>>(
-                        (String category) => DropdownMenuItem<String>(
-                          value: category,
-                          child: Text(category),
-                        ),
-                      )
-                      .toList(),
+                Padding(
+                  padding: const EdgeInsets.only(left: 12),
+                  child: DropdownButton<String>(
+                    value: _selectedFilter,
+                    icon: const Icon(Icons.arrow_drop_down),
+                    dropdownColor: Colors.white,
+                    onChanged: (String? newValue) {
+                      if (newValue != null) {
+                        setState(() {
+                          _selectedFilter = newValue;
+                        });
+                      }
+                    },
+                    items: _categories
+                        .map<DropdownMenuItem<String>>(
+                          (String category) => DropdownMenuItem<String>(
+                            value: category,
+                            child: Align(
+                              alignment: Alignment.center,
+                              child: Text(
+                                category,
+                                style: const TextStyle(
+                                    color: textColor, fontSize: 11),
+                              ),
+                            ),
+                          ),
+                        )
+                        .toList(),
+                  ),
                 ),
                 const Spacer(),
                 // Sort Button
