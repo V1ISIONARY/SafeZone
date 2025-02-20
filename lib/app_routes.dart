@@ -1,4 +1,5 @@
 import 'package:go_router/go_router.dart';
+import 'package:safezone/backend/models/dangerzoneModel/incident_report_request_model.dart';
 import 'package:safezone/backend/models/safezoneModel/safezone_model.dart';
 import 'package:safezone/frontend/pages/admin/admin_initial_screen.dart';
 import 'package:safezone/frontend/pages/admin/admin_reports.dart';
@@ -18,12 +19,13 @@ import 'package:safezone/frontend/pages/main-screen/home_page/circle/list_of_mem
 import 'package:safezone/frontend/pages/main-screen/notifications_page/reports/reports_history_information.dart';
 import 'package:safezone/frontend/pages/main-screen/notifications_page/reports/reports_history.dart';
 import 'package:safezone/frontend/pages/main-screen/notifications_page/reports/reports_status_history.dart';
+import 'package:safezone/frontend/pages/main-screen/notifications_page/safezone/safe_zone_history.dart';
 import 'package:safezone/frontend/pages/main-screen/notifications_page/safezone/safe_zone_history_information.dart';
 import 'package:safezone/frontend/pages/main-screen/home_page/report-incident/create_report.dart';
 import 'package:safezone/frontend/pages/main-screen/home_page/report-incident/report_success.dart';
 import 'package:safezone/frontend/pages/main-screen/home_page/report-incident/submit_report.dart';
 import 'package:safezone/frontend/pages/main-screen/home_page/safe-zone/mark_safe_success.dart';
-import 'package:safezone/frontend/pages/main-screen/home_page/safe-zone/mark_safe_zone.dart';
+import 'package:safezone/frontend/pages/main-screen/home_page/safe-zone/create_safe_zone.dart';
 import 'package:safezone/frontend/pages/main-screen/home_page/safe-zone/review_safe_zone.dart';
 import 'package:safezone/frontend/pages/main-screen/notifications_page/safezone/safe_zone_status_history.dart';
 import 'package:safezone/frontend/pages/main-screen/sos_page/sos.dart';
@@ -38,17 +40,18 @@ GoRouter appRouter(bool isFirstRun) => GoRouter(
           path: '/',
           builder: (context, state) => isFirstRun
               ? const SplashScreen()
-              : BottomNavigationWidget(userToken: 'guess'),
+              : const BottomNavigationWidget(userToken: 'guess'),
         ),
-        // GoRoute(
-        //   path: '/',
-        //   builder: (context, state) => MainAnalytics(initialPage: 0),
-        // ),
+        // // GoRoute(
+        // //   path: '/',
+        // //   builder: (context, state) => MainAnalytics(initialPage: 0),
+        // // ),
         GoRoute(
           path: '/home',
           builder: (context, state) =>
               const BottomNavigationWidget(userToken: 'guess'),
         ),
+
         GoRoute(
           path: '/register',
           builder: (context, state) => const RegisterScreen(),
@@ -63,7 +66,10 @@ GoRouter appRouter(bool isFirstRun) => GoRouter(
         ),
         GoRoute(
           path: '/review-report',
-          builder: (context, state) => const ReviewReport(),
+          builder: (context, state) {
+            final report = state.extra as IncidentReportRequestModel;
+            return ReviewReport(reportInfo: report);
+          },
         ),
         GoRoute(
           path: '/report-success',
@@ -99,6 +105,10 @@ GoRouter appRouter(bool isFirstRun) => GoRouter(
           },
         ),
         GoRoute(
+          path: '/safezone-history',
+          builder: (context, state) => const SafezoneHistory(),
+        ),
+        GoRoute(
           path: '/safezone-history-details',
           builder: (context, state) {
             final safezone = state.extra as SafeZoneModel;
@@ -112,6 +122,17 @@ GoRouter appRouter(bool isFirstRun) => GoRouter(
             return SafeZoneStatusHistory(safezonemodel: safezone);
           },
         ),
+        // GoRoute(
+        //   path: '/members-list',
+        //   builder: (context, state) => const ListOfMembers(),
+        // ),
+        // GoRoute(
+        //   path: '/members-list',
+        //   builder: (context, state) {
+        //     final groupId = state.extra as Int;
+        //     return ListOfMembers(groupID: state.extra);
+        //   },
+        // ),
         GoRoute(
           path: '/mark-safe-zone-success',
           builder: (context, state) => const MarkSafeSuccess(),
@@ -129,7 +150,7 @@ GoRouter appRouter(bool isFirstRun) => GoRouter(
           builder: (context, state) => const SosSuccess(),
         ),
 
-        // CIRCLE/GROUP
+        // CIRCLE/GROUP ROUTES
 
         GoRoute(
           path: '/groups-list',
