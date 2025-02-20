@@ -40,14 +40,14 @@ class _ReportSuccessState extends State<ReportSuccess> {
               CustomButton(
                   text: "Go to reports history",
                   onPressed: () {
-                    context.push('/reports-history');
+                    context.go('/reports-history');
                   }),
               const SizedBox(height: 10),
               CustomButton(
                   text: "Back to Home",
                   isOutlined: true,
                   onPressed: () {
-                    context.push('/');
+                    context.go('/');
                   }),
               const SizedBox(height: 30),
             ],

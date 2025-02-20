@@ -44,10 +44,16 @@ class _MarkSafeSuccessState extends State<MarkSafeSuccess> {
               ),
               const Spacer(),
               CustomButton(
+                  text: "Go to your safezone history",
+                  onPressed: () {
+                    context.go('/safezone-history');
+                  }),
+              const SizedBox(height: 10),
+              CustomButton(
                 text: "Back to Home",
                 isOutlined: true,
                 onPressed: () {
-                  context.push('/home');
+                  context.go('/home');
                   context.read<MapBloc>().add(FetchMapData());
                 },
               ),

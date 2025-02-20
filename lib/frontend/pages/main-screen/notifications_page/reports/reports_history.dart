@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:safezone/backend/bloc/incident_report/incident_report_bloc.dart';
 import 'package:safezone/backend/bloc/incident_report/incident_report_event.dart';
 import 'package:safezone/backend/bloc/incident_report/incident_report_state.dart';
@@ -29,8 +30,8 @@ class _ReportsHistoryState extends State<ReportsHistory>
       .toList();
 
   late final IncidentReportBloc _incidentReportBloc;
-  bool _isAscending = false; 
-  
+  bool _isAscending = false;
+
   @override
   void initState() {
     super.initState();
@@ -70,63 +71,91 @@ class _ReportsHistoryState extends State<ReportsHistory>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        centerTitle: true,
-        title: const CategoryText(text: "My Incident Reports"),
-        actions: [
-          IconButton(
-            icon: Icon(
-              _isAscending ? Icons.arrow_upward : Icons.arrow_downward,
-              color: Colors.black,
-            ),
-            onPressed: _toggleSortOrder,
-          ),
-        ],
-      ),
-      body: Column(
-        children: [
-          Container(
-            margin: const EdgeInsets.all(10),
-            child: Row(
-              children: [
-                const SizedBox(width: 10),
-                const Flexible(
-                  child: Text(
-                    'View and track the status of all your past reports.',
-                    style: TextStyle(fontSize: 15, color: textColor),
+    return WillPopScope(
+      onWillPop: () async {
+        context.go('/home');
+        return false;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          centerTitle: true,
+          title: const CategoryText(text: "My Incident Reports"),
+          actions: [
+            Padding(
+              padding: const EdgeInsets.only(right: 12),
+              child: GestureDetector(
+                onTap: _toggleSortOrder,
+                child: Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: const Color.fromARGB(10, 0, 0, 0),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        _isAscending
+                            ? Icons.arrow_upward
+                            : Icons.arrow_downward,
+                        size: 15,
+                        color: Colors.black,
+                      ),
+                      const SizedBox(width: 10),
+                      const Text(
+                        "Sort by Date",
+                        style: TextStyle(color: textColor, fontSize: 11),
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(width: 8),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                  child: Image.asset(
-                    "lib/resources/svg/check.png",
-                    width: 44,
-                    height: 44,
-                  ),
-                ),
-              ],
+              ),
             ),
-          ),
-          TabBar(
-            controller: _tabController,
-            indicatorColor: btnColor,
-            labelColor: Colors.black,
-            unselectedLabelColor: Colors.black38,
-            tabs: _categories.map((category) => Tab(text: category)).toList(),
-          ),
-          const SizedBox(height: 20),
-          Expanded(
-            child: TabBarView(
+          ],
+        ),
+        body: Column(
+          children: [
+            Container(
+              margin: const EdgeInsets.all(10),
+              child: Row(
+                children: [
+                  const SizedBox(width: 10),
+                  const Flexible(
+                    child: Text(
+                      'View and track the status of all your past reports.',
+                      style: TextStyle(fontSize: 15, color: textColor),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                    child: Image.asset(
+                      "lib/resources/svg/check.png",
+                      width: 44,
+                      height: 44,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            TabBar(
               controller: _tabController,
-              children: _categories
-                  .map((category) => _buildCategoryPage(category))
-                  .toList(),
+              indicatorColor: btnColor,
+              labelColor: Colors.black,
+              unselectedLabelColor: Colors.black38,
+              tabs: _categories.map((category) => Tab(text: category)).toList(),
             ),
-          ),
-        ],
+            const SizedBox(height: 20),
+            Expanded(
+              child: TabBarView(
+                controller: _tabController,
+                children: _categories
+                    .map((category) => _buildCategoryPage(category))
+                    .toList(),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -10,21 +10,21 @@ class IncidentReportModel {
   List<String>? images;
   String? reportTimestamp;
   String? status;
-  String updatedAt;
+  String? updatedAt;
   DangerZoneModel? dangerZone;
   List<IncidentReportStatusHistoryModel>? statusHistory;
 
   IncidentReportModel({
-    required this.id,
-    required this.userId,
-    required this.dangerZoneId,
-    required this.description,
-    required this.reportDate,
-    required this.reportTime,
+    this.id,
+    this.userId,
+    this.dangerZoneId,
+    this.description,
+    this.reportDate,
+    this.reportTime,
     this.images,
-    required this.reportTimestamp,
+    this.reportTimestamp,
     this.status,
-    required this.updatedAt,
+    this.updatedAt,
     this.dangerZone,
     this.statusHistory,
   });
