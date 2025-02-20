@@ -17,7 +17,6 @@ import 'package:safezone/resources/schema/colors.dart';
 import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-
 class Map extends StatefulWidget {
   final String UserToken;
 
@@ -245,11 +244,12 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
 
   void _findRoute() {
     SafeZoneNavigator(
-      googleMapController: googleMapController,
-      currentUserLocation: _currentUserLocation,
-      safeZones: _safeZones,
-      onPolylinesUpdated: _updatePolylines,
-    ).findNearestSafeZone();
+            googleMapController: googleMapController,
+            currentUserLocation: _currentUserLocation,
+            safeZones: _safeZones,
+            onPolylinesUpdated: _updatePolylines,
+            context: context)
+        .findNearestSafeZone();
   }
 
   @override

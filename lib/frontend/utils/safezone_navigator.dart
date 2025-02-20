@@ -4,6 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:safezone/resources/schema/colors.dart';
 
 class SafeZoneNavigator {
   final GoogleMapController? googleMapController;
@@ -11,12 +12,14 @@ class SafeZoneNavigator {
   final List<LatLng> safeZones;
   final Function(Set<Polyline>) onPolylinesUpdated;
   final String googleApiKey = dotenv.env['GOOGLE_API_KEY'] ?? '';
+  final BuildContext context;
 
   SafeZoneNavigator({
     required this.googleMapController,
     required LatLng? currentUserLocation,
     required this.safeZones,
     required this.onPolylinesUpdated,
+    required this.context,
   }) : _currentUserLocation = currentUserLocation;
 
   void findNearestSafeZone() async {
@@ -65,13 +68,32 @@ class SafeZoneNavigator {
         final List<LatLng> polylineCoordinates =
             _decodePolyline(encodedPolyline);
 
+        final eta = data["routes"][0]["legs"][0]["duration"]["text"];
+
         _updatePolylines(polylineCoordinates);
         googleMapController?.animateCamera(CameraUpdate.newLatLngZoom(end, 16));
+
+        _showETA(eta);
       }
     } catch (e) {
       print("Error fetching directions: $e");
     }
   }
+
+void _showETA(String eta) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          "Estimated arrival time: $eta",
+          style: const TextStyle(
+              color: Colors.white), 
+        ),
+        backgroundColor: greenStatusColor, 
+        duration: const Duration(seconds: 5),
+      ),
+    );
+  }
+
 
   List<LatLng> _decodePolyline(String encoded) {
     List<LatLng> points = [];
