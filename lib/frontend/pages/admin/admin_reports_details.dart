@@ -7,7 +7,6 @@ import 'package:go_router/go_router.dart';
 import 'package:insta_image_viewer/insta_image_viewer.dart';
 import 'package:lottie/lottie.dart';
 import 'package:safezone/backend/models/dangerzoneModel/incident_report_model.dart';
-import 'package:safezone/frontend/widgets/buttons/custom_radio_button.dart';
 import 'package:safezone/frontend/widgets/texts/history_information.dart';
 import 'package:safezone/resources/schema/colors.dart';
 import 'package:safezone/resources/schema/texts.dart';
@@ -80,15 +79,15 @@ class _AdminReportsDetailsState extends State<AdminReportsDetails> {
   String reportStatusMessage(String status) {
     switch (status.toLowerCase()) {
       case 'verified':
-        return "This report has been verified and marked as a trusted safe zone. The community now has access to this location as a safe space.";
+        return "This incident report has been verified as accurate and necessary action has been taken.";
       case 'under review':
-        return "This report is currently under review. Please assess the provided details and evidence before making a decision.";
+        return "This incident report is currently under review. Authorities are assessing the provided details and evidence.";
       case 'rejected':
-        return "This report has been rejected due to insufficient or inaccurate information. Ensure the user receives a proper explanation if needed.";
+        return "This incident report has been rejected due to insufficient or inaccurate information. The reporter may be notified for clarification.";
       case 'pending':
-        return "This report is awaiting review. Please verify its details and decide whether to approve or reject it.";
+        return "This incident report is awaiting review. Please verify its details before deciding on further action.";
       default:
-        return "The status of this report is currently unknown. Please check the report details.";
+        return "The status of this incident report is currently unknown. Please check the report details.";
     }
   }
 
@@ -355,6 +354,117 @@ class _AdminReportsDetailsState extends State<AdminReportsDetails> {
                       )),
                 ],
               ),
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                const SizedBox(width: 10),
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () {},
+                    child: Container(
+                      padding: const EdgeInsets.all(15),
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: const Color.fromARGB(37, 94, 98, 117),
+                        borderRadius: BorderRadius.circular(7),
+                        border: Border.all(
+                          color: const Color.fromARGB(126, 94, 100, 117),
+                          width: 1,
+                        ),
+                      ),
+                      child: const Row(
+                        children: [
+                          Icon(
+                            Icons.timelapse,
+                            color: Color.fromARGB(171, 73, 87, 124),
+                          ),
+                          SizedBox(
+                            width: 5,
+                          ),
+                          Text(
+                            "Review",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(fontSize: 13, color: textColor),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () {},
+                    child: Container(
+                      padding: const EdgeInsets.all(15),
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: const Color.fromARGB(38, 94, 117, 106),
+                        borderRadius: BorderRadius.circular(7),
+                        border: Border.all(
+                          color: const Color.fromARGB(127, 94, 117, 106),
+                          width: 1,
+                        ),
+                      ),
+                      child: const Row(
+                        children: [
+                          Icon(
+                            Icons.check_circle,
+                            color: Color.fromARGB(179, 81, 116, 99),
+                          ),
+                          SizedBox(
+                            width: 5,
+                          ),
+                          Text(
+                            "Verify",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(fontSize: 13, color: textColor),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () {},
+                    child: Container(
+                      padding: const EdgeInsets.all(15),
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: const Color.fromARGB(37, 117, 94, 94),
+                        borderRadius: BorderRadius.circular(7),
+                        border: Border.all(
+                          color: const Color.fromARGB(126, 117, 96, 94),
+                          width: 1,
+                        ),
+                      ),
+                      child: const Row(
+                        children: [
+                          Icon(
+                            Icons.cancel,
+                            color: Color.fromARGB(197, 133, 97, 94),
+                          ),
+                          SizedBox(
+                            width: 5,
+                          ),
+                          Text(
+                            "Reject",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(fontSize: 13, color: textColor),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 10),
+              ],
             ),
             const SizedBox(
               height: 50,

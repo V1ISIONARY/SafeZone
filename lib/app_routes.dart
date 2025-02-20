@@ -10,6 +10,11 @@ import 'package:safezone/frontend/pages/authentication/register.dart';
 import 'package:safezone/backend/models/dangerzoneModel/incident_report_model.dart';
 import 'package:safezone/frontend/pages/authentication/login.dart';
 import 'package:safezone/frontend/pages/introduction/splash_screen.dart';
+import 'package:safezone/frontend/pages/main-screen/home_page/circle/create_new_group.dart';
+import 'package:safezone/frontend/pages/main-screen/home_page/circle/generate_new_code.dart';
+import 'package:safezone/frontend/pages/main-screen/home_page/circle/join_group.dart';
+import 'package:safezone/frontend/pages/main-screen/home_page/circle/list_of_groups.dart';
+import 'package:safezone/frontend/pages/main-screen/home_page/circle/list_of_members.dart';
 import 'package:safezone/frontend/pages/main-screen/notifications_page/reports/reports_history_information.dart';
 import 'package:safezone/frontend/pages/main-screen/notifications_page/reports/reports_history.dart';
 import 'package:safezone/frontend/pages/main-screen/notifications_page/reports/reports_status_history.dart';
@@ -42,7 +47,7 @@ GoRouter appRouter(bool isFirstRun) => GoRouter(
         GoRoute(
           path: '/home',
           builder: (context, state) =>
-              BottomNavigationWidget(userToken: 'guess'),
+              const BottomNavigationWidget(userToken: 'guess'),
         ),
         GoRoute(
           path: '/register',
@@ -122,6 +127,33 @@ GoRouter appRouter(bool isFirstRun) => GoRouter(
         GoRoute(
           path: '/sos-success',
           builder: (context, state) => const SosSuccess(),
+        ),
+
+        // CIRCLE/GROUP
+
+        GoRoute(
+          path: '/groups-list',
+          builder: (context, state) => const ListOfGroups(),
+        ),
+
+        GoRoute(
+          path: '/members-list',
+          builder: (context, state) => const ListOfMembers(),
+        ),
+
+        GoRoute(
+          path: '/generate-group-code',
+          builder: (context, state) => const GenerateNewCode(),
+        ),
+
+        GoRoute(
+          path: '/create-new-group',
+          builder: (context, state) => const CreateNewGroup(),
+        ),
+
+        GoRoute(
+          path: '/join-group',
+          builder: (context, state) => const JoinGroup(),
         ),
 
         // ADMIN ROUTES
