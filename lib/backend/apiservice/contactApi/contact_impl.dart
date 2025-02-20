@@ -1,12 +1,13 @@
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:safezone/backend/apiservice/contactApi/contact_repo.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 import 'package:safezone/backend/models/userModel/contacts_model.dart';
-import 'package:safezone/backend/apiservice/vercel_url.dart';
 
 class ContactImplementation extends ContactRepository {
-  static const String baseUrl = '${VercelUrl.mainUrl}/contacts';
+  // static const String baseUrl = '${VercelUrl.mainUrl}/contacts';
+  final baseUrl = "${dotenv.env['API_URL']}/contacts";
 
   @override
   Future<void> addContact(int userId, String name, String phone) async {

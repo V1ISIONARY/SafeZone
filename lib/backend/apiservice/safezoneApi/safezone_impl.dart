@@ -1,18 +1,31 @@
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:safezone/backend/apiservice/safezoneApi/safezone_repo.dart';
-import 'package:safezone/backend/apiservice/vercel_url.dart';
 import 'package:safezone/backend/models/dangerzoneModel/status_update_model.dart';
 import 'package:safezone/backend/models/safezoneModel/safezone_model.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class SafeZoneRepositoryImpl implements SafeZoneRepository {
-  static const String _apiUrl = '${VercelUrl.mainUrl}/safe-zone';
+  // static const String _apiUrl = '${VercelUrl.mainUrl}/safe-zone';
+  final _apiUrl = "${dotenv.env['API_URL']}/safe-zone";
 
   // GET
 
   @override
   Future<List<SafeZoneModel>> getVerifiedSafeZones() async {
     final response = await http.get(Uri.parse('$_apiUrl/verified-safe-zones'));
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = jsonDecode(response.body);
+      return data.map((json) => SafeZoneModel.fromJson(json)).toList();
+    } else {
+      throw Exception('Failed to load safe zones');
+    }
+  }
+
+  @override
+  Future<List<SafeZoneModel>> getAllSafeZones() async {
+    final response = await http.get(Uri.parse('$_apiUrl/safe-zones'));
 
     if (response.statusCode == 200) {
       final List<dynamic> data = jsonDecode(response.body);

@@ -1,5 +1,7 @@
 import 'dart:async';
-
+import 'dart:convert';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart' as gmaps;
@@ -21,6 +23,47 @@ class SafeZoneHistoryDetails extends StatefulWidget {
 
 class _SafeZoneHistoryDetailsState extends State<SafeZoneHistoryDetails> {
   final Completer<gmaps.GoogleMapController> _mapController = Completer();
+  String _address = "Fetching address...";
+
+  @override
+  void initState() {
+    super.initState();
+    _getAddress();
+  }
+
+  Future<void> _getAddress() async {
+    double lat = widget.safezonemodel.latitude ?? 0.0;
+    double lng = widget.safezonemodel.longitude ?? 0.0;
+
+    String apiKey = dotenv.env['GOOGLE_API_KEY'] ?? '';
+    String url =
+        "https://maps.googleapis.com/maps/api/geocode/json?latlng=$lat,$lng&key=$apiKey";
+
+    try {
+      final response = await http.get(Uri.parse(url));
+
+      if (response.statusCode == 200) {
+        var data = json.decode(response.body);
+        if (data["status"] == "OK") {
+          setState(() {
+            _address = data["results"][0]["formatted_address"];
+          });
+        } else {
+          setState(() {
+            _address = "Address not found";
+          });
+        }
+      } else {
+        setState(() {
+          _address = "Failed to fetch address";
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _address = "Error fetching address";
+      });
+    }
+  }
 
   Gradient statusGradient(String status) {
     switch (status.toLowerCase()) {
@@ -234,6 +277,31 @@ class _SafeZoneHistoryDetailsState extends State<SafeZoneHistoryDetails> {
                                 fontSize: 15,
                                 fontWeight: FontWeight.bold,
                                 color: textColor),
+                          ),
+                          const SizedBox(height: 10),
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: const BoxDecoration(
+                                color: Color.fromARGB(5, 0, 0, 0)),
+                            child: Wrap(
+                              children: [
+                                const Text("Location: ",
+                                    style: TextStyle(
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w400,
+                                        color: Colors.black87)),
+                                Container(
+                                  height: 10,
+                                ),
+                                Text(
+                                  _address,
+                                  style: const TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w400,
+                                      color: Colors.black87),
+                                ),
+                              ],
+                            ),
                           ),
                           const SizedBox(
                             height: 20,

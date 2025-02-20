@@ -1,12 +1,9 @@
-// ignore_for_file: avoid_print
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:safezone/backend/bloc/safezoneBloc/safezone_bloc.dart';
 import 'package:safezone/backend/bloc/safezoneBloc/safezone_event.dart';
 import 'package:safezone/backend/bloc/safezoneBloc/safezone_state.dart';
-import 'package:safezone/frontend/widgets/safe_zone_history_card.dart';
+import 'package:safezone/frontend/widgets/cards/safe_zone_history_card.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:safezone/resources/schema/colors.dart';
 import 'package:safezone/resources/schema/texts.dart';
@@ -18,12 +15,25 @@ class SafezoneHistory extends StatefulWidget {
   State<SafezoneHistory> createState() => _SafezoneHistoryState();
 }
 
-class _SafezoneHistoryState extends State<SafezoneHistory> {
+class _SafezoneHistoryState extends State<SafezoneHistory>
+    with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+  final List<String> _categories = [
+    'All',
+    'Verified',
+    'Pending',
+    'Rejected',
+    'Under review'
+  ]
+      .map((category) => category[0].toUpperCase() + category.substring(1))
+      .toList();
   late final SafeZoneBloc _safeZoneBloc;
+  bool _isAscending = false;
 
   @override
   void initState() {
     super.initState();
+    _tabController = TabController(length: _categories.length, vsync: this);
     _safeZoneBloc = BlocProvider.of<SafeZoneBloc>(context);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadReports();
@@ -36,17 +46,25 @@ class _SafezoneHistoryState extends State<SafezoneHistory> {
       final int? userId = prefs.getInt('id');
 
       if (userId != null) {
-        print('User ID: $userId');
         if (mounted) {
           _safeZoneBloc.add(FetchSafeZonesByUserId(userId));
-          print('Fetching reports for user ID: $userId');
         }
-      } else {
-        print("User ID not found in SharedPreferences");
       }
     } catch (e) {
       print("Error loading SharedPreferences: $e");
     }
+  }
+
+  void _toggleSortOrder() {
+    setState(() {
+      _isAscending = !_isAscending;
+    });
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
   }
 
   @override
@@ -56,12 +74,21 @@ class _SafezoneHistoryState extends State<SafezoneHistory> {
         backgroundColor: Colors.white,
         centerTitle: true,
         title: const CategoryText(text: "Safe Zones History"),
+        actions: [
+          IconButton(
+            icon: Icon(
+              _isAscending ? Icons.arrow_upward : Icons.arrow_downward,
+              color: Colors.black,
+            ),
+            onPressed: _toggleSortOrder,
+          ),
+        ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            Row(
+      body: Column(
+        children: [
+          Container(
+            margin: const EdgeInsets.all(10),
+            child: Row(
               children: [
                 const SizedBox(width: 10),
                 const Flexible(
@@ -81,54 +108,64 @@ class _SafezoneHistoryState extends State<SafezoneHistory> {
                 ),
               ],
             ),
-            const SizedBox(height: 20),
-            Expanded(
-              child: BlocBuilder<SafeZoneBloc, SafeZoneState>(
-                builder: (context, state) {
-                  print('State: $state');
-                  if (state is SafeZoneLoading) {
-                    return const Center(child: CircularProgressIndicator());
-                  } else if (state is SafeZonesLoaded) {
-                    final safezones = state.safeZones;
-                    print('Safe zones loaded: ${safezones.length}');
-                    if (safezones.isEmpty) {
-                      return const Center(child: Text("No safe zones found."));
-                    }
-
-                    return ListView.builder(
-                      itemCount: safezones.length,
-                      itemBuilder: (context, index) {
-                        final safezone = safezones[index];
-                        return Slidable(
-                          endActionPane: ActionPane(
-                            motion: const DrawerMotion(),
-                            children: [
-                              SlidableAction(
-                                onPressed: ((context) {
-                                  // Handle delete action here
-                                }),
-                                icon: Icons.delete,
-                                foregroundColor: Colors.white,
-                              )
-                            ],
-                          ),
-                          child: SafezoneHistoryCard(
-                            safeZone: safezone,
-                          ),
-                        );
-                      },
-                    );
-                  } else if (state is SafeZoneError) {
-                    return Center(child: Text("Error: ${state.message}"));
-                  }
-
-                  return const Center(child: Text("Something went wrong"));
-                },
-              ),
+          ),
+          TabBar(
+            controller: _tabController,
+            indicatorColor: btnColor,
+            labelColor: Colors.black,
+            unselectedLabelColor: Colors.black38,
+            tabs: _categories.map((category) => Tab(text: category)).toList(),
+          ),
+          const SizedBox(height: 20),
+          Expanded(
+            child: TabBarView(
+              controller: _tabController,
+              children: _categories
+                  .map((category) => _buildCategoryPage(category))
+                  .toList(),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
+    );
+  }
+
+  Widget _buildCategoryPage(String status) {
+    return BlocBuilder<SafeZoneBloc, SafeZoneState>(
+      builder: (context, state) {
+        if (state is SafeZoneLoading) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (state is SafeZonesLoaded) {
+          final filteredZones = status == 'All'
+              ? state.safeZones
+              : state.safeZones
+                  .where((zone) =>
+                      zone.status?.toLowerCase() == status.toLowerCase())
+                  .toList();
+
+          filteredZones.sort((a, b) => _isAscending
+              ? DateTime.parse(a.reportTimestamp!)
+                  .compareTo(DateTime.parse(b.reportTimestamp!))
+              : DateTime.parse(b.reportTimestamp!)
+                  .compareTo(DateTime.parse(a.reportTimestamp!)));
+
+          if (filteredZones.isEmpty) {
+            return Center(child: Text("No $status safe zones found."));
+          }
+          return ListView.builder(
+            itemCount: filteredZones.length,
+            itemBuilder: (context, index) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                child: SafezoneHistoryCard(safeZone: filteredZones[index]),
+              );
+            },
+          );
+        } else if (state is SafeZoneError) {
+          return Center(child: Text("Error: ${state.message}"));
+        }
+        return const Center(child: Text("Something went wrong"));
+      },
     );
   }
 }

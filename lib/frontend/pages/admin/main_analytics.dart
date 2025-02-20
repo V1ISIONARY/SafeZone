@@ -5,8 +5,8 @@ import 'package:safezone/backend/cubic/analytics.dart';
 import 'package:safezone/frontend/pages/admin/admin_dangerzones.dart';
 import 'package:safezone/frontend/pages/admin/admin_initial_screen.dart';
 import 'package:safezone/frontend/pages/admin/admin_rejected.dart';
-import 'package:safezone/frontend/pages/admin/admin_reports_details.dart';
-import 'package:safezone/frontend/pages/admin/admin_safezone_details.dart';
+import 'package:safezone/frontend/pages/admin/admin_reports.dart';
+import 'package:safezone/frontend/pages/admin/admin_reports_users.dart';
 import 'package:safezone/frontend/pages/admin/admin_safezones.dart';
 
 import '../../../resources/schema/colors.dart';
@@ -33,11 +33,12 @@ class _MainAnalyticsState extends State<MainAnalytics>
 
     pageController = PageController(initialPage: widget.initialPage);
     topLevelPages = [
-      AdminInitialScreen(),
-      AdminReportsDetails(),
-      AdminSafezones(),
-      AdminDangerzones(),
-      AdminRejected()
+      const AdminInitialScreen(),
+      const AdminReportsUsers(),
+      const AdminSafezones(),
+      const AdminReports(),
+      const AdminDangerzones(),
+      const AdminRejected()
     ];
 
     _controller = AnimationController(
@@ -88,8 +89,9 @@ class _MainAnalyticsState extends State<MainAnalytics>
         _bottomAppBarItem("Overview", 0),
         _bottomAppBarItem("Users", 1),
         _bottomAppBarItem("Safezone", 2),
-        _bottomAppBarItem("Dangerzone", 3),
-        _bottomAppBarItem("Rejected", 4)
+        _bottomAppBarItem("Incidents", 3),
+        _bottomAppBarItem("Dangerzone", 4),
+        _bottomAppBarItem("Rejected", 5)
       ]),
     );
   }
@@ -131,7 +133,7 @@ class _MainAnalyticsState extends State<MainAnalytics>
                                     height: 5.0,
                                     color: widgetPricolor,
                                   )
-                                : SizedBox(),
+                                : const SizedBox(),
                           ),
                         ),
                       ))
@@ -159,12 +161,12 @@ class _MainAnalyticsState extends State<MainAnalytics>
               Navigator.pop(context);
             },
             child: Container(
-              margin: EdgeInsets.all(15),
+              margin: const EdgeInsets.all(15),
               decoration: BoxDecoration(
                 border: Border.all(width: 1, color: Colors.black),
                 shape: BoxShape.circle,
               ),
-              child: Icon(Icons.arrow_back, color: Colors.black, size: 10),
+              child: const Icon(Icons.arrow_back, color: Colors.black, size: 10),
             ),
           ),
         ),

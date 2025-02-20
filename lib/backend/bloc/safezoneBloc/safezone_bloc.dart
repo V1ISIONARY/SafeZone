@@ -8,6 +8,7 @@ class SafeZoneBloc extends Bloc<SafeZoneEvent, SafeZoneState> {
 
   SafeZoneBloc({required this.safeZoneRepository}) : super(SafeZoneInitial()) {
     on<FetchSafeZones>(_onFetchSafeZones);
+    on<FetchAllSafeZones>(_onFetchAllSafeZones);
     on<FetchSafeZoneById>(_onFetchSafeZoneById);
     on<FetchSafeZonesByStatus>(_onFetchSafeZonesByStatus);
     on<FetchSafeZonesByUserId>(_onFetchSafeZonesByUserId);
@@ -23,6 +24,22 @@ class SafeZoneBloc extends Bloc<SafeZoneEvent, SafeZoneState> {
     emit(SafeZoneLoading());
     try {
       final safeZones = await safeZoneRepository.getVerifiedSafeZones();
+      emit(SafeZonesLoaded(safeZones));
+    } catch (e) {
+      emit(SafeZoneError(e.toString()));
+    }
+  }
+
+  Future<void> _onFetchAllSafeZones(
+      FetchAllSafeZones event, Emitter<SafeZoneState> emit) async {
+    emit(SafeZoneLoading());
+    try {
+      final safeZones = await safeZoneRepository.getAllSafeZones();
+      print("Fetched All SafeZones: ${safeZones.length}");
+      for (var zone in safeZones) {
+        print("SafeZone -> ID: ${zone.id}, Name: ${zone.name}, "
+            "Location: (${zone.latitude}, ${zone.longitude})");
+      }
       emit(SafeZonesLoaded(safeZones));
     } catch (e) {
       emit(SafeZoneError(e.toString()));

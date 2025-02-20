@@ -11,6 +11,8 @@ abstract class SafeZoneEvent extends Equatable {
 // Fetch all safe zones
 class FetchSafeZones extends SafeZoneEvent {}
 
+class FetchAllSafeZones extends SafeZoneEvent {}
+
 // Fetch a safe zone by ID
 class FetchSafeZoneById extends SafeZoneEvent {
   final int id;

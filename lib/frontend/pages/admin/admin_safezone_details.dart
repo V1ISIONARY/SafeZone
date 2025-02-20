@@ -1,9 +1,12 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart' as gmaps;
 import 'package:go_router/go_router.dart';
+import 'package:safezone/backend/bloc/adminBloc/safezone/safezone_admin_bloc.dart';
+import 'package:safezone/backend/bloc/adminBloc/safezone/safezone_admin_event.dart';
 import 'package:safezone/backend/models/safezoneModel/safezone_model.dart';
 import 'package:safezone/frontend/widgets/buttons/custom_radio_button.dart';
 import 'package:safezone/frontend/widgets/texts/history_information.dart';
@@ -11,9 +14,11 @@ import 'package:safezone/resources/schema/colors.dart';
 import 'package:safezone/resources/schema/texts.dart';
 
 class AdminSafezoneDetails extends StatefulWidget {
-  const AdminSafezoneDetails({super.key, required this.safezonemodel});
+  const AdminSafezoneDetails(
+      {super.key, required this.safezonemodel, required this.address});
 
   final SafeZoneModel safezonemodel;
+  final String address;
 
   @override
   State<AdminSafezoneDetails> createState() => _AdminSafezoneDetailsState();
@@ -76,20 +81,23 @@ class _AdminSafezoneDetailsState extends State<AdminSafezoneDetails> {
   String reportStatusMessage(String status) {
     switch (status.toLowerCase()) {
       case 'verified':
-        return "Your submitted safe zone has been verified by the admin. It is now accessible to the community as a trusted safe space. Thank you for contributing to a safer environment!";
+        return "This safe zone has been verified and marked as a trusted safe zone. The community now has access to this location as a safe space.";
       case 'under review':
-        return "Your safe zone submission is currently under review. The admin is assessing the details before making a decision.";
+        return "This safe zone is currently under review. Please assess the provided details and evidence before making a decision.";
       case 'rejected':
-        return "Your submitted safe zone has been rejected. The provided information did not meet the verification criteria.";
+        return "This safe zone has been rejected due to insufficient or inaccurate information. Ensure the user receives a proper explanation if needed.";
       case 'pending':
-        return "Your safe zone submission is pending. It will be reviewed soon by the admin.";
+        return "This safe zone is awaiting review. Please verify its details and decide whether to approve or reject it.";
       default:
-        return "The status of your submitted safe zone is currently unknown.";
+        return "The status of this safe zone is currently unknown. Please check the report details.";
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final SafeZoneAdminBloc safeZoneAdminBloc =
+        BlocProvider.of<SafeZoneAdminBloc>(context);
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -139,7 +147,7 @@ class _AdminSafezoneDetailsState extends State<AdminSafezoneDetails> {
                   ),
                   GestureDetector(
                     onTap: () {
-                      GoRouter.of(context).push('/safezone-status',
+                      GoRouter.of(context).push('/safezone-status-history',
                           extra: widget.safezonemodel);
                     },
                     child: Container(
@@ -236,8 +244,33 @@ class _AdminSafezoneDetailsState extends State<AdminSafezoneDetails> {
                                 color: textColor),
                           ),
                           const SizedBox(
-                            height: 20,
+                            height: 10,
                           ),
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: const BoxDecoration(
+                                color: Color.fromARGB(5, 0, 0, 0)),
+                            child: Wrap(
+                              children: [
+                                const Text("Location: ",
+                                    style: TextStyle(
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w400,
+                                        color: Colors.black87)),
+                                Container(
+                                  height: 10,
+                                ),
+                                Text(
+                                  widget.address,
+                                  style: const TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w400,
+                                      color: Colors.black87),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 20),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: List.generate(5, (index) {
@@ -378,6 +411,104 @@ class _AdminSafezoneDetailsState extends State<AdminSafezoneDetails> {
                   ),
                 ],
               ),
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                const SizedBox(width: 10),
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      print(
+                          "Review button pressed for ID: ${widget.safezonemodel.id}");
+                      safeZoneAdminBloc
+                          .add(ReviewSafeZone(widget.safezonemodel.id!));
+                    },
+                    icon: const Icon(
+                      Icons.timelapse,
+                      color: Color.fromARGB(171, 73, 87, 124),
+                    ),
+                    label: const Text(
+                      "Review",
+                      style: TextStyle(fontSize: 13, color: textColor),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color.fromARGB(37, 94, 98, 117),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(7),
+                        side: const BorderSide(
+                          color: Color.fromARGB(126, 94, 100, 117),
+                          width: 1,
+                        ),
+                      ),
+                      padding: const EdgeInsets.all(15),
+                      alignment: Alignment.centerLeft,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      safeZoneAdminBloc
+                          .add(VerifySafeZone(widget.safezonemodel.id!));
+                    },
+                    icon: const Icon(
+                      Icons.check_circle,
+                      color: Color.fromARGB(179, 81, 116, 99),
+                    ),
+                    label: const Text(
+                      "Verify",
+                      style: TextStyle(fontSize: 13, color: textColor),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color.fromARGB(38, 94, 117, 106),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(7),
+                        side: const BorderSide(
+                          color: Color.fromARGB(127, 94, 117, 106),
+                          width: 1,
+                        ),
+                      ),
+                      padding: const EdgeInsets.all(15),
+                      alignment: Alignment.centerLeft,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      safeZoneAdminBloc
+                          .add(RejectSafeZone(widget.safezonemodel.id!));
+                    },
+                    icon: const Icon(
+                      Icons.cancel,
+                      color: Color.fromARGB(197, 133, 97, 94),
+                    ),
+                    label: const Text(
+                      "Reject",
+                      style: TextStyle(fontSize: 13, color: textColor),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color.fromARGB(37, 117, 94, 94),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(7),
+                        side: const BorderSide(
+                          color: Color.fromARGB(126, 117, 96, 94),
+                          width: 1,
+                        ),
+                      ),
+                      padding: const EdgeInsets.all(15),
+                      alignment: Alignment.centerLeft,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 10),
+              ],
             ),
             const SizedBox(
               height: 50,

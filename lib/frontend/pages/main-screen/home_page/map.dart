@@ -1,5 +1,3 @@
-// ignore_for_file: unused_field
-
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -18,10 +16,8 @@ import 'package:safezone/resources/schema/colors.dart';
 import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 
 class Map extends StatefulWidget {
-  // ignore: non_constant_identifier_names
   final String UserToken;
 
-  // ignore: non_constant_identifier_names
   const Map({super.key, required this.UserToken});
 
   @override
@@ -35,7 +31,6 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
 
   final Completer<GoogleMapController> _mapController = Completer();
   final GlobalKey _searchKey = GlobalKey();
-  // final GlobalKey _sosKey = GlobalKey();
   final GlobalKey _circleKey = GlobalKey();
   final GlobalKey _reportKey = GlobalKey();
   final GlobalKey _safeKey = GlobalKey();
@@ -58,16 +53,16 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
   late Animation<Color?> _colorAnimation;
   late TextEditingController _textEditingController;
   late AnimationController _mapCategoryHint;
-  // bool _isFadedOut = false;
 
   final List<String> hints = [
     'Barangay',
-    'Hospial',
+    'Hospital',
     'Police Station',
     'Municipal',
   ];
 
   int _currentHintIndex = 0;
+  LatLng? _currentUserLocation;
 
   @override
   void initState() {
@@ -112,7 +107,7 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
 
     _focusNode = FocusNode();
     _textEditingController = TextEditingController();
-    _changeHintText(); // TODO: Fix error
+    _changeHintText();
 
     _focusNode.addListener(() {
       if (_focusNode.hasFocus && _textEditingController.text.isEmpty) {
@@ -125,12 +120,22 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
     });
   }
 
+  @override
+  void dispose() {
+    _controller.dispose();
+    _controllerFade.dispose();
+    _mapCategoryHint.dispose();
+    _focusNode.dispose();
+    _textEditingController.dispose();
+    super.dispose();
+  }
+
   Future<void> _createCustomMarker() async {
     try {
       customMarker =
           await MarkerUtils.createCustomMarker(context, widgetPricolor);
       customDangerZoneMarker = await MarkerUtils.resizeMarker(
-        'lib/resources/images/dangerzone.png',
+        'lib/resources/images/dangerzonee.png',
         58,
         86,
       );
@@ -147,8 +152,6 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
       print("Error loading markers: $e");
     }
   }
-
-  void getPolyPoints() async {}
 
   void _changeHintText() {
     Future.delayed(const Duration(seconds: 2), () {
@@ -192,11 +195,12 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
       ));
 
       setState(() {
+        _currentUserLocation = LatLng(position.latitude, position.longitude);
         markers.clear();
         markers.add(Marker(
           markerId: const MarkerId("My Location"),
-          position: LatLng(position.latitude, position.longitude),
-          icon: customMarker!,
+          position: _currentUserLocation!,
+          icon: customMarker ?? BitmapDescriptor.defaultMarker,
           infoWindow: const InfoWindow(title: 'My Location'),
         ));
       });
@@ -244,14 +248,26 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
                 } else if (state is MapDataLoaded) {
                   markers.clear();
                   circles.clear();
+
+                  // Add user's current location marker
+                  if (_currentUserLocation != null) {
+                    markers.add(
+                      Marker(
+                        markerId: const MarkerId("My Location"),
+                        position: _currentUserLocation!,
+                        icon: customMarker ?? BitmapDescriptor.defaultMarker,
+                        infoWindow: const InfoWindow(title: 'My Location'),
+                      ),
+                    );
+                  }
+
+                  // Add danger zones
                   for (var dangerZone in state.dangerZones) {
                     markers.add(
                       Marker(
                         markerId: MarkerId(dangerZone.id.toString()),
-                        icon:
-                            customDangerZoneMarker!, // TODO: fix this null thing bug
-                        // icon: customDangerZoneMarker ??
-                        //     BitmapDescriptor.defaultMarker,
+                        icon: customDangerZoneMarker ??
+                            BitmapDescriptor.defaultMarker,
                         position:
                             LatLng(dangerZone.latitude, dangerZone.longitude),
                         infoWindow: InfoWindow(
@@ -260,7 +276,6 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
                       ),
                     );
                     circles.add(
-                      // TODO: add gesture detector thatll show incident reports in that specific zone, gotta mod the BE pa
                       Circle(
                         circleId: CircleId(dangerZone.id.toString()),
                         center:
@@ -272,6 +287,8 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
                       ),
                     );
                   }
+
+                  // Add safe zones
                   for (var safeZone in state.safeZones) {
                     markers.add(
                       Marker(
@@ -307,47 +324,28 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
                     zoom: 14.0,
                   ),
                   mapType: _currentMapType,
-                  // markers: {
-                  //   if (customMarker != null)
-                  //     Marker(
-                  //       markerId: const MarkerId('source'),
-                  //       position: sourceLocation,
-                  //       icon: customMarker!,
-                  //       infoWindow: const InfoWindow(title: 'Source Location'),
-                  //     ),
-                  // },
-                  // markers: _showMarkers ? markers : {},
-                  markers: {
-                    Marker(
-                      markerId: const MarkerId('source'),
-                      position: sourceLocation,
-                      icon: customMarker ?? BitmapDescriptor.defaultMarker,
-                      infoWindow: const InfoWindow(title: 'Source Location'),
-                    ),
-                    if (_showMarkers) ...markers,
-                  },
-
+                  markers: _showMarkers ? markers : {},
                   circles: circles,
                   onMapCreated: (GoogleMapController controller) async {
                     googleMapController = controller;
                     String style = '''
-                            [
-                              {
-                                "featureType": "poi.business",
-                                "elementType": "labels",
-                                "stylers": [
-                                  { "visibility": "off" }
-                                ]
-                              },
-                              {
-                                "featureType": "poi",
-                                "elementType": "labels.text",
-                                "stylers": [
-                                  { "visibility": "off" }
-                                ]
-                              }
-                            ]
-                            ''';
+                    [
+                      {
+                        "featureType": "poi.business",
+                        "elementType": "labels",
+                        "stylers": [
+                          { "visibility": "off" }
+                        ]
+                      },
+                      {
+                        "featureType": "poi",
+                        "elementType": "labels.text",
+                        "stylers": [
+                          { "visibility": "off" }
+                        ]
+                      }
+                    ]
+                    ''';
                     controller.setMapStyle(style);
                     _mapController.complete(controller);
 
@@ -355,7 +353,7 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
                   },
                   mapToolbarEnabled: false,
                   zoomControlsEnabled: false,
-                  myLocationEnabled: false,
+                  myLocationEnabled: true,
                   myLocationButtonEnabled: false,
                 );
               },
@@ -551,75 +549,66 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
               ],
             ),
             Positioned(
-              bottom: 100,
+              bottom: 90,
               left: 15,
               child: Row(
                 children: [
                   GestureDetector(
                     onTap: () {
                       setState(() {
-                        _currentMapType = _currentMapType == MapType.normal
-                            ? MapType.satellite
-                            : MapType.normal;
+                        _showOptions = !_showOptions;
                       });
                     },
-                    child: Container(
-                      width: 50,
-                      height: 50,
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey,
-                            blurRadius: 2,
-                            offset: Offset(1, 1),
-                          ),
-                        ],
-                      ),
-                      child: Center(
-                        child: _buildButton(Icons.map),
-                      ),
+                    child: AnimatedRotation(
+                      turns: _showOptions ? 0.5 : 0,
+                      duration: const Duration(milliseconds: 200),
+                      child: _buildButton(Icons.keyboard_arrow_right),
                     ),
                   ),
-                  SizedBox(width: 10,),
-                  GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _showMarkers = !_showMarkers;
-                      });
-                    },
-                    child: _buildButton(
-                        _showMarkers ? Icons.visibility : Icons.visibility_off),
+                  const SizedBox(width: 7),
+                  AnimatedOpacity(
+                    opacity: _showOptions ? 1.0 : 0.0,
+                    duration: const Duration(milliseconds: 200),
+                    child: Row(
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _currentMapType =
+                                  _currentMapType == MapType.normal
+                                      ? MapType.satellite
+                                      : MapType.normal;
+                            });
+                          },
+                          child: _buildButton(Icons.map),
+                        ),
+                        SizedBox(width: 7),
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _showMarkers = !_showMarkers;
+                            });
+                          },
+                          child: _buildButton(_showMarkers
+                              ? Icons.visibility
+                              : Icons.visibility_off),
+                        ),
+                      ],
+                    ),
                   ),
-                ]
+                ],
               ),
             ),
-            // Positioned(
-            //   left: 20,
-            //   bottom: 92,
-            //   child: GestureDetector(
-            //     onTap: () {
-            //       setState(() {
-            //         _showOptions = !_showOptions;
-            //       });
-            //     },
-            //     child: AnimatedRotation(
-            //       turns: _showOptions ? 0.5 : 0, // Rotates the arrow
-            //       duration: const Duration(milliseconds: 300),
-            //       child: _buildButton(Icons.keyboard_arrow_down),
-            //     ),
-            //   ),
-            // ),
+
             // Floating buttons
-            widget.UserToken == 'guess'
+            widget.UserToken == 'ng'
                 ? const SizedBox()
                 : Positioned(
-                    right: 20,
+                    right: 15,
                     bottom: 80,
                     child: SizedBox(
                       width: 60,
-                      height: 200,
+                      height: 160,
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
@@ -627,15 +616,14 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
                             key: _circleKey,
                             onTap: () async {
                               context.push('/sos-page');
-                              // Position position = await getCurrentLocation();
                             },
                             child: Container(
-                              width: 50,
-                              height: 50,
-                              decoration: const BoxDecoration(
+                              width: 40,
+                              height: 40,
+                              decoration: BoxDecoration(
                                 color: Colors.white,
-                                shape: BoxShape.circle,
-                                boxShadow: [
+                                borderRadius: BorderRadius.circular(10),
+                                boxShadow: const [
                                   BoxShadow(
                                     color: Colors.grey,
                                     blurRadius: 2,
@@ -656,12 +644,12 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
                               showCreateReportDialog(context);
                             },
                             child: Container(
-                              width: 50,
-                              height: 50,
-                              decoration: const BoxDecoration(
+                              width: 40,
+                              height: 40,
+                              decoration: BoxDecoration(
                                 color: Colors.white,
-                                shape: BoxShape.circle,
-                                boxShadow: [
+                                borderRadius: BorderRadius.circular(10),
+                                boxShadow: const [
                                   BoxShadow(
                                     color: Colors.grey,
                                     blurRadius: 2,
@@ -683,12 +671,13 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
                               showMarkSafeDialog(context);
                             },
                             child: Container(
-                              width: 50,
-                              height: 50,
-                              decoration: const BoxDecoration(
+                              width: 40,
+                              height: 40,
+                              decoration: BoxDecoration(
                                 color: Colors.white,
-                                shape: BoxShape.circle,
-                                boxShadow: [
+                                borderRadius: BorderRadius.circular(
+                                    10), // Square shape with rounded corners
+                                boxShadow: const [
                                   BoxShadow(
                                     color: Colors.grey,
                                     blurRadius: 2,
@@ -843,8 +832,8 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
 
 Widget _buildButton(IconData icon) {
   return Container(
-    width: 50,
-    height: 50,
+    width: 40,
+    height: 40,
     decoration: BoxDecoration(
       color: Colors.white,
       borderRadius:
