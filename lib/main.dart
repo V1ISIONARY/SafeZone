@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:safezone/backend/apiservice/adminApi/safezoneApi/safezone_impl.dart';
+import 'package:safezone/backend/apiservice/adminApi/safezoneApi/safezone_repo.dart';
+import 'package:safezone/backend/bloc/adminBloc/safezone/safezone_admin_bloc.dart';
 import 'package:safezone/backend/cubic/analytics.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -25,7 +28,8 @@ Future<void> main() async {
 
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   bool isFirstRun = prefs.getBool('isFirstRun') ?? true;
-  await dotenv.load(fileName: "../.env");
+  // await dotenv.load(fileName: "../.env");
+  await dotenv.load(fileName: ".env");
 
   runApp(MyApp(isFirstRun: isFirstRun));
 }
@@ -68,6 +72,9 @@ class MyApp extends StatelessWidget {
             safeZoneRepository: SafeZoneRepositoryImpl(),
             dangerZoneRepository: DangerZoneRepositoryImpl(),
           )..add(FetchMapData()),
+        ),
+        BlocProvider(
+          create: (_) => SafeZoneAdminBloc(SafezoneAdminRepositoryImpl()),
         ),
       ],
       child: MaterialApp.router(

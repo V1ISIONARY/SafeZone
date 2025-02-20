@@ -6,7 +6,7 @@ import 'package:safezone/backend/apiservice/authApi/auth_repo.dart';
 
 class AuthenticationImplementation extends AuthenticationRepository {
   // static const String baseUrl = '${VercelUrl.mainUrl}/user';
-  final baseUrl = "${dotenv.env['API_URL']}/user";
+  final String baseUrl = "${dotenv.env['API_URL']}/user";
 
 
   @override

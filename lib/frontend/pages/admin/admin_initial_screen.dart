@@ -1,6 +1,5 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:safezone/resources/schema/colors.dart';
 import '../../../resources/schema/texts.dart';
 import '../../widgets/buttons/percentage_average.dart';
