@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
@@ -550,75 +549,66 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
               ],
             ),
             Positioned(
-              bottom: 100,
+              bottom: 90,
               left: 15,
-              child: Row(children: [
-                GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _currentMapType = _currentMapType == MapType.normal
-                          ? MapType.satellite
-                          : MapType.normal;
-                    });
-                  },
-                  child: Container(
-                    width: 50,
-                    height: 50,
-                    decoration: const BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey,
-                          blurRadius: 2,
-                          offset: Offset(1, 1),
+              child: Row(
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _showOptions = !_showOptions;
+                      });
+                    },
+                    child: AnimatedRotation(
+                      turns: _showOptions ? 0.5 : 0,
+                      duration: const Duration(milliseconds: 200),
+                      child: _buildButton(Icons.keyboard_arrow_right),
+                    ),
+                  ),
+                  const SizedBox(width: 7),
+                  AnimatedOpacity(
+                    opacity: _showOptions ? 1.0 : 0.0,
+                    duration: const Duration(milliseconds: 200),
+                    child: Row(
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _currentMapType =
+                                  _currentMapType == MapType.normal
+                                      ? MapType.satellite
+                                      : MapType.normal;
+                            });
+                          },
+                          child: _buildButton(Icons.map),
+                        ),
+                        SizedBox(width: 7),
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _showMarkers = !_showMarkers;
+                            });
+                          },
+                          child: _buildButton(_showMarkers
+                              ? Icons.visibility
+                              : Icons.visibility_off),
                         ),
                       ],
                     ),
-                    child: Center(
-                      child: _buildButton(Icons.map),
-                    ),
                   ),
-                ),
-                SizedBox(
-                  width: 10,
-                ),
-                GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _showMarkers = !_showMarkers;
-                    });
-                  },
-                  child: _buildButton(
-                      _showMarkers ? Icons.visibility : Icons.visibility_off),
-                ),
-              ]),
+                ],
+              ),
             ),
-            // Positioned(
-            //   left: 20,
-            //   bottom: 92,
-            //   child: GestureDetector(
-            //     onTap: () {
-            //       setState(() {
-            //         _showOptions = !_showOptions;
-            //       });
-            //     },
-            //     child: AnimatedRotation(
-            //       turns: _showOptions ? 0.5 : 0, // Rotates the arrow
-            //       duration: const Duration(milliseconds: 300),
-            //       child: _buildButton(Icons.keyboard_arrow_down),
-            //     ),
-            //   ),
-            // ),
+
             // Floating buttons
-            widget.UserToken == 'guess'
+            widget.UserToken == 'ng'
                 ? const SizedBox()
                 : Positioned(
-                    right: 20,
+                    right: 15,
                     bottom: 80,
                     child: SizedBox(
                       width: 60,
-                      height: 200,
+                      height: 160,
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
@@ -626,15 +616,14 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
                             key: _circleKey,
                             onTap: () async {
                               context.push('/sos-page');
-                              // Position position = await getCurrentLocation();
                             },
                             child: Container(
-                              width: 50,
-                              height: 50,
-                              decoration: const BoxDecoration(
+                              width: 40,
+                              height: 40,
+                              decoration: BoxDecoration(
                                 color: Colors.white,
-                                shape: BoxShape.circle,
-                                boxShadow: [
+                                borderRadius: BorderRadius.circular(10),
+                                boxShadow: const [
                                   BoxShadow(
                                     color: Colors.grey,
                                     blurRadius: 2,
@@ -655,12 +644,12 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
                               showCreateReportDialog(context);
                             },
                             child: Container(
-                              width: 50,
-                              height: 50,
-                              decoration: const BoxDecoration(
+                              width: 40,
+                              height: 40,
+                              decoration: BoxDecoration(
                                 color: Colors.white,
-                                shape: BoxShape.circle,
-                                boxShadow: [
+                                borderRadius: BorderRadius.circular(10),
+                                boxShadow: const [
                                   BoxShadow(
                                     color: Colors.grey,
                                     blurRadius: 2,
@@ -682,12 +671,13 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
                               showMarkSafeDialog(context);
                             },
                             child: Container(
-                              width: 50,
-                              height: 50,
-                              decoration: const BoxDecoration(
+                              width: 40,
+                              height: 40,
+                              decoration: BoxDecoration(
                                 color: Colors.white,
-                                shape: BoxShape.circle,
-                                boxShadow: [
+                                borderRadius: BorderRadius.circular(
+                                    10), // Square shape with rounded corners
+                                boxShadow: const [
                                   BoxShadow(
                                     color: Colors.grey,
                                     blurRadius: 2,
@@ -842,8 +832,8 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
 
 Widget _buildButton(IconData icon) {
   return Container(
-    width: 50,
-    height: 50,
+    width: 40,
+    height: 40,
     decoration: BoxDecoration(
       color: Colors.white,
       borderRadius:
