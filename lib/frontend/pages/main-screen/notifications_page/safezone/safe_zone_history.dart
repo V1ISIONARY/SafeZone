@@ -72,8 +72,8 @@ class _SafezoneHistoryState extends State<SafezoneHistory>
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        context.go('/home'); 
-        return false; 
+        context.go('/home');
+        return false;
       },
       child: Scaffold(
         appBar: AppBar(
@@ -81,12 +81,34 @@ class _SafezoneHistoryState extends State<SafezoneHistory>
           centerTitle: true,
           title: const CategoryText(text: "Safe Zones History"),
           actions: [
-            IconButton(
-              icon: Icon(
-                _isAscending ? Icons.arrow_upward : Icons.arrow_downward,
-                color: Colors.black,
+            Padding(
+              padding: const EdgeInsets.only(right: 12),
+              child: GestureDetector(
+                onTap: _toggleSortOrder,
+                child: Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: const Color.fromARGB(10, 0, 0, 0),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        _isAscending
+                            ? Icons.arrow_upward
+                            : Icons.arrow_downward,
+                        size: 15,
+                        color: Colors.black,
+                      ),
+                      const SizedBox(width: 10),
+                      const Text(
+                        "Sort by Date",
+                        style: TextStyle(color: textColor, fontSize: 11),
+                      ),
+                    ],
+                  ),
+                ),
               ),
-              onPressed: _toggleSortOrder,
             ),
           ],
         ),

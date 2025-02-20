@@ -30,8 +30,8 @@ class _ReportsHistoryState extends State<ReportsHistory>
       .toList();
 
   late final IncidentReportBloc _incidentReportBloc;
-  bool _isAscending = false; 
-  
+  bool _isAscending = false;
+
   @override
   void initState() {
     super.initState();
@@ -73,7 +73,7 @@ class _ReportsHistoryState extends State<ReportsHistory>
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        context.go('/home'); 
+        context.go('/home');
         return false;
       },
       child: Scaffold(
@@ -82,12 +82,34 @@ class _ReportsHistoryState extends State<ReportsHistory>
           centerTitle: true,
           title: const CategoryText(text: "My Incident Reports"),
           actions: [
-            IconButton(
-              icon: Icon(
-                _isAscending ? Icons.arrow_upward : Icons.arrow_downward,
-                color: Colors.black,
+            Padding(
+              padding: const EdgeInsets.only(right: 12),
+              child: GestureDetector(
+                onTap: _toggleSortOrder,
+                child: Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: const Color.fromARGB(10, 0, 0, 0),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        _isAscending
+                            ? Icons.arrow_upward
+                            : Icons.arrow_downward,
+                        size: 15,
+                        color: Colors.black,
+                      ),
+                      const SizedBox(width: 10),
+                      const Text(
+                        "Sort by Date",
+                        style: TextStyle(color: textColor, fontSize: 11),
+                      ),
+                    ],
+                  ),
+                ),
               ),
-              onPressed: _toggleSortOrder,
             ),
           ],
         ),
