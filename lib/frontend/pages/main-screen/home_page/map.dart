@@ -11,9 +11,12 @@ import 'package:safezone/backend/bloc/mapBloc/map_bloc.dart';
 import 'package:safezone/backend/bloc/mapBloc/map_state.dart';
 import 'package:safezone/backend/services/first_run_service.dart';
 import 'package:safezone/frontend/utils/marker_utils.dart';
+import 'package:safezone/frontend/utils/safezone_navigator.dart';
 import 'package:safezone/frontend/widgets/dialogs/dialogs.dart';
 import 'package:safezone/resources/schema/colors.dart';
 import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 
 class Map extends StatefulWidget {
   final String UserToken;
@@ -27,6 +30,8 @@ class Map extends StatefulWidget {
 class _MapState extends State<Map> with TickerProviderStateMixin {
   Set<Marker> markers = {};
   Set<Circle> circles = {};
+  Set<Polyline> _polylines = {};
+  List<LatLng> _safeZones = [];
   static const LatLng sourceLocation = LatLng(16.0471, 120.3425);
 
   final Completer<GoogleMapController> _mapController = Completer();
@@ -232,6 +237,21 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
     return position;
   }
 
+  void _updatePolylines(Set<Polyline> polylines) {
+    setState(() {
+      _polylines = polylines;
+    });
+  }
+
+  void _findRoute() {
+    SafeZoneNavigator(
+      googleMapController: googleMapController,
+      currentUserLocation: _currentUserLocation,
+      safeZones: _safeZones,
+      onPolylinesUpdated: _updatePolylines,
+    ).findNearestSafeZone();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -249,7 +269,6 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
                   markers.clear();
                   circles.clear();
 
-                  // Add user's current location marker
                   if (_currentUserLocation != null) {
                     markers.add(
                       Marker(
@@ -261,7 +280,6 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
                     );
                   }
 
-                  // Add danger zones
                   for (var dangerZone in state.dangerZones) {
                     markers.add(
                       Marker(
@@ -287,8 +305,11 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
                       ),
                     );
                   }
+                  _safeZones = state.safeZones
+                      .map((safeZone) =>
+                          LatLng(safeZone.latitude!, safeZone.longitude!))
+                      .toList();
 
-                  // Add safe zones
                   for (var safeZone in state.safeZones) {
                     markers.add(
                       Marker(
@@ -326,6 +347,7 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
                   mapType: _currentMapType,
                   markers: _showMarkers ? markers : {},
                   circles: circles,
+                  polylines: _polylines,
                   onMapCreated: (GoogleMapController controller) async {
                     googleMapController = controller;
                     String style = '''
@@ -545,6 +567,35 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
                       ),
                     ),
                   ),
+                ),
+                Align(
+                  alignment: Alignment.topRight,
+                  child: GestureDetector(
+                    onTap: _findRoute,
+                    child: Container(
+                      margin: const EdgeInsets.only(right: 20),
+                      width: 150,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(8),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Colors.grey,
+                            blurRadius: 2,
+                            offset: Offset(1, 1),
+                          ),
+                        ],
+                      ),
+                      child: const Center(
+                        child: Text(
+                          "Show Nearest Safe Zone",
+                          style: TextStyle(
+                              color: labelFormFieldColor, fontSize: 11),
+                        ),
+                      ),
+                    ),
+                  ),
                 )
               ],
             ),
@@ -615,7 +666,7 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
                           GestureDetector(
                             key: _circleKey,
                             onTap: () async {
-                              context.push('/sos-page');
+                              context.push('/groups-list');
                             },
                             child: Container(
                               width: 40,
