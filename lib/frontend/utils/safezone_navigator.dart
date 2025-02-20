@@ -66,7 +66,7 @@ class SafeZoneNavigator {
             _decodePolyline(encodedPolyline);
 
         _updatePolylines(polylineCoordinates);
-        googleMapController?.animateCamera(CameraUpdate.newLatLng(end));
+        googleMapController?.animateCamera(CameraUpdate.newLatLngZoom(end, 16));
       }
     } catch (e) {
       print("Error fetching directions: $e");

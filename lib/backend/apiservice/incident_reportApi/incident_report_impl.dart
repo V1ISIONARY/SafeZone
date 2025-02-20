@@ -8,7 +8,7 @@ import 'package:safezone/backend/models/dangerzoneModel/status_update_model.dart
 
 class IncidentRepositoryImpl implements IncidentReportRepository {
   // static const String _apiUrl = '${VercelUrl.mainUrl}/incident-reports';
-    final _apiUrl = "${dotenv.env['API_URL']}/incident-reports";
+  final _apiUrl = "${dotenv.env['API_URL']}/incident-reports";
 
   // GET
 
@@ -96,6 +96,8 @@ class IncidentRepositoryImpl implements IncidentReportRepository {
   @override
   Future<IncidentReportRequestModel> createIncidentReport(
       IncidentReportRequestModel incidentReport) async {
+    print("Request Body: ${jsonEncode(incidentReport.toJson())}");
+
     final response = await http.post(
       Uri.parse('$_apiUrl/incident'),
       headers: <String, String>{
@@ -108,7 +110,9 @@ class IncidentRepositoryImpl implements IncidentReportRepository {
       final data = jsonDecode(response.body);
       return IncidentReportRequestModel.fromJson(data);
     } else {
-      throw Exception('Failed to create incident report');
+      print(response.statusCode);
+      // throw Exception('Failed to create incident report');
+      throw Exception('No Internet Connection. Please check your network.'); 
     }
   }
 

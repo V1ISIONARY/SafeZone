@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:safezone/backend/bloc/safezoneBloc/safezone_bloc.dart';
 import 'package:safezone/backend/bloc/safezoneBloc/safezone_event.dart';
 import 'package:safezone/backend/bloc/safezoneBloc/safezone_state.dart';
@@ -69,63 +70,69 @@ class _SafezoneHistoryState extends State<SafezoneHistory>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        centerTitle: true,
-        title: const CategoryText(text: "Safe Zones History"),
-        actions: [
-          IconButton(
-            icon: Icon(
-              _isAscending ? Icons.arrow_upward : Icons.arrow_downward,
-              color: Colors.black,
+    return WillPopScope(
+      onWillPop: () async {
+        context.go('/home'); 
+        return false; 
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          centerTitle: true,
+          title: const CategoryText(text: "Safe Zones History"),
+          actions: [
+            IconButton(
+              icon: Icon(
+                _isAscending ? Icons.arrow_upward : Icons.arrow_downward,
+                color: Colors.black,
+              ),
+              onPressed: _toggleSortOrder,
             ),
-            onPressed: _toggleSortOrder,
-          ),
-        ],
-      ),
-      body: Column(
-        children: [
-          Container(
-            margin: const EdgeInsets.all(10),
-            child: Row(
-              children: [
-                const SizedBox(width: 10),
-                const Flexible(
-                  child: Text(
-                    'View and track the status of all your past safe zones.',
-                    style: TextStyle(fontSize: 15, color: textColor),
+          ],
+        ),
+        body: Column(
+          children: [
+            Container(
+              margin: const EdgeInsets.all(10),
+              child: Row(
+                children: [
+                  const SizedBox(width: 10),
+                  const Flexible(
+                    child: Text(
+                      'View and track the status of all your past safe zones.',
+                      style: TextStyle(fontSize: 15, color: textColor),
+                    ),
                   ),
-                ),
-                const SizedBox(width: 8),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                  child: Image.asset(
-                    "lib/resources/svg/check.png",
-                    width: 44,
-                    height: 44,
+                  const SizedBox(width: 8),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                    child: Image.asset(
+                      "lib/resources/svg/check.png",
+                      width: 44,
+                      height: 44,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-          TabBar(
-            controller: _tabController,
-            indicatorColor: btnColor,
-            labelColor: Colors.black,
-            unselectedLabelColor: Colors.black38,
-            tabs: _categories.map((category) => Tab(text: category)).toList(),
-          ),
-          const SizedBox(height: 20),
-          Expanded(
-            child: TabBarView(
+            TabBar(
               controller: _tabController,
-              children: _categories
-                  .map((category) => _buildCategoryPage(category))
-                  .toList(),
+              indicatorColor: btnColor,
+              labelColor: Colors.black,
+              unselectedLabelColor: Colors.black38,
+              tabs: _categories.map((category) => Tab(text: category)).toList(),
             ),
-          ),
-        ],
+            const SizedBox(height: 20),
+            Expanded(
+              child: TabBarView(
+                controller: _tabController,
+                children: _categories
+                    .map((category) => _buildCategoryPage(category))
+                    .toList(),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
