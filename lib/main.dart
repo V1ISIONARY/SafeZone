@@ -2,7 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:safezone/backend/apiservice/adminApi/safezoneApi/safezone_impl.dart';
 import 'package:safezone/backend/apiservice/adminApi/safezoneApi/safezone_repo.dart';
+import 'package:safezone/backend/apiservice/circleApi/circle_impl.dart';
+import 'package:safezone/backend/apiservice/profileApi/profile_impl.dart';
 import 'package:safezone/backend/bloc/adminBloc/safezone/safezone_admin_bloc.dart';
+import 'package:safezone/backend/bloc/circleBloc/circle_bloc.dart';
+import 'package:safezone/backend/bloc/profileBloc/profile_bloc.dart';
 import 'package:safezone/backend/cubic/analytics.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -75,6 +79,12 @@ class MyApp extends StatelessWidget {
         ),
         BlocProvider(
           create: (_) => SafeZoneAdminBloc(SafezoneAdminRepositoryImpl()),
+        ),
+        BlocProvider(
+          create: (_) => CircleBloc(CircleImplementation()),
+        ),
+        BlocProvider(
+          create: (_) => ProfileBloc(ProfileImplementation()),
         ),
       ],
       child: MaterialApp.router(

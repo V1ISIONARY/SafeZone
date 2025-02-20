@@ -41,9 +41,9 @@ class CircleBloc extends Bloc<CircleEvent, CircleState> {
           event.userId,
           event.code,
         );
-        emit(CircleUpdatedState(message: 'Member added successfully'));
+        emit(CircleUpdatedState(message: 'Joining Group successfully'));
       } catch (e) {
-        emit(CircleErrorState(message: 'Error adding member: ${e.toString()}'));
+        emit(CircleErrorState(message: 'Error Joining Group: ${e.toString()}'));
       }
     });
 

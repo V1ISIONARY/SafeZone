@@ -8,11 +8,9 @@ import 'package:safezone/backend/models/userModel/circle_model.dart';
 
 class CircleImplementation extends CircleRepository {
   // static const String baseUrl = '${VercelUrl.mainUrl}/circle';
-    final baseUrl = "${dotenv.env['API_URL']}/circle";
+  final baseUrl = "${dotenv.env['API_URL']}/circle";
 
-  
   @override
-  // Fetch circles for a specific user
   Future<List<CircleModel>> getUserCircles(int userId) async {
     final response = await http.get(
       Uri.parse('$baseUrl/view_user_circles?user_id=$userId'),
@@ -23,12 +21,23 @@ class CircleImplementation extends CircleRepository {
     );
 
     if (response.statusCode == 200) {
-      final List<dynamic> data = jsonDecode(response.body);
-      return data
-          .map((circleJson) => CircleModel.fromJson(circleJson))
-          .toList();
+      print('Response Body: ${response.body}');
+
+      // Decode response as a Map
+      final Map<String, dynamic> data = jsonDecode(response.body);
+
+      // Check if "circles" key exists and is a list
+      if (data.containsKey('circles') && data['circles'] is List) {
+        final List<dynamic> circlesJson = data['circles'];
+        return circlesJson
+            .map((circleJson) => CircleModel.fromJson(circleJson))
+            .toList();
+      } else {
+        print('Circles key not found or invalid format: $data');
+        throw Exception('Circles key not found or invalid format');
+      }
     } else {
-      print("Failed to fetch user circles");
+      print("Failed to fetch user circles: ${response.body}");
       throw Exception('Failed to load circles');
     }
   }

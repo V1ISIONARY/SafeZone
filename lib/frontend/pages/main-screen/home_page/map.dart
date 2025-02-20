@@ -615,7 +615,7 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
                           GestureDetector(
                             key: _circleKey,
                             onTap: () async {
-                              context.push('/sos-page');
+                              context.push('/groups-list');
                             },
                             child: Container(
                               width: 40,

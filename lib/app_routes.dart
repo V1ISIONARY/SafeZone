@@ -137,8 +137,12 @@ GoRouter appRouter(bool isFirstRun) => GoRouter(
         ),
 
         GoRoute(
-          path: '/members-list',
-          builder: (context, state) => const ListOfMembers(),
+          path: '/members/:circleId', // Add dynamic route
+          builder: (context, state) {
+            final circleId = int.parse(state.pathParameters['circleId']!);
+            return ListOfMembers(
+                circleId: circleId); // Pass circleId to the widget
+          },
         ),
 
         GoRoute(
