@@ -41,9 +41,9 @@ class CircleBloc extends Bloc<CircleEvent, CircleState> {
           event.userId,
           event.code,
         );
-        emit(CircleUpdatedState(message: 'Member added successfully'));
+        emit(CircleUpdatedState(message: 'Joining Group successfully'));
       } catch (e) {
-        emit(CircleErrorState(message: 'Error adding member: ${e.toString()}'));
+        emit(CircleErrorState(message: 'Error Joining Group: ${e.toString()}'));
       }
     });
 
@@ -77,6 +77,7 @@ class CircleBloc extends Bloc<CircleEvent, CircleState> {
       emit(CircleLoadingState());
       try {
         final members = await _circleImplementation.viewMembers(event.circleId);
+        print("Raw API Response: ${members}");
         emit(CircleMembersLoadedState(members: members));
       } catch (e) {
         emit(CircleErrorState(

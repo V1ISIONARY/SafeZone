@@ -4,6 +4,7 @@ class CircleModel {
   final bool isActive;
   final String code;
   final String createdAt;
+  final String codeExpiry; // Added code expiry
 
   CircleModel({
     required this.id,
@@ -11,27 +12,30 @@ class CircleModel {
     required this.isActive,
     required this.code,
     required this.createdAt,
+    required this.codeExpiry, // Added code expiry
   });
 
   // Factory method to create CircleModel from JSON
   factory CircleModel.fromJson(Map<String, dynamic> json) {
     return CircleModel(
-      id: json['id'],
-      name: json['name'],
+      id: json['circle_id'] ?? 0,
+      name: json['circle_name'],
       code: json['code'] ?? "",
-      isActive: json['is_active'],
-      createdAt: json['created_at'],
+      isActive: json['is_active'] ?? true,
+      createdAt: json['created_at'] ?? "",
+      codeExpiry: json['code_expiry'] ?? "", // Map expiry time
     );
   }
 
   // Method to convert CircleModel to JSON
   Map<String, dynamic> toJson() {
     return {
-      'id': id,
-      'name': name,
+      'circle_id': id,
+      'circle_name': name,
       'code': code,
       'is_active': isActive,
       'created_at': createdAt,
+      'code_expiry': codeExpiry, // Add expiry time to JSON
     };
   }
 }

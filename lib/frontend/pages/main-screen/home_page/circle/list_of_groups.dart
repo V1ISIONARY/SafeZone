@@ -1,0 +1,465 @@
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:safezone/backend/bloc/circleBloc/circle_bloc.dart';
+import 'package:safezone/backend/bloc/circleBloc/circle_event.dart';
+import 'package:safezone/backend/bloc/circleBloc/circle_state.dart';
+import 'package:safezone/backend/models/userModel/circle_model.dart';
+import 'package:safezone/resources/schema/colors.dart';
+import 'package:safezone/resources/schema/texts.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+class ListOfGroups extends StatefulWidget {
+  const ListOfGroups({super.key});
+
+  @override
+  State<ListOfGroups> createState() => _ListOfGroupsState();
+}
+
+class _ListOfGroupsState extends State<ListOfGroups> {
+  List<CircleModel> _circles = []; // Local list to store circles
+  int? _userId; // Store userId locally
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserId();
+  }
+
+  // Load userId from shared preferences and fetch circles
+  Future<void> _loadUserId() async {
+    final prefs = await SharedPreferences.getInstance();
+    final userId = prefs.getInt('id');
+
+    if (userId != null) {
+      setState(() {
+        _userId = userId; // Store userId locally
+      });
+      // Check if the circles list is empty to prevent refetching
+      context.read<CircleBloc>().add(FetchCirclesEvent(userId: userId));
+    } else {
+      print("User ID not found in shared preferences.");
+    }
+  }
+
+  // Show dialog to create a new group
+  Future<void> _showCreateGroupDialog() async {
+    final TextEditingController nameController = TextEditingController();
+
+    return showDialog<void>(
+      context: context,
+      barrierDismissible:
+          false, // Prevent dismissing by tapping outside the dialog
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10), // Rounded corners
+          ),
+          title: const Text(
+            'Enter Group Name',
+            style: TextStyle(
+                fontSize: 15, fontWeight: FontWeight.w600, color: textColor),
+          ),
+          content: TextField(
+            controller: nameController,
+            style: const TextStyle(fontSize: 11), // Set input text size
+            decoration: InputDecoration(
+              labelText: 'Group Name',
+              labelStyle: const TextStyle(
+                  fontSize: 11, color: Colors.grey), // Label font size
+              hintText: 'Enter group name',
+              hintStyle: const TextStyle(
+                  fontSize: 11, color: Colors.grey), // Hint font size
+              contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 12, vertical: 8), // Compact padding
+              border: OutlineInputBorder(
+                borderRadius:
+                    BorderRadius.circular(8), // Slightly smaller radius
+                borderSide: const BorderSide(
+                    color: Colors.grey, width: 1), // Subtle gray border
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: const BorderSide(
+                    color: Colors.blue, width: 2), // Blue focus effect
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: const BorderSide(
+                    color: Colors.grey,
+                    width: 1), // Lighter border when not focused
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.grey[700],
+                textStyle: const TextStyle(fontSize: 16),
+              ),
+              child: const Text(
+                'Cancel',
+                style: TextStyle(color: textColor, fontSize: 13),
+              ),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color.fromARGB(255, 114, 151, 192),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              ),
+              onPressed: () {
+                final groupName = nameController.text.trim();
+                if (groupName.isNotEmpty) {
+                  context.read<CircleBloc>().add(
+                      CreateCircleEvent(name: groupName, userId: _userId!));
+
+                  setState(() {
+                    _circles = [];
+                  });
+
+                  Future.delayed(const Duration(seconds: 2), () {
+                    _loadUserId();
+                  });
+
+                  Navigator.of(context).pop();
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Please enter a group name')),
+                  );
+                }
+              },
+              child: const Text(
+                'Create',
+                style: TextStyle(
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _showJoinGroupDialog() async {
+    final TextEditingController codeController = TextEditingController();
+
+    return showDialog<void>(
+      context: context,
+      barrierDismissible:
+          false, // Prevent dismissing by tapping outside the dialog
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10), // Rounded corners
+          ),
+          title: const Text(
+            'Enter Group Code',
+            style: TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
+              color: textColor, // Ensure consistency with create group dialog
+            ),
+          ),
+          content: TextField(
+            controller: codeController,
+            style: const TextStyle(fontSize: 11), // Set input text size
+            decoration: InputDecoration(
+              labelText: 'Group Code',
+              labelStyle: const TextStyle(fontSize: 11, color: Colors.grey),
+              hintText: 'Enter group code',
+              hintStyle: const TextStyle(fontSize: 11, color: Colors.grey),
+              contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 12, vertical: 8), // Compact padding
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: const BorderSide(color: Colors.grey, width: 1),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: const BorderSide(color: Colors.blue, width: 2),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: const BorderSide(color: Colors.grey, width: 1),
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.grey[700],
+                textStyle: const TextStyle(fontSize: 16),
+              ),
+              child: const Text(
+                'Cancel',
+                style: TextStyle(color: textColor, fontSize: 13),
+              ),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color.fromARGB(255, 114, 151, 192),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              ),
+              onPressed: () {
+                final code = codeController.text.trim();
+                if (code.isNotEmpty) {
+                  context
+                      .read<CircleBloc>()
+                      .add(AddMemberEvent(code: code, userId: _userId!));
+
+                  setState(() {
+                    _circles = [];
+                  });
+
+                  Future.delayed(const Duration(seconds: 2), () {
+                    _loadUserId();
+                  });
+
+                  Navigator.of(context).pop();
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Please enter a code')),
+                  );
+                }
+              },
+              child: const Text(
+                'Join',
+                style: TextStyle(
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        centerTitle: true,
+        title: const CategoryText(text: "My Groups"),
+      ),
+      body: Container(
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    _showCreateGroupDialog(); // Show the dialog for creating a new group
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(10),
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: const Color.fromARGB(37, 117, 94, 94),
+                      borderRadius: BorderRadius.circular(7),
+                      border: Border.all(
+                        color: const Color.fromARGB(126, 117, 96, 94),
+                        width: 1,
+                      ),
+                    ),
+                    child: const Text("Create New Group",
+                        style: TextStyle(color: textColor, fontSize: 11)),
+                  ),
+                ),
+                const SizedBox(
+                  width: 5,
+                ),
+                GestureDetector(
+                  onTap: () {
+                    // Show dialog to input the group code
+                    _showJoinGroupDialog();
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(10),
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: const Color.fromARGB(37, 117, 94, 94),
+                      borderRadius: BorderRadius.circular(7),
+                      border: Border.all(
+                        color: const Color.fromARGB(126, 117, 96, 94),
+                        width: 1,
+                      ),
+                    ),
+                    child: const Text(
+                      "Join Group",
+                      style: TextStyle(color: textColor, fontSize: 11),
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  width: 10,
+                )
+              ],
+            ),
+            BlocListener<CircleBloc, CircleState>(
+              listener: (context, state) {
+                if (state is CircleCreatedState) {
+                  // Handle Circle Created
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                        content:
+                            Text('New group "${state.circle.name}" created!')),
+                  );
+                } else if (state is CircleUpdatedState) {
+                  // Handle Circle Updated
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(state.message)),
+                  );
+                } else if (state is CircleDeletedState) {
+                  // Handle Circle Deleted
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(state.message)),
+                  );
+                } else if (state is CircleErrorState) {
+                  // Handle Error
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Error: ${state.message}')),
+                  );
+                } else if (state is CircleLoadedState) {
+                  // Save circles in the local list
+                  setState(() {
+                    _circles = state.circles;
+                  });
+                }
+              },
+              child: BlocBuilder<CircleBloc, CircleState>(
+                builder: (context, state) {
+                  if (state is CircleLoadingState) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (_circles.isNotEmpty) {
+                    // Use the local list of circles
+                    return Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        child: ListView.builder(
+                          itemCount: _circles.length,
+                          itemBuilder: (context, index) {
+                            final group = _circles[index];
+                            final codeExpiry = group.codeExpiry.isNotEmpty
+                                ? group.codeExpiry
+                                : "No expiry"; // Handle empty expiry
+
+                            return GestureDetector(
+                              onTap: () {
+                                context.push('/members/${group.id}');
+                              },
+                              child: Container(
+                                width: double.infinity,
+                                height: 80,
+                                margin: const EdgeInsets.symmetric(
+                                    horizontal: 10, vertical: 5),
+                                decoration: BoxDecoration(
+                                  color: const Color.fromARGB(10, 0, 0, 0),
+                                  borderRadius: BorderRadius.circular(5),
+                                ),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Container(
+                                      width: 60,
+                                      height: 60,
+                                      margin: const EdgeInsets.symmetric(
+                                          horizontal: 15),
+                                      decoration: const BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: Colors.white,
+                                      ),
+                                      child: const Icon(Icons.group),
+                                    ),
+                                    const SizedBox(width: 10),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          CategoryText(text: group.name),
+                                          CategoryDescripText(
+                                              text: group.id.toString()),
+                                          CategoryDescripText(text: group.code),
+                                          CategoryDescripText(text: codeExpiry),
+                                        ],
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding:
+                                          const EdgeInsets.only(right: 12.0),
+                                      child: TextButton(
+                                        onPressed: () {
+                                          // Clear the circles list
+                                          setState(() {
+                                            _circles = [];
+                                          });
+
+                                          // Trigger the Generate Code action
+                                          context.read<CircleBloc>().add(
+                                                GenerateCodeEvent(
+                                                    circleId: group.id),
+                                              );
+
+                                          // Re-fetch the list of circles after code is generated
+                                          _loadUserId();
+                                        },
+                                        style: TextButton.styleFrom(
+                                          backgroundColor: const Color.fromARGB(
+                                              29,
+                                              151,
+                                              163,
+                                              175), // Button color
+                                          padding: const EdgeInsets.all(5),
+
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(5),
+                                          ),
+                                        ),
+                                        child: const Text(
+                                          'Generate Code',
+                                          style: TextStyle(
+                                              color: textColor, fontSize: 11),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    );
+                  } else if (state is CircleErrorState) {
+                    return Center(child: Text(state.message));
+                  }
+                  return Container();
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

@@ -50,3 +50,13 @@ class CircleCodeGeneratedState extends CircleState {
 
   CircleCodeGeneratedState({required this.code, required this.expiry});
 }
+
+// New state for when a user is joining a circle
+class CircleJoiningState extends CircleState {}
+
+// New state for when a user has successfully joined a circle
+class CircleJoinedState extends CircleState {
+  final String message;
+
+  CircleJoinedState({required this.message});
+}

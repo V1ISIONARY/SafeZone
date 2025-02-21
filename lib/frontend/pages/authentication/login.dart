@@ -101,7 +101,7 @@ class _LoginState extends State<Login> {
                       color: Color(0xFF5C5C5C),
                     ),
                   ),
-                  SizedBox(height: 8),   // TODO: add validations
+                  SizedBox(height: 8), // TODO: add validations
                   TextField(
                     controller: emailController,
                     style: TextStyle(
@@ -285,8 +285,12 @@ class _LoginState extends State<Login> {
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => BottomNavigationWidget(userToken: 'who')),
+                              builder: (context) =>
+                                  BottomNavigationWidget(userToken: 'who')),
                         );
+                        print(state);
+                      } else if (state is LoginError) {
+                        print(state.message);
                       }
                     },
                     child: Container(),
