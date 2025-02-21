@@ -152,32 +152,31 @@ class _ListOfGroupsState extends State<ListOfGroups> {
 
     return showDialog<void>(
       context: context,
-      barrierDismissible:
-          true,
+      barrierDismissible: true,
       builder: (BuildContext context) {
         return AlertDialog(
           backgroundColor: Colors.white,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10), 
+            borderRadius: BorderRadius.circular(10),
           ),
           title: const Text(
             'Enter Group Code',
             style: TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.w600,
-              color: textColor, 
+              color: textColor,
             ),
           ),
           content: TextField(
             controller: codeController,
-            style: const TextStyle(fontSize: 11), 
+            style: const TextStyle(fontSize: 11),
             decoration: InputDecoration(
               labelText: 'Group Code',
               labelStyle: const TextStyle(fontSize: 11, color: Colors.grey),
               hintText: 'Enter group code',
               hintStyle: const TextStyle(fontSize: 11, color: Colors.grey),
-              contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 12, vertical: 8), 
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
                 borderSide: const BorderSide(color: Colors.grey, width: 1),
@@ -264,26 +263,38 @@ class _ListOfGroupsState extends State<ListOfGroups> {
               children: [
                 GestureDetector(
                   onTap: () {
-                    _showCreateGroupDialog(); 
+                    _showCreateGroupDialog();
                   },
                   child: Container(
                     padding: const EdgeInsets.all(10),
                     alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      color: const Color.fromARGB(37, 117, 94, 94),
-                      borderRadius: BorderRadius.circular(7),
-                      border: Border.all(
-                        color: const Color.fromARGB(126, 117, 96, 94),
-                        width: 1,
-                      ),
+                    child: const Row(
+                      children: [
+                        Icon(
+                          Icons.group_add,
+                          color: btnColor,
+                          size: 15,
+                        ),
+                        SizedBox(
+                          width: 8,
+                        ),
+                        Text("Create Group",
+                            style: TextStyle(color: textColor, fontSize: 11)),
+                      ],
                     ),
-                    child: const Text("Create New Group",
-                        style: TextStyle(color: textColor, fontSize: 11)),
                   ),
                 ),
-                const SizedBox(
-                  width: 5,
+
+                // Vertical Divider
+                SizedBox(
+                  height: 20, // Adjust height to match button height
+                  child: VerticalDivider(
+                    color: Colors.grey, // Change color if needed
+                    thickness: 1, // Adjust thickness
+                    width: 10, // Space taken by the divider
+                  ),
                 ),
+
                 GestureDetector(
                   onTap: () {
                     _showJoinGroupDialog();
@@ -291,23 +302,27 @@ class _ListOfGroupsState extends State<ListOfGroups> {
                   child: Container(
                     padding: const EdgeInsets.all(10),
                     alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      color: const Color.fromARGB(37, 117, 94, 94),
-                      borderRadius: BorderRadius.circular(7),
-                      border: Border.all(
-                        color: const Color.fromARGB(126, 117, 96, 94),
-                        width: 1,
-                      ),
-                    ),
-                    child: const Text(
-                      "Join Group",
-                      style: TextStyle(color: textColor, fontSize: 11),
+                    child: const Row(
+                      children: [
+                        Icon(
+                          Icons.login,
+                          color: btnColor,
+                          size: 15,
+                        ),
+                        SizedBox(
+                          width: 8,
+                        ),
+                        Text(
+                          "Join Group",
+                          style: TextStyle(color: textColor, fontSize: 11),
+                        ),
+                      ],
                     ),
                   ),
                 ),
-                const SizedBox(
-                  width: 10,
-                )
+                SizedBox(
+                  width: 8,
+                ),
               ],
             ),
             BlocListener<CircleBloc, CircleState>(
@@ -356,15 +371,16 @@ class _ListOfGroupsState extends State<ListOfGroups> {
                             final group = _circles[index];
                             final codeExpiry = group.codeExpiry.isNotEmpty
                                 ? group.codeExpiry
-                                : "No expiry"; 
+                                : "No expiry";
 
                             return GestureDetector(
                               onTap: () {
-                                context.push('/members/${group.id}', extra: group);
+                                context.push('/members/${group.id}',
+                                    extra: group);
                               },
                               child: Container(
                                 width: double.infinity,
-                                height: 80,
+                                height: 70,
                                 margin: const EdgeInsets.symmetric(
                                     horizontal: 10, vertical: 5),
                                 decoration: BoxDecoration(
@@ -376,8 +392,8 @@ class _ListOfGroupsState extends State<ListOfGroups> {
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   children: [
                                     Container(
-                                      width: 60,
-                                      height: 60,
+                                      width: 50,
+                                      height: 50,
                                       margin: const EdgeInsets.symmetric(
                                           horizontal: 15),
                                       decoration: const BoxDecoration(
@@ -395,10 +411,23 @@ class _ListOfGroupsState extends State<ListOfGroups> {
                                             MainAxisAlignment.center,
                                         children: [
                                           CategoryText(text: group.name),
-                                          CategoryDescripText(
-                                              text: group.id.toString()),
-                                          CategoryDescripText(text: group.code),
-                                          CategoryDescripText(text: codeExpiry),
+                                          // const SizedBox(height: 5,),
+                                          // Container(
+                                          //   padding: const EdgeInsets.all(5),
+                                          //   decoration: BoxDecoration(
+                                          //       color: const Color.fromARGB(214, 197, 197, 197),
+                                          //       borderRadius:
+                                          //           BorderRadius.circular(5)),
+                                          //   child: Text(
+                                          //     'Invite Code: ${group.code}',
+                                          //     style: const TextStyle(
+                                          //       fontSize: 11,
+                                          //       fontWeight: FontWeight.w500,
+                                          //       color: Colors.white,
+                                          //     ),
+                                          //   ),
+                                          // ),
+                                          // CategoryDescripText(text: codeExpiry),
                                         ],
                                       ),
                                     ),
@@ -423,7 +452,7 @@ class _ListOfGroupsState extends State<ListOfGroups> {
                                         },
                                         style: TextButton.styleFrom(
                                           backgroundColor: const Color.fromARGB(
-                                              29,
+                                              10,
                                               151,
                                               163,
                                               175), // Button color
