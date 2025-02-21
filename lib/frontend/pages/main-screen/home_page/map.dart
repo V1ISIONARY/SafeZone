@@ -41,6 +41,7 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
 
   bool _showMarkers = true;
   bool _showOptions = false;
+  bool _isSafeZoneShown = false;
 
   BitmapDescriptor? customMarker;
   BitmapDescriptor? customDangerZoneMarker;
@@ -126,6 +127,8 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
 
   @override
   void dispose() {
+    _positionStreamSubscription?.cancel();
+
     _controller.dispose();
     _controllerFade.dispose();
     _mapCategoryHint.dispose();
@@ -187,28 +190,53 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
     }
   }
 
+  StreamSubscription<Position>? _positionStreamSubscription;
+
   Future<void> _fetchLocation() async {
-    Position position = await getCurrentLocation();
+    bool serviceEnabled;
+    LocationPermission permission;
 
-    if (googleMapController != null) {
-      googleMapController!.animateCamera(CameraUpdate.newCameraPosition(
-        CameraPosition(
-          target: LatLng(position.latitude, position.longitude),
-          zoom: 14.0,
-        ),
-      ));
-
-      setState(() {
-        _currentUserLocation = LatLng(position.latitude, position.longitude);
-        markers.clear();
-        markers.add(Marker(
-          markerId: const MarkerId("My Location"),
-          position: _currentUserLocation!,
-          icon: customMarker ?? BitmapDescriptor.defaultMarker,
-          infoWindow: const InfoWindow(title: 'My Location'),
-        ));
-      });
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      return Future.error('Location services are disabled');
     }
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        return Future.error("Location permission denied");
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      return Future.error('Location permissions are permanently denied');
+    }
+
+    _positionStreamSubscription =
+        Geolocator.getPositionStream().listen((Position position) {
+      if (googleMapController != null) {
+        googleMapController!.animateCamera(CameraUpdate.newCameraPosition(
+          CameraPosition(
+            target: LatLng(position.latitude, position.longitude),
+            zoom: 18.0,
+            tilt: 60.0,
+            bearing: 40.0,
+          ),
+        ));
+
+        setState(() {
+          _currentUserLocation = LatLng(position.latitude, position.longitude);
+          markers.clear();
+          markers.add(Marker(
+            markerId: const MarkerId("My Location"),
+            position: _currentUserLocation!,
+            icon: customMarker ?? BitmapDescriptor.defaultMarker,
+            infoWindow: const InfoWindow(title: 'My Location'),
+          ));
+        });
+      }
+    });
   }
 
   Future<Position> getCurrentLocation() async {
@@ -243,13 +271,45 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
   }
 
   void _findRoute() {
-    SafeZoneNavigator(
-            googleMapController: googleMapController,
-            currentUserLocation: _currentUserLocation,
-            safeZones: _safeZones,
-            onPolylinesUpdated: _updatePolylines,
-            context: context)
-        .findNearestSafeZone();
+    if (!_isSafeZoneShown) {
+      // Show nearest safe zone
+      SafeZoneNavigator(
+        googleMapController: googleMapController,
+        currentUserLocation: _currentUserLocation,
+        safeZones: _safeZones,
+        onPolylinesUpdated: _updatePolylines,
+        context: context,
+      ).findNearestSafeZone();
+
+      setState(() {
+        _isSafeZoneShown = true; // Update the state
+      });
+    } else {
+      // Reset the map
+      _resetMap();
+
+      setState(() {
+        _isSafeZoneShown = false; // Update the state
+      });
+    }
+  }
+
+  void _resetMap() {
+    setState(() {
+      _polylines.clear(); // Clear the polylines
+    });
+
+    // Reset the camera to the initial position
+    googleMapController?.animateCamera(
+      CameraUpdate.newCameraPosition(
+        const CameraPosition(
+          target: sourceLocation, // Your initial location
+          zoom: 14.0, // Default zoom level
+          tilt: 0.0, // No tilt (flat view)
+          bearing: 0.0, // No bearing (facing north)
+        ),
+      ),
+    );
   }
 
   @override
@@ -342,7 +402,7 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
                 return GoogleMap(
                   initialCameraPosition: const CameraPosition(
                     target: sourceLocation,
-                    zoom: 14.0,
+                    zoom: 16.0,
                   ),
                   mapType: _currentMapType,
                   markers: _showMarkers ? markers : {},
@@ -577,7 +637,9 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
                       width: 150,
                       height: 40,
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: _isSafeZoneShown
+                            ? Colors.grey[300]
+                            : Colors.white, // Toggle color
                         borderRadius: BorderRadius.circular(8),
                         boxShadow: const [
                           BoxShadow(
@@ -587,10 +649,10 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
                           ),
                         ],
                       ),
-                      child: const Center(
+                      child: Center(
                         child: Text(
-                          "Show Nearest Safe Zone",
-                          style: TextStyle(
+                          "Show Nearest Safe Zone", // Keep the text constant
+                          style: const TextStyle(
                               color: labelFormFieldColor, fontSize: 11),
                         ),
                       ),

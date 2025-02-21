@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
@@ -22,8 +23,19 @@ class SafeZoneNavigator {
     required this.context,
   }) : _currentUserLocation = currentUserLocation;
 
+  final Completer<GoogleMapController> _mapController = Completer();
+
+  Future<void> _ensureMapControllerReady() async {
+    if (googleMapController == null) {
+      await _mapController.future;
+    }
+  }
+
   void findNearestSafeZone() async {
+    await _ensureMapControllerReady(); 
+
     if (_currentUserLocation == null) {
+      print("Current user location is null!");
       return;
     }
 
@@ -45,6 +57,30 @@ class SafeZoneNavigator {
     }
 
     if (nearestSafeZone != null) {
+      await googleMapController?.animateCamera(
+        CameraUpdate.newCameraPosition(
+          CameraPosition(
+            target: nearestSafeZone,
+            zoom: 16.0,
+            tilt: 0.0, 
+            bearing: 0.0, 
+          ),
+        ),
+      );
+
+      await Future.delayed(const Duration(seconds: 1));
+
+      await googleMapController?.animateCamera(
+        CameraUpdate.newCameraPosition(
+          CameraPosition(
+            target: _currentUserLocation,
+            zoom: 18.0,
+            tilt: 60.0, 
+            bearing: 40.0, 
+          ),
+        ),
+      );
+
       _drawRoute(_currentUserLocation, nearestSafeZone);
     }
   }
@@ -80,20 +116,18 @@ class SafeZoneNavigator {
     }
   }
 
-void _showETA(String eta) {
+  void _showETA(String eta) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
           "Estimated arrival time: $eta",
-          style: const TextStyle(
-              color: Colors.white), 
+          style: const TextStyle(color: Colors.white),
         ),
-        backgroundColor: greenStatusColor, 
+        backgroundColor: greenStatusColor,
         duration: const Duration(seconds: 5),
       ),
     );
   }
-
 
   List<LatLng> _decodePolyline(String encoded) {
     List<LatLng> points = [];
