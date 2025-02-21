@@ -49,7 +49,7 @@ class _ListOfGroupsState extends State<ListOfGroups> {
     return showDialog<void>(
       context: context,
       barrierDismissible:
-          false, // Prevent dismissing by tapping outside the dialog
+          true, // Prevent dismissing by tapping outside the dialog
       builder: (BuildContext context) {
         return AlertDialog(
           backgroundColor: Colors.white,
@@ -153,31 +153,31 @@ class _ListOfGroupsState extends State<ListOfGroups> {
     return showDialog<void>(
       context: context,
       barrierDismissible:
-          false, // Prevent dismissing by tapping outside the dialog
+          true,
       builder: (BuildContext context) {
         return AlertDialog(
           backgroundColor: Colors.white,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10), // Rounded corners
+            borderRadius: BorderRadius.circular(10), 
           ),
           title: const Text(
             'Enter Group Code',
             style: TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.w600,
-              color: textColor, // Ensure consistency with create group dialog
+              color: textColor, 
             ),
           ),
           content: TextField(
             controller: codeController,
-            style: const TextStyle(fontSize: 11), // Set input text size
+            style: const TextStyle(fontSize: 11), 
             decoration: InputDecoration(
               labelText: 'Group Code',
               labelStyle: const TextStyle(fontSize: 11, color: Colors.grey),
               hintText: 'Enter group code',
               hintStyle: const TextStyle(fontSize: 11, color: Colors.grey),
               contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 12, vertical: 8), // Compact padding
+                  horizontal: 12, vertical: 8), 
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
                 borderSide: const BorderSide(color: Colors.grey, width: 1),
@@ -264,7 +264,7 @@ class _ListOfGroupsState extends State<ListOfGroups> {
               children: [
                 GestureDetector(
                   onTap: () {
-                    _showCreateGroupDialog(); // Show the dialog for creating a new group
+                    _showCreateGroupDialog(); 
                   },
                   child: Container(
                     padding: const EdgeInsets.all(10),
@@ -286,7 +286,6 @@ class _ListOfGroupsState extends State<ListOfGroups> {
                 ),
                 GestureDetector(
                   onTap: () {
-                    // Show dialog to input the group code
                     _showJoinGroupDialog();
                   },
                   child: Container(
@@ -357,11 +356,11 @@ class _ListOfGroupsState extends State<ListOfGroups> {
                             final group = _circles[index];
                             final codeExpiry = group.codeExpiry.isNotEmpty
                                 ? group.codeExpiry
-                                : "No expiry"; // Handle empty expiry
+                                : "No expiry"; 
 
                             return GestureDetector(
                               onTap: () {
-                                context.push('/members/${group.id}');
+                                context.push('/members/${group.id}', extra: group);
                               },
                               child: Container(
                                 width: double.infinity,
