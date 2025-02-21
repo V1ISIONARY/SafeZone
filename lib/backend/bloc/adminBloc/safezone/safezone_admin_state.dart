@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:safezone/backend/models/safezoneModel/safezone_model.dart';
 
 abstract class SafeZoneAdminState extends Equatable {
   const SafeZoneAdminState();
@@ -28,3 +29,13 @@ class SafeZoneAdminFailure extends SafeZoneAdminState {
   @override
   List<Object> get props => [error];
 }
+
+class SafeZoneAdminLoaded extends SafeZoneAdminState {
+  final List<SafeZoneModel> safeZones;
+
+  const SafeZoneAdminLoaded(this.safeZones);
+
+  @override
+  List<Object> get props => [safeZones];
+}
+

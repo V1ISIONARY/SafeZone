@@ -33,3 +33,7 @@ class ReviewSafeZone extends SafeZoneAdminEvent {
   @override
   List<Object> get props => [id];
 }
+
+class FetchSafeZones extends SafeZoneAdminEvent {
+  
+}
