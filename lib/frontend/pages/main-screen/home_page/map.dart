@@ -72,15 +72,17 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
   int _currentHintIndex = 0;
   LatLng? _currentUserLocation;
 
+  StreamSubscription<Position>? _positionStreamSubscription;
+
   @override
   void initState() {
     super.initState();
     _loadUserId();
     _pageController = PageController();
     context.read<DangerZoneBloc>().add(FetchDangerZones());
-    _fetchLocation();
     _checkFirstRun();
     _createCustomMarker();
+    _fetchLocation();
 
     _controller = AnimationController(
       duration: const Duration(milliseconds: 400),
@@ -126,17 +128,9 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
         _controllerFade.reverse();
       }
     });
-  }
 
-  Future<void> _loadUserId() async {
-    // Retrieve the userId from SharedPreferences or any storage mechanism you're using
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    int? userId = prefs.getInt('id'); // Adjust this if using a different method
-    if (userId != null) {
-      setState(() {
-        _userId = userId;
-      });
-    }
+    // Start listening for location changes
+    _startLocationUpdates();
   }
 
   @override
@@ -149,6 +143,16 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
     _focusNode.dispose();
     _textEditingController.dispose();
     super.dispose();
+  }
+
+  Future<void> _loadUserId() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    int? userId = prefs.getInt('id');
+    if (userId != null) {
+      setState(() {
+        _userId = userId;
+      });
+    }
   }
 
   Future<void> _createCustomMarker() async {
@@ -204,14 +208,9 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
     }
   }
 
-  StreamSubscription<Position>? _positionStreamSubscription;
-
   Future<void> _fetchLocation() async {
     try {
-      // Get current location
       Position position = await getCurrentLocation();
-
-      // If the googleMapController exists, update the map's camera position
       if (googleMapController != null) {
         googleMapController!.animateCamera(CameraUpdate.newCameraPosition(
           CameraPosition(
@@ -220,7 +219,6 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
           ),
         ));
 
-        // Update the UI
         setState(() {
           _currentUserLocation = LatLng(position.latitude, position.longitude);
           markers.clear();
@@ -299,7 +297,6 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
 
   void _findRoute() {
     if (!_isSafeZoneShown) {
-      // Show nearest safe zone
       SafeZoneNavigator(
         googleMapController: googleMapController,
         currentUserLocation: _currentUserLocation,
@@ -309,34 +306,66 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
       ).findNearestSafeZone();
 
       setState(() {
-        _isSafeZoneShown = true; // Update the state
+        _isSafeZoneShown = true;
       });
     } else {
-      // Reset the map
       _resetMap();
-
       setState(() {
-        _isSafeZoneShown = false; // Update the state
+        _isSafeZoneShown = false;
       });
     }
   }
 
   void _resetMap() {
     setState(() {
-      _polylines.clear(); // Clear the polylines
+      _polylines.clear();
     });
 
-    // Reset the camera to the initial position
     googleMapController?.animateCamera(
       CameraUpdate.newCameraPosition(
         const CameraPosition(
-          target: sourceLocation, // Your initial location
-          zoom: 14.0, // Default zoom level
-          tilt: 0.0, // No tilt (flat view)
-          bearing: 0.0, // No bearing (facing north)
+          target: sourceLocation,
+          zoom: 14.0,
+          tilt: 0.0,
+          bearing: 0.0,
         ),
       ),
     );
+  }
+
+  // Start listening to location changes
+  void _startLocationUpdates() {
+    _positionStreamSubscription = Geolocator.getPositionStream(
+      locationSettings: const LocationSettings(
+        accuracy: LocationAccuracy.high,
+        distanceFilter: 10,
+      ),
+    ).listen((Position position) {
+      print(
+          "Location updated: Latitude: ${position.latitude}, Longitude: ${position.longitude}");
+
+      if (googleMapController != null) {
+        googleMapController!.animateCamera(CameraUpdate.newCameraPosition(
+          CameraPosition(
+            target: LatLng(position.latitude, position.longitude),
+            zoom: 14.0,
+          ),
+        ));
+
+        setState(() {
+          _currentUserLocation = LatLng(position.latitude, position.longitude);
+          markers.clear();
+          markers.add(Marker(
+            markerId: const MarkerId("My Location"),
+            position: _currentUserLocation!,
+            icon: customMarker ?? BitmapDescriptor.defaultMarker,
+            infoWindow: const InfoWindow(title: 'My Location'),
+          ));
+        });
+
+        updateLocation(position.latitude, position.longitude);
+      }
+    });
   }
 
   @override

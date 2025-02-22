@@ -60,3 +60,9 @@ class CircleJoinedState extends CircleState {
 
   CircleJoinedState({required this.message});
 }
+
+class GroupMembersLoadedState extends CircleState {
+  final List<Map<String, dynamic>> members;
+
+  GroupMembersLoadedState({required this.members});
+}

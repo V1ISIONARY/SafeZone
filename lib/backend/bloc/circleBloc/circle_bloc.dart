@@ -100,5 +100,16 @@ class CircleBloc extends Bloc<CircleEvent, CircleState> {
         ));
       }
     });
+    on<ViewGroupMembersEvent>((event, emit) async {
+      emit(CircleLoadingState());
+      try {
+        final members = await _circleImplementation.viewGroupMembers(
+            event.userId, event.circleId);
+        emit(GroupMembersLoadedState(members: members));
+      } catch (e) {
+        emit(CircleErrorState(
+            message: 'Error fetching group members: ${e.toString()}'));
+      }
+    });
   }
 }
