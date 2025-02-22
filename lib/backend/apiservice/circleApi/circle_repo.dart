@@ -7,4 +7,5 @@ abstract class CircleRepository {
   Future<Map<String, dynamic>> generateCircleCode(int circleId);
   Future<void> removeMemberFromCircle(int circleId, int userId);
   Future<List<Map<String, dynamic>>> viewMembers(int circleId);
+  Future<List<Map<String, dynamic>>> viewGroupMembers(int userId, int circleId);
 }

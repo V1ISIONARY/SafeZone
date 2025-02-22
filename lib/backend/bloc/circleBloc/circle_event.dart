@@ -46,3 +46,10 @@ class GenerateCodeEvent extends CircleEvent {
 
   GenerateCodeEvent({required this.circleId});
 }
+
+class ViewGroupMembersEvent extends CircleEvent {
+  final int circleId;
+  final int userId;
+
+  ViewGroupMembersEvent({required this.circleId, required this.userId});
+}

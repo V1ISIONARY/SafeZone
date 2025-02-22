@@ -180,4 +180,39 @@ class CircleImplementation extends CircleRepository {
       throw Exception('Failed to view members');
     }
   }
+
+  @override
+  Future<List<Map<String, dynamic>>> viewGroupMembers(
+      int userId, int circleId) async {
+    final response = await http.get(
+      Uri.parse(
+          '${dotenv.env['API_URL']}/groupmember/view_group_members?user_id=$userId&circle_id=$circleId'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      print("Raw API Response: $data");
+
+      if (data.containsKey('members') && data['members'] is List) {
+        final membersList = List<Map<String, dynamic>>.from(data['members']);
+
+        // Debug print each member's data
+        for (var member in membersList) {
+          print("Member Data: $member");
+        }
+
+        return membersList;
+      } else {
+        throw Exception("Unexpected response format: missing 'members' key");
+      }
+    } else {
+      print(
+          "Failed to view group members. Status Code: ${response.statusCode}");
+      throw Exception('Failed to view group members');
+    }
+  }
 }
