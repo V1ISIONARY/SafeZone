@@ -1,6 +1,7 @@
 import 'package:go_router/go_router.dart';
 import 'package:safezone/backend/models/dangerzoneModel/incident_report_request_model.dart';
 import 'package:safezone/backend/models/safezoneModel/safezone_model.dart';
+import 'package:safezone/backend/models/userModel/circle_model.dart';
 import 'package:safezone/frontend/pages/admin/admin_initial_screen.dart';
 import 'package:safezone/frontend/pages/admin/admin_reports.dart';
 import 'package:safezone/frontend/pages/admin/admin_reports_details.dart';
@@ -161,8 +162,11 @@ GoRouter appRouter(bool isFirstRun) => GoRouter(
           path: '/members/:circleId', // Add dynamic route
           builder: (context, state) {
             final circleId = int.parse(state.pathParameters['circleId']!);
+            final group = state.extra as CircleModel;
             return ListOfMembers(
-                circleId: circleId); // Pass circleId to the widget
+              circleId: circleId,
+              circleInfo: group,
+            ); // Pass circleId to the widget
           },
         ),
 

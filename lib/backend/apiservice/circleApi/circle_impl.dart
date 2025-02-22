@@ -161,10 +161,22 @@ class CircleImplementation extends CircleRepository {
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
-      // Assuming the response contains an array of member objects
-      return List<Map<String, dynamic>>.from(data['members']);
+      print("Raw API Response (impl): $data");
+
+      if (data.containsKey('members') && data['members'] is List) {
+        final membersList = List<Map<String, dynamic>>.from(data['members']);
+
+        // Debug print each member's data
+        for (var member in membersList) {
+          print("Member Data: $member");
+        }
+
+        return membersList;
+      } else {
+        throw Exception("Unexpected response format: missing 'members' key");
+      }
     } else {
-      print("Failed to view members");
+      print("Failed to view members. Status Code: ${response.statusCode}");
       throw Exception('Failed to view members');
     }
   }
