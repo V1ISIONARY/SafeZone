@@ -10,43 +10,61 @@ class SafezoneAdminRepositoryImpl implements SafeZoneAdminRepository {
   // GET
 
   @override
-  Future<bool> verifySafezone(int id) async {
-    print("🔹 Calling API to verify safezone ID = $id");
+   Future<SafeZoneModel?> verifySafezone(int id) async {
     final response = await http.put(Uri.parse('$_apiUrl/verify-safezone/$id'));
 
     if (response.statusCode == 200) {
-      print("✅ Database Updated Successfully");
-      return true;
+      final data = jsonDecode(response.body);
+      final safeZoneData = data['safe_zone'];
+      if (safeZoneData != null) {
+        return SafeZoneModel.fromJson(safeZoneData);
+      } else {
+        return null; 
+      }
     } else {
-      print("❌ Failed to update database: ${response.body}");
-      throw Exception('Failed to verify safezone');
+      throw Exception('Failed to verify safe zone');
     }
   }
-
   @override
-  Future<bool> rejectSafezone(int id) async {
+  Future<SafeZoneModel?> rejectSafezone(int id) async {
     final response = await http.put(Uri.parse('$_apiUrl/reject-safezone/$id'));
 
     if (response.statusCode == 200) {
-      return true;
+      final data = jsonDecode(response.body);
+      final safeZoneData = data['safe_zone'];
+
+      if (safeZoneData != null) {
+      return SafeZoneModel.fromJson(data); // Return the updated SafeZoneModel
+      } else {
+        print("❌ Safe zone data is null");
+        return null;
+      }
     } else {
       throw Exception('Failed to reject safezone');
     }
-  }
+    }
 
-  @override
-  Future<bool> reviewSafezone(int id) async {
+    @override
+  Future<SafeZoneModel?> reviewSafezone(int id) async {
     print("🔹 Calling API to review safezone ID = $id");
     final response = await http.put(Uri.parse('$_apiUrl/review-safezone/$id'));
 
     if (response.statusCode == 200) {
       print("✅ Database Updated Successfully");
-      return true;
+      final data = jsonDecode(response.body);
+      final safeZoneData = data['safe_zone'];
+      if (safeZoneData != null) {
+        return SafeZoneModel.fromJson(safeZoneData); // Return the updated SafeZoneModel
+      } else {
+        print("❌ Safe zone data is null");
+        return null;
+      }
     } else {
       print("❌ Failed to update database: ${response.body}");
-      throw Exception('Failed to review safezone');
+      return null; // Return null if the operation fails
     }
   }
+
 
   @override
   Future<List<SafeZoneModel>> getSafeZones() async {
@@ -63,4 +81,5 @@ class SafezoneAdminRepositoryImpl implements SafeZoneAdminRepository {
       throw Exception('Failed to load safe zones');
     }
   }
-}
+  
+  }

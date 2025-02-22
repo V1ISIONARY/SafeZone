@@ -8,22 +8,34 @@ import '../../../../resources/schema/texts.dart';
 class AdminSafeZonesCard extends StatelessWidget {
   final SafeZoneModel safeZone;
   final String address;
+  final VoidCallback? onRefresh;
 
   const AdminSafeZonesCard(
-      {super.key, required this.safeZone, required this.address});
+      {super.key, required this.safeZone, required this.address, this.onRefresh});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {
-        context.push(
-          "/admin-safezone-details",
-          extra: {
-            'safezone': safeZone,
-            'address': address,
-          },
-        );
-      },
+      onTap: () async {
+  final shouldRefresh = await context.push(
+    "/admin-safezone-details",
+    extra: {
+      'safezone': safeZone,
+      'address': address,
+      
+    },
+  );
+
+  // Log the shouldRefresh value
+  print("shouldRefresh: $shouldRefresh");
+
+  // Refresh the data if needed
+  if (shouldRefresh == true) {
+    print('refreshing');
+    onRefresh!();
+    // Trigger a refresh (you'll need to pass a callback or use a state management solution)
+  }
+},
       child: Container(
         width: double.infinity,
         height: 100,

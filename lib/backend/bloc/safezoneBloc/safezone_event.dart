@@ -82,3 +82,4 @@ class DeleteSafeZone extends SafeZoneEvent {
   @override
   List<Object> get props => [id];
 }
+
