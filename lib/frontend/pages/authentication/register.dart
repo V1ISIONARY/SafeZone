@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:safezone/backend/bloc/authBloc/auth_bloc.dart';
 import 'package:safezone/backend/bloc/authBloc/auth_event.dart';
 import 'package:safezone/backend/bloc/authBloc/auth_state.dart';
+import 'package:geolocator/geolocator.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -346,23 +347,35 @@ class _RegisterScreenState extends State<RegisterScreen> {
           ),
           const Spacer(),
           ElevatedButton(
-            onPressed: () {
+            onPressed: () async {
+              // Get the current position (latitude and longitude)
+              Position position = await Geolocator.getCurrentPosition(
+                  desiredAccuracy: LocationAccuracy.high);
+
+              // Get the signup Bloc
               final signupBloc = context.read<AuthenticationBloc>();
 
+              // Add the UserSignUpEvent with latitude and longitude
               signupBloc.add(UserSignUpEvent(
-                username: usernameController.text,
-                email: emailController.text,
-                password: passwordController.text,
-                address:
-                    'Some address', // Replace with actual input if required
-                firstname: firstNameController.text,
-                lastname: lastNameController.text,
-                isAdmin: false,
-                isGirl: selectedGender == 'Female',
-                isVerified: true,
-              ));
+                  username: usernameController.text,
+                  email: emailController.text,
+                  password: passwordController.text,
+                  address:
+                      'Some address', // Replace with actual input if required
+                  firstname: firstNameController.text,
+                  lastname: lastNameController.text,
+                  isAdmin: false,
+                  isGirl: selectedGender == 'Female',
+                  isVerified: true,
+                  latitude: position.latitude, // Pass latitude
+                  longitude: position.longitude // Pass longitude
+                  ));
 
-              context.push('/login');
+              // Check if the widget is still mounted before navigating
+              if (mounted) {
+                // Navigate to login screen after successful registration
+                context.push('/login');
+              }
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFFEF8D88),
@@ -379,7 +392,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 fontWeight: FontWeight.w400,
               ),
             ),
-          ),
+          )
         ],
       ),
     );

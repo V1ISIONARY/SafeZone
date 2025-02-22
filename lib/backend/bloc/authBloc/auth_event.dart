@@ -8,6 +8,13 @@ class UserLogin extends AuthenticationEvent {
   UserLogin(this.email, this.password);
 }
 
+class UpdateLocationEvent extends AuthenticationEvent {
+  final double latitude;
+  final double longitude;
+
+  UpdateLocationEvent({required this.latitude, required this.longitude});
+}
+
 class UserSignUpEvent extends AuthenticationEvent {
   final String username;
   final String email;
@@ -18,6 +25,8 @@ class UserSignUpEvent extends AuthenticationEvent {
   final bool isAdmin;
   final bool isGirl;
   final bool isVerified;
+  final double longitude;
+  final double latitude;
 
   UserSignUpEvent({
     required this.username,
@@ -29,5 +38,7 @@ class UserSignUpEvent extends AuthenticationEvent {
     required this.isAdmin,
     required this.isGirl,
     required this.isVerified,
+    required this.longitude,
+    required this.latitude,
   });
 }

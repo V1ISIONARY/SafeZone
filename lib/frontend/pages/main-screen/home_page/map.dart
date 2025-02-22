@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
@@ -14,8 +15,10 @@ import 'package:safezone/frontend/utils/marker_utils.dart';
 import 'package:safezone/frontend/utils/safezone_navigator.dart';
 import 'package:safezone/frontend/widgets/dialogs/dialogs.dart';
 import 'package:safezone/resources/schema/colors.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'dart:convert';
 
 class Map extends StatefulWidget {
   final String UserToken;
@@ -64,13 +67,14 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
     'Police Station',
     'Municipal',
   ];
-
+  int? _userId;
   int _currentHintIndex = 0;
   LatLng? _currentUserLocation;
 
   @override
   void initState() {
     super.initState();
+    _loadUserId();
     _pageController = PageController();
     context.read<DangerZoneBloc>().add(FetchDangerZones());
     _fetchLocation();
@@ -94,10 +98,9 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
 
     _mapCategoryHint.repeat();
 
-    _hintAnimation = Tween<Offset>(
-      begin: const Offset(0, 0),
-      end: const Offset(0, -1),
-    ).animate(_controller);
+    _hintAnimation =
+        Tween<Offset>(begin: const Offset(0, 0), end: const Offset(0, -1))
+            .animate(_controller);
 
     _hintColorAnimation = ColorTween(
       begin: Colors.black.withOpacity(0.5),
@@ -122,6 +125,17 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
         _controllerFade.reverse();
       }
     });
+  }
+
+  Future<void> _loadUserId() async {
+    // Retrieve the userId from SharedPreferences or any storage mechanism you're using
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    int? userId = prefs.getInt('id'); // Adjust this if using a different method
+    if (userId != null) {
+      setState(() {
+        _userId = userId;
+      });
+    }
   }
 
   @override
@@ -188,26 +202,36 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
   }
 
   Future<void> _fetchLocation() async {
-    Position position = await getCurrentLocation();
+    try {
+      // Get current location
+      Position position = await getCurrentLocation();
 
-    if (googleMapController != null) {
-      googleMapController!.animateCamera(CameraUpdate.newCameraPosition(
-        CameraPosition(
-          target: LatLng(position.latitude, position.longitude),
-          zoom: 14.0,
-        ),
-      ));
-
-      setState(() {
-        _currentUserLocation = LatLng(position.latitude, position.longitude);
-        markers.clear();
-        markers.add(Marker(
-          markerId: const MarkerId("My Location"),
-          position: _currentUserLocation!,
-          icon: customMarker ?? BitmapDescriptor.defaultMarker,
-          infoWindow: const InfoWindow(title: 'My Location'),
+      // If the googleMapController exists, update the map's camera position
+      if (googleMapController != null) {
+        googleMapController!.animateCamera(CameraUpdate.newCameraPosition(
+          CameraPosition(
+            target: LatLng(position.latitude, position.longitude),
+            zoom: 14.0,
+          ),
         ));
-      });
+
+        // Update the UI
+        setState(() {
+          _currentUserLocation = LatLng(position.latitude, position.longitude);
+          markers.clear();
+          markers.add(Marker(
+            markerId: const MarkerId("My Location"),
+            position: _currentUserLocation!,
+            icon: customMarker ?? BitmapDescriptor.defaultMarker,
+            infoWindow: const InfoWindow(title: 'My Location'),
+          ));
+        });
+
+        // Call the update location API (assuming the updateLocation function is defined)
+        await updateLocation(position.latitude, position.longitude);
+      }
+    } catch (e) {
+      print('Error: $e');
     }
   }
 
@@ -250,6 +274,33 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
             onPolylinesUpdated: _updatePolylines,
             context: context)
         .findNearestSafeZone();
+  }
+
+  Future<void> updateLocation(double latitude, double longitude) async {
+    try {
+      var response = await http.post(
+        Uri.parse('${dotenv.env['API_URL']}/profile/update-location'),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'user_id': _userId.toString(),
+          'latitude': latitude.toString(),
+          'longitude': longitude.toString(),
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        print('Location updated successfully!');
+      } else {
+        print('Failed to update location');
+      }
+    } catch (e) {
+      print(_userId);
+      print('$latitude');
+      print('$longitude');
+      print('Error updating location: $e');
+    }
   }
 
   @override

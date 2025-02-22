@@ -14,6 +14,8 @@ class UserSignUp extends AuthenticationState {
   final bool isAdmin;
   final bool isGirl;
   final bool isVerified;
+  final double longitude;
+  final double latitude;
 
   UserSignUp({
     required this.username,
@@ -25,6 +27,8 @@ class UserSignUp extends AuthenticationState {
     required this.isAdmin,
     required this.isGirl,
     required this.isVerified,
+    required this.longitude,
+    required this.latitude,
   });
 }
 
@@ -64,3 +68,18 @@ class SignUpError extends AuthenticationState {
 }
 
 class SignUpnLoading extends AuthenticationState {}
+
+class UpdateLocationLoading extends AuthenticationState {}
+
+class UpdateLocationSuccess extends AuthenticationState {
+  final double latitude;
+  final double longitude;
+
+  UpdateLocationSuccess(this.latitude, this.longitude);
+}
+
+class UpdateLocationError extends AuthenticationState {
+  final String message;
+
+  UpdateLocationError(this.message);
+}

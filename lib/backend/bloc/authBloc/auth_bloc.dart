@@ -22,20 +22,32 @@ class AuthenticationBloc
       emit(SignUpnLoading());
       try {
         await _authrepo.userSignUp(
-          event.username,
-          event.email,
-          event.password,
-          event.address,
-          event.firstname,
-          event.lastname,
-          event.isAdmin,
-          event.isGirl,
-          event.isVerified,
-        );
+            event.username,
+            event.email,
+            event.password,
+            event.address,
+            event.firstname,
+            event.lastname,
+            event.isAdmin,
+            event.isGirl,
+            event.isVerified,
+            event.longitude,
+            event.latitude);
 
         emit(SignUpSuccess());
       } catch (error) {
         emit(SignUpError('Sign up failed: ${error.toString()}'));
+      }
+    });
+    on<UpdateLocationEvent>((event, emit) async {
+      emit(UpdateLocationLoading());
+      try {
+        // Call the repository or API to update the location here
+        await _authrepo.updateLocation(event.latitude, event.longitude);
+
+        emit(UpdateLocationSuccess(event.latitude, event.longitude));
+      } catch (e) {
+        emit(UpdateLocationError('Failed to update location: ${e.toString()}'));
       }
     });
   }

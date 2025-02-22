@@ -8,7 +8,6 @@ class AuthenticationImplementation extends AuthenticationRepository {
   // static const String baseUrl = '${VercelUrl.mainUrl}/user';
   final String baseUrl = "${dotenv.env['API_URL']}/user";
 
-
   @override
   Future<void> userLogin(String email, String password) async {
     final response = await http.post(
@@ -56,7 +55,9 @@ class AuthenticationImplementation extends AuthenticationRepository {
       String lastname,
       bool isAdmin,
       bool isGirl,
-      bool isVerified) async {
+      bool isVerified,
+      double latitude,
+      double longitude) async {
     final response = await http.post(
       Uri.parse('$baseUrl/create_account'),
       headers: {
@@ -73,14 +74,50 @@ class AuthenticationImplementation extends AuthenticationRepository {
         'is_admin': isAdmin,
         'is_girl': isGirl,
         'is_verified': isVerified,
+        'latitude': latitude,
+        'longitude': longitude
       }),
     );
 
     if (response.statusCode == 201) {
-      print("Account created successfully");
+      print(
+          "Account created successfully"); // This updates location in Firestore
     } else {
       final errorMessage = jsonDecode(response.body)['error'];
       print("Failed to create account: $errorMessage");
+      throw Exception(errorMessage);
+    }
+  }
+
+  @override
+  // New method to update user location
+  Future<void> updateLocation(double latitude, double longitude) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final int userId = prefs.getInt('id') ?? 0;
+
+    if (userId == 0) {
+      print("User not logged in");
+      return;
+    }
+
+    final response = await http.post(
+      Uri.parse("${dotenv.env['API_URL']}/profile/update-location"),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: jsonEncode({
+        'user_id': userId,
+        'latitude': latitude,
+        'longitude': longitude,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      print("Location updated successfully");
+    } else {
+      final errorMessage = jsonDecode(response.body)['error'];
+      print("Failed to update location: $errorMessage");
       throw Exception(errorMessage);
     }
   }
