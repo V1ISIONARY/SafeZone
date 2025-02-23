@@ -61,12 +61,11 @@ class _SplashScreenState extends State<SplashScreen> {
           children: [
             Center(
               child: Container(
-                width: 100,
-                height: 100,
+                width: 120,
+                height: 120,
                 color: Colors.transparent,
-                child: SvgPicture.asset(
-                  'lib/resources/svg/logo.svg',
-                  fit: BoxFit.cover,
+                child: Image.asset(
+                  'lib/resources/images/email.png',
                 ),
               ),
             ),
