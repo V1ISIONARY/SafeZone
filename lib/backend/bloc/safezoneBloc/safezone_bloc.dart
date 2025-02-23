@@ -111,15 +111,19 @@ class SafeZoneBloc extends Bloc<SafeZoneEvent, SafeZoneState> {
 
   // Update a safe zone
   Future<void> _onUpdateSafeZone(
-      UpdateSafeZone event, Emitter<SafeZoneState> emit) async {
-    emit(SafeZoneLoading());
-    try {
-      await safeZoneRepository.updateSafeZone(event.safeZone);
-      emit(const SafeZoneOperationSuccess('Safe zone updated successfully'));
-    } catch (e) {
-      emit(SafeZoneError(e.toString()));
-    }
+    UpdateSafeZone event, Emitter<SafeZoneState> emit) async {
+  emit(SafeZoneLoading()); // Show loading state
+  try {
+    await safeZoneRepository.updateSafeZone(event.safeZone);
+    emit(const SafeZoneOperationSuccess('Safe zone updated successfully'));
+
+    // Fetch the latest data after updating
+    final safeZones = await safeZoneRepository.getAllSafeZones();
+    emit(SafeZonesLoaded(safeZones)); // Emit new state with updated data
+  } catch (e) {
+    emit(SafeZoneError(e.toString())); // Handle errors
   }
+}
 
   // Delete a safe zone
   Future<void> _onDeleteSafeZone(

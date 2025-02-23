@@ -210,15 +210,18 @@ GoRouter appRouter(bool isFirstRun) => GoRouter(
           },
         ),
 
-        GoRoute(
+       GoRoute(
           path: '/admin-safezone-details',
           builder: (context, state) {
             final extra = state.extra as Map<String, dynamic>;
             final safezone = extra['safezone'] as SafeZoneModel;
             final address = extra['address'] as String;
+            final Function(SafeZoneModel)? onStatusChanged = extra['onStatusChanged'] as Function(SafeZoneModel)?;
+
             return AdminSafezoneDetails(
               safezonemodel: safezone,
               address: address,
+              onStatusChanged: onStatusChanged,
             );
           },
         ),

@@ -203,6 +203,7 @@ class _AdminSafezonesState extends State<AdminSafezones> {
                 child: AdminSafeZonesCard(
                   safeZone: safeZone,
                   address: _addresses[safeZone.id] ?? "Fetching address...",
+                  onRefresh: _loadSafezones
                 ),
               );
             },

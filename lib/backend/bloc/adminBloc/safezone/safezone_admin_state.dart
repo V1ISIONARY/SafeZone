@@ -13,12 +13,13 @@ class SafeZoneAdminInitial extends SafeZoneAdminState {}
 class SafeZoneAdminLoading extends SafeZoneAdminState {}
 
 class SafeZoneAdminSuccess extends SafeZoneAdminState {
+  final SafeZoneModel safeZoneModel; // Include the updated safe zone model
   final String message;
 
-  const SafeZoneAdminSuccess(this.message);
+  const SafeZoneAdminSuccess(this.safeZoneModel, this.message);
 
   @override
-  List<Object> get props => [message];
+  List<Object> get props => [safeZoneModel, message];
 }
 
 class SafeZoneAdminFailure extends SafeZoneAdminState {
