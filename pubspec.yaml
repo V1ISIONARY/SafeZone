@@ -61,6 +61,8 @@ dependencies:
   geocoding: ^3.0.0
   flutter_polyline_points: ^2.1.0
   dio: ^5.8.0+1
+  email_otp: ^3.0.2
+  mailer: ^6.4.1
 
 flutter_launcher_icons:
   android: "launcher_icon"
