@@ -143,14 +143,7 @@ class _AccountDetailsState extends State<AccountDetails> {
                 width: double.infinity,
                 child: Stack(
                   children: [
-                    Text(
-                      "Credentials",
-                      style: TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black
-                      ),
-                    ),
+                    CategoryText(text: 'Credentials'),
                     Positioned(
                       right: 0,
                       top: 0,
@@ -219,14 +212,7 @@ class _AccountDetailsState extends State<AccountDetails> {
             ),
             Padding(
               padding: EdgeInsets.symmetric(vertical: 15),
-              child: Text(
-                "Privacy & Security",
-                style: TextStyle(
-                  fontSize: 17,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black
-                ),
-              ),
+              child: CategoryText(text: 'Privacy & Security'),
             ),
             Container(
               width: double.infinity,

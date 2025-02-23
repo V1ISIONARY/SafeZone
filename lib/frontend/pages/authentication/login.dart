@@ -2,12 +2,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart'; // Import BLoC package
 import 'package:flutter_svg/svg.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:safezone/backend/bloc/authBloc/auth_bloc.dart';
 import 'package:safezone/backend/bloc/authBloc/auth_event.dart';
 import 'package:safezone/backend/bloc/authBloc/auth_state.dart';
 import 'package:safezone/frontend/pages/authentication/register.dart';
 import 'package:safezone/frontend/widgets/bottom_navigation.dart';
 import 'package:safezone/resources/schema/colors.dart';
+
+import '../../../resources/schema/texts.dart';
+import '../../widgets/buttons/ovalBtn.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -65,31 +70,26 @@ class _LoginState extends State<Login> {
                       height: 50,
                     ),
                   ),
-                  SizedBox(height: 50),
+                  SizedBox(height: 30),
                   RichText(
                     text: TextSpan(
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w500,
-                        color: Color(0xFF5C5C5C),
-                        fontFamily: 'Poppins',
-                      ),
-                      children: const [
-                        TextSpan(text: 'Welcome Back To '),
+                      text: 'Welcome Back To ',
+                      style: TextStyle(fontSize: 20, color: Colors.black, fontWeight: FontWeight.w600, letterSpacing: 1),
+                      children: [
                         TextSpan(
                           text: 'SafeZone',
                           style: TextStyle(
-                            color: Color(0xFFEF8D88),
+                            color: widgetPricolor,
                           ),
                         ),
                       ],
                     ),
                   ),
-                  SizedBox(height: 10),
+                  SizedBox(height: 5),
                   Text(
                     'Enter your details below',
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: 13,
                       fontWeight: FontWeight.w400,
                       color: const Color(0xFF707070),
                     ),
@@ -98,45 +98,47 @@ class _LoginState extends State<Login> {
                   Text(
                     'Email address or username',
                     style: TextStyle(
-                      color: Color(0xFF5C5C5C),
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.black45,
                     ),
                   ),
-                  SizedBox(height: 8), // TODO: add validations
+                  SizedBox(height: 8),
                   TextField(
                     controller: emailController,
                     style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w200,
                       color: textColor,
                     ),
                     decoration: InputDecoration(
                       hintText: "safezone@gmail.com",
                       hintStyle: TextStyle(
-                          fontSize: 14,
-                          color: labelFormFieldColor,
-                          fontWeight: FontWeight.w200),
-                      labelText: "Email address",
-                      labelStyle: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w200,
+                        fontSize: 13,
                         color: labelFormFieldColor,
+                        fontWeight: FontWeight.w200
                       ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(color: widgetPricolor, width: 2),
+                      ),
                       filled: true,
                       fillColor: Colors.grey[100],
                       contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 15, vertical: 12),
+                        horizontal: 15, vertical: 12
+                      ),
                     ),
                   ),
                   const SizedBox(height: 10),
                   Text(
                     'Password',
                     style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFF5C5C5C),
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.black45,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -144,41 +146,43 @@ class _LoginState extends State<Login> {
                     controller: passwordController,
                     obscureText: !_passwordVisible,
                     style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w200,
                       color: textColor,
                     ),
                     decoration: InputDecoration(
-                      hintText: "Enter Password",
+                      hintText: "Hel******",
                       hintStyle: TextStyle(
-                          fontSize: 14,
-                          color: labelFormFieldColor,
-                          fontWeight: FontWeight.w200),
-                      labelText: "Password",
-                      labelStyle: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w200,
+                        fontSize: 13,
                         color: labelFormFieldColor,
+                        fontWeight: FontWeight.w200
                       ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(color: widgetPricolor, width: 2),
                       ),
                       filled: true,
                       fillColor: Colors.grey[100],
                       contentPadding: const EdgeInsets.symmetric(
                           horizontal: 15, vertical: 12),
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          _passwordVisible
-                              ? Icons.visibility
-                              : Icons.visibility_off,
-                          color: Color(0xFF707070),
+                      suffixIcon: Padding(
+                        padding: EdgeInsets.only(right: 10),
+                        child: GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _passwordVisible = !_passwordVisible;
+                            });
+                          },
+                          child: Icon(
+                            _passwordVisible
+                                ? Icons.visibility
+                                : Icons.visibility_off,
+                            color: Color(0xFF707070),
+                          ),
                         ),
-                        onPressed: () {
-                          setState(() {
-                            _passwordVisible = !_passwordVisible;
-                          });
-                        },
                       ),
                     ),
                   ),
@@ -205,6 +209,7 @@ class _LoginState extends State<Login> {
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(3),
                             ),
+                            activeColor: widgetPricolor,
                           ),
                           Text(
                             'Remember me',
@@ -216,68 +221,92 @@ class _LoginState extends State<Login> {
                           ),
                         ],
                       ),
-                      TextButton(
-                        onPressed: () {},
+                      GestureDetector(
                         child: Text(
-                          'Forgot Password?',
+                          "Forgot Password?",
                           style: TextStyle(
-                              color: Color(0xFFEF8D88),
-                              fontSize: 11,
-                              fontWeight: FontWeight.w400),
+                            fontSize: 11,
+                            fontWeight: FontWeight.w400,
+                            color: widgetPricolor,
+                          ),
                         ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 100),
-                  ElevatedButton(
-                    onPressed: () {
-                      final email = emailController.text;
-                      final password = passwordController.text;
+                  Container(
+                    height: 50,
+                    width: double.infinity,
+                    margin: EdgeInsets.symmetric(vertical: 40, horizontal: 20),
+                    child: GestureDetector(
+                      onTap: () {
+                        final email = emailController.text;
+                        final password = passwordController.text;
 
-                      context.read<AuthenticationBloc>().add(
-                            UserLogin(email, password),
-                          );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFFEF8D88),
-                      padding: EdgeInsets.symmetric(vertical: 15),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    child: Text(
-                      'Login',
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        "Don't have an account yet? ",
-                        style: TextStyle(fontSize: 11, color: textColor),
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => RegisterScreen()),
-                          );
-                        },
-                        child: Text(
-                          'Sign Up',
-                          style: TextStyle(
-                              color: Color(0xFFEF8D88),
-                              fontWeight: FontWeight.bold,
-                              fontSize: 11),
+                        context.read<AuthenticationBloc>().add(
+                          UserLogin(email, password),
+                        );
+                      },
+                      child: Container(
+                        height: 50,
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          color: widgetPricolor,
+                          borderRadius: BorderRadius.circular(50),
+                        ),
+                        child: Center(
+                          child: Text(
+                            'Sign In', 
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.white,
+                            ),
+                          ),
                         ),
                       ),
-                    ],
+                    )
+                  ),
+                  Container(
+                    width: double.infinity,
+                    margin: EdgeInsets.symmetric(horizontal: 20),
+                    child: Center(
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            "Don't have an account yet?",
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: Colors.black87,
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.only(left: 7),
+                            child: GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  PageTransition(
+                                    child: RegisterScreen(),
+                                    type: PageTransitionType.rightToLeft,
+                                    duration: Duration(milliseconds: 300),
+                                  ),
+                                );
+                              },
+                              child: Text(
+                                "Sign Up",
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.bold,
+                                  color: widgetPricolor,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                   BlocListener<AuthenticationBloc, AuthenticationState>(
                     listener: (context, state) {

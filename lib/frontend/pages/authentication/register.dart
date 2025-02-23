@@ -12,6 +12,9 @@ import 'package:safezone/backend/bloc/authBloc/auth_bloc.dart';
 import 'package:safezone/backend/bloc/authBloc/auth_event.dart';
 import 'package:safezone/backend/bloc/authBloc/auth_state.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:safezone/resources/schema/texts.dart';
+
+import '../../../resources/schema/colors.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -108,14 +111,28 @@ class _RegisterScreenState extends State<RegisterScreen> {
       },
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: Colors.transparent,
+          backgroundColor: Colors.white,
           elevation: 0,
-          leading: currentStep > 0
-              ? IconButton(
-                  icon: const Icon(Icons.arrow_back, color: Colors.black),
-                  onPressed: previousStep,
-                )
-              : null,
+          automaticallyImplyLeading: false,
+          centerTitle: true,
+          title: const CategoryText(text: "Sign Up"),
+          leading: GestureDetector(
+            onTap: () {
+              if (currentStep > 0) {
+                previousStep(); 
+              } else {
+                Navigator.pop(context); 
+              }
+            },
+            child: Container(
+              margin: const EdgeInsets.all(15),
+              decoration: BoxDecoration(
+                border: Border.all(width: 1, color: Colors.black),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.arrow_back, color: Colors.black, size: 10),
+            ),
+          ),
         ),
         body: Column(
           children: [
@@ -161,28 +178,32 @@ class _RegisterScreenState extends State<RegisterScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Enter your email address',
-            style: GoogleFonts.poppins(
-              fontSize: 20,
-              color: const Color(0xFF5C5C5C),
-              fontWeight: FontWeight.w500,
-            ),
+          CategoryText(
+            text: 'Enter your email address',
           ),
-          const SizedBox(height: 11),
-          Text(
-            'Make sure to enter a valid email address for account verification.',
-            style: GoogleFonts.poppins(
-              fontSize: 15,
-              fontWeight: FontWeight.w200,
-              color: const Color(0xFF707070),
-            ),
+          const SizedBox(height: 5),
+          CategoryDescripText(
+            text: 'Make sure to enter a valid email address for account verification.',
           ),
-          const SizedBox(height: 47),
+          const SizedBox(height: 30),
           TextField(
             controller: emailController,
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w200,
+              color: textColor,
+            ),
             decoration: InputDecoration(
-              labelText: "Email Address",
+              hintText: "Email Address",
+              hintStyle: TextStyle(
+                fontSize: 13,
+                color: labelFormFieldColor,
+                fontWeight: FontWeight.w200
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: widgetPricolor, width: 2),
+              ),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
@@ -190,17 +211,29 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
           ),
           const Spacer(),
-          ElevatedButton(
-            onPressed: () async {
-              sendOTP(
-                  emailController.text); 
+          GestureDetector(
+            onTap: (){
+              sendOTP(emailController.text);
             },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFEF8D88),
-              minimumSize: const Size(double.infinity, 50),
+            child: Container(
+              height: 50,
+              width: double.infinity,
+              margin: EdgeInsets.only(bottom: 30),
+              decoration: BoxDecoration(
+                color: widgetPricolor,
+                borderRadius: BorderRadius.circular(50),
+              ),
+              child: Center(
+                child: Text(
+                  'Send Code', 
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
             ),
-            child: const Text("Send Code"),
-          ),
+          )
         ],
       ),
     );
@@ -212,31 +245,33 @@ class _RegisterScreenState extends State<RegisterScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'One-Time Code sent',
-            style: GoogleFonts.poppins(
-              fontSize: 20,
-              color: const Color(0xFF5C5C5C),
-              fontWeight: FontWeight.w500,
-            ),
+          CategoryText(
+            text: 'One-Time Code sent',
           ),
-          const SizedBox(height: 11),
-          Text(
-            'We have sent an email to ${emailController.text} containing a 6-digit code',
-            style: GoogleFonts.poppins(
-              fontSize: 15,
-              fontWeight: FontWeight.w200,
-              color: const Color(0xFF707070),
-            ),
+          const SizedBox(height: 5),
+          CategoryDescripText(
+            text: 'We have sent an email to ${emailController.text} containing a 6-digit code',
           ),
-          const SizedBox(height: 47),
+          const SizedBox(height: 30),
           TextField(
             controller: codeController,
-            keyboardType: TextInputType.number,
-            maxLength: 6,
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w200,
+              color: textColor,
+            ),
             decoration: InputDecoration(
               hintText: "Enter 6-digit code",
               counterText: "",
+              hintStyle: TextStyle(
+                fontSize: 13,
+                color: labelFormFieldColor,
+                fontWeight: FontWeight.w200
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: widgetPricolor, width: 2),
+              ),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
@@ -246,19 +281,23 @@ class _RegisterScreenState extends State<RegisterScreen> {
           const SizedBox(height: 10),
           Align(
             alignment: Alignment.centerRight,
-            child: TextButton(
-              onPressed: () {
+            child: GestureDetector(
+              onTap: () {
                 codeController.clear();
               },
-              child: const Text(
+              child: Text(
                 "Clear",
-                style: TextStyle(color: Colors.red),
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w400,
+                  color: widgetPricolor,
+                ),
               ),
             ),
           ),
           const Spacer(),
-          ElevatedButton(
-            onPressed: () async {
+          GestureDetector(
+            onTap: () async {
               if (codeController.text.isEmpty) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text("Please enter the OTP")),
@@ -267,7 +306,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
               }
 
               if (codeController.text == generatedOTP) {
-                // Compare OTP
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text("OTP verified successfully")),
                 );
@@ -279,11 +317,24 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 );
               }
             },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.redAccent,
-              minimumSize: const Size(double.infinity, 50),
+            child: Container(
+              height: 50,
+              width: double.infinity,
+              margin: EdgeInsets.only(bottom: 30),
+              decoration: BoxDecoration(
+                color: widgetPricolor,
+                borderRadius: BorderRadius.circular(50),
+              ),
+              child: Center(
+                child: Text(
+                  'Verify', 
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
             ),
-            child: const Text("Verify"),
           )
         ],
       ),
@@ -296,44 +347,60 @@ class _RegisterScreenState extends State<RegisterScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            "Tell Us About Yourself",
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          const CategoryText(
+            text: "Tell Us About Yourself",
           ),
-          const SizedBox(height: 11),
-          Text(
-            'We’re almost there! Add these details to set up your account.',
-            style: GoogleFonts.poppins(
-              fontSize: 15,
-              fontWeight: FontWeight.w200,
-              color: const Color(0xFF707070),
-            ),
+          const SizedBox(height: 5),
+          CategoryDescripText(
+            text: 'We’re almost there! Add these details to set up your account.',
           ),
-          const SizedBox(height: 47),
+          const SizedBox(height: 30),
           TextField(
             controller: firstNameController,
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w200,
+              color: textColor,
+            ),
             decoration: InputDecoration(
               hintText: "Enter First Name",
-              labelText: "First Name",
+              hintStyle: TextStyle(
+                fontSize: 13,
+                color: labelFormFieldColor,
+                fontWeight: FontWeight.w200
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: widgetPricolor, width: 2),
+              ),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
-              filled: true,
-              fillColor: Colors.grey[100],
               contentPadding: const EdgeInsets.symmetric(horizontal: 15),
             ),
           ),
           const SizedBox(height: 10),
           TextField(
             controller: lastNameController,
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w200,
+              color: textColor,
+            ),
             decoration: InputDecoration(
               hintText: "Enter Last Name",
-              labelText: "Last Name",
+              hintStyle: TextStyle(
+                fontSize: 13,
+                color: labelFormFieldColor,
+                fontWeight: FontWeight.w200
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: widgetPricolor, width: 2),
+              ),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
-              filled: true,
-              fillColor: Colors.grey[100],
               contentPadding: const EdgeInsets.symmetric(horizontal: 15),
             ),
           ),
@@ -352,26 +419,44 @@ class _RegisterScreenState extends State<RegisterScreen> {
               });
             },
             decoration: InputDecoration(
-              labelText: "Gender",
+              hintText: "Gender",
+              hintStyle: TextStyle(
+                fontSize: 13,
+                color: labelFormFieldColor,
+                fontWeight: FontWeight.w200
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: widgetPricolor, width: 2),
+              ),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
-              filled: true,
-              fillColor: Colors.grey[100],
               contentPadding: const EdgeInsets.symmetric(horizontal: 15),
             ),
           ),
           const SizedBox(height: 10),
           TextField(
             controller: usernameController,
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w200,
+              color: textColor,
+            ),
             decoration: InputDecoration(
               hintText: "Enter Username",
-              labelText: "Username",
+              hintStyle: TextStyle(
+                fontSize: 13,
+                color: labelFormFieldColor,
+                fontWeight: FontWeight.w200
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: widgetPricolor, width: 2),
+              ),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
-              filled: true,
-              fillColor: Colors.grey[100],
               contentPadding: const EdgeInsets.symmetric(horizontal: 15),
             ),
           ),
@@ -379,14 +464,25 @@ class _RegisterScreenState extends State<RegisterScreen> {
           TextField(
             controller: passwordController,
             obscureText: true,
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w200,
+              color: textColor,
+            ),
             decoration: InputDecoration(
               hintText: "Enter Password",
-              labelText: "Password",
+              hintStyle: TextStyle(
+                fontSize: 13,
+                color: labelFormFieldColor,
+                fontWeight: FontWeight.w200
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: widgetPricolor, width: 2),
+              ),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
-              filled: true,
-              fillColor: Colors.grey[100],
               contentPadding: const EdgeInsets.symmetric(horizontal: 15),
             ),
           ),
@@ -394,20 +490,31 @@ class _RegisterScreenState extends State<RegisterScreen> {
           TextField(
             controller: confirmPasswordController,
             obscureText: true,
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w200,
+              color: textColor,
+            ),
             decoration: InputDecoration(
               hintText: "Confirm Password",
-              labelText: "Confirm Password",
+              hintStyle: TextStyle(
+                fontSize: 13,
+                color: labelFormFieldColor,
+                fontWeight: FontWeight.w200
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: widgetPricolor, width: 2),
+              ),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
-              filled: true,
-              fillColor: Colors.grey[100],
               contentPadding: const EdgeInsets.symmetric(horizontal: 15),
             ),
           ),
           const Spacer(),
-          ElevatedButton(
-            onPressed: () async {
+          GestureDetector(
+            onTap: () async {
               if (passwordController.text != confirmPasswordController.text) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text("Passwords do not match")),
@@ -435,19 +542,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 longitude: position.longitude, // Pass longitude
               ));
             },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFEF8D88),
-              minimumSize: const Size(double.infinity, 50),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
+            child: Container(
+              height: 50,
+              margin: EdgeInsets.only(bottom: 30),
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: widgetPricolor,
+                borderRadius: BorderRadius.circular(50),
               ),
-            ),
-            child: const Text(
-              "Create New Account",
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 15,
-                fontWeight: FontWeight.w400,
+              child: Center(
+                child: Text(
+                  'Create new account', 
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.white,
+                  ),
+                ),
               ),
             ),
           ),

@@ -26,7 +26,7 @@ class AdminReportsCard extends StatelessWidget {
       },
       child: Container(
         width: double.infinity,
-        height: 100,
+        height: 70,
         margin: const EdgeInsets.only(bottom: 10),
         decoration: BoxDecoration(
           color: const Color.fromARGB(10, 0, 0, 0),
@@ -37,8 +37,8 @@ class AdminReportsCard extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Container(
-              width: 60,
-              height: 60,
+              width: 40,
+              height: 40,
               margin: const EdgeInsets.only(left: 15),
               decoration: const BoxDecoration(
                 shape: BoxShape.circle,
@@ -47,7 +47,6 @@ class AdminReportsCard extends StatelessWidget {
             ),
             const SizedBox(width: 10),
             Expanded(
-              // Prevents overflow
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -56,7 +55,7 @@ class AdminReportsCard extends StatelessWidget {
                   Row(
                     children: [
                       const Icon(Icons.location_on, size: 12, color: btnColor),
-                      const SizedBox(width: 2),
+                      const SizedBox(width: 1),
                       Expanded(
                         child: CategoryDescripTextEllipsis(
                           text: address,
@@ -65,20 +64,13 @@ class AdminReportsCard extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  CategoryDescripTextEllipsis(text: reportModel.description!),
+                  reportModel.description == null || reportModel.description!.isEmpty
+                    ? Container()
+                    : Padding(
+                      padding: EdgeInsets.only(top: 1),
+                      child: CategoryDescripTextEllipsis(text: reportModel.description!),
+                    )
                 ],
-              ),
-            ),
-            Container(
-              width: 60,
-              height: 60,
-              margin: const EdgeInsets.only(right: 15),
-              child: Image.asset(
-                'lib/resources/images/line.png',
-                fit: BoxFit.cover,
               ),
             ),
           ],
