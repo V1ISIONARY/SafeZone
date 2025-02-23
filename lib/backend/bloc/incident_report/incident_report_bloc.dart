@@ -56,32 +56,11 @@ class IncidentReportBloc
         emit(IncidentReportError(e.toString()));
       }
     });
-
-    // on<FetchIncidentReportsByUserId>((event, emit) async {
-    //   try {
-    //     emit(IncidentReportLoading());
-
-    //     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    //     final int? userId = prefs.getInt('id');
-
-    //     if (userId == null) {
-    //       emit(const IncidentReportError("User ID not found in SharedPreferences"));
-    //       return;
-    //     }
-
-    //     final incidentReports =
-    //         await _incidentReportRepository.getIncidentReportsByUserId(userId);
-
-    //     emit(IncidentReportLoaded(incidentReports));
-    //   } catch (e) {
-    //     emit(IncidentReportError(e.toString()));
-    //   }
-    // });
+    
 
     on<FetchIncidentReportsByUserId>((event, emit) async {
       emit(IncidentReportLoading());
       try {
-        // Fetch data here and emit success or error state
         final reports = await _incidentReportRepository
             .getIncidentReportsByUserId(event.userId);
         emit(IncidentReportLoaded(reports));
@@ -109,6 +88,7 @@ class IncidentReportBloc
             .createIncidentReport(event.incidentReport);
         emit(IncidentReportCreated());
       } catch (e) {
+        print("Error creating incident report: $e"); // Add logging
         emit(IncidentReportError(e.toString()));
       }
     });

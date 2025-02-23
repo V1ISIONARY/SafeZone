@@ -15,7 +15,7 @@ class AdminReportsUsers extends StatefulWidget {
 }
 
 class _AdminReportsUsersState extends State<AdminReportsUsers> {
-  late TextEditingController _textEditingController;
+  // late TextEditingController _textEditingController;
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +32,7 @@ class _AdminReportsUsersState extends State<AdminReportsUsers> {
                 width: double.infinity,
                 height: 200,
                 decoration: BoxDecoration(
-                    color: Color.fromARGB(10, 0, 0, 0),
+                    color: const Color.fromARGB(10, 0, 0, 0),
                     borderRadius: BorderRadius.circular(5)),
               ),
               Container(

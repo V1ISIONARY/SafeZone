@@ -1,3 +1,5 @@
+import 'dart:io';
+
 class IncidentReportRequestModel {
   final int? id;
   final int? userId;
@@ -5,10 +7,8 @@ class IncidentReportRequestModel {
   final String? description;
   final String? reportDate;
   final String? reportTime;
-  final List<String>? images;
+  final List<File>? images;
   final String? reportTimestamp;
-  final String? status;
-  final String? updatedAt;
   final double? latitude;
   final double? longitude;
   final double? radius;
@@ -23,8 +23,6 @@ class IncidentReportRequestModel {
     this.reportTime,
     this.images,
     this.reportTimestamp,
-    this.status,
-    this.updatedAt,
     this.latitude,
     this.longitude,
     this.radius,
@@ -33,15 +31,13 @@ class IncidentReportRequestModel {
 
   factory IncidentReportRequestModel.fromJson(Map<String, dynamic> json) {
     return IncidentReportRequestModel(
+      id: json['id'], 
       userId: json['user_id'],
       dangerZoneId: json['danger_zone_id'],
       description: json['description'],
       reportDate: json['report_date'],
       reportTime: json['report_time'],
-      images: json['images'] != null ? List<String>.from(json['images']) : null,
       reportTimestamp: json['report_timestamp'],
-      status: json['status'],
-      updatedAt: json['updated_at'],
       latitude: json['latitude'],
       longitude: json['longitude'],
       radius: json['radius'],
@@ -51,15 +47,13 @@ class IncidentReportRequestModel {
 
   Map<String, dynamic> toJson() {
     return {
+      'id': id,
       'user_id': userId,
       'danger_zone_id': dangerZoneId,
       'description': description,
       'report_date': reportDate,
       'report_time': reportTime,
-      'images': images,
       'report_timestamp': reportTimestamp,
-      'status': status,
-      'updated_at': updatedAt,
       'latitude': latitude,
       'longitude': longitude,
       'radius': radius,

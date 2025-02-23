@@ -1,17 +1,17 @@
 class CircleModel {
   final int id;
   final String name;
-  final bool isActive;
+  bool? isActive;
   final String code;
-  final String createdAt;
+  String? createdAt;
   final String codeExpiry; // Added code expiry
 
   CircleModel({
     required this.id,
     required this.name,
-    required this.isActive,
+    this.isActive,
     required this.code,
-    required this.createdAt,
+    this.createdAt,
     required this.codeExpiry, // Added code expiry
   });
 

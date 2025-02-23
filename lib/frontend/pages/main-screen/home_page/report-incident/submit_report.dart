@@ -48,7 +48,7 @@ class _ReviewReportState extends State<ReviewReport> {
           } else if (state is IncidentReportError) {
             Navigator.pop(context);
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.message)),
+              SnackBar(content: Text(state.message + "haysssss")),
             );
           }
         },
@@ -151,7 +151,7 @@ class _ReviewReportState extends State<ReviewReport> {
                           return Padding(
                             padding: const EdgeInsets.only(right: 8.0),
                             child: Image.file(
-                              File(widget.reportInfo.images![index]),
+                              widget.reportInfo.images![index],
                               width: 100,
                               height: 100,
                               fit: BoxFit.cover,
@@ -182,6 +182,6 @@ class _ReviewReportState extends State<ReviewReport> {
           ),
         ),
       ),
-    );
+    ); 
   }
 }

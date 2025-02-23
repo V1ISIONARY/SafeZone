@@ -167,10 +167,8 @@ class _CreateReportState extends State<CreateReport> {
                     description: _descriptionController.text,
                     reportDate: DateFormat("yyyy-MM-dd").format(DateTime.now()),
                     reportTime: DateFormat("HH:mm:ss").format(DateTime.now()),
-                    images: selectedImages.map((file) => file.path).toList(),
+                    images: selectedImages, // Pass the File objects directly
                     reportTimestamp: reportTimestamp,
-                    updatedAt: DateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
-                        .format(DateTime.now().toUtc()),
                     latitude: _pinnedLocation!.latitude,
                     longitude: _pinnedLocation!.longitude,
                     radius: 50.0, // Default radius (adjust if needed)

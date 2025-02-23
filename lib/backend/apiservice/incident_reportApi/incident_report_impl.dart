@@ -106,16 +106,36 @@ class IncidentRepositoryImpl implements IncidentReportRepository {
       body: jsonEncode(incidentReport.toJson()),
     );
 
-    if (response.statusCode == 201) {
-      final data = jsonDecode(response.body);
-      return IncidentReportRequestModel.fromJson(data);
+    print("Response Status Code: ${response.statusCode}");
+    print("Response Body: ${response.body}");
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data = jsonDecode(response.body);
+
+      final Map<String, dynamic> responseData = {
+        'id': data['incident_report_id'],
+        'user_id': incidentReport.userId, 
+        'danger_zone_id':
+            incidentReport.dangerZoneId, 
+        'description':
+            incidentReport.description,
+        'report_date':
+            incidentReport.reportDate, 
+        'report_time':
+            incidentReport.reportTime, 
+        'report_timestamp':
+            incidentReport.reportTimestamp,
+        'latitude': incidentReport.latitude, 
+        'longitude': incidentReport.longitude, 
+        'radius': incidentReport.radius,
+        'name': incidentReport.name,
+      };
+
+      return IncidentReportRequestModel.fromJson(responseData);
     } else {
-      print(response.statusCode);
-      // throw Exception('Failed to create incident report');
-      throw Exception('No Internet Connection. Please check your network.'); 
+      throw Exception('Failed to create incident report: ${response.body}');
     }
   }
-
   // PUT
 
   @override
