@@ -6,6 +6,7 @@ class ProfileModel {
   final bool isGirl;
   final bool isVerified;
   final String status;
+  final int? circleId;
 
   ProfileModel({
     required this.id,
@@ -15,6 +16,7 @@ class ProfileModel {
     required this.isGirl,
     required this.isVerified,
     required this.status,
+    required this.circleId,
   });
 
   factory ProfileModel.fromJson(Map<String, dynamic> json) {
@@ -25,7 +27,8 @@ class ProfileModel {
       isAdmin: json['is_admin'] ?? false,
       isGirl: json['is_girl'] ?? false,
       isVerified: json['is_verified'] ?? false,
-      status: json['status'] ?? "Safe", // Ensure correct key usage
+      status: json['status'] ?? "Safe",
+      circleId: json['active_circle'] ?? 0,
     );
   }
 
@@ -38,6 +41,7 @@ class ProfileModel {
       'is_girl': isGirl,
       'is_verified': isVerified,
       'status': status,
+      'active_circle': circleId,
     };
   }
 }

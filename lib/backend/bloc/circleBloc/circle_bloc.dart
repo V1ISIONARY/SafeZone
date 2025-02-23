@@ -111,5 +111,20 @@ class CircleBloc extends Bloc<CircleEvent, CircleState> {
             message: 'Error fetching group members: ${e.toString()}'));
       }
     });
+    on<ChangeActiveEvent>((event, emit) async {
+      emit(CircleActiveChangingState(
+          circleId: event.circleId, isActive: event.isActive));
+
+      try {
+        await _circleImplementation.activeCircle(
+            event.circleId, event.isActive);
+        emit(CircleActiveChangedState(
+            circleId: event.circleId, isActive: event.isActive));
+      } catch (e) {
+        emit(CircleErrorState(
+          message: 'Error Changing Circle Status: ${e.toString()}',
+        ));
+      }
+    });
   }
 }

@@ -361,7 +361,8 @@ class _ListOfGroupsState extends State<ListOfGroups> {
                   if (state is CircleLoadingState) {
                     return const Center(child: CircularProgressIndicator());
                   } else if (_circles.isNotEmpty) {
-                    // Use the local list of circles
+                    print(
+                        "Circles: ${_circles.map((circle) => circle.isActive).toList()}");
                     return Expanded(
                       child: Padding(
                         padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -416,26 +417,94 @@ class _ListOfGroupsState extends State<ListOfGroups> {
                                     ),
                                     StatefulBuilder(
                                       builder: (context, setState) {
-                                        bool isSwitched = false;
-                                        return Transform.scale(
-                                          scale:
-                                              0.8, // Adjust scale to make the switch smaller
-                                          child: Switch(
-                                            value: isSwitched,
-                                            onChanged: (value) {
-                                              setState(() {
-                                                isSwitched = value;
-                                              });
-                                            },
-                                            activeColor: btnColor,
-                                            materialTapTargetSize:
-                                                MaterialTapTargetSize
-                                                    .shrinkWrap, // Reduces touch area
+                                        return TextButton(
+                                          onPressed: group.isActive
+                                              ? null // Disable the button when activated
+                                              : () async {
+                                                  // Check if any other button is active, and set it to false if found
+                                                  for (var otherGroup
+                                                      in _circles) {
+                                                    if (otherGroup.isActive &&
+                                                        otherGroup != group) {
+                                                      // Deactivate other active button
+                                                      context
+                                                          .read<CircleBloc>()
+                                                          .add(
+                                                            ChangeActiveEvent(
+                                                              circleId:
+                                                                  otherGroup.id,
+                                                              isActive:
+                                                                  false, // Set other buttons to inactive
+                                                            ),
+                                                          );
+                                                      // Update the state of the other button locally
+                                                      setState(() {
+                                                        otherGroup.isActive =
+                                                            false;
+                                                      });
+                                                    }
+                                                  }
+
+                                                  final newState = !group
+                                                      .isActive; // Toggle the state of the current button
+
+                                                  // Dispatch event to update the CircleBloc state for the current button
+                                                  context
+                                                      .read<CircleBloc>()
+                                                      .add(
+                                                        ChangeActiveEvent(
+                                                          circleId: group.id,
+                                                          isActive: newState,
+                                                        ),
+                                                      );
+
+                                                  // Save the current group.id to shared preferences
+                                                  final prefs =
+                                                      await SharedPreferences
+                                                          .getInstance();
+                                                  await prefs.setInt(
+                                                      'circle',
+                                                      group
+                                                          .id); // Save active circle id
+
+                                                  // Delay to load user ID
+                                                  Future.delayed(
+                                                      const Duration(
+                                                          seconds: 1), () {
+                                                    _loadUserId();
+                                                  });
+
+                                                  // Local state update for button appearance
+                                                  setState(() {
+                                                    group.isActive = newState;
+                                                  });
+                                                },
+                                          style: TextButton.styleFrom(
+                                            backgroundColor: group.isActive
+                                                ? btnColor
+                                                : const Color.fromARGB(
+                                                    255,
+                                                    155,
+                                                    155,
+                                                    155), // Green for active, Red for inactive
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                            ),
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 16, vertical: 10),
+                                          ),
+                                          child: Text(
+                                            group.isActive
+                                                ? 'Activated'
+                                                : 'Activate', // Button text changes based on isActive
+                                            style: const TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 14),
                                           ),
                                         );
                                       },
                                     ),
-
                                     const SizedBox(width: 15),
                                   ],
                                 ),
