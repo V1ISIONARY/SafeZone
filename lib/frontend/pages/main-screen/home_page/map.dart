@@ -6,6 +6,9 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:safezone/backend/bloc/circleBloc/circle_bloc.dart';
+import 'package:safezone/backend/bloc/circleBloc/circle_event.dart';
+import 'package:safezone/backend/bloc/circleBloc/circle_state.dart';
 import 'package:safezone/backend/bloc/dangerzoneBloc/dangerzone_bloc.dart';
 import 'package:safezone/backend/bloc/dangerzoneBloc/dangerzone_event.dart';
 import 'package:safezone/backend/bloc/mapBloc/map_bloc.dart';
@@ -81,6 +84,36 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
     super.initState();
     _loadUserId();
     _pageController = PageController();
+
+    print(_circleId);
+    print(_circleId);
+    print(_circleId);
+    print(_circleId);
+
+    print(_circleId);
+    print(_circleId);
+
+    print(_circleId);
+    print(_circleId);
+    print(_circleId);
+    print(_circleId);
+    print(_circleId);
+    print(_userId);
+    print(_userId);
+    print(_userId);
+    print(_userId);
+    print(_userId);
+    print(_userId);
+    print(_userId);
+    print(_userId);
+    print(_userId);
+    print(_userId);
+    print(_userId);
+    print(_userId);
+    print(_userId);
+    print(_userId);
+    print(_userId);
+
     context.read<DangerZoneBloc>().add(FetchDangerZones());
     _checkFirstRun();
     _createCustomMarker();
@@ -154,8 +187,10 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
     if (userId != null) {
       setState(() {
         _userId = userId;
-        _circleId = circleId;
       });
+    }
+    if (circleId != null) {
+      context.read<CircleBloc>().add(FetchMembersEvent(circleId: circleId));
     }
   }
 
@@ -381,96 +416,116 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
         height: double.infinity,
         child: Stack(
           children: [
-            BlocBuilder<MapBloc, MapState>(
-              builder: (context, state) {
-                if (state is MapLoading) {
-                  return const Center(child: CircularProgressIndicator());
-                } else if (state is MapDataLoaded) {
-                  markers.clear();
-                  circles.clear();
-
-                  if (_currentUserLocation != null) {
-                    markers.add(
-                      Marker(
-                        markerId: const MarkerId("My Location"),
-                        position: _currentUserLocation!,
-                        icon: customMarker ?? BitmapDescriptor.defaultMarker,
-                        infoWindow: const InfoWindow(title: 'My Location'),
-                      ),
-                    );
-                  }
-
-                  for (var dangerZone in state.dangerZones) {
-                    markers.add(
-                      Marker(
-                        markerId: MarkerId(dangerZone.id.toString()),
-                        icon: customDangerZoneMarker ??
-                            BitmapDescriptor.defaultMarker,
-                        position:
-                            LatLng(dangerZone.latitude, dangerZone.longitude),
-                        infoWindow: InfoWindow(
-                          title: dangerZone.name,
-                        ),
-                      ),
-                    );
-                    circles.add(
-                      Circle(
-                        circleId: CircleId(dangerZone.id.toString()),
-                        center:
-                            LatLng(dangerZone.latitude, dangerZone.longitude),
-                        radius: dangerZone.radius,
-                        strokeWidth: 1,
-                        strokeColor: Colors.transparent,
-                        fillColor: Colors.red.withOpacity(0.1),
-                      ),
-                    );
-                  }
-                  _safeZones = state.safeZones
-                      .map((safeZone) =>
-                          LatLng(safeZone.latitude!, safeZone.longitude!))
-                      .toList();
-
-                  for (var safeZone in state.safeZones) {
-                    markers.add(
-                      Marker(
-                        markerId: MarkerId(safeZone.id.toString()),
-                        icon: customSafeZoneMarker ??
-                            BitmapDescriptor.defaultMarker,
-                        position:
-                            LatLng(safeZone.latitude!, safeZone.longitude!),
-                        infoWindow: InfoWindow(
-                          title: safeZone.name,
-                          snippet: "${safeZone.radius}",
-                        ),
-                      ),
-                    );
-                    circles.add(
-                      Circle(
-                        circleId: CircleId(safeZone.id.toString()),
-                        center: LatLng(safeZone.latitude!, safeZone.longitude!),
-                        radius: safeZone.radius!,
-                        strokeWidth: 1,
-                        strokeColor: Colors.transparent,
-                        fillColor: Colors.green.withOpacity(0.1),
-                      ),
-                    );
-                  }
-                } else if (state is MapError) {
-                  return Center(child: Text(state.message));
+            BlocListener<CircleBloc, CircleState>(
+              listener: (context, state) {
+                if (state is CircleMembersLoadedState) {
+                  setState(() {
+                    members = state.members;
+                  });
+                  print(members.length);
+                  print(members.length);
+                  print(members.length);
+                  print(members.length);
+                  print(members.length);
+                  print(members.length);
+                  print(members.length);
+                  print(members.length);
+                } else if (state is CircleLoadingState) {
+                  // Handle loading state (e.g., show loading indicator if needed)
+                } else if (state is CircleErrorState) {
+                  print("Error fetching members: ${state.message}");
                 }
+              },
+              child: BlocBuilder<MapBloc, MapState>(
+                builder: (context, state) {
+                  if (state is MapLoading) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (state is MapDataLoaded) {
+                    markers.clear();
+                    circles.clear();
+                    if (_currentUserLocation != null) {
+                      markers.add(
+                        Marker(
+                          markerId: const MarkerId("My Location"),
+                          position: _currentUserLocation!,
+                          icon: customMarker ?? BitmapDescriptor.defaultMarker,
+                          infoWindow: const InfoWindow(title: 'My Location'),
+                        ),
+                      );
+                    }
 
-                return GoogleMap(
-                  initialCameraPosition: const CameraPosition(
-                    target: sourceLocation,
-                    zoom: 16.0,
-                  ),
-                  mapType: _currentMapType,
-                  markers: _showMarkers ? markers : {},
-                  circles: circles,
-                  polylines: _polylines,
-                  onMapCreated: (GoogleMapController controller) async {
-                    googleMapController = controller;
-                    String style = '''
+                    for (var dangerZone in state.dangerZones) {
+                      markers.add(
+                        Marker(
+                          markerId: MarkerId(dangerZone.id.toString()),
+                          icon: customDangerZoneMarker ??
+                              BitmapDescriptor.defaultMarker,
+                          position:
+                              LatLng(dangerZone.latitude, dangerZone.longitude),
+                          infoWindow: InfoWindow(
+                            title: dangerZone.name,
+                          ),
+                        ),
+                      );
+                      circles.add(
+                        Circle(
+                          circleId: CircleId(dangerZone.id.toString()),
+                          center:
+                              LatLng(dangerZone.latitude, dangerZone.longitude),
+                          radius: dangerZone.radius,
+                          strokeWidth: 1,
+                          strokeColor: Colors.transparent,
+                          fillColor: Colors.red.withOpacity(0.1),
+                        ),
+                      );
+                    }
+                    _safeZones = state.safeZones
+                        .map((safeZone) =>
+                            LatLng(safeZone.latitude!, safeZone.longitude!))
+                        .toList();
+
+                    for (var safeZone in state.safeZones) {
+                      markers.add(
+                        Marker(
+                          markerId: MarkerId(safeZone.id.toString()),
+                          icon: customSafeZoneMarker ??
+                              BitmapDescriptor.defaultMarker,
+                          position:
+                              LatLng(safeZone.latitude!, safeZone.longitude!),
+                          infoWindow: InfoWindow(
+                            title: safeZone.name,
+                            snippet: "${safeZone.radius}",
+                          ),
+                        ),
+                      );
+                      circles.add(
+                        Circle(
+                          circleId: CircleId(safeZone.id.toString()),
+                          center:
+                              LatLng(safeZone.latitude!, safeZone.longitude!),
+                          radius: safeZone.radius!,
+                          strokeWidth: 1,
+                          strokeColor: Colors.transparent,
+                          fillColor: Colors.green.withOpacity(0.1),
+                        ),
+                      );
+                    }
+                  } else if (state is MapError) {
+                    return Center(child: Text(state.message));
+                  }
+
+                  return GoogleMap(
+                    initialCameraPosition: const CameraPosition(
+                      target: sourceLocation,
+                      zoom: 16.0,
+                    ),
+                    mapType: _currentMapType,
+                    markers: _showMarkers ? markers : {},
+                    circles: circles,
+                    polylines: _polylines,
+                    onMapCreated: (GoogleMapController controller) async {
+                      googleMapController = controller;
+                      String style = '''
                     [
                       {
                         "featureType": "poi.business",
@@ -488,17 +543,18 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                       }
                     ]
                     ''';
-                    controller.setMapStyle(style);
-                    _mapController.complete(controller);
+                      controller.setMapStyle(style);
+                      _mapController.complete(controller);
 
-                    _fetchLocation();
-                  },
-                  mapToolbarEnabled: false,
-                  zoomControlsEnabled: false,
-                  myLocationEnabled: true,
-                  myLocationButtonEnabled: false,
-                );
-              },
+                      _fetchLocation();
+                    },
+                    mapToolbarEnabled: false,
+                    zoomControlsEnabled: false,
+                    myLocationEnabled: true,
+                    myLocationButtonEnabled: false,
+                  );
+                },
+              ),
             ),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,

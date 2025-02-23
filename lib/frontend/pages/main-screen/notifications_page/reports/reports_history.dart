@@ -79,8 +79,31 @@ class _ReportsHistoryState extends State<ReportsHistory>
       child: Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.white,
-          centerTitle: true,
-          title: const CategoryText(text: "My Incident Reports"),
+          automaticallyImplyLeading: false,
+          centerTitle: false,
+          title: Transform.translate(
+            offset: Offset(-15, 0),
+            child: Row(
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    Navigator.pop(context);
+                  },
+                  child: Container(
+                    margin: const EdgeInsets.all(15),
+                    height: 25,
+                    width: 25,
+                    decoration: BoxDecoration(
+                      border: Border.all(width: 1, color: Colors.black),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Icons.arrow_back, color: Colors.black, size: 10),
+                  ),
+                ),
+                CategoryText(text: "My Incident Reports")
+              ]
+            ),
+          ),
           actions: [
             Padding(
               padding: const EdgeInsets.only(right: 12),
@@ -90,7 +113,7 @@ class _ReportsHistoryState extends State<ReportsHistory>
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
                     color: const Color.fromARGB(10, 0, 0, 0),
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(5),
                   ),
                   child: Row(
                     children: [
@@ -116,14 +139,12 @@ class _ReportsHistoryState extends State<ReportsHistory>
         body: Column(
           children: [
             Container(
-              margin: const EdgeInsets.all(10),
+              margin: const EdgeInsets.only(left: 16, bottom: 16, right: 16),
               child: Row(
                 children: [
-                  const SizedBox(width: 10),
                   const Flexible(
-                    child: Text(
-                      'View and track the status of all your past reports.',
-                      style: TextStyle(fontSize: 15, color: textColor),
+                    child: CategoryDescripText(
+                      text: 'View and track the status of all your past reports.',
                     ),
                   ),
                   const SizedBox(width: 8),
@@ -131,8 +152,8 @@ class _ReportsHistoryState extends State<ReportsHistory>
                     padding: const EdgeInsets.symmetric(horizontal: 10.0),
                     child: Image.asset(
                       "lib/resources/svg/check.png",
-                      width: 44,
-                      height: 44,
+                      width: 25,
+                      height: 25,
                     ),
                   ),
                 ],
@@ -180,7 +201,31 @@ class _ReportsHistoryState extends State<ReportsHistory>
                   .compareTo(DateTime.parse(a.reportTimestamp!)));
 
           if (filteredReports.isEmpty) {
-            return Center(child: Text("No $status reports found."));
+            return Transform.translate(
+              offset: const Offset(0, -50),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 150,
+                    height: 150,
+                    child: Image.asset(
+                      'lib/resources/images/empty-state/search.png',
+                      width: 150,
+                      height: 150,
+                    ),
+                  ),
+                  Text(
+                    'No $status found.',
+                    style: const TextStyle(
+                      color: Colors.black54,
+                      fontSize: 9,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            );
           }
           return ListView.builder(
             itemCount: filteredReports.length,
