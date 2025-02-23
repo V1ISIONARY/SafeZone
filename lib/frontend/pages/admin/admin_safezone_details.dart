@@ -29,6 +29,38 @@ class _AdminSafezoneDetailsState extends State<AdminSafezoneDetails> {
   late SafeZoneModel _safeZoneModel;
   bool _isLoading = false;
 
+  Future<void> _showConfirmationDialog(
+    String action, Function onConfirm) {
+  return showDialog<void>(
+    context: context,
+    barrierDismissible: false, // User must tap button to dismiss
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text('Confirm $action'),
+        content: Text('Are you sure you want to $action this safe zone?'),
+        backgroundColor: Colors.white,
+        actions: <Widget>[
+          TextButton(
+            style: TextButton.styleFrom(foregroundColor: Colors.black),
+            child: const Text('Cancel'),
+            onPressed: () {
+              Navigator.of(context).pop(); // Dismiss the dialog
+            },
+          ),
+          TextButton(
+            style: TextButton.styleFrom(foregroundColor: Colors.black),
+            child: Text(action[0].toUpperCase() + action.substring(1)),
+            onPressed: () {
+              onConfirm(); // Call the action function
+              Navigator.of(context).pop(); // Dismiss the dialog
+            },
+          ),
+        ],
+      );
+    },
+  );
+}
+
   Gradient statusGradient(String status) {
     switch (status.toLowerCase()) {
       case 'verified':
@@ -476,10 +508,12 @@ Widget build(BuildContext context) {
                   Expanded(
                     child: ElevatedButton.icon(
                       onPressed: () {
-                        print(
+                            _showConfirmationDialog('review', () {
+                              print(
                             "Review button pressed for ID: ${widget.safezonemodel.id}");
-                        safeZoneAdminBloc
+                              safeZoneAdminBloc
                             .add(ReviewSafeZone(widget.safezonemodel.id!));
+                            });
                       },
                       icon: const Icon(
                         Icons.timelapse,
@@ -507,8 +541,12 @@ Widget build(BuildContext context) {
                   Expanded(
                     child: ElevatedButton.icon(
                       onPressed: () {
-                        safeZoneAdminBloc
+                            _showConfirmationDialog('verify', () {
+                              print(
+                            "Verify button pressed for ID: ${widget.safezonemodel.id}");
+                              safeZoneAdminBloc
                             .add(VerifySafeZone(widget.safezonemodel.id!));
+                            });
                       },
                       icon: const Icon(
                         Icons.check_circle,
@@ -536,8 +574,12 @@ Widget build(BuildContext context) {
                   Expanded(
                     child: ElevatedButton.icon(
                       onPressed: () {
-                        safeZoneAdminBloc
+                            _showConfirmationDialog('reject', () {
+                              print(
+                            "Reject button pressed for ID: ${widget.safezonemodel.id}");
+                              safeZoneAdminBloc
                             .add(RejectSafeZone(widget.safezonemodel.id!));
+                            });
                       },
                       icon: const Icon(
                         Icons.cancel,

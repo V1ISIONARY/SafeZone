@@ -1,7 +1,13 @@
+import 'dart:math';
+
+import 'package:email_otp/email_otp.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:mailer/mailer.dart';
+import 'package:mailer/smtp_server/gmail.dart';
 import 'package:safezone/backend/bloc/authBloc/auth_bloc.dart';
 import 'package:safezone/backend/bloc/authBloc/auth_event.dart';
 import 'package:safezone/backend/bloc/authBloc/auth_state.dart';
@@ -26,6 +32,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController confirmPasswordController =
       TextEditingController();
 
+  EmailOTP myauth = EmailOTP();
+  String generatedOTP = "";
   String? selectedGender;
 
   @override
@@ -52,18 +60,49 @@ class _RegisterScreenState extends State<RegisterScreen> {
     });
   }
 
+  Future<void> sendOTP(String recipientEmail) async {
+    const String senderEmail = 'safezone.SY2425@gmail.com';
+    final String senderPassword = dotenv.env['GMAIL_PASSWORD'] ?? '';
+
+    if (senderPassword.isEmpty) {
+      print('Error: GMAIL_PASSWORD is not set in .env file');
+      return;
+    }
+
+    generatedOTP = (Random().nextInt(900000) + 100000).toString();
+
+    final smtpServer = gmail(senderEmail, senderPassword);
+    final message = Message()
+      ..from = const Address(senderEmail, 'SafeZone App')
+      ..recipients.add(recipientEmail)
+      ..subject = 'Your SafeZone OTP Code'
+      ..text =
+          'Your OTP code is: $generatedOTP\n\nThis code is valid for 10 minutes.';
+
+    try {
+      await send(message, smtpServer);
+      nextStep();
+      print('OTP sent successfully: $generatedOTP');
+    } catch (e) {
+      print('Error sending OTP: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocListener<AuthenticationBloc, AuthenticationState>(
       listener: (context, state) {
         if (state is SignUpSuccess) {
-          GoRouter.of(context).go('/');
+          GoRouter.of(context).go('/login');
         } else if (state is SignUpFailed || state is SignUpError) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-                content: Text(state is SignUpFailed
+              content: Text(
+                state is SignUpFailed
                     ? state.message
-                    : (state as SignUpError).message)),
+                    : (state as SignUpError).message,
+              ),
+            ),
           );
         }
       },
@@ -116,8 +155,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-  // TODO: add validations
-
   Widget _buildEmailStep() {
     return Padding(
       padding: const EdgeInsets.all(20),
@@ -154,7 +191,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
           ),
           const Spacer(),
           ElevatedButton(
-            onPressed: nextStep,
+            onPressed: () async {
+              sendOTP(
+                  emailController.text); 
+            },
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFFEF8D88),
               minimumSize: const Size(double.infinity, 50),
@@ -182,7 +222,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           ),
           const SizedBox(height: 11),
           Text(
-            'We have sent an email to visionary@gmail.com containing a 6-digit code',
+            'We have sent an email to ${emailController.text} containing a 6-digit code',
             style: GoogleFonts.poppins(
               fontSize: 15,
               fontWeight: FontWeight.w200,
@@ -218,13 +258,33 @@ class _RegisterScreenState extends State<RegisterScreen> {
           ),
           const Spacer(),
           ElevatedButton(
-            onPressed: nextStep,
+            onPressed: () async {
+              if (codeController.text.isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("Please enter the OTP")),
+                );
+                return;
+              }
+
+              if (codeController.text == generatedOTP) {
+                // Compare OTP
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("OTP verified successfully")),
+                );
+                nextStep(); 
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                      content: Text("Invalid OTP, please try again.")),
+                );
+              }
+            },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.redAccent,
               minimumSize: const Size(double.infinity, 50),
             ),
             child: const Text("Verify"),
-          ),
+          )
         ],
       ),
     );
@@ -348,34 +408,32 @@ class _RegisterScreenState extends State<RegisterScreen> {
           const Spacer(),
           ElevatedButton(
             onPressed: () async {
-              // Get the current position (latitude and longitude)
+              if (passwordController.text != confirmPasswordController.text) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("Passwords do not match")),
+                );
+                return;
+              }
+
               Position position = await Geolocator.getCurrentPosition(
                   desiredAccuracy: LocationAccuracy.high);
 
-              // Get the signup Bloc
               final signupBloc = context.read<AuthenticationBloc>();
 
-              // Add the UserSignUpEvent with latitude and longitude
               signupBloc.add(UserSignUpEvent(
-                  username: usernameController.text,
-                  email: emailController.text,
-                  password: passwordController.text,
-                  address:
-                      'Some address', // Replace with actual input if required
-                  firstname: firstNameController.text,
-                  lastname: lastNameController.text,
-                  isAdmin: false,
-                  isGirl: selectedGender == 'Female',
-                  isVerified: true,
-                  latitude: position.latitude, // Pass latitude
-                  longitude: position.longitude // Pass longitude
-                  ));
-
-              // Check if the widget is still mounted before navigating
-              if (mounted) {
-                // Navigate to login screen after successful registration
-                context.push('/login');
-              }
+                username: usernameController.text,
+                email: emailController.text,
+                password: passwordController.text,
+                address:
+                    'Some address', // Replace with actual input if required
+                firstname: firstNameController.text,
+                lastname: lastNameController.text,
+                isAdmin: false,
+                isGirl: selectedGender == 'Female',
+                isVerified: true,
+                latitude: position.latitude, // Pass latitude
+                longitude: position.longitude, // Pass longitude
+              ));
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFFEF8D88),
@@ -392,7 +450,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 fontWeight: FontWeight.w400,
               ),
             ),
-          )
+          ),
         ],
       ),
     );
