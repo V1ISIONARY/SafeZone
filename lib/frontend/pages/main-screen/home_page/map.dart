@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -22,6 +23,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'dart:convert';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Maps extends StatefulWidget {
   final String UserToken;
@@ -73,51 +75,29 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
     'Municipal',
   ];
   int? _userId;
-  int? _circleId;
   int _currentHintIndex = 0;
   LatLng? _currentUserLocation;
 
   StreamSubscription<Position>? _positionStreamSubscription;
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _loadUserId();
+  }
 
   @override
   void initState() {
     super.initState();
     _loadUserId();
+
     _pageController = PageController();
-
-    print(_circleId);
-    print(_circleId);
-    print(_circleId);
-    print(_circleId);
-
-    print(_circleId);
-    print(_circleId);
-
-    print(_circleId);
-    print(_circleId);
-    print(_circleId);
-    print(_circleId);
-    print(_circleId);
-    print(_userId);
-    print(_userId);
-    print(_userId);
-    print(_userId);
-    print(_userId);
-    print(_userId);
-    print(_userId);
-    print(_userId);
-    print(_userId);
-    print(_userId);
-    print(_userId);
-    print(_userId);
-    print(_userId);
-    print(_userId);
-    print(_userId);
-
     context.read<DangerZoneBloc>().add(FetchDangerZones());
     _checkFirstRun();
     _createCustomMarker();
-    _fetchLocation();
+    print("Members list before fetching: $members");
+
+    // Fetch members' location data after userId is loaded
+    _fetchLocation(); // This ensures that the user's location is updated before showing members
 
     _controller = AnimationController(
       duration: const Duration(milliseconds: 400),
@@ -188,10 +168,86 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
       setState(() {
         _userId = userId;
       });
+
+      // Once _userId is loaded, fetch members' data if a circle is available
+      if (circleId != null) {
+        context.read<CircleBloc>().add(FetchMembersEvent(circleId: circleId));
+      }
     }
-    if (circleId != null) {
-      context.read<CircleBloc>().add(FetchMembersEvent(circleId: circleId));
+    context.read<CircleBloc>().stream.listen((state) {
+      if (state is CircleMembersLoadedState) {
+        _listenForMemberLocationData(state.members);
+      }
+    });
+  }
+
+  Future<void> _listenForMemberLocationData(
+      List<Map<String, dynamic>> members) async {
+    print("Listening for members' location data...");
+
+    try {
+      if (members.isEmpty) {
+        print("No members to listen for.");
+        return;
+      }
+
+      // Create a listener for each member's location
+      for (var member in members) {
+        String userId = member['user_id'].toString();
+
+        // Skip if the userId is the same as _userId
+        if (userId == _userId.toString()) {
+          print("Skipping current user: $userId");
+          continue; // Move to the next user
+        }
+
+        // Listen to Firestore document for the user's location in real-time
+        FirebaseFirestore.instance
+            .collection('locations')
+            .doc(userId)
+            .snapshots()
+            .listen((documentSnapshot) {
+          if (documentSnapshot.exists) {
+            var data = documentSnapshot.data() as Map<String, dynamic>;
+
+            print("Real-time Firestore document data for user $userId: $data");
+
+            if (data.containsKey('latitude') && data.containsKey('longitude')) {
+              try {
+                double latitude = double.parse(data['latitude'].toString());
+                double longitude = double.parse(data['longitude'].toString());
+
+                print(
+                    'User: $userId | Latitude: $latitude | Longitude: $longitude');
+
+                _addMarker(latitude, longitude, userId);
+              } catch (e) {
+                print(
+                    "Error converting latitude/longitude for user $userId: $e");
+              }
+            } else {
+              print("Missing location fields for user $userId");
+            }
+          } else {
+            print("No location data found for user $userId");
+          }
+        });
+      }
+    } catch (e) {
+      print('Error listening to members location data: $e');
     }
+  }
+
+  // Add a marker for each member
+  void _addMarker(double latitude, double longitude, String userId) {
+    setState(() {
+      markers.add(Marker(
+        markerId: MarkerId(userId),
+        position: LatLng(latitude, longitude),
+        icon: customMarker ?? BitmapDescriptor.defaultMarker,
+        infoWindow: InfoWindow(title: 'User $userId'),
+      ));
+    });
   }
 
   Future<void> _createCustomMarker() async {
@@ -420,16 +476,10 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
               listener: (context, state) {
                 if (state is CircleMembersLoadedState) {
                   setState(() {
-                    members = state.members;
+                    members = state.members
+                        .where((member) => member['user_id'] != _userId)
+                        .toList();
                   });
-                  print(members.length);
-                  print(members.length);
-                  print(members.length);
-                  print(members.length);
-                  print(members.length);
-                  print(members.length);
-                  print(members.length);
-                  print(members.length);
                 } else if (state is CircleLoadingState) {
                   // Handle loading state (e.g., show loading indicator if needed)
                 } else if (state is CircleErrorState) {
@@ -844,7 +894,12 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                           GestureDetector(
                             key: _circleKey,
                             onTap: () async {
-                              context.push('/groups-list');
+                              final result = await context.push('/groups-list');
+                              if (result == null) {
+                                _loadUserId();
+                              } else {
+                                _loadUserId();
+                              }
                             },
                             child: Container(
                               width: 40,

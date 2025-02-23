@@ -64,6 +64,8 @@ dependencies:
   email_otp: ^3.0.2
   mailer: ^6.4.1
   url_launcher: ^6.3.1
+  cloud_firestore: ^5.6.4
+  firebase_core: ^3.10.1
 
 flutter_launcher_icons:
   android: "launcher_icon"
