@@ -77,6 +77,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
   int? _userId;
   int _currentHintIndex = 0;
   LatLng? _currentUserLocation;
+  StreamSubscription? _locationSubscription;
 
   StreamSubscription<Position>? _positionStreamSubscription;
   @override
@@ -157,6 +158,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
     _mapCategoryHint.dispose();
     _focusNode.dispose();
     _textEditingController.dispose();
+    _locationSubscription?.cancel();
     super.dispose();
   }
 
@@ -191,18 +193,15 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
         return;
       }
 
-      // Create a listener for each member's location
       for (var member in members) {
         String userId = member['user_id'].toString();
 
-        // Skip if the userId is the same as _userId
         if (userId == _userId.toString()) {
           print("Skipping current user: $userId");
-          continue; // Move to the next user
+          continue;
         }
 
-        // Listen to Firestore document for the user's location in real-time
-        FirebaseFirestore.instance
+        _locationSubscription = FirebaseFirestore.instance
             .collection('locations')
             .doc(userId)
             .snapshots()
@@ -220,7 +219,11 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                 print(
                     'User: $userId | Latitude: $latitude | Longitude: $longitude');
 
-                _addMarker(latitude, longitude, userId);
+                if (mounted) {
+                  setState(() {
+                    _addMarker(latitude, longitude, userId);
+                  });
+                }
               } catch (e) {
                 print(
                     "Error converting latitude/longitude for user $userId: $e");
