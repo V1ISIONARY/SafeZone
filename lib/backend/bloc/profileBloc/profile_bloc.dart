@@ -20,5 +20,20 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         emit(ProfileError("Error fetching profile: $e"));
       }
     });
+
+    on<UpdateStatusEvent>((event, emit) async {
+      emit(UpdateStatusLoading());
+      try {
+        final success =
+            await profileRepository.updateStatus(event.userId, event.status);
+        if (success) {
+          emit(UpdateStatusSuccess(event.status));
+        } else {
+          emit(const UpdateStatusError("Failed to update status"));
+        }
+      } catch (e) {
+        emit(UpdateStatusError("Error updating status: $e"));
+      }
+    });
   }
 }

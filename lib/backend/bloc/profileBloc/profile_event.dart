@@ -15,3 +15,13 @@ class GetProfileEvent extends ProfileEvent {
   @override
   List<Object?> get props => [userId];
 }
+
+class UpdateStatusEvent extends ProfileEvent {
+  final int userId;
+  final String status;
+
+  const UpdateStatusEvent(this.userId, this.status);
+
+  @override
+  List<Object?> get props => [userId, status];
+}
