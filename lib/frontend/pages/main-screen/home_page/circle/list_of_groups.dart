@@ -411,65 +411,32 @@ class _ListOfGroupsState extends State<ListOfGroups> {
                                             MainAxisAlignment.center,
                                         children: [
                                           CategoryText(text: group.name),
-                                          // const SizedBox(height: 5,),
-                                          // Container(
-                                          //   padding: const EdgeInsets.all(5),
-                                          //   decoration: BoxDecoration(
-                                          //       color: const Color.fromARGB(214, 197, 197, 197),
-                                          //       borderRadius:
-                                          //           BorderRadius.circular(5)),
-                                          //   child: Text(
-                                          //     'Invite Code: ${group.code}',
-                                          //     style: const TextStyle(
-                                          //       fontSize: 11,
-                                          //       fontWeight: FontWeight.w500,
-                                          //       color: Colors.white,
-                                          //     ),
-                                          //   ),
-                                          // ),
-                                          // CategoryDescripText(text: codeExpiry),
                                         ],
                                       ),
                                     ),
-                                    Padding(
-                                      padding:
-                                          const EdgeInsets.only(right: 12.0),
-                                      child: TextButton(
-                                        onPressed: () {
-                                          // Clear the circles list
-                                          setState(() {
-                                            _circles = [];
-                                          });
-
-                                          // Trigger the Generate Code action
-                                          context.read<CircleBloc>().add(
-                                                GenerateCodeEvent(
-                                                    circleId: group.id),
-                                              );
-
-                                          // Re-fetch the list of circles after code is generated
-                                          _loadUserId();
-                                        },
-                                        style: TextButton.styleFrom(
-                                          backgroundColor: const Color.fromARGB(
-                                              10,
-                                              151,
-                                              163,
-                                              175), // Button color
-                                          padding: const EdgeInsets.all(5),
-
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(5),
+                                    StatefulBuilder(
+                                      builder: (context, setState) {
+                                        bool isSwitched = false;
+                                        return Transform.scale(
+                                          scale:
+                                              0.8, // Adjust scale to make the switch smaller
+                                          child: Switch(
+                                            value: isSwitched,
+                                            onChanged: (value) {
+                                              setState(() {
+                                                isSwitched = value;
+                                              });
+                                            },
+                                            activeColor: btnColor,
+                                            materialTapTargetSize:
+                                                MaterialTapTargetSize
+                                                    .shrinkWrap, // Reduces touch area
                                           ),
-                                        ),
-                                        child: const Text(
-                                          'Generate Code',
-                                          style: TextStyle(
-                                              color: textColor, fontSize: 11),
-                                        ),
-                                      ),
+                                        );
+                                      },
                                     ),
+
+                                    const SizedBox(width: 15),
                                   ],
                                 ),
                               ),
