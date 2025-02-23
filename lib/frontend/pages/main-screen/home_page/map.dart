@@ -20,16 +20,17 @@ import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'dart:convert';
 
-class Map extends StatefulWidget {
+class Maps extends StatefulWidget {
   final String UserToken;
 
-  const Map({super.key, required this.UserToken});
+  const Maps({super.key, required this.UserToken});
 
   @override
-  State<Map> createState() => _MapState();
+  State<Maps> createState() => _MapsState();
 }
 
-class _MapState extends State<Map> with TickerProviderStateMixin {
+class _MapsState extends State<Maps> with TickerProviderStateMixin {
+  List<Map<String, dynamic>> members = [];
   Set<Marker> markers = {};
   Set<Circle> circles = {};
   Set<Polyline> _polylines = {};
@@ -69,6 +70,7 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
     'Municipal',
   ];
   int? _userId;
+  int? _circleId;
   int _currentHintIndex = 0;
   LatLng? _currentUserLocation;
 
@@ -148,9 +150,11 @@ class _MapState extends State<Map> with TickerProviderStateMixin {
   Future<void> _loadUserId() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     int? userId = prefs.getInt('id');
+    int? circleId = prefs.getInt('circle');
     if (userId != null) {
       setState(() {
         _userId = userId;
+        _circleId = circleId;
       });
     }
   }

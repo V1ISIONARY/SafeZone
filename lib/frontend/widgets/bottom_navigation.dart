@@ -10,7 +10,8 @@ import 'package:safezone/frontend/pages/main-screen/settings_page/main-settings.
 class BottomNavigationWidget extends StatefulWidget {
   final String userToken;
 
-  const BottomNavigationWidget({Key? key, required this.userToken}) : super(key: key);
+  const BottomNavigationWidget({Key? key, required this.userToken})
+      : super(key: key);
 
   @override
   _BottomNavigationWidgetState createState() => _BottomNavigationWidgetState();
@@ -25,7 +26,7 @@ class _BottomNavigationWidgetState extends State<BottomNavigationWidget> {
   void initState() {
     super.initState();
     _pages = [
-      Map(UserToken: widget.userToken),
+      Maps(UserToken: widget.userToken),
       Contact(UserToken: widget.userToken),
       Notif(UserToken: widget.userToken, initialPage: 0),
       Settings(UserToken: widget.userToken),
