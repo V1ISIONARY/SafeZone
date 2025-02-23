@@ -35,6 +35,7 @@ class AuthenticationImplementation extends AuthenticationRepository {
       await prefs.setBool('is_admin', data['profile']['is_admin']);
       await prefs.setBool('is_girl', data['profile']['is_girl']);
       await prefs.setBool('is_verified', data['profile']['is_verified']);
+      await prefs.setInt('circle', data['profile']['active_circle'] ?? 0);
 
       print("Login successful, data saved to SharedPreferences");
       viewSharedPreferences();

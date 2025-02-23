@@ -66,3 +66,17 @@ class GroupMembersLoadedState extends CircleState {
 
   GroupMembersLoadedState({required this.members});
 }
+
+class CircleActiveChangedState extends CircleState {
+  final int circleId;
+  final bool isActive;
+
+  CircleActiveChangedState({required this.circleId, required this.isActive});
+}
+
+class CircleActiveChangingState extends CircleState {
+  final int circleId;
+  final bool isActive;
+
+  CircleActiveChangingState({required this.circleId, required this.isActive});
+}

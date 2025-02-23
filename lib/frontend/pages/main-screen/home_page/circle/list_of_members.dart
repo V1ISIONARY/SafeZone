@@ -90,6 +90,7 @@ class _ListOfMembersState extends State<ListOfMembers> {
               name: widget.circleInfo.name,
               code: state.code,
               codeExpiry: state.expiry,
+              isActive: widget.circleInfo.isActive,
             );
             isLoading = false;
           });
@@ -124,7 +125,8 @@ class _ListOfMembersState extends State<ListOfMembers> {
                       children: [
                         Theme(
                             data: Theme.of(context).copyWith(
-                                dividerColor: const Color.fromARGB(6, 92, 92, 92)),
+                                dividerColor:
+                                    const Color.fromARGB(6, 92, 92, 92)),
                             child: ExpansionTile(
                               title: const Text(
                                 "Invite Members",

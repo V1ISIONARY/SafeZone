@@ -1,7 +1,7 @@
 class CircleModel {
   final int id;
   final String name;
-  bool? isActive;
+  bool isActive;
   final String code;
   String? createdAt;
   final String codeExpiry; // Added code expiry
@@ -9,7 +9,7 @@ class CircleModel {
   CircleModel({
     required this.id,
     required this.name,
-    this.isActive,
+    required this.isActive,
     required this.code,
     this.createdAt,
     required this.codeExpiry, // Added code expiry
@@ -21,7 +21,7 @@ class CircleModel {
       id: json['circle_id'] ?? 0,
       name: json['circle_name'],
       code: json['code'] ?? "",
-      isActive: json['is_active'] ?? true,
+      isActive: json['status'],
       createdAt: json['created_at'] ?? "",
       codeExpiry: json['code_expiry'] ?? "", // Map expiry time
     );

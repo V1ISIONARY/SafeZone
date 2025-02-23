@@ -215,4 +215,29 @@ class CircleImplementation extends CircleRepository {
       throw Exception('Failed to view group members');
     }
   }
+
+  Future<void> activeCircle(int circleId, bool isActive) async {
+    try {
+      final response = await http.patch(
+        Uri.parse('$baseUrl/update_active_status'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: jsonEncode({
+          'circle_id': circleId,
+          'is_active': isActive,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        print('Circle status updated successfully');
+      } else {
+        final error = jsonDecode(response.body)['error'];
+        throw Exception('Failed to update status: $error');
+      }
+    } catch (e) {
+      print('Error updating circle status: $e');
+    }
+  }
 }
