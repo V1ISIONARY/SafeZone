@@ -63,6 +63,7 @@ dependencies:
   dio: ^5.8.0+1
   email_otp: ^3.0.2
   mailer: ^6.4.1
+  url_launcher: ^6.3.1
 
 flutter_launcher_icons:
   android: "launcher_icon"
