@@ -183,7 +183,7 @@ class Starter extends StatelessWidget {
                 );
               },
               child: Text(
-                "Guess",
+                "Guest",
                 style: TextStyle(fontSize: 13, color: Colors.white),
               ),
             ),

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:safezone/resources/schema/colors.dart';
 
+import '../../../../../resources/schema/texts.dart';
+
 class PrivacyPolicy extends StatefulWidget {
   const PrivacyPolicy({super.key});
 
@@ -14,17 +16,22 @@ class _PrivacyPolicyState extends State<PrivacyPolicy> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
+        automaticallyImplyLeading: false,
         centerTitle: true,
-        title: const Text(
-          "Privacy Policy",
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: Colors.black,
+        title: const CategoryText(text: "Privacy Policy"),
+        leading: GestureDetector(
+          onTap: () {
+            Navigator.pop(context);
+          },
+          child: Container(
+            margin: const EdgeInsets.all(15),
+            decoration: BoxDecoration(
+              border: Border.all(width: 1, color: Colors.black),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(Icons.arrow_back, color: Colors.black, size: 10),
           ),
         ),
-        iconTheme: const IconThemeData(color: Colors.black),
-        elevation: 0,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),

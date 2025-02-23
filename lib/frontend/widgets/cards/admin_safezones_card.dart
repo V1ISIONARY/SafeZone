@@ -10,6 +10,7 @@ class AdminSafeZonesCard extends StatelessWidget {
   final String address;
   final VoidCallback? onRefresh;
 
+
   const AdminSafeZonesCard(
       {super.key, required this.safeZone, required this.address, this.onRefresh});
 
@@ -38,7 +39,7 @@ class AdminSafeZonesCard extends StatelessWidget {
 },
       child: Container(
         width: double.infinity,
-        height: 100,
+        height: 70,
         margin: const EdgeInsets.only(bottom: 10),
         decoration: BoxDecoration(
           color: const Color.fromARGB(10, 0, 0, 0),
@@ -49,8 +50,8 @@ class AdminSafeZonesCard extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Container(
-              width: 60,
-              height: 60,
+              width: 40,
+              height: 40,
               margin: const EdgeInsets.only(left: 15),
               decoration: const BoxDecoration(
                 shape: BoxShape.circle,
@@ -65,6 +66,7 @@ class AdminSafeZonesCard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   CategoryText(text: safeZone.name!),
+                  SizedBox(height: 1),
                   Row(
                     children: [
                       const Icon(Icons.location_on, size: 12, color: btnColor),
@@ -77,20 +79,13 @@ class AdminSafeZonesCard extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  CategoryDescripTextEllipsis(text: safeZone.description!),
+                  safeZone.description == null || safeZone.description!.isEmpty
+                    ? Container()
+                    : Padding(
+                      padding: EdgeInsets.only(top: 1),
+                      child: CategoryDescripTextEllipsis(text: safeZone.description!),
+                    )
                 ],
-              ),
-            ),
-            Container(
-              width: 60,
-              height: 60,
-              margin: const EdgeInsets.only(right: 15),
-              child: Image.asset(
-                'lib/resources/images/line.png',
-                fit: BoxFit.cover,
               ),
             ),
           ],
@@ -98,4 +93,5 @@ class AdminSafeZonesCard extends StatelessWidget {
       ),
     );
   }
+  
 }

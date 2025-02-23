@@ -18,7 +18,7 @@ class IdentifiedZone extends StatelessWidget {
     return GestureDetector(
       child: Container(
         width: double.infinity,
-        height: 80,
+        height: 70,
         margin: EdgeInsets.only(bottom: 10),
         decoration: BoxDecoration(
             color: Color.fromARGB(10, 0, 0, 0),
@@ -28,8 +28,8 @@ class IdentifiedZone extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Container(
-              width: 60,
-              height: 60,
+              width: 40,
+              height: 40,
               margin: EdgeInsets.only(left: 15),
               decoration:
                   BoxDecoration(shape: BoxShape.circle, color: Colors.white),
@@ -45,16 +45,6 @@ class IdentifiedZone extends StatelessWidget {
                         text: location)
                   ],
                 )),
-            Spacer(),
-            Container(
-              width: 60,
-              height: 60,
-              margin: EdgeInsets.only(right: 15),
-              child: Image.asset(
-                'lib/resources/images/line.png',
-                fit: BoxFit.cover,
-              ),
-            )
           ],
         ),
       ),

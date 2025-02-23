@@ -82,7 +82,7 @@ class _SlidesState extends State<Slides> {
                     context,
                     PageTransition(
                       type: PageTransitionType.rightToLeft,
-                      duration: Duration(milliseconds: 300), child: Container(),
+                      duration: Duration(milliseconds: 300), child: RegisterScreen(),
                     ),
                   );
                 },

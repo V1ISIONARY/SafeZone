@@ -89,8 +89,7 @@ class _ListOfMembersState extends State<ListOfMembers> {
               id: widget.circleInfo.id,
               name: widget.circleInfo.name,
               code: state.code,
-              codeExpiry: state.expiry,
-              isActive: widget.circleInfo.isActive,
+              codeExpiry: state.expiry, isActive: true, createdAt: '',
             );
             isLoading = false;
           });

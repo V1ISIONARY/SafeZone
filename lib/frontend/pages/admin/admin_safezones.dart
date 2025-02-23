@@ -97,45 +97,41 @@ class _AdminSafezonesState extends State<AdminSafezones> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Padding(
-                  padding: const EdgeInsets.only(left: 12),
-                  child: DropdownButton<String>(
-                    value: _selectedFilter,
-                    icon: const Icon(Icons.arrow_drop_down),
-                    dropdownColor: Colors.white,
-                    onChanged: (String? newValue) {
-                      if (newValue != null) {
-                        setState(() {
-                          _selectedFilter = newValue;
-                        });
-                      }
-                    },
-                    items: _categories
-                        .map<DropdownMenuItem<String>>(
-                          (String category) => DropdownMenuItem<String>(
-                            value: category,
-                            child: Align(
-                              alignment: Alignment.center,
-                              child: Text(
-                                category,
-                                style: const TextStyle(
-                                    color: textColor, fontSize: 11),
-                              ),
+                DropdownButton<String>(
+                  value: _selectedFilter,
+                  icon: const Icon(Icons.arrow_drop_down),
+                  dropdownColor: Colors.white,
+                  onChanged: (String? newValue) {
+                    if (newValue != null) {
+                      setState(() {
+                        _selectedFilter = newValue;
+                      });
+                    }
+                  },
+                  items: _categories
+                      .map<DropdownMenuItem<String>>(
+                        (String category) => DropdownMenuItem<String>(
+                          value: category,
+                          child: Align(
+                            alignment: Alignment.center,
+                            child: Text(
+                              category,
+                              style: const TextStyle(
+                                  color: textColor, fontSize: 11),
                             ),
                           ),
-                        )
-                        .toList(),
-                  ),
+                        ),
+                      )
+                      .toList(),
                 ),
                 const Spacer(),
-                // Sort Button
                 GestureDetector(
                     onTap: _toggleSortOrder,
                     child: Container(
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
                           color: const Color.fromARGB(10, 0, 0, 0),
-                          borderRadius: BorderRadius.circular(10)),
+                          borderRadius: BorderRadius.circular(5)),
                       child: Row(
                         children: [
                           Icon(
