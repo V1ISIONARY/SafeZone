@@ -65,8 +65,8 @@ class _LoginState extends State<Login> {
                   SizedBox(height: 130),
                   Align(
                     alignment: Alignment.topLeft,
-                    child: SvgPicture.asset(
-                      'lib/resources/svg/logo.svg',
+                    child: Image.asset(
+                      'lib/resources/images/email.png',
                       height: 50,
                     ),
                   ),
@@ -151,7 +151,7 @@ class _LoginState extends State<Login> {
                       color: textColor,
                     ),
                     decoration: InputDecoration(
-                      hintText: "Hel******",
+                      hintText: "hsl******",
                       hintStyle: TextStyle(
                         fontSize: 13,
                         color: labelFormFieldColor,

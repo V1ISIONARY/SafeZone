@@ -72,15 +72,35 @@ class _RegisterScreenState extends State<RegisterScreen> {
       return;
     }
 
-    generatedOTP = (Random().nextInt(900000) + 100000).toString();
+    String generatedOTP = (Random().nextInt(900000) + 100000).toString();
 
     final smtpServer = gmail(senderEmail, senderPassword);
+
+    final String htmlContent = '''
+    <html>
+      <body>
+        <table align="center" width="100%" cellpadding="0" cellspacing="0" role="presentation">
+          <tr>
+            <td align="center">
+              <img src="https://firebasestorage.googleapis.com/v0/b/safezone-11724.firebasestorage.app/o/Group%2031.png?alt=media&token=393c849f-c3e6-4c19-a231-62350ec23667" alt="SafeZone Logo" style="width:150px;height:auto;">
+            </td>
+          </tr>
+        </table>
+        <p>Dear SafeZone User,</p>
+        <p>To proceed with your verification request, here's your one-time PIN:</p>
+        <h2>$generatedOTP</h2>
+        <p>One Time PIN is only valid for 10 Minutes.</p>
+        <p>Did you request for this? If not, please ignore this email or report this activity to our customer service by sending an email to <a href="mailto:safezone.SY2425@gmail.com">safezone.SY2425@gmail.com</a>.</p>
+        <p>Thank you!</p>
+      </body>
+    </html>
+    ''';
+
     final message = Message()
       ..from = const Address(senderEmail, 'SafeZone App')
       ..recipients.add(recipientEmail)
       ..subject = 'Your SafeZone OTP Code'
-      ..text =
-          'Your OTP code is: $generatedOTP\n\nThis code is valid for 10 minutes.';
+      ..html = htmlContent;
 
     try {
       await send(message, smtpServer);
@@ -119,9 +139,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
           leading: GestureDetector(
             onTap: () {
               if (currentStep > 0) {
-                previousStep(); 
+                previousStep();
               } else {
-                Navigator.pop(context); 
+                Navigator.pop(context);
               }
             },
             child: Container(
@@ -130,7 +150,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 border: Border.all(width: 1, color: Colors.black),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.arrow_back, color: Colors.black, size: 10),
+              child:
+                  const Icon(Icons.arrow_back, color: Colors.black, size: 10),
             ),
           ),
         ),
@@ -183,7 +204,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
           ),
           const SizedBox(height: 5),
           CategoryDescripText(
-            text: 'Make sure to enter a valid email address for account verification.',
+            text:
+                'Make sure to enter a valid email address for account verification.',
           ),
           const SizedBox(height: 30),
           TextField(
@@ -196,10 +218,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
             decoration: InputDecoration(
               hintText: "Email Address",
               hintStyle: TextStyle(
-                fontSize: 13,
-                color: labelFormFieldColor,
-                fontWeight: FontWeight.w200
-              ),
+                  fontSize: 13,
+                  color: labelFormFieldColor,
+                  fontWeight: FontWeight.w200),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
                 borderSide: BorderSide(color: widgetPricolor, width: 2),
@@ -212,7 +233,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           ),
           const Spacer(),
           GestureDetector(
-            onTap: (){
+            onTap: () {
               sendOTP(emailController.text);
             },
             child: Container(
@@ -225,7 +246,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ),
               child: Center(
                 child: Text(
-                  'Send Code', 
+                  'Send Code',
                   style: TextStyle(
                     fontSize: 12,
                     color: Colors.white,
@@ -250,7 +271,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
           ),
           const SizedBox(height: 5),
           CategoryDescripText(
-            text: 'We have sent an email to ${emailController.text} containing a 6-digit code',
+            text:
+                'We have sent an email to ${emailController.text} containing a 6-digit code',
           ),
           const SizedBox(height: 30),
           TextField(
@@ -264,10 +286,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
               hintText: "Enter 6-digit code",
               counterText: "",
               hintStyle: TextStyle(
-                fontSize: 13,
-                color: labelFormFieldColor,
-                fontWeight: FontWeight.w200
-              ),
+                  fontSize: 13,
+                  color: labelFormFieldColor,
+                  fontWeight: FontWeight.w200),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
                 borderSide: BorderSide(color: widgetPricolor, width: 2),
@@ -309,7 +330,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text("OTP verified successfully")),
                 );
-                nextStep(); 
+                nextStep();
               } else {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
@@ -327,7 +348,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ),
               child: Center(
                 child: Text(
-                  'Verify', 
+                  'Verify',
                   style: TextStyle(
                     fontSize: 12,
                     color: Colors.white,
@@ -352,7 +373,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
           ),
           const SizedBox(height: 5),
           CategoryDescripText(
-            text: 'We’re almost there! Add these details to set up your account.',
+            text:
+                'We’re almost there! Add these details to set up your account.',
           ),
           const SizedBox(height: 30),
           TextField(
@@ -365,10 +387,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
             decoration: InputDecoration(
               hintText: "Enter First Name",
               hintStyle: TextStyle(
-                fontSize: 13,
-                color: labelFormFieldColor,
-                fontWeight: FontWeight.w200
-              ),
+                  fontSize: 13,
+                  color: labelFormFieldColor,
+                  fontWeight: FontWeight.w200),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
                 borderSide: BorderSide(color: widgetPricolor, width: 2),
@@ -390,10 +411,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
             decoration: InputDecoration(
               hintText: "Enter Last Name",
               hintStyle: TextStyle(
-                fontSize: 13,
-                color: labelFormFieldColor,
-                fontWeight: FontWeight.w200
-              ),
+                  fontSize: 13,
+                  color: labelFormFieldColor,
+                  fontWeight: FontWeight.w200),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
                 borderSide: BorderSide(color: widgetPricolor, width: 2),
@@ -421,10 +441,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
             decoration: InputDecoration(
               hintText: "Gender",
               hintStyle: TextStyle(
-                fontSize: 13,
-                color: labelFormFieldColor,
-                fontWeight: FontWeight.w200
-              ),
+                  fontSize: 13,
+                  color: labelFormFieldColor,
+                  fontWeight: FontWeight.w200),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
                 borderSide: BorderSide(color: widgetPricolor, width: 2),
@@ -446,10 +465,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
             decoration: InputDecoration(
               hintText: "Enter Username",
               hintStyle: TextStyle(
-                fontSize: 13,
-                color: labelFormFieldColor,
-                fontWeight: FontWeight.w200
-              ),
+                  fontSize: 13,
+                  color: labelFormFieldColor,
+                  fontWeight: FontWeight.w200),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
                 borderSide: BorderSide(color: widgetPricolor, width: 2),
@@ -472,10 +490,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
             decoration: InputDecoration(
               hintText: "Enter Password",
               hintStyle: TextStyle(
-                fontSize: 13,
-                color: labelFormFieldColor,
-                fontWeight: FontWeight.w200
-              ),
+                  fontSize: 13,
+                  color: labelFormFieldColor,
+                  fontWeight: FontWeight.w200),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
                 borderSide: BorderSide(color: widgetPricolor, width: 2),
@@ -498,10 +515,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
             decoration: InputDecoration(
               hintText: "Confirm Password",
               hintStyle: TextStyle(
-                fontSize: 13,
-                color: labelFormFieldColor,
-                fontWeight: FontWeight.w200
-              ),
+                  fontSize: 13,
+                  color: labelFormFieldColor,
+                  fontWeight: FontWeight.w200),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
                 borderSide: BorderSide(color: widgetPricolor, width: 2),
@@ -552,7 +568,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ),
               child: Center(
                 child: Text(
-                  'Create new account', 
+                  'Create new account',
                   style: TextStyle(
                     fontSize: 12,
                     color: Colors.white,
