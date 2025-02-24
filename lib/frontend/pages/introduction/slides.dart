@@ -5,6 +5,7 @@ import 'package:safezone/frontend/pages/authentication/register.dart';
 import 'package:safezone/resources/schema/texts.dart';
 
 import '../../../resources/schema/colors.dart';
+import '../../widgets/fade.dart';
 
 
 class Slides extends StatefulWidget {
@@ -213,15 +214,76 @@ class Page1 extends StatelessWidget {
       children: [
         Expanded(
           child: Container(
-            color: Colors.black12,
             width: double.infinity,
-            // decoration: BoxDecoration(
-            //   color: Colors.black12,
-            //   borderRadius: BorderRadius.only(
-            //     bottomLeft: Radius.circular(70),
-            //     bottomRight: Radius.circular(70),
-            //   ),
-            // ),
+            child: Stack(
+              children: [
+                Positioned(
+                  top: 0,
+                  right: 0,
+                  child: Transform.translate(
+                    offset: Offset(180, -200),
+                    child: Container(
+                      height: 400,
+                      width: 400,
+                      child: SvgPicture.asset(
+                        'lib/resources/svg/eclipse.svg'
+                      ),
+                    ),
+                  )
+                ),
+                Positioned(
+                  bottom: 0,
+                  left: 0,
+                  child: Transform.translate(
+                    offset: Offset(-100, 100),
+                    child: Container(
+                      height: 300,
+                      width: 300,
+                      child: SvgPicture.asset(
+                        'lib/resources/svg/eclipse.svg',
+                        color: Colors.green,
+                      ),
+                    ),
+                  )
+                ),
+                Positioned(
+                  bottom: 0,
+                  left: 0,
+                  child: Transform.translate(
+                    offset: Offset(-70, 130),
+                    child: Container(
+                      height: 150,
+                      width: 250,
+                      color: Colors.white,
+                    ),
+                  )
+                ),
+                Positioned(
+                  bottom: 0,
+                  right: 0,
+                  left: 0,
+                  child: Container(
+                    width: double.infinity,
+                    height: MediaQuery.of(context).size.width * 1.36,
+                    child: Image.asset(
+                      'lib/resources/images/unit1.png',
+                      fit: BoxFit.cover,
+                    )
+                  ),
+                ),
+                Positioned(
+                  bottom: 0,
+                  right: 0,
+                  left: 0,
+                  child: CustomPaint(
+                    painter: WhiteBackgroundPainter(height: 0.1, begin: Alignment.topCenter, end: Alignment.bottomCenter),
+                    child: Container(
+                      height: MediaQuery.of(context).size.height * 0.1, // Add a height constraint here
+                    ),
+                  )
+                )
+              ],
+            ),
           ),
         ),
         Padding(
@@ -273,15 +335,76 @@ class Page2 extends StatelessWidget {
       children: [
         Expanded(
           child: Container(
-            color: Colors.black12,
             width: double.infinity,
-            // decoration: BoxDecoration(
-            //   color: Colors.black12,
-            //   borderRadius: BorderRadius.only(
-            //     bottomLeft: Radius.circular(70),
-            //     bottomRight: Radius.circular(70),
-            //   ),
-            // ),
+            child: Stack(
+              children: [
+                Positioned(
+                  top: 0,
+                  left: 0,
+                  child: Transform.translate(
+                    offset: Offset(-180, -200),
+                    child: Container(
+                      height: 400,
+                      width: 400,
+                      child: SvgPicture.asset(
+                        'lib/resources/svg/eclipse.svg'
+                      ),
+                    ),
+                  )
+                ),
+                Positioned(
+                  bottom: 0,
+                  right: 0,
+                  child: Transform.translate(
+                    offset: Offset(100, 100), 
+                    child: Container(
+                      height: 300,
+                      width: 300,
+                      child: SvgPicture.asset(
+                        'lib/resources/svg/eclipse.svg',
+                        color: Colors.green,
+                      ),
+                    ),
+                  ),
+                ),
+                Positioned(
+                  bottom: 0,
+                  right: 0,
+                  child: Transform.translate(
+                    offset: Offset(-130, 70),
+                    child: Container(
+                      height: 150,
+                      width: 250,
+                      color: Colors.white,
+                    ),
+                  )
+                ),
+                Positioned(
+                  bottom: 0,
+                  right: 0,
+                  left: 0,
+                  child: Container(
+                    width: double.infinity,
+                    height: MediaQuery.of(context).size.width * 1.36,
+                    child: Image.asset(
+                      'lib/resources/images/unit1.png',
+                      fit: BoxFit.cover,
+                    )
+                  ),
+                ),
+                Positioned(
+                  bottom: 0,
+                  right: 0,
+                  left: 0,
+                  child: CustomPaint(
+                    painter: WhiteBackgroundPainter(height: 0.1, begin: Alignment.topCenter, end: Alignment.bottomCenter),
+                    child: Container(
+                      height: MediaQuery.of(context).size.height * 0.1, // Add a height constraint here
+                    ),
+                  )
+                )
+              ],
+            ),
           ),
         ),
         Padding(
@@ -333,15 +456,76 @@ class Page3 extends StatelessWidget {
       children: [
         Expanded(
           child: Container(
-            color: Colors.black12,
             width: double.infinity,
-            // decoration: BoxDecoration(
-            //   color: Colors.black12,
-            //   borderRadius: BorderRadius.only(
-            //     bottomLeft: Radius.circular(70),
-            //     bottomRight: Radius.circular(70),
-            //   ),
-            // ),
+            child: Stack(
+              children: [
+                Positioned(
+                  top: 0,
+                  right: 0,
+                  child: Transform.translate(
+                    offset: Offset(180, -200),
+                    child: Container(
+                      height: 400,
+                      width: 400,
+                      child: SvgPicture.asset(
+                        'lib/resources/svg/eclipse.svg'
+                      ),
+                    ),
+                  )
+                ),
+                Positioned(
+                  bottom: 0,
+                  left: 0,
+                  child: Transform.translate(
+                    offset: Offset(-100, 100),
+                    child: Container(
+                      height: 300,
+                      width: 300,
+                      child: SvgPicture.asset(
+                        'lib/resources/svg/eclipse.svg',
+                        color: Colors.green,
+                      ),
+                    ),
+                  )
+                ),
+                Positioned(
+                  bottom: 0,
+                  left: 0,
+                  child: Transform.translate(
+                    offset: Offset(-70, 130),
+                    child: Container(
+                      height: 150,
+                      width: 250,
+                      color: Colors.white,
+                    ),
+                  )
+                ),
+                Positioned(
+                  bottom: 0,
+                  right: 0,
+                  left: 0,
+                  child: Container(
+                    width: double.infinity,
+                    height: MediaQuery.of(context).size.width * 1.36,
+                    child: Image.asset(
+                      'lib/resources/images/unit1.png',
+                      fit: BoxFit.cover,
+                    )
+                  ),
+                ),
+                Positioned(
+                  bottom: 0,
+                  right: 0,
+                  left: 0,
+                  child: CustomPaint(
+                    painter: WhiteBackgroundPainter(height: 0.1, begin: Alignment.topCenter, end: Alignment.bottomCenter),
+                    child: Container(
+                      height: MediaQuery.of(context).size.height * 0.1, // Add a height constraint here
+                    ),
+                  )
+                )
+              ],
+            ),
           ),
         ),
         Padding(

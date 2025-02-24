@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
+import 'package:lottie/lottie.dart';
 import 'package:safezone/backend/bloc/safezoneBloc/safezone_bloc.dart';
 import 'package:safezone/backend/bloc/safezoneBloc/safezone_event.dart';
 import 'package:safezone/backend/bloc/safezoneBloc/safezone_state.dart';
@@ -163,7 +164,19 @@ class _AdminSafezonesState extends State<AdminSafezones> {
     return BlocBuilder<SafeZoneBloc, SafeZoneState>(
       builder: (context, state) {
         if (state is SafeZoneLoading) {
-          return const Center(child: CircularProgressIndicator());
+          return Expanded(
+            child: Center(
+              child: Transform.translate(
+                offset: const Offset(0, -60), 
+                child: Lottie.asset(
+                  'lib/resources/lottie/loading.json',
+                  width: 80,
+                  height: 80,
+                  fit: BoxFit.cover,
+                ),
+              )
+            )
+          );
         } else if (state is SafeZonesLoaded) {
           List filteredZones = _selectedFilter == 'All'
               ? state.safeZones

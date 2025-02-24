@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart' as gmaps;
 import 'package:go_router/go_router.dart';
+import 'package:lottie/lottie.dart';
 import 'package:safezone/backend/bloc/adminBloc/safezone/safezone_admin_bloc.dart';
 import 'package:safezone/backend/bloc/adminBloc/safezone/safezone_admin_event.dart';
 import 'package:safezone/backend/bloc/adminBloc/safezone/safezone_admin_state.dart';
@@ -183,13 +184,39 @@ Widget build(BuildContext context) {
   child: Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.white,
+          automaticallyImplyLeading: false,
           centerTitle: true,
           title: const CategoryText(text: "Safe zone Details"),
+          leading: GestureDetector(
+            onTap: () {
+              Navigator.pop(context);
+            },
+            child: Container(
+              margin: const EdgeInsets.all(15),
+              decoration: BoxDecoration(
+                border: Border.all(width: 1, color: Colors.black),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.arrow_back, color: Colors.black, size: 10),
+            ),
+          ),
         ),
         body: BlocBuilder<SafeZoneAdminBloc, SafeZoneAdminState>(
           builder: (context, state) {
             if (_isLoading) {
-              return const Center(child: CircularProgressIndicator());
+              return Expanded(
+                child: Center(
+                  child: Transform.translate(
+                    offset: const Offset(0, -60), 
+                    child: Lottie.asset(
+                      'lib/resources/lottie/loading.json',
+                      width: 80,
+                      height: 80,
+                      fit: BoxFit.cover,
+                    ),
+                  )
+                )
+              );
             }
             return SingleChildScrollView(
               child: Column(

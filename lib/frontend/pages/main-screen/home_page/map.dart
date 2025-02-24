@@ -18,6 +18,7 @@ import 'package:safezone/backend/services/first_run_service.dart';
 import 'package:safezone/frontend/utils/marker_utils.dart';
 import 'package:safezone/frontend/utils/safezone_navigator.dart';
 import 'package:safezone/frontend/widgets/dialogs/dialogs.dart';
+import 'package:safezone/frontend/widgets/loadingstate.dart';
 import 'package:safezone/resources/schema/colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
@@ -492,7 +493,14 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
               child: BlocBuilder<MapBloc, MapState>(
                 builder: (context, state) {
                   if (state is MapLoading) {
-                    return const Center(child: CircularProgressIndicator());
+                    return Expanded(
+                      child: Center(
+                        child: Transform.translate(
+                          offset: const Offset(0, 0), 
+                          child: LoadingState()
+                        ),
+                      ),
+                    );
                   } else if (state is MapDataLoaded) {
                     markers.clear();
                     circles.clear();
