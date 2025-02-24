@@ -13,6 +13,7 @@ import 'package:safezone/backend/bloc/circleBloc/circle_state.dart';
 import 'package:safezone/backend/bloc/dangerzoneBloc/dangerzone_bloc.dart';
 import 'package:safezone/backend/bloc/dangerzoneBloc/dangerzone_event.dart';
 import 'package:safezone/backend/bloc/mapBloc/map_bloc.dart';
+import 'package:safezone/backend/bloc/mapBloc/map_event.dart';
 import 'package:safezone/backend/bloc/mapBloc/map_state.dart';
 import 'package:safezone/backend/services/first_run_service.dart';
 import 'package:safezone/frontend/utils/marker_utils.dart';
@@ -39,6 +40,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
   List<Map<String, dynamic>> members = [];
   Set<Marker> markers = {};
   Set<Circle> circles = {};
+  Set<Marker> membersMarkers = {};
   Set<Polyline> _polylines = {};
   List<LatLng> _safeZones = [];
   static const LatLng sourceLocation = LatLng(16.0471, 120.3425);
@@ -58,7 +60,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
   BitmapDescriptor? customSafeZoneMarker;
 
   MapType _currentMapType = MapType.normal;
-  late PageController _pageController;
+
   GoogleMapController? googleMapController;
   late AnimationController _controller;
   late Animation<Offset> _hintAnimation;
@@ -92,7 +94,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
     super.initState();
     _loadUserId();
 
-    _pageController = PageController();
+    context.read<MapBloc>().add(FetchMapData());
     context.read<DangerZoneBloc>().add(FetchDangerZones());
     _checkFirstRun();
     _createCustomMarker();
@@ -163,7 +165,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
     super.dispose();
   }
 
-  Future<void> _loadUserId() async {
+  void _loadUserId() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     int? userId = prefs.getInt('id');
     int? circleId = prefs.getInt('circle');
@@ -172,85 +174,33 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
         _userId = userId;
       });
 
-      // Once _userId is loaded, fetch members' data if a circle is available
       if (circleId != null) {
         context.read<CircleBloc>().add(FetchMembersEvent(circleId: circleId));
       }
     }
     context.read<CircleBloc>().stream.listen((state) {
       if (state is CircleMembersLoadedState) {
-        _listenForMemberLocationData(state.members);
+        context.read<MapBloc>().add(FetchMapData());
+
+        context
+            .read<MapBloc>()
+            .add(ListenForMemberLocations(state.members, _userId!));
       }
     });
   }
 
-  Future<void> _listenForMemberLocationData(
-      List<Map<String, dynamic>> members) async {
-    print("Listening for members' location data...");
-
-    try {
-      if (members.isEmpty) {
-        print("No members to listen for.");
-        return;
-      }
-
-      for (var member in members) {
-        String userId = member['user_id'].toString();
-
-        if (userId == _userId.toString()) {
-          print("Skipping current user: $userId");
-          continue;
-        }
-
-        _locationSubscription = FirebaseFirestore.instance
-            .collection('locations')
-            .doc(userId)
-            .snapshots()
-            .listen((documentSnapshot) {
-          if (documentSnapshot.exists) {
-            var data = documentSnapshot.data() as Map<String, dynamic>;
-
-            print("Real-time Firestore document data for user $userId: $data");
-
-            if (data.containsKey('latitude') && data.containsKey('longitude')) {
-              try {
-                double latitude = double.parse(data['latitude'].toString());
-                double longitude = double.parse(data['longitude'].toString());
-
-                print(
-                    'User: $userId | Latitude: $latitude | Longitude: $longitude');
-
-                if (mounted) {
-                  setState(() {
-                    _addMarker(latitude, longitude, userId);
-                  });
-                }
-              } catch (e) {
-                print(
-                    "Error converting latitude/longitude for user $userId: $e");
-              }
-            } else {
-              print("Missing location fields for user $userId");
-            }
-          } else {
-            print("No location data found for user $userId");
-          }
-        });
-      }
-    } catch (e) {
-      print('Error listening to members location data: $e');
-    }
-  }
-
-  // Add a marker for each member
-  void _addMarker(double latitude, double longitude, String userId) {
+  void _updateMemberMarker(String userId, double latitude, double longitude) {
     setState(() {
-      markers.add(Marker(
-        markerId: MarkerId(userId),
-        position: LatLng(latitude, longitude),
-        icon: customMarker ?? BitmapDescriptor.defaultMarker,
-        infoWindow: InfoWindow(title: 'User $userId'),
-      ));
+      markers.removeWhere((marker) => marker.markerId.value == "user_$userId");
+
+      markers.add(
+        Marker(
+          markerId: MarkerId("user_$userId"),
+          position: LatLng(latitude, longitude),
+          icon: customMarker ?? BitmapDescriptor.defaultMarker,
+          infoWindow: InfoWindow(title: 'User $userId'),
+        ),
+      );
     });
   }
 
@@ -476,18 +426,13 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
         height: double.infinity,
         child: Stack(
           children: [
-            BlocListener<CircleBloc, CircleState>(
+            BlocListener<MapBloc, MapState>(
               listener: (context, state) {
-                if (state is CircleMembersLoadedState) {
-                  setState(() {
-                    members = state.members
-                        .where((member) => member['user_id'] != _userId)
-                        .toList();
-                  });
-                } else if (state is CircleLoadingState) {
-                  // Handle loading state (e.g., show loading indicator if needed)
-                } else if (state is CircleErrorState) {
-                  print("Error fetching members: ${state.message}");
+                if (state is MemberLocationUpdated) {
+                  // Update the marker for the specific user
+                  print("iz changingggggg");
+                  _updateMemberMarker(
+                      state.userId, state.latitude, state.longitude);
                 }
               },
               child: BlocBuilder<MapBloc, MapState>(
@@ -496,9 +441,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                     return Expanded(
                       child: Center(
                         child: Transform.translate(
-                          offset: const Offset(0, 0), 
-                          child: LoadingState()
-                        ),
+                            offset: const Offset(0, 0), child: LoadingState()),
                       ),
                     );
                   } else if (state is MapDataLoaded) {
@@ -511,6 +454,18 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                           position: _currentUserLocation!,
                           icon: customMarker ?? BitmapDescriptor.defaultMarker,
                           infoWindow: const InfoWindow(title: 'My Location'),
+                        ),
+                      );
+                    }
+                    for (var member in state.members) {
+                      markers.add(
+                        Marker(
+                          markerId: MarkerId(member['user_id'].toString()),
+                          position:
+                              LatLng(member['latitude'], member['longitude']),
+                          icon: BitmapDescriptor.defaultMarker,
+                          infoWindow:
+                              InfoWindow(title: 'User ${member['user_id']}'),
                         ),
                       );
                     }
@@ -581,29 +536,31 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                       zoom: 16.0,
                     ),
                     mapType: _currentMapType,
+                    // markers: _showMarkers ? {...markers, ...membersMarkers} : {},
                     markers: _showMarkers ? markers : {},
+
                     circles: circles,
                     polylines: _polylines,
                     onMapCreated: (GoogleMapController controller) async {
                       googleMapController = controller;
                       String style = '''
-                    [
-                      {
-                        "featureType": "poi.business",
-                        "elementType": "labels",
-                        "stylers": [
-                          { "visibility": "off" }
-                        ]
-                      },
-                      {
-                        "featureType": "poi",
-                        "elementType": "labels.text",
-                        "stylers": [
-                          { "visibility": "off" }
-                        ]
-                      }
-                    ]
-                    ''';
+                              [
+                                {
+                                  "featureType": "poi.business",
+                                  "elementType": "labels",
+                                  "stylers": [
+                                    { "visibility": "off" }
+                                  ]
+                                },
+                                {
+                                  "featureType": "poi",
+                                  "elementType": "labels.text",
+                                  "stylers": [
+                                    { "visibility": "off" }
+                                  ]
+                                }
+                              ]
+                              ''';
                       controller.setMapStyle(style);
                       _mapController.complete(controller);
 

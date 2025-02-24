@@ -9,24 +9,32 @@ abstract class MapState extends Equatable {
   List<Object> get props => [];
 }
 
-// Initial state
 class MapInitial extends MapState {}
 
-// Loading state
 class MapLoading extends MapState {}
 
-// Loaded state for safe zones and danger zones
 class MapDataLoaded extends MapState {
   final List<SafeZoneModel> safeZones;
   final List<DangerZoneModel> dangerZones;
+  final List<Map<String, dynamic>> members;
 
-  const MapDataLoaded(this.safeZones, this.dangerZones);
+  const MapDataLoaded(this.safeZones, this.dangerZones, this.members);
 
   @override
-  List<Object> get props => [safeZones, dangerZones];
+  List<Object> get props => [safeZones, dangerZones, members];
 }
 
-// Error state
+class MemberLocationUpdated extends MapState {
+  final String userId;
+  final double latitude;
+  final double longitude;
+
+  const MemberLocationUpdated(this.userId, this.latitude, this.longitude);
+
+  @override
+  List<Object> get props => [userId, latitude, longitude];
+}
+
 class MapError extends MapState {
   final String message;
 

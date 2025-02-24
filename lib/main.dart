@@ -112,7 +112,8 @@ class MyApp extends StatelessWidget {
               BlocProvider(
                 create: (_) => MapBloc(
                     safeZoneRepository: SafeZoneRepositoryImpl(),
-                    dangerZoneRepository: DangerZoneRepositoryImpl())
+                    dangerZoneRepository: DangerZoneRepositoryImpl(),
+                    circleRepository: CircleImplementation())
                   ..add(FetchMapData()),
               ),
               BlocProvider(
