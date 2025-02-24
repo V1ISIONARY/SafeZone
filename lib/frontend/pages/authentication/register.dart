@@ -72,7 +72,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       return;
     }
 
-    String generatedOTP = (Random().nextInt(900000) + 100000).toString();
+    generatedOTP = (Random().nextInt(900000) + 100000).toString();
 
     final smtpServer = gmail(senderEmail, senderPassword);
 
@@ -86,12 +86,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
             </td>
           </tr>
         </table>
-        <p>Dear SafeZone User,</p>
+        <p>Dear user,</p>
+        <p>Welcome to SafeZone app!</p>
         <p>To proceed with your verification request, here's your one-time PIN:</p>
         <h2>$generatedOTP</h2>
-        <p>One Time PIN is only valid for 10 Minutes.</p>
+        <p>One Time PIN is only valid for 10 minutes.</p>
         <p>Did you request for this? If not, please ignore this email or report this activity to our customer service by sending an email to <a href="mailto:safezone.SY2425@gmail.com">safezone.SY2425@gmail.com</a>.</p>
-        <p>Thank you!</p>
+        <p>Thank you.</p>
       </body>
     </html>
     ''';
@@ -99,7 +100,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     final message = Message()
       ..from = const Address(senderEmail, 'SafeZone App')
       ..recipients.add(recipientEmail)
-      ..subject = 'Your SafeZone OTP Code'
+      ..subject = 'SafeZone OTP Code'
       ..html = htmlContent;
 
     try {
