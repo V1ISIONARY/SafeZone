@@ -40,3 +40,23 @@ class SendNotification extends NotificationEvent {
   @override
   List<Object?> get props => [userId, title, message, type];
 }
+
+// New events
+class FetchNewUnreadNotifications extends NotificationEvent {
+  final int userId;
+  final String lastChecked;
+
+  FetchNewUnreadNotifications(this.userId, this.lastChecked);
+
+  @override
+  List<Object?> get props => [userId, lastChecked];
+}
+
+class FetchUnreadNotificationsCount extends NotificationEvent {
+  final int userId;
+
+  FetchUnreadNotificationsCount(this.userId);
+
+  @override
+  List<Object?> get props => [userId];
+}

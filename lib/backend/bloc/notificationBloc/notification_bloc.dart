@@ -59,5 +59,28 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
         emit(NotificationError(e.toString()));
       }
     });
+    on<FetchNewUnreadNotifications>((event, emit) async {
+      emit(NotificationLoading());
+      try {
+        final result = await notificationRepository.getNewUnreadNotifications(
+            event.userId, event.lastChecked);
+        emit(NewUnreadNotificationsLoaded(result));
+      } catch (e) {
+        emit(NotificationError(
+            "Failed to load new unread notifications: ${e.toString()}"));
+      }
+    });
+
+    on<FetchUnreadNotificationsCount>((event, emit) async {
+      emit(NotificationLoading());
+      try {
+        final count = await notificationRepository
+            .getUnreadNotificationsCount(event.userId);
+        emit(UnreadNotificationsCountLoaded(count));
+      } catch (e) {
+        emit(NotificationError(
+            "Failed to load unread notifications count: ${e.toString()}"));
+      }
+    });
   }
 }

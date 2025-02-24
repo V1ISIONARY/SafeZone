@@ -6,4 +6,7 @@ abstract class NotificationRepository {
   Future<bool> deleteNotification(int notificationId);
   Future<bool> sendNotification(
       int userId, String title, String message, String type);
+  Future<int> getUnreadNotificationsCount(int userId);
+  Future<Map<String, dynamic>> getNewUnreadNotifications(
+      int userId, String lastChecked);
 }
