@@ -445,7 +445,7 @@ class _ListOfGroupsState extends State<ListOfGroups> {
                                                                       otherGroup
                                                                           .id,
                                                                   isActive:
-                                                                      false, // Set other buttons to inactive
+                                                                      false, userId: _userId!, // Set other buttons to inactive
                                                                 ),
                                                               );
                                                           // Update the state of the other button locally
@@ -468,7 +468,7 @@ class _ListOfGroupsState extends State<ListOfGroups> {
                                                               circleId:
                                                                   group.id,
                                                               isActive:
-                                                                  newState,
+                                                                  newState, userId: _userId!,
                                                             ),
                                                           );
 

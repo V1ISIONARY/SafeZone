@@ -8,5 +8,5 @@ abstract class CircleRepository {
   Future<void> removeMemberFromCircle(int circleId, int userId);
   Future<List<Map<String, dynamic>>> viewMembers(int circleId);
   Future<List<Map<String, dynamic>>> viewGroupMembers(int userId, int circleId);
-  Future<void> activeCircle(int circleId, bool isActive);
+  Future<void> activeCircle(int userId,int circleId, bool isActive);
 }

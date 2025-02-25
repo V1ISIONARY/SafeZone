@@ -215,8 +215,8 @@ class CircleImplementation extends CircleRepository {
       throw Exception('Failed to view group members');
     }
   }
-
-  Future<void> activeCircle(int circleId, bool isActive) async {
+  @override
+  Future<void> activeCircle(int userId,int circleId, bool isActive) async {
     try {
       final response = await http.patch(
         Uri.parse('$baseUrl/update_active_status'),
@@ -225,6 +225,7 @@ class CircleImplementation extends CircleRepository {
           'Accept': 'application/json'
         },
         body: jsonEncode({
+          'user_id' : userId,
           'circle_id': circleId,
           'is_active': isActive,
         }),

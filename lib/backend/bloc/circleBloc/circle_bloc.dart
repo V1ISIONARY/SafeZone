@@ -116,7 +116,7 @@ class CircleBloc extends Bloc<CircleEvent, CircleState> {
           circleId: event.circleId, isActive: event.isActive));
 
       try {
-        await _circleImplementation.activeCircle(
+        await _circleImplementation.activeCircle(event.userId,
             event.circleId, event.isActive);
         emit(CircleActiveChangedState(
             circleId: event.circleId, isActive: event.isActive));

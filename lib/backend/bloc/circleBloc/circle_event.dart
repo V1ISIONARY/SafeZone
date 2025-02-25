@@ -55,8 +55,9 @@ class ViewGroupMembersEvent extends CircleEvent {
 }
 
 class ChangeActiveEvent extends CircleEvent {
+  final int userId;
   final int circleId;
   final bool isActive;
 
-  ChangeActiveEvent({required this.circleId, required this.isActive});
+  ChangeActiveEvent({required this.userId,required this.circleId, required this.isActive});
 }
