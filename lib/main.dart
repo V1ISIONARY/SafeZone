@@ -4,9 +4,11 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:safezone/backend/apiservice/adminApi/safezoneApi/safezone_impl.dart';
 import 'package:safezone/backend/apiservice/adminApi/safezoneApi/safezone_repo.dart';
 import 'package:safezone/backend/apiservice/circleApi/circle_impl.dart';
+import 'package:safezone/backend/apiservice/notificationApi/notification_impl.dart';
 import 'package:safezone/backend/apiservice/profileApi/profile_impl.dart';
 import 'package:safezone/backend/bloc/adminBloc/safezone/safezone_admin_bloc.dart';
 import 'package:safezone/backend/bloc/circleBloc/circle_bloc.dart';
+import 'package:safezone/backend/bloc/notificationBloc/notification_bloc.dart';
 import 'package:safezone/backend/bloc/profileBloc/profile_bloc.dart';
 import 'package:safezone/backend/cubic/analytics.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -124,6 +126,9 @@ class MyApp extends StatelessWidget {
               ),
               BlocProvider(
                 create: (_) => ProfileBloc(ProfileImplementation()),
+              ),
+              BlocProvider(
+                create: (_) => NotificationBloc(NotificationImplementation()),
               ),
             ],
             child: MaterialApp.router(

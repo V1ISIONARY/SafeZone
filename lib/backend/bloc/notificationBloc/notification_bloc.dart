@@ -82,5 +82,19 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
             "Failed to load unread notifications count: ${e.toString()}"));
       }
     });
+    on<BroadcastNotification>((event, emit) async {
+      try {
+        bool success = await notificationRepository.broadcastNotification(
+            event.userId, event.title, event.message, event.type);
+        if (success) {
+          emit(NotificationBroadcasted());
+        } else {
+          emit(NotificationError("Failed to broadcast notification."));
+        }
+      } catch (e) {
+        emit(NotificationError(e.toString()));
+      }
+    });
+
   }
 }
