@@ -73,17 +73,24 @@ class CircleBloc extends Bloc<CircleEvent, CircleState> {
     });
 
     // Fetch members of a circle
-    on<FetchMembersEvent>((event, emit) async {
-      emit(CircleLoadingState());
-      try {
-        final members = await _circleImplementation.viewMembers(event.circleId);
-        print("Raw API Response: ${members}");
-        emit(CircleMembersLoadedState(members: members));
-      } catch (e) {
-        emit(CircleErrorState(
-            message: 'Error fetching members: ${e.toString()}'));
-      }
-    });
+on<FetchMembersEvent>((event, emit) async {
+  if (state is CircleLoadingState) {
+    print("FetchMembersEvent already in progress, skipping duplicate call.");
+    return;
+  }
+
+  emit(CircleLoadingState());
+  try {
+    final members = await _circleImplementation.viewMembers(event.circleId);
+    print("Fetched Members for Circle ID: ${event.circleId}");
+    print("Raw API Response: $event.circleId $event.circleId$event.circleId$event.circleId$event.circleId$event.circleId$event.circleId$event.circleId$event.circleId$event.circleId$event.circleId  $members");
+
+    emit(CircleMembersLoadedState(members: members));
+  } catch (e) {
+    emit(CircleErrorState(message: 'Error fetching members: ${e.toString()}'));
+  }
+});
+
 // Generate a circle code
     on<GenerateCodeEvent>((event, emit) async {
       emit(CircleLoadingState());

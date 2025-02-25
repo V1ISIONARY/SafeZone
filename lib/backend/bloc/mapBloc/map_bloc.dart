@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:safezone/backend/apiservice/circleApi/circle_repo.dart';
@@ -12,6 +14,7 @@ class MapBloc extends Bloc<MapPageEvent, MapState> {
   final DangerZoneRepository dangerZoneRepository;
   final CircleRepository circleRepository;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  Map<String, StreamSubscription<DocumentSnapshot>> _locationListeners = {};
 
   MapBloc({
     required this.safeZoneRepository,
@@ -29,7 +32,7 @@ class MapBloc extends Bloc<MapPageEvent, MapState> {
       // Fetch safe zones
       final safeZones = await safeZoneRepository.getVerifiedSafeZones();
       final SharedPreferences prefs = await SharedPreferences.getInstance();
-      final int userId = prefs.getInt('id') ?? 0;
+      final int userId = prefs.getInt('circle') ?? 0;
 
       // Fetch danger zones
       final dangerZones = await dangerZoneRepository.getVerifiedDangerZones();
@@ -44,41 +47,60 @@ class MapBloc extends Bloc<MapPageEvent, MapState> {
     }
   }
 
-  Future<void> _onListenForMemberLocations(
-      ListenForMemberLocations event, Emitter<MapState> emit) async {
-    print("Listening for members' location data...");
+Future<void> _onListenForMemberLocations(
+    ListenForMemberLocations event, Emitter<MapState> emit) async {
+  print("Starting to listen for members' location data...");
+  print("Event members: ${event.members}");
+  print("Current user ID: ${event.userId}");
 
-    try {
-      for (var member in event.members) {
-        String userId = member['user_id'].toString();
+  try {
+    for (var member in event.members) {
+      String userId = member['user_id'].toString();
+      print("Processing member: $userId");
 
-        if (userId == event.userId.toString()) {
-          print("Skipping current user: $userId");
-
-          continue;
-        }
-
-        _firestore
-            .collection('locations')
-            .doc(userId)
-            .snapshots()
-            .listen((documentSnapshot) {
-          if (documentSnapshot.exists) {
-            var data = documentSnapshot.data() as Map<String, dynamic>;
-
-            print("Real-time Firestore document data for user $userId: $data");
-
-            if (data.containsKey('latitude') && data.containsKey('longitude')) {
-              double latitude = double.parse(data['latitude'].toString());
-              double longitude = double.parse(data['longitude'].toString());
-
-              emit(MemberLocationUpdated(userId, latitude, longitude));
-            }
-          }
-        });
+      if (userId == event.userId.toString()) {
+        print("Skipping current user: $userId");
+        continue;
       }
-    } catch (e) {
-      emit(MapError(e.toString()));
+
+      if (_locationListeners.containsKey(userId)) {
+        print("Listener already exists for user: $userId, skipping duplicate.");
+        continue;
+      }
+
+      print("Setting up Firestore listener for user: $userId");
+
+      var subscription = _firestore
+          .collection('locations')
+          .doc(userId)
+          .snapshots()
+          .listen((documentSnapshot) {
+        if (documentSnapshot.exists) {
+          var data = documentSnapshot.data() as Map<String, dynamic>;
+          print("Received Firestore document data for user $userId: $data");
+
+          if (data.containsKey('latitude') && data.containsKey('longitude')) {
+            double latitude = double.parse(data['latitude'].toString());
+            double longitude = double.parse(data['longitude'].toString());
+
+            print(
+                "Updated location for user $userId -> Latitude: $latitude, Longitude: $longitude");
+
+            emit(MemberLocationUpdated(userId, latitude, longitude));
+          } else {
+            print("Missing latitude or longitude data for user $userId");
+          }
+        } else {
+          print("No Firestore document found for user $userId");
+        }
+      });
+
+      _locationListeners[userId] = subscription;
     }
+  } catch (e) {
+    print("Error in _onListenForMemberLocations: $e");
+    emit(MapError(e.toString()));
   }
+}
+
 }
