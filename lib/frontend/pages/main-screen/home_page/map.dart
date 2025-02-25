@@ -1,8 +1,9 @@
 import 'dart:async';
+import 'dart:ui' as ui;
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -25,7 +26,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'dart:convert';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Maps extends StatefulWidget {
   final String UserToken;
@@ -38,6 +38,7 @@ class Maps extends StatefulWidget {
 
 class _MapsState extends State<Maps> with TickerProviderStateMixin {
   List<Map<String, dynamic>> members = [];
+  Map<String, BitmapDescriptor> memberMarkers = {};
   Set<Marker> markers = {};
   Set<Circle> circles = {};
   Set<Marker> membersMarkers = {};
@@ -58,6 +59,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
   BitmapDescriptor? customMarker;
   BitmapDescriptor? customDangerZoneMarker;
   BitmapDescriptor? customSafeZoneMarker;
+  BitmapDescriptor? customMemberMarker;
 
   MapType _currentMapType = MapType.normal;
 
@@ -100,7 +102,6 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
     _createCustomMarker();
     print("Members list before fetching: $members");
 
-    // Fetch members' location data after userId is loaded
     _fetchLocation(); // This ensures that the user's location is updated before showing members
 
     _controller = AnimationController(
@@ -148,7 +149,6 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
       }
     });
 
-    // Start listening for location changes
     _startLocationUpdates();
   }
 
@@ -187,44 +187,6 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
             .add(ListenForMemberLocations(state.members, _userId!));
       }
     });
-  }
-
-  void _updateMemberMarker(String userId, double latitude, double longitude) {
-    setState(() {
-      markers.removeWhere((marker) => marker.markerId.value == "user_$userId");
-
-      markers.add(
-        Marker(
-          markerId: MarkerId("user_$userId"),
-          position: LatLng(latitude, longitude),
-          icon: customMarker ?? BitmapDescriptor.defaultMarker,
-          infoWindow: InfoWindow(title: 'User $userId'),
-        ),
-      );
-    });
-  }
-
-  Future<void> _createCustomMarker() async {
-    try {
-      customMarker =
-          await MarkerUtils.createCustomMarker(context, widgetPricolor);
-      customDangerZoneMarker = await MarkerUtils.resizeMarker(
-        'lib/resources/images/dangerzonee.png',
-        58,
-        86,
-      );
-      customSafeZoneMarker = await MarkerUtils.resizeMarker(
-        'lib/resources/images/safezone.png',
-        58,
-        86,
-      );
-
-      if (mounted) {
-        setState(() {});
-      }
-    } catch (e) {
-      print("Error loading markers: $e");
-    }
   }
 
   void _changeHintText() {
@@ -311,12 +273,6 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
     return position;
   }
 
-  void _updatePolylines(Set<Polyline> polylines) {
-    setState(() {
-      _polylines = polylines;
-    });
-  }
-
   Future<void> updateLocation(double latitude, double longitude) async {
     try {
       var response = await http.post(
@@ -342,6 +298,231 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
       print('$longitude');
       print('Error updating location: $e');
     }
+  }
+
+  void _startLocationUpdates() {
+    _positionStreamSubscription = Geolocator.getPositionStream(
+      locationSettings: const LocationSettings(
+        accuracy: LocationAccuracy.high,
+        distanceFilter: 10,
+      ),
+    ).listen((Position position) {
+      print(
+          "Location updated: Latitude: ${position.latitude}, Longitude: ${position.longitude}");
+
+      if (googleMapController != null) {
+        googleMapController!.animateCamera(CameraUpdate.newCameraPosition(
+          CameraPosition(
+            target: LatLng(position.latitude, position.longitude),
+            zoom: 14.0,
+          ),
+        ));
+
+        setState(() {
+          _currentUserLocation = LatLng(position.latitude, position.longitude);
+          markers.clear();
+          markers.add(Marker(
+            markerId: const MarkerId("My Location"),
+            position: _currentUserLocation!,
+            icon: customMarker ?? BitmapDescriptor.defaultMarker,
+            infoWindow: const InfoWindow(title: 'My Location'),
+          ));
+        });
+
+        updateLocation(position.latitude, position.longitude);
+      }
+    });
+  }
+
+  // MARKERS
+
+  Future<void> _createCustomMarker() async {
+    try {
+      customMarker =
+          await MarkerUtils.createCustomMarker(context, widgetPricolor);
+      customDangerZoneMarker = await MarkerUtils.resizeMarker(
+        'lib/resources/images/dangerzonee.png',
+        58,
+        86,
+      );
+      customSafeZoneMarker = await MarkerUtils.resizeMarker(
+        'lib/resources/images/safezone.png',
+        58,
+        86,
+      );
+
+      if (mounted) {
+        setState(() {});
+      }
+    } catch (e) {
+      print("Error loading markers: $e");
+    }
+  }
+
+  Future<void> _preloadMemberMarkers(List<Map<String, dynamic>> members) async {
+    for (var member in members) {
+      String userId = member['user_id'].toString();
+      BitmapDescriptor marker = await _loadCustomMemberMarker(userId);
+      memberMarkers[userId] = marker;
+    }
+  }
+
+  void _updateMemberMarker(
+      String userId, double latitude, double longitude) async {
+    setState(() {
+      markers.removeWhere((marker) => marker.markerId.value == "user_$userId");
+
+      markers.add(
+        Marker(
+          markerId: MarkerId("user_$userId"),
+          position: LatLng(latitude, longitude),
+          icon: customMemberMarker!,
+          infoWindow: InfoWindow(title: 'User $userId'),
+        ),
+      );
+    });
+  }
+
+  Future<BitmapDescriptor> _loadCustomMemberMarker(String letter) async {
+    ByteData data =
+        await rootBundle.load('lib/resources/images/member_icon1.png');
+    ui.Codec codec = await ui.instantiateImageCodec(
+      data.buffer.asUint8List(),
+      targetWidth: 100,
+      targetHeight: 110,
+    );
+    ui.FrameInfo frameInfo = await codec.getNextFrame();
+    ui.Image originalImage = frameInfo.image;
+
+    final ui.PictureRecorder pictureRecorder = ui.PictureRecorder();
+    final Canvas canvas = Canvas(pictureRecorder);
+    final Paint paint = Paint();
+
+    canvas.drawImage(originalImage, const Offset(0, 0), paint);
+
+    final TextPainter textPainter = TextPainter(
+      text: TextSpan(
+        text: letter,
+        style: const TextStyle(
+          color: ui.Color.fromARGB(255, 71, 71, 71),
+          fontSize: 100 * 0.4,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      textDirection: TextDirection.ltr,
+    );
+    textPainter.layout();
+
+    double dx = (100 - textPainter.width) / 2;
+    double dy = (110 - textPainter.height) / 2 - (110 * 0.1);
+
+    textPainter.paint(canvas, Offset(dx, dy));
+
+    final ui.Image finalImage =
+        await pictureRecorder.endRecording().toImage(100, 110);
+
+    ByteData? byteData =
+        await finalImage.toByteData(format: ui.ImageByteFormat.png);
+    Uint8List resizedData = byteData!.buffer.asUint8List();
+
+    return BitmapDescriptor.fromBytes(resizedData);
+  }
+
+  Set<Marker> _createMarkers(MapState state) {
+    Set<Marker> markers = {};
+
+    if (_currentUserLocation != null) {
+      markers.add(
+        Marker(
+          markerId: const MarkerId("My Location"),
+          position: _currentUserLocation!,
+          icon: customMarker ?? BitmapDescriptor.defaultMarker,
+          infoWindow: const InfoWindow(title: 'My Location'),
+        ),
+      );
+    }
+
+    if (state is MapDataLoaded) {
+      markers.clear();
+      circles.clear();
+      for (var member in state.members) {
+        String userId = member['user_id'].toString();
+        double latitude = member['latitude'];
+        double longitude = member['longitude'];
+
+        BitmapDescriptor? memberMarker = memberMarkers[userId];
+
+        markers.add(
+          Marker(
+            markerId: MarkerId(userId),
+            position: LatLng(latitude, longitude),
+            icon: memberMarker ?? BitmapDescriptor.defaultMarker,
+            infoWindow: InfoWindow(title: 'User $userId'),
+          ),
+        );
+      }
+
+      for (var dangerZone in state.dangerZones) {
+        markers.add(
+          Marker(
+            markerId: MarkerId(dangerZone.id.toString()),
+            icon: customDangerZoneMarker ?? BitmapDescriptor.defaultMarker,
+            position: LatLng(dangerZone.latitude, dangerZone.longitude),
+            infoWindow: InfoWindow(
+              title: dangerZone.name,
+            ),
+          ),
+        );
+        circles.add(
+          Circle(
+            circleId: CircleId(dangerZone.id.toString()),
+            center: LatLng(dangerZone.latitude, dangerZone.longitude),
+            radius: dangerZone.radius,
+            strokeWidth: 1,
+            strokeColor: Colors.transparent,
+            fillColor: Colors.red.withOpacity(0.1),
+          ),
+        );
+      }
+
+      _safeZones = state.safeZones
+          .map((safeZone) => LatLng(safeZone.latitude!, safeZone.longitude!))
+          .toList();
+
+      for (var safeZone in state.safeZones) {
+        markers.add(
+          Marker(
+            markerId: MarkerId(safeZone.id.toString()),
+            icon: customSafeZoneMarker ?? BitmapDescriptor.defaultMarker,
+            position: LatLng(safeZone.latitude!, safeZone.longitude!),
+            infoWindow: InfoWindow(
+              title: safeZone.name,
+              snippet: "${safeZone.radius}",
+            ),
+          ),
+        );
+        circles.add(
+          Circle(
+            circleId: CircleId(safeZone.id.toString()),
+            center: LatLng(safeZone.latitude!, safeZone.longitude!),
+            radius: safeZone.radius!,
+            strokeWidth: 1,
+            strokeColor: Colors.transparent,
+            fillColor: Colors.green.withOpacity(0.1),
+          ),
+        );
+      }
+    }
+
+    return markers;
+  }
+
+  // FINDING ROUTE TO SAFEZONE
+
+  void _updatePolylines(Set<Polyline> polylines) {
+    setState(() {
+      _polylines = polylines;
+    });
   }
 
   void _findRoute() {
@@ -382,41 +563,6 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
     );
   }
 
-  // Start listening to location changes
-  void _startLocationUpdates() {
-    _positionStreamSubscription = Geolocator.getPositionStream(
-      locationSettings: const LocationSettings(
-        accuracy: LocationAccuracy.high,
-        distanceFilter: 10,
-      ),
-    ).listen((Position position) {
-      print(
-          "Location updated: Latitude: ${position.latitude}, Longitude: ${position.longitude}");
-
-      if (googleMapController != null) {
-        googleMapController!.animateCamera(CameraUpdate.newCameraPosition(
-          CameraPosition(
-            target: LatLng(position.latitude, position.longitude),
-            zoom: 14.0,
-          ),
-        ));
-
-        setState(() {
-          _currentUserLocation = LatLng(position.latitude, position.longitude);
-          markers.clear();
-          markers.add(Marker(
-            markerId: const MarkerId("My Location"),
-            position: _currentUserLocation!,
-            icon: customMarker ?? BitmapDescriptor.defaultMarker,
-            infoWindow: const InfoWindow(title: 'My Location'),
-          ));
-        });
-
-        updateLocation(position.latitude, position.longitude);
-      }
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -429,7 +575,6 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
             BlocListener<MapBloc, MapState>(
               listener: (context, state) {
                 if (state is MemberLocationUpdated) {
-                  // Update the marker for the specific user
                   print("iz changingggggg");
                   _updateMemberMarker(
                       state.userId, state.latitude, state.longitude);
@@ -445,100 +590,17 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                       ),
                     );
                   } else if (state is MapDataLoaded) {
-                    markers.clear();
-                    circles.clear();
-                    if (_currentUserLocation != null) {
-                      markers.add(
-                        Marker(
-                          markerId: const MarkerId("My Location"),
-                          position: _currentUserLocation!,
-                          icon: customMarker ?? BitmapDescriptor.defaultMarker,
-                          infoWindow: const InfoWindow(title: 'My Location'),
-                        ),
-                      );
-                    }
-                    for (var member in state.members) {
-                      markers.add(
-                        Marker(
-                          markerId: MarkerId(member['user_id'].toString()),
-                          position:
-                              LatLng(member['latitude'], member['longitude']),
-                          icon: BitmapDescriptor.defaultMarker,
-                          infoWindow:
-                              InfoWindow(title: 'User ${member['user_id']}'),
-                        ),
-                      );
-                    }
-
-                    for (var dangerZone in state.dangerZones) {
-                      markers.add(
-                        Marker(
-                          markerId: MarkerId(dangerZone.id.toString()),
-                          icon: customDangerZoneMarker ??
-                              BitmapDescriptor.defaultMarker,
-                          position:
-                              LatLng(dangerZone.latitude, dangerZone.longitude),
-                          infoWindow: InfoWindow(
-                            title: dangerZone.name,
-                          ),
-                        ),
-                      );
-                      circles.add(
-                        Circle(
-                          circleId: CircleId(dangerZone.id.toString()),
-                          center:
-                              LatLng(dangerZone.latitude, dangerZone.longitude),
-                          radius: dangerZone.radius,
-                          strokeWidth: 1,
-                          strokeColor: Colors.transparent,
-                          fillColor: Colors.red.withOpacity(0.1),
-                        ),
-                      );
-                    }
-                    _safeZones = state.safeZones
-                        .map((safeZone) =>
-                            LatLng(safeZone.latitude!, safeZone.longitude!))
-                        .toList();
-
-                    for (var safeZone in state.safeZones) {
-                      markers.add(
-                        Marker(
-                          markerId: MarkerId(safeZone.id.toString()),
-                          icon: customSafeZoneMarker ??
-                              BitmapDescriptor.defaultMarker,
-                          position:
-                              LatLng(safeZone.latitude!, safeZone.longitude!),
-                          infoWindow: InfoWindow(
-                            title: safeZone.name,
-                            snippet: "${safeZone.radius}",
-                          ),
-                        ),
-                      );
-                      circles.add(
-                        Circle(
-                          circleId: CircleId(safeZone.id.toString()),
-                          center:
-                              LatLng(safeZone.latitude!, safeZone.longitude!),
-                          radius: safeZone.radius!,
-                          strokeWidth: 1,
-                          strokeColor: Colors.transparent,
-                          fillColor: Colors.green.withOpacity(0.1),
-                        ),
-                      );
-                    }
+                    _preloadMemberMarkers(state.members);
                   } else if (state is MapError) {
                     return Center(child: Text(state.message));
                   }
-
                   return GoogleMap(
                     initialCameraPosition: const CameraPosition(
                       target: sourceLocation,
                       zoom: 16.0,
                     ),
                     mapType: _currentMapType,
-                    // markers: _showMarkers ? {...markers, ...membersMarkers} : {},
-                    markers: _showMarkers ? markers : {},
-
+                    markers: _showMarkers ? _createMarkers(state) : {},
                     circles: circles,
                     polylines: _polylines,
                     onMapCreated: (GoogleMapController controller) async {
@@ -783,10 +845,10 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                           ),
                         ],
                       ),
-                      child: Center(
+                      child: const Center(
                         child: Text(
-                          "Show Nearest Safe Zone", // Keep the text constant
-                          style: const TextStyle(
+                          "Show nearest safe zone", // Keep the text constant
+                          style: TextStyle(
                               color: labelFormFieldColor, fontSize: 11),
                         ),
                       ),
