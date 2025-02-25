@@ -17,7 +17,8 @@ class Unread extends StatefulWidget {
 }
 
 class _UnreadState extends State<Unread> {
-  List<NotificationModel> unreadNotifications = []; // Store unread notifications locally
+  List<NotificationModel> unreadNotifications =
+      []; // Store unread notifications locally
   int userId = 0; // Default userId
 
   @override
@@ -28,7 +29,8 @@ class _UnreadState extends State<Unread> {
 
   Future<void> _fetchUserIdAndNotifications() async {
     final prefs = await SharedPreferences.getInstance();
-    userId = prefs.getInt('id') ?? 0; // Get stored userId, default to 0 if not found
+    userId =
+        prefs.getInt('id') ?? 0; // Get stored userId, default to 0 if not found
 
     if (userId != 0) {
       context.read<NotificationBloc>().add(FetchNotifications(userId));
@@ -77,10 +79,25 @@ class _UnreadState extends State<Unread> {
               notification.createdAt,
               style: const TextStyle(color: Colors.grey, fontSize: 12),
             ),
+            onTap: () {
+              _markAsRead(notification);
+            },
           ),
         );
       },
     );
+  }
+
+  void _markAsRead(NotificationModel notification) {
+    final updatedNotification = notification.copyWith(isRead: true);
+
+    setState(() {
+      unreadNotifications.removeWhere((notif) => notif.id == notification.id);
+    });
+
+    context
+        .read<NotificationBloc>()
+        .add(MarkNotificationAsRead(updatedNotification.id));
   }
 
   Widget _buildPlaceholder() {
@@ -122,7 +139,7 @@ class _UnreadState extends State<Unread> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.error, color: Colors.red, size: 50),
+          const Icon(Icons.error, color: Colors.red, size: 50),
           const SizedBox(height: 10),
           Text(
             "Error: $message",

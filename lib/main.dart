@@ -30,10 +30,10 @@ import 'package:safezone/backend/bloc/authBloc/auth_bloc.dart';
 import 'package:safezone/app_routes.dart';
 import 'package:safezone/resources/schema/app_theme.dart';
 import 'firebase_options.dart';
+import 'package:awesome_notifications/awesome_notifications.dart';
 
 void main() async {
-  WidgetsFlutterBinding
-      .ensureInitialized(); // Ensures that all widgets are properly initialized
+  WidgetsFlutterBinding.ensureInitialized();
 
   // Initialize SharedPreferences and dotenv
   final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -44,9 +44,32 @@ void main() async {
 
   // Initialize Firebase
   await Firebase.initializeApp(
-    options: DefaultFirebaseOptions
-        .currentPlatform, // Use the generated options here
+    options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  // Initialize Awesome Notifications
+  await AwesomeNotifications().initialize(
+    null, // Change to your app icon
+    [
+      NotificationChannel(
+        channelKey: 'alerts',
+        channelName: 'Alerts',
+        channelDescription: 'Notification channel for alerts',
+        defaultColor: const Color(0xFF9D50DD),
+        ledColor: Colors.white,
+        importance: NotificationImportance.Max,
+        playSound: true,
+      ),
+    ],
+    debug: true, // Set to false in production
+  );
+
+  // Request notification permissions
+  await AwesomeNotifications().isNotificationAllowed().then((isAllowed) {
+    if (!isAllowed) {
+      AwesomeNotifications().requestPermissionToSendNotifications();
+    }
+  });
 
   runApp(MyApp(isFirstRun: isFirstRun));
 }
@@ -57,9 +80,30 @@ class MyApp extends StatelessWidget {
   const MyApp({super.key, required this.isFirstRun});
 
   Future<void> _initializeApp() async {
-    // You can add additional initialization logic here if necessary
     await Firebase.initializeApp();
     await dotenv.load(fileName: ".env");
+  }
+
+  // Function to trigger a test notification
+  Future<void> _sendTestNotification() async {
+    // Check if notifications are allowed
+    bool isAllowed = await AwesomeNotifications().isNotificationAllowed();
+
+    if (!isAllowed) {
+      // Request permission to send notifications
+      await AwesomeNotifications().requestPermissionToSendNotifications();
+    }
+
+    // Create the notification after permission is granted
+    await AwesomeNotifications().createNotification(
+      content: NotificationContent(
+        id: 10,
+        channelKey: 'alerts',
+        title: 'Welcome to SafeZone!',
+        body: 'This is a test notification.',
+        notificationLayout: NotificationLayout.Default,
+      ),
+    );
   }
 
   @override
@@ -67,69 +111,53 @@ class MyApp extends StatelessWidget {
     return FutureBuilder(
       future: _initializeApp(),
       builder: (context, snapshot) {
-        // Show loading spinner while Firebase is initializing
         if (snapshot.connectionState == ConnectionState.waiting) {
           return MaterialApp(
             home: Scaffold(
-              body:
-                  Center(child: CircularProgressIndicator()), // Loading spinner
+              body: Center(child: CircularProgressIndicator()),
             ),
           );
         } else if (snapshot.hasError) {
-          // Display error if initialization fails
           return MaterialApp(
             home: Scaffold(
               body: Center(child: Text('Error loading app: ${snapshot.error}')),
             ),
           );
         } else {
-          // Once initialized, show the app
+          // Trigger the notification test after app initialization
+          _sendTestNotification();
+
           return MultiBlocProvider(
             providers: [
               BlocProvider(
-                create: (_) =>
-                    AuthenticationBloc(AuthenticationImplementation()),
-              ),
+                  create: (_) =>
+                      AuthenticationBloc(AuthenticationImplementation())),
+              BlocProvider(create: (_) => ContactBloc(ContactImplementation())),
+              BlocProvider(create: (_) => NotificationCubit()),
+              BlocProvider(create: (_) => AnalyticsCubic()),
               BlocProvider(
-                create: (_) => ContactBloc(ContactImplementation()),
-              ),
+                  create: (_) => IncidentReportBloc(IncidentRepositoryImpl())),
               BlocProvider(
-                create: (_) => NotificationCubit(),
-              ),
+                  create: (_) => DangerZoneBloc(
+                      dangerZoneRepository: DangerZoneRepositoryImpl())
+                    ..add(FetchDangerZones())),
               BlocProvider(
-                create: (_) => AnalyticsCubic(),
-              ),
+                  create: (_) => SafeZoneBloc(
+                      safeZoneRepository: SafeZoneRepositoryImpl())),
               BlocProvider(
-                create: (_) => IncidentReportBloc(IncidentRepositoryImpl()),
-              ),
+                  create: (_) => MapBloc(
+                      safeZoneRepository: SafeZoneRepositoryImpl(),
+                      dangerZoneRepository: DangerZoneRepositoryImpl(),
+                      circleRepository: CircleImplementation())
+                    ..add(FetchMapData())),
               BlocProvider(
-                create: (_) => DangerZoneBloc(
-                    dangerZoneRepository: DangerZoneRepositoryImpl())
-                  ..add(FetchDangerZones()),
-              ),
+                  create: (_) =>
+                      SafeZoneAdminBloc(SafezoneAdminRepositoryImpl())),
+              BlocProvider(create: (_) => CircleBloc(CircleImplementation())),
+              BlocProvider(create: (_) => ProfileBloc(ProfileImplementation())),
               BlocProvider(
-                create: (_) =>
-                    SafeZoneBloc(safeZoneRepository: SafeZoneRepositoryImpl()),
-              ),
-              BlocProvider(
-                create: (_) => MapBloc(
-                    safeZoneRepository: SafeZoneRepositoryImpl(),
-                    dangerZoneRepository: DangerZoneRepositoryImpl(),
-                    circleRepository: CircleImplementation())
-                  ..add(FetchMapData()),
-              ),
-              BlocProvider(
-                create: (_) => SafeZoneAdminBloc(SafezoneAdminRepositoryImpl()),
-              ),
-              BlocProvider(
-                create: (_) => CircleBloc(CircleImplementation()),
-              ),
-              BlocProvider(
-                create: (_) => ProfileBloc(ProfileImplementation()),
-              ),
-              BlocProvider(
-                create: (_) => NotificationBloc(NotificationImplementation()),
-              ),
+                  create: (_) =>
+                      NotificationBloc(NotificationImplementation())),
             ],
             child: MaterialApp.router(
               debugShowCheckedModeBanner: false,

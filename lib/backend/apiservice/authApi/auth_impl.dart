@@ -1,5 +1,6 @@
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
+import 'package:safezone/backend/bloc/notificationBloc/notification_polling.dart';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:safezone/backend/apiservice/authApi/auth_repo.dart';
@@ -7,14 +8,13 @@ import 'package:safezone/backend/apiservice/authApi/auth_repo.dart';
 class AuthenticationImplementation extends AuthenticationRepository {
   // static const String baseUrl = '${VercelUrl.mainUrl}/user';
   final String baseUrl = "${dotenv.env['API_URL']}/user";
-
   @override
   Future<void> userLogin(String email, String password) async {
     final response = await http.post(
       Uri.parse('$baseUrl/login'),
       headers: {
         'Content-Type': 'application/json',
-        'Accept': 'application/json'
+        'Accept': 'application/json',
       },
       body: jsonEncode({
         'email': email,
@@ -38,6 +38,7 @@ class AuthenticationImplementation extends AuthenticationRepository {
       await prefs.setInt('circle', data['profile']['active_circle'] ?? 0);
 
       print("Login successful, data saved to SharedPreferences");
+
       viewSharedPreferences();
     } else {
       final errorMessage = jsonDecode(response.body)['error'];

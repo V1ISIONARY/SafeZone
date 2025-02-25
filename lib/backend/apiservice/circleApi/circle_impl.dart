@@ -151,6 +151,12 @@ class CircleImplementation extends CircleRepository {
 
   @override
   Future<List<Map<String, dynamic>>> viewMembers(int circleId) async {
+    // Check if circleId is 0, and don't call the API if it is
+    if (circleId == 0) {
+      print("Circle ID is 0, not making the API call.");
+      return []; // Return an empty list or handle accordingly
+    }
+
     final response = await http.get(
       Uri.parse('$baseUrl/view_members?circle_id=$circleId'),
       headers: {
@@ -161,14 +167,6 @@ class CircleImplementation extends CircleRepository {
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
-      print(circleId);
-      print(circleId);
-      print(circleId);
-      print(circleId);
-      print(circleId);
-      print(circleId);
-      print(circleId);
-      
       print("Raw API Response (impl): $data");
 
       if (data.containsKey('members') && data['members'] is List) {
@@ -223,8 +221,9 @@ class CircleImplementation extends CircleRepository {
       throw Exception('Failed to view group members');
     }
   }
+
   @override
-  Future<void> activeCircle(int userId,int circleId, bool isActive) async {
+  Future<void> activeCircle(int userId, int circleId, bool isActive) async {
     try {
       final response = await http.patch(
         Uri.parse('$baseUrl/update_active_status'),
@@ -233,7 +232,7 @@ class CircleImplementation extends CircleRepository {
           'Accept': 'application/json'
         },
         body: jsonEncode({
-          'user_id' : userId,
+          'user_id': userId,
           'circle_id': circleId,
           'is_active': isActive,
         }),

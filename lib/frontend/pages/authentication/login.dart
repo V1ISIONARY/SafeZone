@@ -7,9 +7,11 @@ import 'package:page_transition/page_transition.dart';
 import 'package:safezone/backend/bloc/authBloc/auth_bloc.dart';
 import 'package:safezone/backend/bloc/authBloc/auth_event.dart';
 import 'package:safezone/backend/bloc/authBloc/auth_state.dart';
+import 'package:safezone/backend/bloc/notificationBloc/notification_polling.dart';
 import 'package:safezone/frontend/pages/authentication/register.dart';
 import 'package:safezone/frontend/widgets/bottom_navigation.dart';
 import 'package:safezone/resources/schema/colors.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../resources/schema/texts.dart';
 import '../../widgets/buttons/ovalBtn.dart';
@@ -24,7 +26,8 @@ class Login extends StatefulWidget {
 class _LoginState extends State<Login> {
   bool _passwordVisible = false;
   bool _rememberMe = false;
-
+  final NotificationPollingService _pollingService =
+      NotificationPollingService();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
@@ -74,7 +77,11 @@ class _LoginState extends State<Login> {
                   RichText(
                     text: TextSpan(
                       text: 'Welcome Back To ',
-                      style: TextStyle(fontSize: 20, color: Colors.black, fontWeight: FontWeight.w600, letterSpacing: 1),
+                      style: TextStyle(
+                          fontSize: 20,
+                          color: Colors.black,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 1),
                       children: [
                         TextSpan(
                           text: 'SafeZone',
@@ -114,10 +121,9 @@ class _LoginState extends State<Login> {
                     decoration: InputDecoration(
                       hintText: "safezone@gmail.com",
                       hintStyle: TextStyle(
-                        fontSize: 13,
-                        color: labelFormFieldColor,
-                        fontWeight: FontWeight.w200
-                      ),
+                          fontSize: 13,
+                          color: labelFormFieldColor,
+                          fontWeight: FontWeight.w200),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
@@ -128,8 +134,7 @@ class _LoginState extends State<Login> {
                       filled: true,
                       fillColor: Colors.grey[100],
                       contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 15, vertical: 12
-                      ),
+                          horizontal: 15, vertical: 12),
                     ),
                   ),
                   const SizedBox(height: 10),
@@ -153,10 +158,9 @@ class _LoginState extends State<Login> {
                     decoration: InputDecoration(
                       hintText: "hsl******",
                       hintStyle: TextStyle(
-                        fontSize: 13,
-                        color: labelFormFieldColor,
-                        fontWeight: FontWeight.w200
-                      ),
+                          fontSize: 13,
+                          color: labelFormFieldColor,
+                          fontWeight: FontWeight.w200),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
@@ -235,37 +239,37 @@ class _LoginState extends State<Login> {
                   ),
                   const SizedBox(height: 100),
                   Container(
-                    height: 50,
-                    width: double.infinity,
-                    margin: EdgeInsets.symmetric(vertical: 40, horizontal: 20),
-                    child: GestureDetector(
-                      onTap: () {
-                        final email = emailController.text;
-                        final password = passwordController.text;
+                      height: 50,
+                      width: double.infinity,
+                      margin:
+                          EdgeInsets.symmetric(vertical: 40, horizontal: 20),
+                      child: GestureDetector(
+                        onTap: () {
+                          final email = emailController.text;
+                          final password = passwordController.text;
 
-                        context.read<AuthenticationBloc>().add(
-                          UserLogin(email, password),
-                        );
-                      },
-                      child: Container(
-                        height: 50,
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          color: widgetPricolor,
-                          borderRadius: BorderRadius.circular(50),
-                        ),
-                        child: Center(
-                          child: Text(
-                            'Sign In', 
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.white,
+                          context.read<AuthenticationBloc>().add(
+                                UserLogin(email, password),
+                              );
+                        },
+                        child: Container(
+                          height: 50,
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            color: widgetPricolor,
+                            borderRadius: BorderRadius.circular(50),
+                          ),
+                          child: Center(
+                            child: Text(
+                              'Sign In',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.white,
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    )
-                  ),
+                      )),
                   Container(
                     width: double.infinity,
                     margin: EdgeInsets.symmetric(horizontal: 20),
@@ -309,8 +313,19 @@ class _LoginState extends State<Login> {
                     ),
                   ),
                   BlocListener<AuthenticationBloc, AuthenticationState>(
-                    listener: (context, state) {
+                    listener: (context, state) async {
                       if (state is LoginSuccess) {
+                        // Once login is successful, navigate and start polling
+                        final SharedPreferences prefs =
+                            await SharedPreferences.getInstance();
+                        int userId = prefs.getInt('id') ?? 0;
+
+                        if (userId != 0) {
+                          int intervalInSeconds = 10;
+                          _pollingService.startPolling(
+                              userId, intervalInSeconds);
+                        }
+
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(

@@ -28,7 +28,8 @@ class _AllState extends State<All> {
 
   Future<void> _fetchUserIdAndNotifications() async {
     final prefs = await SharedPreferences.getInstance();
-    userId = prefs.getInt('id') ?? 0; // Get stored userId, default to 0 if not found
+    userId =
+        prefs.getInt('id') ?? 0; // Get stored userId, default to 0 if not found
 
     if (userId != 0) {
       context.read<NotificationBloc>().add(FetchNotifications(userId));
@@ -39,7 +40,6 @@ class _AllState extends State<All> {
     print(userId);
     print(userId);
     print(userId);
-    
   }
 
   @override
@@ -69,6 +69,7 @@ class _AllState extends State<All> {
       itemCount: notifications.length,
       itemBuilder: (context, index) {
         final notification = notifications[index];
+
         return Card(
           margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           child: ListTile(
@@ -81,6 +82,20 @@ class _AllState extends State<All> {
               notification.createdAt,
               style: const TextStyle(color: Colors.grey, fontSize: 12),
             ),
+            onTap: () {
+              if (!notification.isRead) {
+                // Dispatch event to mark notification as read
+                context
+                    .read<NotificationBloc>()
+                    .add(MarkNotificationAsRead(notification.id));
+
+                // Update local UI immediately
+                setState(() {
+                  notifications[index] = notification.copyWith(isRead: true);
+                });
+              }
+              // Perform any additional actions when tapped
+            },
           ),
         );
       },

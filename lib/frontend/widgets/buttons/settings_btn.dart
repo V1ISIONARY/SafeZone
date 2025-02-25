@@ -17,67 +17,79 @@ class Settingsbtn extends StatelessWidget {
   final String svgIcon;
   final String navigateTo;
   final String description;
+  final VoidCallback onTap; // Add this for custom onTap functionality
 
-  const Settingsbtn(
-      {super.key,
-      required this.title,
-      required this.svgIcon,
-      required this.navigateTo,
-      required this.description});
+  const Settingsbtn({
+    super.key,
+    required this.title,
+    required this.svgIcon,
+    required this.navigateTo,
+    required this.description,
+    required this.onTap, // Add onTap to constructor
+  });
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-        onTap: () {
-          Navigator.push(
-              context,
-              PageTransition(
-                  child: _getPageForNavigation(navigateTo),
-                  type: PageTransitionType.rightToLeft,
-                  duration: Duration(milliseconds: 200)));
-        },
-        child: Container(
-            width: double.infinity,
-            color: Colors.white,
-            margin: const EdgeInsets.symmetric(vertical: 15),
-            child: Stack(
+      onTap: () {
+        onTap(); // Call the custom onTap function
+
+        Navigator.push(
+          context,
+          PageTransition(
+            child: _getPageForNavigation(navigateTo),
+            type: PageTransitionType.rightToLeft,
+            duration: Duration(milliseconds: 200),
+          ),
+        );
+      },
+      child: Container(
+        width: double.infinity,
+        color: Colors.white,
+        margin: const EdgeInsets.symmetric(vertical: 15),
+        child: Stack(
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
+                Container(
+                  height: 25,
+                  width: 25,
+                  margin: EdgeInsets.only(right: 17),
+                  child: SvgPicture.asset(
+                    svgIcon,
+                    color: const Color.fromARGB(179, 0, 0, 0),
+                  ),
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                        height: 25,
-                        width: 25,
-                        margin: EdgeInsets.only(right: 17),
-                        child: SvgPicture.asset(
-                          svgIcon,
-                          color: const Color.fromARGB(179, 0, 0, 0),
-                        )),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        PrimaryText(text: title),
-                        DescriptionText(
-                          text: description,
-                        )
-                      ],
-                    )
+                    PrimaryText(text: title),
+                    DescriptionText(
+                      text: description,
+                    ),
                   ],
                 ),
-                Positioned(
-                    right: -10,
-                    top: 5,
-                    bottom: 5,
-                    child: Container(
-                        height: 20,
-                        width: 20,
-                        margin: EdgeInsets.only(right: 17),
-                        child: SvgPicture.asset(
-                          'lib/resources/svg/proceed.svg',
-                          color: const Color.fromARGB(179, 0, 0, 0),
-                        )))
               ],
-            )));
+            ),
+            Positioned(
+              right: -10,
+              top: 5,
+              bottom: 5,
+              child: Container(
+                height: 20,
+                width: 20,
+                margin: EdgeInsets.only(right: 17),
+                child: SvgPicture.asset(
+                  'lib/resources/svg/proceed.svg',
+                  color: const Color.fromARGB(179, 0, 0, 0),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   Widget _getPageForNavigation(String page) {

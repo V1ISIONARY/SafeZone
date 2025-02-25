@@ -169,15 +169,19 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     int? userId = prefs.getInt('id');
     int? circleId = prefs.getInt('circle');
+
     if (userId != null) {
       setState(() {
         _userId = userId;
       });
 
+      // Only call FetchMembersEvent if circleId is not null or 0
       if (circleId != null) {
         context.read<CircleBloc>().add(FetchMembersEvent(circleId: circleId));
       }
     }
+
+    // Listen for the CircleBloc state changes
     context.read<CircleBloc>().stream.listen((state) {
       if (state is CircleMembersLoadedState) {
         context.read<MapBloc>().add(FetchMapData());
