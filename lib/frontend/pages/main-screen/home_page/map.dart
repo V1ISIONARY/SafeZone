@@ -398,7 +398,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
 
   Future<BitmapDescriptor> _loadCustomMemberMarker(String letter) async {
     ByteData data =
-        await rootBundle.load('lib/resources/images/member_icon1.png');
+        await rootBundle.load('lib/resources/images/marker_member.png');
     ui.Codec codec = await ui.instantiateImageCodec(
       data.buffer.asUint8List(),
       targetWidth: 100,
