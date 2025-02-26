@@ -1,4 +1,3 @@
-// ignore_for_file: prefer_const_constructors, unused_element
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -20,20 +19,27 @@ class Settings extends StatefulWidget {
 
 class _SettingsState extends State<Settings> {
   bool isToggled = false;
-
   int selectedItem = 0;
+
+  Future<String> _getUserName() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final firstName = prefs.getString('first_name') ?? '';
+    final lastName = prefs.getString('last_name') ?? '';
+
+    // Capitalize the first letter and make the rest lowercase
+    final formattedFirstName = firstName.isNotEmpty
+        ? firstName[0].toUpperCase() + firstName.substring(1).toLowerCase()
+        : '';
+    final formattedLastName = lastName.isNotEmpty
+        ? lastName[0].toUpperCase() + lastName.substring(1).toLowerCase()
+        : '';
+
+    return '$formattedFirstName $formattedLastName'.trim();
+  }
 
   void onItemTap(int index) {
     setState(() {
       selectedItem = index;
-    });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      // _showSnackBar();
     });
   }
 
@@ -124,33 +130,67 @@ class _SettingsState extends State<Settings> {
                                                                   .white70),
                                                     ),
                                                   ])
-                                            : Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                    Text(
-                                                      'Louise Romero',
+                                            : FutureBuilder<String>(
+                                                future: _getUserName(),
+                                                builder: (context, snapshot) {
+                                                  if (snapshot
+                                                          .connectionState ==
+                                                      ConnectionState.waiting) {
+                                                    return Text(
+                                                      'Loading...',
                                                       style:
                                                           GoogleFonts.poppins(
-                                                              fontSize: 15,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w500,
-                                                              color:
-                                                                  Colors.white),
-                                                    ),
-                                                    Text(
-                                                      '(+63) 970 815 2371',
+                                                        fontSize: 15,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        color: Colors.white,
+                                                      ),
+                                                    );
+                                                  } else if (snapshot
+                                                      .hasError) {
+                                                    return Text(
+                                                      'Error loading name',
                                                       style:
                                                           GoogleFonts.poppins(
-                                                              fontSize: 9,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w400,
-                                                              color: Colors
-                                                                  .white70),
-                                                    ),
-                                                  ])
+                                                        fontSize: 15,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        color: Colors.white,
+                                                      ),
+                                                    );
+                                                  } else {
+                                                    return Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Text(
+                                                          snapshot.data ??
+                                                              'Unknown User',
+                                                          style: GoogleFonts
+                                                              .poppins(
+                                                            fontSize: 15,
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                            color: Colors.white,
+                                                          ),
+                                                        ),
+                                                        Text(
+                                                          '(+63) 970 815 2371',
+                                                          style: GoogleFonts
+                                                              .poppins(
+                                                            fontSize: 9,
+                                                            fontWeight:
+                                                                FontWeight.w400,
+                                                            color:
+                                                                Colors.white70,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    );
+                                                  }
+                                                },
+                                              )
                                       ],
                                     )),
                                 Positioned(
@@ -399,14 +439,6 @@ class _SettingsState extends State<Settings> {
                     navigateTo: 'Login',
                     description: 'Hello love GoodBye',
                     onTap: () async {
-                      print("12313123213123123");
-                      print("12313123213123123");
-                      print("12313123213123123");
-                      print("12313123213123123");
-                      print("12313123213123123");
-                      print("12313123213123123");
-                      print("12313123213123123");
-                      print("12313123213123123");
                       NotificationPollingService().stopPolling();
 
                       // Clear the SharedPreferences
@@ -440,27 +472,6 @@ class _SettingsState extends State<Settings> {
         ),
       ),
     );
-  }
-
-  void _showSnackBar() {
-    final snackBar = SnackBar(
-      content: Text(
-        'You need to sign in to access all feature.',
-        style: TextStyle(color: Colors.white),
-      ),
-      duration: Duration(seconds: 5),
-      behavior: SnackBarBehavior.floating, // Allows movement via margin
-      backgroundColor: widgetPricolor,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10),
-      ),
-      margin: EdgeInsets.only(
-        bottom: 90, // Adjust this value to move it higher
-        left: 16,
-        right: 16,
-      ),
-    );
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
   Widget _buildItem(int index, String label, String imgStyle) {

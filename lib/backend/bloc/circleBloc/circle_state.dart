@@ -19,6 +19,12 @@ class CircleErrorState extends CircleState {
   CircleErrorState({required this.message});
 }
 
+class CircleAddMemberErrorState extends CircleState {
+  final String message;
+
+  CircleAddMemberErrorState({required this.message});
+}
+
 class CircleCreatedState extends CircleState {
   final CircleModel circle;
 

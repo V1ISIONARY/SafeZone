@@ -34,14 +34,14 @@ import 'package:safezone/frontend/pages/main-screen/sos_page/sos_countdown.dart'
 import 'package:safezone/frontend/pages/main-screen/sos_page/sos_success.dart';
 import 'package:safezone/frontend/widgets/bottom_navigation.dart';
 
-GoRouter appRouter(bool isFirstRun) => GoRouter(
+GoRouter appRouter(bool isFirstRun, String? userToken) => GoRouter(
       initialLocation: '/',
       routes: [
         GoRoute(
           path: '/',
           builder: (context, state) => isFirstRun
               ? const SplashScreen()
-              : const BottomNavigationWidget(userToken: 'guess'),
+              : BottomNavigationWidget(userToken: userToken ?? 'guess'),
         ),
         // // GoRoute(
         // //   path: '/',
@@ -50,7 +50,7 @@ GoRouter appRouter(bool isFirstRun) => GoRouter(
         GoRoute(
           path: '/home',
           builder: (context, state) =>
-              const BottomNavigationWidget(userToken: 'guess'),
+              BottomNavigationWidget(userToken: userToken ?? 'guess'),
         ),
 
         GoRoute(

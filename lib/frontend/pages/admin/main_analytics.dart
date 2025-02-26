@@ -6,7 +6,7 @@ import 'package:safezone/frontend/pages/admin/admin_dangerzones.dart';
 import 'package:safezone/frontend/pages/admin/admin_initial_screen.dart';
 import 'package:safezone/frontend/pages/admin/admin_rejected.dart';
 import 'package:safezone/frontend/pages/admin/admin_reports.dart';
-import 'package:safezone/frontend/pages/admin/admin_reports_users.dart';
+import 'package:safezone/frontend/pages/admin/admin_users.dart';
 import 'package:safezone/frontend/pages/admin/admin_safezones.dart';
 
 import '../../../resources/schema/colors.dart';
