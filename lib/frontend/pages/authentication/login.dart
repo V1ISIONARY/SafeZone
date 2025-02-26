@@ -1,8 +1,6 @@
 // ignore_for_file: prefer_const_constructors
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart'; // Import BLoC package
-import 'package:flutter_svg/svg.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:safezone/backend/bloc/authBloc/auth_bloc.dart';
 import 'package:safezone/backend/bloc/authBloc/auth_event.dart';
@@ -12,9 +10,6 @@ import 'package:safezone/frontend/pages/authentication/register.dart';
 import 'package:safezone/frontend/widgets/bottom_navigation.dart';
 import 'package:safezone/resources/schema/colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import '../../../resources/schema/texts.dart';
-import '../../widgets/buttons/ovalBtn.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});

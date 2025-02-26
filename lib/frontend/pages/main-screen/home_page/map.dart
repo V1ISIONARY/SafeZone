@@ -16,6 +16,9 @@ import 'package:safezone/backend/bloc/dangerzoneBloc/dangerzone_event.dart';
 import 'package:safezone/backend/bloc/mapBloc/map_bloc.dart';
 import 'package:safezone/backend/bloc/mapBloc/map_event.dart';
 import 'package:safezone/backend/bloc/mapBloc/map_state.dart';
+import 'package:safezone/backend/bloc/notificationBloc/notification_bloc.dart';
+import 'package:safezone/backend/bloc/notificationBloc/notification_event.dart';
+import 'package:safezone/backend/bloc/notificationBloc/notification_state.dart';
 import 'package:safezone/backend/services/first_run_service.dart';
 import 'package:safezone/frontend/utils/marker_utils.dart';
 import 'package:safezone/frontend/utils/safezone_navigator.dart';
@@ -55,6 +58,8 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
   bool _showMarkers = true;
   bool _showOptions = false;
   bool _isSafeZoneShown = false;
+  bool _wasInsideSafeZone = false;
+  bool _wasInsideDangerZone = false;
 
   BitmapDescriptor? customMarker;
   BitmapDescriptor? customDangerZoneMarker;
@@ -100,7 +105,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
     context.read<DangerZoneBloc>().add(FetchDangerZones());
     _checkFirstRun();
     _createCustomMarker().then((_) {
-      _fetchLocation(); 
+      _fetchLocation();
     });
     print("Members list before fetching: $members");
 
@@ -293,6 +298,8 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
 
       if (response.statusCode == 200) {
         print('Location updated successfully!');
+        print('$latitude');
+        print('$longitude');
       } else {
         print('Failed to update location');
       }
@@ -310,20 +317,22 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
         accuracy: LocationAccuracy.high,
         distanceFilter: 10,
       ),
-    ).listen((Position position) {
+    ).listen((Position position) async {
       print(
           "Location updated: Latitude: ${position.latitude}, Longitude: ${position.longitude}");
+
+      LatLng userLocation = LatLng(position.latitude, position.longitude);
 
       if (googleMapController != null) {
         googleMapController!.animateCamera(CameraUpdate.newCameraPosition(
           CameraPosition(
-            target: LatLng(position.latitude, position.longitude),
+            target: userLocation,
             zoom: 14.0,
           ),
         ));
 
         setState(() {
-          _currentUserLocation = LatLng(position.latitude, position.longitude);
+          _currentUserLocation = userLocation;
           markers.clear();
           markers.add(Marker(
             markerId: const MarkerId("My Location"),
@@ -334,8 +343,74 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
         });
 
         updateLocation(position.latitude, position.longitude);
+
+        bool isInsideSafeZone = _isInsideZone(
+            userLocation,
+            circles
+                .where((circle) =>
+                    circle.fillColor == Colors.green.withOpacity(0.1))
+                .toList());
+        bool isInsideDangerZone = _isInsideZone(
+            userLocation,
+            circles
+                .where(
+                    (circle) => circle.fillColor == Colors.red.withOpacity(0.1))
+                .toList());
+
+        if (isInsideSafeZone && !_wasInsideSafeZone) {
+          _showZoneDialog("Safe Zone", "You have entered a safe zone.");
+          _sendBroadcastNotification("Group member - Safe Zone", " has entered a safe zone.");
+          _wasInsideSafeZone = true;
+        } else if (isInsideDangerZone && !_wasInsideDangerZone) {
+          _showZoneDialog("Danger Zone",
+              "You have entered a danger zone. Please be cautious.");
+          _sendBroadcastNotification(
+              "Group member - Danger Zone", " has entered a danger zone. Please be cautious.");
+          _wasInsideDangerZone = true;
+        }
+
+        if (!isInsideSafeZone && _wasInsideSafeZone) {
+          _showZoneDialog("Safe Zone", "You have exited the safe zone.");
+          _sendBroadcastNotification("Group member - Safe Zone", " has exited the safe zone.");
+          _wasInsideSafeZone = false;
+        } else if (!isInsideDangerZone && _wasInsideDangerZone) {
+          _showZoneDialog("Danger Zone", "You have exited the danger zone.");
+          _sendBroadcastNotification(
+              "Group member - Danger Zone", " has exited the danger zone.");
+          _wasInsideDangerZone = false;
+        }
       }
     });
+  }
+
+  Future<void> _sendBroadcastNotification(String title, String message) async {
+    final prefs = await SharedPreferences.getInstance();
+    int userId = prefs.getInt('id') ?? 0;
+    String firstName = prefs.getString('first_name') ?? "User";
+    String lastName = prefs.getString('last_name') ?? "";
+
+    final formattedFirstName = firstName.isNotEmpty
+        ? firstName[0].toUpperCase() + firstName.substring(1).toLowerCase()
+        : '';
+    final formattedLastName = lastName.isNotEmpty
+        ? lastName[0].toUpperCase() + lastName.substring(1).toLowerCase()
+        : '';
+    String fullName = "$formattedFirstName $formattedLastName".trim();
+
+    if (userId != 0) {
+      context.read<NotificationBloc>().add(
+            BroadcastNotification(
+              userId,
+              title,
+              "$fullName $message",
+              "Zone Alert",
+            ),
+          );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Error: User ID not found!")),
+      );
+    }
   }
 
   // MARKERS
@@ -532,6 +607,44 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
     return markers;
   }
 
+  // TRIGGERS WHEN USER ENTERS OR EXITS A ZONE :>
+
+  bool _isInsideZone(LatLng userLocation, List<Circle> zones) {
+    for (var zone in zones) {
+      double distance = Geolocator.distanceBetween(
+        userLocation.latitude,
+        userLocation.longitude,
+        zone.center.latitude,
+        zone.center.longitude,
+      );
+
+      if (distance <= zone.radius) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  void _showZoneDialog(String title, String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title),
+          content: Text(message),
+          actions: <Widget>[
+            TextButton(
+              child: const Text("Oki"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   // FINDING ROUTE TO SAFEZONE
 
   void _updatePolylines(Set<Polyline> polylines) {
@@ -587,14 +700,32 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
         height: double.infinity,
         child: Stack(
           children: [
-            BlocListener<MapBloc, MapState>(
-              listener: (context, state) {
-                if (state is MemberLocationUpdated) {
-                  print("iz changingggggg");
-                  _updateMemberMarker(
-                      state.userId, state.latitude, state.longitude);
-                }
-              },
+            MultiBlocListener(
+              listeners: [
+                BlocListener<MapBloc, MapState>(
+                  listener: (context, state) {
+                    if (state is MemberLocationUpdated) {
+                      print("iz changingggggg");
+                      _updateMemberMarker(
+                          state.userId, state.latitude, state.longitude);
+                    }
+                  },
+                ),
+                BlocListener<NotificationBloc, NotificationState>(
+                  listener: (context, state) {
+                    if (state is NotificationBroadcasted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                            content: Text("Zone notification broadcasted!")),
+                      );
+                    } else if (state is NotificationError) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text("Error: ${state.message}")),
+                      );
+                    }
+                  },
+                ),
+              ],
               child: BlocBuilder<MapBloc, MapState>(
                 builder: (context, state) {
                   if (state is MapLoading) {
@@ -622,23 +753,23 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                     onMapCreated: (GoogleMapController controller) async {
                       googleMapController = controller;
                       String style = '''
-                              [
-                                {
-                                  "featureType": "poi.business",
-                                  "elementType": "labels",
-                                  "stylers": [
-                                    { "visibility": "off" }
-                                  ]
-                                },
-                                {
-                                  "featureType": "poi",
-                                  "elementType": "labels.text",
-                                  "stylers": [
-                                    { "visibility": "off" }
-                                  ]
-                                }
-                              ]
-                              ''';
+                                          [
+                                            {
+                                              "featureType": "poi.business",
+                                              "elementType": "labels",
+                                              "stylers": [
+                                                { "visibility": "off" }
+                                              ]
+                                            },
+                                            {
+                                              "featureType": "poi",
+                                              "elementType": "labels.text",
+                                              "stylers": [
+                                                { "visibility": "off" }
+                                              ]
+                                            }
+                                          ]
+                                          ''';
                       controller.setMapStyle(style);
                       _mapController.complete(controller);
 
