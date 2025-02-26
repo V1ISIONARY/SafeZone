@@ -7,7 +7,7 @@ import 'package:safezone/frontend/pages/admin/admin_reports.dart';
 import 'package:safezone/frontend/pages/admin/admin_reports_details.dart';
 import 'package:safezone/frontend/pages/admin/admin_safezone_details.dart';
 import 'package:safezone/frontend/pages/admin/admin_safezones.dart';
-import 'package:safezone/frontend/pages/admin/main_analytics.dart';
+//import 'package:safezone/frontend/pages/admin/main_analytics.dart';
 import 'package:safezone/frontend/pages/authentication/register.dart';
 import 'package:safezone/backend/models/dangerzoneModel/incident_report_model.dart';
 import 'package:safezone/frontend/pages/authentication/login.dart';
@@ -222,6 +222,22 @@ GoRouter appRouter(bool isFirstRun) => GoRouter(
               safezonemodel: safezone,
               address: address,
               onStatusChanged: onStatusChanged,
+            );
+          },
+        ),
+
+        GoRoute(
+          path: '/admin-reports-details',
+          builder: (context, state) {
+            final extra = state.extra as Map<String, dynamic>;
+            final report = extra['report'] as IncidentReportModel; 
+            final address = extra['address'] as String;
+            final Function(IncidentReportModel)? onStatusChanged = extra['onStatusChanged'] as Function(IncidentReportModel)?; 
+
+            return AdminReportsDetails(
+              reportInfo: report,
+              address: address,
+              onStatusChanged: onStatusChanged, 
             );
           },
         ),
