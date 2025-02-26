@@ -33,8 +33,9 @@ class CircleImplementation extends CircleRepository {
             .map((circleJson) => CircleModel.fromJson(circleJson))
             .toList();
       } else {
+        // If "circles" key is missing or not a list, return an empty list
         print('Circles key not found or invalid format: $data');
-        throw Exception('Circles key not found or invalid format');
+        return []; 
       }
     } else {
       print("Failed to fetch user circles: ${response.body}");

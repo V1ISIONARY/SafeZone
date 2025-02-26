@@ -336,7 +336,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
         updateLocation(position.latitude, position.longitude);
       }
     });
-  }    
+  }
 
   // MARKERS
 
@@ -366,6 +366,11 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
   Future<void> _preloadMemberMarkers(List<Map<String, dynamic>> members) async {
     for (var member in members) {
       String userId = member['user_id'].toString();
+
+      if (userId == _userId.toString()) {
+        continue;
+      }
+
       BitmapDescriptor marker = await _loadCustomMemberMarker(userId);
       memberMarkers[userId] = marker;
     }
@@ -373,6 +378,10 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
 
   void _updateMemberMarker(
       String userId, double latitude, double longitude) async {
+    if (userId == _userId.toString()) {
+      return;
+    }
+
     setState(() {
       markers.removeWhere((marker) => marker.markerId.value == "user_$userId");
 
@@ -455,6 +464,10 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
         double longitude = member['longitude'];
 
         BitmapDescriptor? memberMarker = memberMarkers[userId];
+
+        if (userId == _userId.toString()) {
+          continue;
+        }
 
         markers.add(
           Marker(
