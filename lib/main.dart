@@ -38,6 +38,7 @@ void main() async {
   // Initialize SharedPreferences and dotenv
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   bool isFirstRun = prefs.getBool('isFirstRun') ?? true;
+  String userToken = prefs.getString('userToken') ?? 'guess';
 
   // Load environment variables
   await dotenv.load(fileName: ".env");
@@ -71,13 +72,14 @@ void main() async {
     }
   });
 
-  runApp(MyApp(isFirstRun: isFirstRun));
+  runApp(MyApp(isFirstRun: isFirstRun, userToken: userToken));
 }
 
 class MyApp extends StatelessWidget {
   final bool isFirstRun;
+  final String userToken;
 
-  const MyApp({super.key, required this.isFirstRun});
+  const MyApp({super.key, required this.isFirstRun, required this.userToken});
 
   Future<void> _initializeApp() async {
     await Firebase.initializeApp();
@@ -161,7 +163,7 @@ class MyApp extends StatelessWidget {
             ],
             child: MaterialApp.router(
               debugShowCheckedModeBanner: false,
-              routerConfig: appRouter(isFirstRun),
+              routerConfig: appRouter(isFirstRun, userToken),
               theme: AppTheme.lightTheme,
               title: "SafeZone",
             ),

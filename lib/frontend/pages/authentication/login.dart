@@ -319,6 +319,7 @@ class _LoginState extends State<Login> {
                         final SharedPreferences prefs =
                             await SharedPreferences.getInstance();
                         int userId = prefs.getInt('id') ?? 0;
+                            await prefs.setString('userToken', userId.toString());
 
                         if (userId != 0) {
                           int intervalInSeconds = 10;
@@ -330,7 +331,7 @@ class _LoginState extends State<Login> {
                           context,
                           MaterialPageRoute(
                               builder: (context) =>
-                                  BottomNavigationWidget(userToken: 'who')),
+                                  BottomNavigationWidget(userToken: userId.toString())),
                         );
                         print(state);
                       } else if (state is LoginError) {
