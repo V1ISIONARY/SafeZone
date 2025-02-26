@@ -7,6 +7,7 @@ import 'package:safezone/backend/models/userModel/notifications_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class NotificationPollingService {
+
   static final NotificationPollingService _instance =
       NotificationPollingService._internal();
 

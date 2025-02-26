@@ -5,9 +5,12 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:safezone/backend/apiservice/authApi/auth_repo.dart';
 
+import '../../models/userModel/profile_model.dart';
+
 class AuthenticationImplementation extends AuthenticationRepository {
   // static const String baseUrl = '${VercelUrl.mainUrl}/user';
   final String baseUrl = "${dotenv.env['API_URL']}/user";
+
   @override
   Future<void> userLogin(String email, String password) async {
     final response = await http.post(

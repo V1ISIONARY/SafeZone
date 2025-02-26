@@ -20,6 +20,7 @@ class Settings extends StatefulWidget {
 class _SettingsState extends State<Settings> {
   bool isToggled = false;
   int selectedItem = 0;
+  bool? isAdmin;
 
   Future<String> _getUserName() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -41,6 +42,23 @@ class _SettingsState extends State<Settings> {
     setState(() {
       selectedItem = index;
     });
+  }
+
+  Future<void> _loadAdminStatus() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool adminStatus = prefs.getBool('is_admin') ?? false;
+
+    print("DEBUG: Loaded isAdmin from SharedPreferences: $adminStatus");
+
+    setState(() {
+      isAdmin = adminStatus;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _loadAdminStatus();
   }
 
   @override
@@ -272,7 +290,7 @@ class _SettingsState extends State<Settings> {
                         onTap: () {},
                       ),
                     ),
-                    widget.UserToken == 'admin'
+                    isAdmin == false
                         ? Container()
                         : Settingsbtn(
                             title: 'Report Analytics',
@@ -340,7 +358,7 @@ class _SettingsState extends State<Settings> {
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                PrimaryText(text: "Notification"),
+                                PrimaryText(text: 'Notification'),
                                 DescriptionText(
                                   text: "Control your notification",
                                 )
@@ -441,11 +459,9 @@ class _SettingsState extends State<Settings> {
                     onTap: () async {
                       NotificationPollingService().stopPolling();
 
-                      // Clear the SharedPreferences
                       final SharedPreferences prefs =
                           await SharedPreferences.getInstance();
-                      prefs
-                          .clear(); // Clears all the stored data in SharedPreferences
+                      prefs.clear();
                     },
                   ),
             Container(

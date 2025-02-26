@@ -1,6 +1,8 @@
 // ignore_for_file: prefer_const_constructors
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart'; // Import BLoC package
+import 'package:flutter_svg/svg.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:safezone/backend/bloc/authBloc/auth_bloc.dart';
 import 'package:safezone/backend/bloc/authBloc/auth_event.dart';
@@ -10,6 +12,9 @@ import 'package:safezone/frontend/pages/authentication/register.dart';
 import 'package:safezone/frontend/widgets/bottom_navigation.dart';
 import 'package:safezone/resources/schema/colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../../resources/schema/texts.dart';
+import '../../widgets/buttons/ovalBtn.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -39,7 +44,7 @@ class _LoginState extends State<Login> {
       backgroundColor: Colors.white,
       body: Stack(
         children: [
-          // Background Image (Positioned at the top)
+
           Positioned(
             top: 0,
             left: 0,
@@ -47,11 +52,10 @@ class _LoginState extends State<Login> {
             child: Image.asset(
               'lib/resources/images/login.png',
               width: double.infinity,
-              fit: BoxFit.cover, // Adjust as needed
+              fit: BoxFit.cover,
             ),
           ),
 
-          // Foreground Content
           SingleChildScrollView(
             keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
             child: Padding(
@@ -264,7 +268,8 @@ class _LoginState extends State<Login> {
                             ),
                           ),
                         ),
-                      )),
+                      )
+                    ),
                   Container(
                     width: double.infinity,
                     margin: EdgeInsets.symmetric(horizontal: 20),
@@ -310,10 +315,10 @@ class _LoginState extends State<Login> {
                   BlocListener<AuthenticationBloc, AuthenticationState>(
                     listener: (context, state) async {
                       if (state is LoginSuccess) {
-                        // Once login is successful, navigate and start polling
+                        
                         final SharedPreferences prefs =
                             await SharedPreferences.getInstance();
-                        int userId = prefs.getInt('id') ?? 0;
+                            int userId = prefs.getInt('id') ?? 0;
                             await prefs.setString('userToken', userId.toString());
 
                         if (userId != 0) {
@@ -325,8 +330,8 @@ class _LoginState extends State<Login> {
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
-                              builder: (context) =>
-                                  BottomNavigationWidget(userToken: userId.toString())),
+                            builder: (context) => BottomNavigationWidget(userToken: userId.toString())
+                          ),
                         );
                         print(state);
                       } else if (state is LoginError) {
