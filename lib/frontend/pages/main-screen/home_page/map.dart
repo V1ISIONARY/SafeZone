@@ -336,7 +336,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
         updateLocation(position.latitude, position.longitude);
       }
     });
-  }
+  }    
 
   // MARKERS
 

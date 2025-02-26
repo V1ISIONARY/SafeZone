@@ -154,7 +154,7 @@ class CircleImplementation extends CircleRepository {
     // Check if circleId is 0, and don't call the API if it is
     if (circleId == 0) {
       print("Circle ID is 0, not making the API call.");
-      return []; // Return an empty list or handle accordingly
+      return []; // Return an empty list
     }
 
     final response = await http.get(
@@ -179,11 +179,11 @@ class CircleImplementation extends CircleRepository {
 
         return membersList;
       } else {
-        throw Exception("Unexpected response format: missing 'members' key");
+        return []; // Return an empty list if 'members' key is missing or not a list
       }
     } else {
       print("Failed to view members. Status Code: ${response.statusCode}");
-      throw Exception('Failed to view members');
+      return []; // Return an empty list on failure
     }
   }
 

@@ -29,78 +29,78 @@ class MapBloc extends Bloc<MapPageEvent, MapState> {
       FetchMapData event, Emitter<MapState> emit) async {
     emit(MapLoading());
     try {
-      // Fetch safe zones
       final safeZones = await safeZoneRepository.getVerifiedSafeZones();
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final int userId = prefs.getInt('circle') ?? 0;
 
-      // Fetch danger zones
       final dangerZones = await dangerZoneRepository.getVerifiedDangerZones();
 
-      // Fetch members' data
       final members = await circleRepository.viewMembers(userId);
 
-      // Emit combined data
-      emit(MapDataLoaded(safeZones, dangerZones, members));
+      if (members != null && members.isNotEmpty) {
+        emit(MapDataLoaded(safeZones, dangerZones, members));
+      } else {
+        emit(MapDataLoaded(safeZones, dangerZones, []));
+      }
     } catch (e) {
       emit(MapError(e.toString()));
     }
   }
 
-Future<void> _onListenForMemberLocations(
-    ListenForMemberLocations event, Emitter<MapState> emit) async {
-  print("Starting to listen for members' location data...");
-  print("Event members: ${event.members}");
-  print("Current user ID: ${event.userId}");
+  Future<void> _onListenForMemberLocations(
+      ListenForMemberLocations event, Emitter<MapState> emit) async {
+    print("Starting to listen for members' location data...");
+    print("Event members: ${event.members}");
+    print("Current user ID: ${event.userId}");
 
-  try {
-    for (var member in event.members) {
-      String userId = member['user_id'].toString();
-      print("Processing member: $userId");
+    try {
+      for (var member in event.members) {
+        String userId = member['user_id'].toString();
+        print("Processing member: $userId");
 
-      if (userId == event.userId.toString()) {
-        print("Skipping current user: $userId");
-        continue;
-      }
-
-      if (_locationListeners.containsKey(userId)) {
-        print("Listener already exists for user: $userId, skipping duplicate.");
-        continue;
-      }
-
-      print("Setting up Firestore listener for user: $userId");
-
-      var subscription = _firestore
-          .collection('locations')
-          .doc(userId)
-          .snapshots()
-          .listen((documentSnapshot) {
-        if (documentSnapshot.exists) {
-          var data = documentSnapshot.data() as Map<String, dynamic>;
-          print("Received Firestore document data for user $userId: $data");
-
-          if (data.containsKey('latitude') && data.containsKey('longitude')) {
-            double latitude = double.parse(data['latitude'].toString());
-            double longitude = double.parse(data['longitude'].toString());
-
-            print(
-                "Updated location for user $userId -> Latitude: $latitude, Longitude: $longitude");
-
-            emit(MemberLocationUpdated(userId, latitude, longitude));
-          } else {
-            print("Missing latitude or longitude data for user $userId");
-          }
-        } else {
-          print("No Firestore document found for user $userId");
+        if (userId == event.userId.toString()) {
+          print("Skipping current user: $userId");
+          continue;
         }
-      });
 
-      _locationListeners[userId] = subscription;
+        if (_locationListeners.containsKey(userId)) {
+          print(
+              "Listener already exists for user: $userId, skipping duplicate.");
+          continue;
+        }
+
+        print("Setting up Firestore listener for user: $userId");
+
+        var subscription = _firestore
+            .collection('locations')
+            .doc(userId)
+            .snapshots()
+            .listen((documentSnapshot) {
+          if (documentSnapshot.exists) {
+            var data = documentSnapshot.data() as Map<String, dynamic>;
+            print("Received Firestore document data for user $userId: $data");
+
+            if (data.containsKey('latitude') && data.containsKey('longitude')) {
+              double latitude = double.parse(data['latitude'].toString());
+              double longitude = double.parse(data['longitude'].toString());
+
+              print(
+                  "Updated location for user $userId -> Latitude: $latitude, Longitude: $longitude");
+
+              emit(MemberLocationUpdated(userId, latitude, longitude));
+            } else {
+              print("Missing latitude or longitude data for user $userId");
+            }
+          } else {
+            print("No Firestore document found for user $userId");
+          }
+        });
+
+        _locationListeners[userId] = subscription;
+      }
+    } catch (e) {
+      print("Error in _onListenForMemberLocations: $e");
+      emit(MapError(e.toString()));
     }
-  } catch (e) {
-    print("Error in _onListenForMemberLocations: $e");
-    emit(MapError(e.toString()));
   }
-}
-
 }
