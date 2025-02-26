@@ -141,13 +141,13 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> {
                             interval: 1,
                           ),
                         ),
-                        topTitles: AxisTitles(
+                        topTitles: const AxisTitles(
                             sideTitles: SideTitles(showTitles: false)),
-                        rightTitles: AxisTitles(
+                        rightTitles: const AxisTitles(
                             sideTitles: SideTitles(showTitles: false)),
                       ),
                       borderData: FlBorderData(show: false),
-                      gridData: FlGridData(show: true),
+                      gridData: const FlGridData(show: true),
                       lineBarsData: [
                         LineChartBarData(
                           spots: graphData[selectedCategory]!,
@@ -164,21 +164,21 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> {
               ),
             ],
           ),
-          Padding(
-            padding: const EdgeInsets.only(top: 15),
+          const Padding(
+            padding: EdgeInsets.only(top: 15),
             child: Row(
               children: [
                 Expanded(
                     child:
                         PercentageAverage(count: 236, title: 'Total Reports')),
-                const SizedBox(width: 10),
+                SizedBox(width: 10),
                 Expanded(
                     child:
                         PercentageAverage(count: 236, title: 'Total Reviews')),
               ],
             ),
           ),
-          Column(
+          const Column(
             children: [
               PercentageAverage(count: 236, title: 'Total Rejects'),
               PercentageAverage(count: 236, title: 'Total Verify'),
