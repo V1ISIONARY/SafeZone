@@ -99,10 +99,10 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
     context.read<MapBloc>().add(FetchMapData());
     context.read<DangerZoneBloc>().add(FetchDangerZones());
     _checkFirstRun();
-    _createCustomMarker();
+    _createCustomMarker().then((_) {
+      _fetchLocation(); 
+    });
     print("Members list before fetching: $members");
-
-    _fetchLocation(); // This ensures that the user's location is updated before showing members
 
     _controller = AnimationController(
       duration: const Duration(milliseconds: 400),
@@ -456,8 +456,6 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
     }
 
     if (state is MapDataLoaded) {
-      markers.clear();
-      circles.clear();
       for (var member in state.members) {
         String userId = member['user_id'].toString();
         double latitude = member['latitude'];
