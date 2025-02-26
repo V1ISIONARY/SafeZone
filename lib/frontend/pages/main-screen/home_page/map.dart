@@ -603,7 +603,8 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                     return Expanded(
                       child: Center(
                         child: Transform.translate(
-                            offset: const Offset(0, 0), child: LoadingState()),
+                            offset: const Offset(0, 0),
+                            child: const LoadingState()),
                       ),
                     );
                   } else if (state is MapDataLoaded) {
@@ -927,7 +928,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
             ),
 
             // Floating buttons
-            widget.UserToken == 'ng'
+            widget.UserToken == 'guess'
                 ? const SizedBox()
                 : Positioned(
                     right: 15,

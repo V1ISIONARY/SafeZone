@@ -4,6 +4,7 @@ import 'package:safezone/backend/bloc/circleBloc/circle_bloc.dart';
 import 'package:safezone/backend/bloc/circleBloc/circle_event.dart';
 import 'package:safezone/backend/bloc/circleBloc/circle_state.dart';
 import 'package:safezone/backend/models/userModel/circle_model.dart';
+import 'package:safezone/frontend/widgets/loadingstate.dart';
 import 'package:safezone/resources/schema/colors.dart';
 import 'package:safezone/resources/schema/texts.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -346,6 +347,30 @@ class _ListOfGroupsState extends State<ListOfGroups> {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text('Error: ${state.message}')),
                     );
+                  } else if (state is CircleAddMemberErrorState) {
+                    showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        backgroundColor: bgColor,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        title: const Text('No Group Found',
+                            style: TextStyle(color: textColor, fontSize: 15)),
+                        content: const Text(
+                            'Please check the group invitation code or create a new one.',
+                            style: TextStyle(color: textColor, fontSize: 13)),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.of(context).pop(),
+                            child: const Text(
+                              'OK',
+                              style: TextStyle(color: textColor, fontSize: 13),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
                   } else if (state is CircleLoadedState) {
                     setState(() {
                       _circles = state.circles;
@@ -355,7 +380,14 @@ class _ListOfGroupsState extends State<ListOfGroups> {
                 child: BlocBuilder<CircleBloc, CircleState>(
                   builder: (context, state) {
                     if (state is CircleLoadingState) {
-                      return const Center(child: CircularProgressIndicator());
+                      return Expanded(
+                        child: Center(
+                          child: Transform.translate(
+                            offset: const Offset(0, 0),
+                            child: const LoadingState(),
+                          ),
+                        ),
+                      );
                     } else if (_circles.isNotEmpty) {
                       return Expanded(
                         child: Padding(
@@ -500,14 +532,48 @@ class _ListOfGroupsState extends State<ListOfGroups> {
                       );
                     } else if (state is CircleErrorState) {
                       return Center(child: Text(state.message));
-                    } else {
+                    } else if (_circles.isEmpty) {
                       // Handle the case where there are no circles
-                      return const Center(
-                        child: Text(
-                          "No groups found. Create or join a group to get started.",
-                          style: TextStyle(color: Colors.grey, fontSize: 16),
+                      return Expanded(
+                        child: Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Container(
+                                width: 150,
+                                height: 150,
+                                child: Image.asset(
+                                  'lib/resources/images/empty-state/no_group.png',
+                                  width: 150,
+                                  height: 150,
+                                ),
+                              ),
+                              const SizedBox(height: 5),
+                              const Text(
+                                'No groups found.',
+                                style: TextStyle(
+                                  color: Colors.black54,
+                                  fontSize: 11,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                              const SizedBox(height: 5),
+                              const Text(
+                                'Try creating a new group or joining an existing group.',
+                                style: TextStyle(
+                                  color: Colors.black54,
+                                  fontSize: 9,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                              const SizedBox(height: 60),
+                            ],
+                          ),
                         ),
                       );
+                    } else {
+                      // Handle the case where there are no circles
+                      return Container();
                     }
                   },
                 ),

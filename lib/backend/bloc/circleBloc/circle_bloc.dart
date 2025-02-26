@@ -43,7 +43,7 @@ class CircleBloc extends Bloc<CircleEvent, CircleState> {
         );
         emit(CircleUpdatedState(message: 'Joining Group successfully'));
       } catch (e) {
-        emit(CircleErrorState(message: 'Error Joining Group: ${e.toString()}'));
+        emit(CircleAddMemberErrorState(message: 'Error Joining Group: ${e.toString()}'));
       }
     });
 
