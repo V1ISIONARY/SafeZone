@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:ui' as ui;
 import 'package:flutter/services.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -100,6 +101,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
   void initState() {
     super.initState();
     _loadUserId();
+    _loadMapType();
 
     context.read<MapBloc>().add(FetchMapData());
     context.read<DangerZoneBloc>().add(FetchDangerZones());
@@ -155,6 +157,31 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
     });
 
     _startLocationUpdates();
+  }
+
+  Future<void> _loadMapType() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    int? mapTypeIndex = prefs.getInt('mapType');
+
+    if (mapTypeIndex != null) {
+      setState(() {
+        _currentMapType = _mapTypeFromIndex(mapTypeIndex);
+      });
+    }
+  }
+
+  // Convert saved index to MapType
+  MapType _mapTypeFromIndex(int index) {
+    switch (index) {
+      case 1:
+        return MapType.satellite;
+      case 2:
+        return MapType.terrain;
+      case 3:
+        return MapType.hybrid;
+      default:
+        return MapType.normal;
+    }
   }
 
   @override
@@ -690,6 +717,33 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
       ),
     );
   }
+  
+  // Future<void> _searchLocation(String query) async {
+  //   if (query.isEmpty) return;
+
+  //   try {
+  //     List<Location> locations = await locationFromAddress(query);
+  //     if (locations.isNotEmpty) {
+  //       Location location = locations.first;
+  //       LatLng newPosition = LatLng(location.latitude, location.longitude);
+
+  //       googleMapController?.animateCamera(
+  //         CameraUpdate.newCameraPosition(
+  //           CameraPosition(target: newPosition, zoom: 16.0),
+  //         ),
+  //       );
+
+  //       setState(() {
+  //         _currentUserLocation = newPosition;
+  //         markers = {
+  //           Marker(markerId: MarkerId("searchLocation"), position: newPosition),
+  //         };
+  //       });
+  //     }
+  //   } catch (e) {
+  //     print("Location not found: $e");
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -753,23 +807,23 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                     onMapCreated: (GoogleMapController controller) async {
                       googleMapController = controller;
                       String style = '''
-                                          [
-                                            {
-                                              "featureType": "poi.business",
-                                              "elementType": "labels",
-                                              "stylers": [
-                                                { "visibility": "off" }
-                                              ]
-                                            },
-                                            {
-                                              "featureType": "poi",
-                                              "elementType": "labels.text",
-                                              "stylers": [
-                                                { "visibility": "off" }
-                                              ]
-                                            }
-                                          ]
-                                          ''';
+                        [
+                          {
+                            "featureType": "poi.business",
+                            "elementType": "labels",
+                            "stylers": [
+                              { "visibility": "off" }
+                            ]
+                          },
+                          {
+                            "featureType": "poi",
+                            "elementType": "labels.text",
+                            "stylers": [
+                              { "visibility": "off" }
+                            ]
+                          }
+                        ]
+                        ''';
                       controller.setMapStyle(style);
                       _mapController.complete(controller);
 
@@ -822,6 +876,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                 Positioned.fill(
                                   child: TextField(
                                     controller: _textEditingController,
+                                    // onSubmitted: _searchLocation,
                                     focusNode: _focusNode,
                                     style: const TextStyle(
                                       color: Colors.black,

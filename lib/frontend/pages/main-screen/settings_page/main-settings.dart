@@ -38,10 +38,28 @@ class _SettingsState extends State<Settings> {
     return '$formattedFirstName $formattedLastName'.trim();
   }
 
+  Future<void> _saveMapType(int index) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('mapType', index);
+  }
+
+  // Load saved MapType index
+  Future<void> _loadSelectedMapType() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    int? savedIndex = prefs.getInt('mapType');
+
+    if (savedIndex != null) {
+      setState(() {
+        selectedItem = savedIndex;
+      });
+    }
+  }
+
   void onItemTap(int index) {
     setState(() {
       selectedItem = index;
     });
+    _saveMapType(index); 
   }
 
   Future<void> _loadAdminStatus() async {
@@ -59,6 +77,7 @@ class _SettingsState extends State<Settings> {
   void initState() {
     super.initState();
     _loadAdminStatus();
+    _loadSelectedMapType();
   }
 
   @override
@@ -498,7 +517,7 @@ class _SettingsState extends State<Settings> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         GestureDetector(
-          onTap: () => onItemTap(index), // Handle tap
+          onTap: () => onItemTap(index), 
           child: Container(
             width: 60,
             height: 60,
