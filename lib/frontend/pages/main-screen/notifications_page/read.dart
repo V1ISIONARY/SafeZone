@@ -17,8 +17,8 @@ class Read extends StatefulWidget {
 }
 
 class _ReadState extends State<Read> {
-  List<NotificationModel> readNotifications = []; // Store read notifications locally
-  int userId = 0; // Default userId
+  List<NotificationModel> readNotifications = [];
+  int userId = 0;
 
   @override
   void initState() {
@@ -28,7 +28,7 @@ class _ReadState extends State<Read> {
 
   Future<void> _fetchUserIdAndNotifications() async {
     final prefs = await SharedPreferences.getInstance();
-    userId = prefs.getInt('id') ?? 0; // Get stored userId, default to 0 if not found
+    userId = prefs.getInt('id') ?? 0;
 
     if (userId != 0) {
       context.read<NotificationBloc>().add(FetchNotifications(userId));
@@ -65,17 +65,60 @@ class _ReadState extends State<Read> {
       itemCount: readNotifications.length,
       itemBuilder: (context, index) {
         final notification = readNotifications[index];
-        return Card(
-          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: ListTile(
-            title: Text(
-              notification.title,
-              style: const TextStyle(fontWeight: FontWeight.bold),
-            ),
-            subtitle: Text(notification.message),
-            trailing: Text(
-              notification.createdAt,
-              style: const TextStyle(color: Colors.grey, fontSize: 12),
+        return Container(
+          width: double.infinity,
+          margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+          decoration: BoxDecoration(
+            color: const Color.fromARGB(10, 0, 0, 0),
+            borderRadius: BorderRadius.circular(5),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Row(
+              children: [
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.white,
+                  ),
+                  child: const Icon(
+                    Icons.notifications,
+                    color: Colors.grey,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        notification.title,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: textColor,
+                          fontSize: 15,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        notification.message,
+                        style: const TextStyle(
+                          color: labelFormFieldColor,
+                          fontSize: 13,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        notification.createdAt,
+                        style:
+                            const TextStyle(color: Colors.grey, fontSize: 11),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ),
         );
@@ -122,7 +165,7 @@ class _ReadState extends State<Read> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.error, color: Colors.red, size: 50),
+          const Icon(Icons.error, color: Colors.red, size: 50),
           const SizedBox(height: 10),
           Text(
             "Error: $message",

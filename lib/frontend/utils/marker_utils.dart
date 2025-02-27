@@ -50,7 +50,7 @@ class MarkerUtils {
     // Draw the light pink circle
     final Paint circlePaint = Paint()
       ..color = const ui.Color.fromARGB(255, 240, 238, 238); // Light pink color
-    final Offset circleCenter =
+    const Offset circleCenter =
         Offset(pinWidth / 2, pinHeight / 3); // Center of the circle
     canvas.drawCircle(circleCenter, circleRadius, circlePaint);
 
@@ -59,9 +59,9 @@ class MarkerUtils {
       text: const TextSpan(
         text: "You",
         style: TextStyle(
-          color: textColor,
+          color: ui.Color.fromARGB(255, 71, 71, 71),
           fontSize: textSize,
-          fontWeight: FontWeight.w400,
+          fontWeight: FontWeight.bold,
         ),
       ),
       textDirection: TextDirection.ltr,
@@ -92,5 +92,4 @@ class MarkerUtils {
     // Return the custom marker as a BitmapDescriptor
     return BitmapDescriptor.fromBytes(imageData);
   }
-
 }
