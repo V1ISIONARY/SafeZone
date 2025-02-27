@@ -427,7 +427,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
         86,
       );
       customSafeZoneMarker = await MarkerUtils.resizeMarker(
-        'lib/resources/images/safezone.png',
+        'lib/resources/images/marker_safezone.png',
         58,
         86,
       );

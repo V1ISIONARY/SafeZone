@@ -3,6 +3,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:safezone/resources/schema/colors.dart';
 
 class MarkerUtils {
   static Future<BitmapDescriptor> resizeMarker(
@@ -28,8 +29,10 @@ class MarkerUtils {
 
     const double pinWidth = 100;
     const double pinHeight = 160;
-    const double imageSize = 75;
+    const double circleRadius = 40; // Radius of the circle
+    const double textSize = 30;
 
+    // Draw the pin shape
     final Paint pinPaint = Paint()..color = widgetColor;
     final Path pinPath = Path()
       ..moveTo(pinWidth / 2, pinHeight)
@@ -44,38 +47,50 @@ class MarkerUtils {
 
     canvas.drawPath(pinPath, pinPaint);
 
-    final Rect imageRect = Rect.fromCircle(
-      center: const Offset(pinWidth / 2, pinHeight / 3),
-      radius: imageSize / 2,
+    // Draw the light pink circle
+    final Paint circlePaint = Paint()
+      ..color = const ui.Color.fromARGB(255, 240, 238, 238); // Light pink color
+    final Offset circleCenter =
+        Offset(pinWidth / 2, pinHeight / 3); // Center of the circle
+    canvas.drawCircle(circleCenter, circleRadius, circlePaint);
+
+    // Draw the text "you"
+    final TextPainter textPainter = TextPainter(
+      text: const TextSpan(
+        text: "You",
+        style: TextStyle(
+          color: textColor,
+          fontSize: textSize,
+          fontWeight: FontWeight.w400,
+        ),
+      ),
+      textDirection: TextDirection.ltr,
     );
 
-    final ui.Image image =
-        await _loadImage('lib/resources/images/miro.png', context);
-    paintImage(
-      canvas: canvas,
-      rect: imageRect,
-      image: image,
-      fit: BoxFit.cover,
-    );
+    // Layout the text
+    textPainter.layout();
 
+    // Calculate the position to center the text within the circle
+    final double textX = circleCenter.dx - (textPainter.width / 2);
+    final double textY = circleCenter.dy - (textPainter.height / 2);
+
+    // Draw the text on the canvas
+    textPainter.paint(canvas, Offset(textX, textY));
+
+    // Convert the canvas to an image
     final ui.Image markerImage = await pictureRecorder.endRecording().toImage(
           pinWidth.toInt(),
           pinHeight.toInt(),
         );
+
+    // Convert the image to bytes
     final ByteData? byteData = await markerImage.toByteData(
       format: ui.ImageByteFormat.png,
     );
     final Uint8List imageData = byteData!.buffer.asUint8List();
 
+    // Return the custom marker as a BitmapDescriptor
     return BitmapDescriptor.fromBytes(imageData);
   }
 
-  static Future<ui.Image> _loadImage(
-      String assetPath, BuildContext context) async {
-    final ByteData data = await DefaultAssetBundle.of(context).load(assetPath);
-    final ui.Codec codec =
-        await ui.instantiateImageCodec(data.buffer.asUint8List());
-    final ui.FrameInfo frameInfo = await codec.getNextFrame();
-    return frameInfo.image;
-  }
 }

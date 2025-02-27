@@ -10,6 +10,7 @@ import 'package:safezone/backend/bloc/authBloc/auth_state.dart';
 import 'package:safezone/backend/bloc/notificationBloc/notification_polling.dart';
 import 'package:safezone/frontend/pages/authentication/register.dart';
 import 'package:safezone/frontend/widgets/bottom_navigation.dart';
+import 'package:safezone/frontend/widgets/loadingstate.dart';
 import 'package:safezone/resources/schema/colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -316,10 +317,15 @@ class _LoginState extends State<Login> {
                         showDialog(
                           context: context,
                           barrierDismissible: false,
-                          builder: (context) => const AlertDialog(
+                          builder: (context) => AlertDialog(
+                            backgroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.circular(10), // Rounded corners
+                            ),
                             content: Row(
-                              children: [
-                                CircularProgressIndicator(),
+                              children: const [
+                                LoadingState(),
                                 SizedBox(width: 10),
                                 Text("Logging in..."),
                               ],
