@@ -359,19 +359,21 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
 
         if (isInsideSafeZone && !_wasInsideSafeZone) {
           _showZoneDialog("Safe Zone", "You have entered a safe zone.");
-          _sendBroadcastNotification("Group member - Safe Zone", " has entered a safe zone.");
+          _sendBroadcastNotification(
+              "Group member - Safe Zone", " has entered a safe zone.");
           _wasInsideSafeZone = true;
         } else if (isInsideDangerZone && !_wasInsideDangerZone) {
           _showZoneDialog("Danger Zone",
               "You have entered a danger zone. Please be cautious.");
-          _sendBroadcastNotification(
-              "Group member - Danger Zone", " has entered a danger zone. Please be cautious.");
+          _sendBroadcastNotification("Group member - Danger Zone",
+              " has entered a danger zone. Please be cautious.");
           _wasInsideDangerZone = true;
         }
 
         if (!isInsideSafeZone && _wasInsideSafeZone) {
           _showZoneDialog("Safe Zone", "You have exited the safe zone.");
-          _sendBroadcastNotification("Group member - Safe Zone", " has exited the safe zone.");
+          _sendBroadcastNotification(
+              "Group member - Safe Zone", " has exited the safe zone.");
           _wasInsideSafeZone = false;
         } else if (!isInsideDangerZone && _wasInsideDangerZone) {
           _showZoneDialog("Danger Zone", "You have exited the danger zone.");
@@ -441,12 +443,14 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
   Future<void> _preloadMemberMarkers(List<Map<String, dynamic>> members) async {
     for (var member in members) {
       String userId = member['user_id'].toString();
+      String name = member['first_name'];
+      String firstLetter = name.isNotEmpty ? name[0] : '';
 
       if (userId == _userId.toString()) {
         continue;
       }
 
-      BitmapDescriptor marker = await _loadCustomMemberMarker(userId);
+      BitmapDescriptor marker = await _loadCustomMemberMarker(firstLetter);
       memberMarkers[userId] = marker;
     }
   }
@@ -493,7 +497,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
         text: letter,
         style: const TextStyle(
           color: ui.Color.fromARGB(255, 71, 71, 71),
-          fontSize: 100 * 0.4,
+          fontSize: 100 * 0.35,
           fontWeight: FontWeight.bold,
         ),
       ),
@@ -533,6 +537,8 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
     if (state is MapDataLoaded) {
       for (var member in state.members) {
         String userId = member['user_id'].toString();
+        String firstName = member['first_name'];
+        String lastName = member['last_name'];
         double latitude = member['latitude'];
         double longitude = member['longitude'];
 
@@ -547,7 +553,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
             markerId: MarkerId(userId),
             position: LatLng(latitude, longitude),
             icon: memberMarker ?? BitmapDescriptor.defaultMarker,
-            infoWindow: InfoWindow(title: 'User $userId'),
+            infoWindow: InfoWindow(title: '$firstName $lastName'),
           ),
         );
       }
