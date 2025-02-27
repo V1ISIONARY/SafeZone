@@ -10,6 +10,7 @@ import 'package:safezone/backend/bloc/authBloc/auth_state.dart';
 import 'package:safezone/backend/bloc/notificationBloc/notification_polling.dart';
 import 'package:safezone/frontend/pages/authentication/register.dart';
 import 'package:safezone/frontend/widgets/bottom_navigation.dart';
+import 'package:safezone/frontend/widgets/loadingstate.dart';
 import 'package:safezone/resources/schema/colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -44,7 +45,6 @@ class _LoginState extends State<Login> {
       backgroundColor: Colors.white,
       body: Stack(
         children: [
-
           Positioned(
             top: 0,
             left: 0,
@@ -55,7 +55,6 @@ class _LoginState extends State<Login> {
               fit: BoxFit.cover,
             ),
           ),
-
           SingleChildScrollView(
             keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
             child: Padding(
@@ -268,8 +267,7 @@ class _LoginState extends State<Login> {
                             ),
                           ),
                         ),
-                      )
-                    ),
+                      )),
                   Container(
                     width: double.infinity,
                     margin: EdgeInsets.symmetric(horizontal: 20),
@@ -314,12 +312,34 @@ class _LoginState extends State<Login> {
                   ),
                   BlocListener<AuthenticationBloc, AuthenticationState>(
                     listener: (context, state) async {
-                      if (state is LoginSuccess) {
-                        
+                      if (state is LoginLoading) {
+                        // Show a loading dialog while logging in
+                        showDialog(
+                          context: context,
+                          barrierDismissible: false,
+                          builder: (context) => AlertDialog(
+                            backgroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.circular(10), // Rounded corners
+                            ),
+                            content: Row(
+                              children: const [
+                                LoadingState(),
+                                SizedBox(width: 10),
+                                Text("Logging in..."),
+                              ],
+                            ),
+                          ),
+                        );
+                      } else if (state is LoginSuccess) {
+                        Navigator.pop(
+                            context); // Close the loading dialog if it's open
+
                         final SharedPreferences prefs =
                             await SharedPreferences.getInstance();
-                            int userId = prefs.getInt('id') ?? 0;
-                            await prefs.setString('userToken', userId.toString());
+                        int userId = prefs.getInt('id') ?? 0;
+                        await prefs.setString('userToken', userId.toString());
 
                         if (userId != 0) {
                           int intervalInSeconds = 10;
@@ -330,16 +350,19 @@ class _LoginState extends State<Login> {
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => BottomNavigationWidget(userToken: userId.toString())
+                            builder: (context) => BottomNavigationWidget(
+                                userToken: userId.toString()),
                           ),
                         );
                         print(state);
                       } else if (state is LoginError) {
+                        Navigator.pop(
+                            context); // Close the loading dialog if it's open
                         print(state.message);
                       }
                     },
                     child: Container(),
-                  ),
+                  )
                 ],
               ),
             ),
