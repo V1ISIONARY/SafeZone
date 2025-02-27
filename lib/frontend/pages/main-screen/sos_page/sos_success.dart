@@ -9,7 +9,6 @@ import 'package:safezone/frontend/widgets/buttons/custom_button.dart';
 import 'package:safezone/resources/schema/colors.dart';
 import 'package:safezone/resources/schema/texts.dart';
 
-
 class SosSuccess extends StatefulWidget {
   const SosSuccess({super.key});
 
@@ -27,25 +26,29 @@ class _SosSuccessState extends State<SosSuccess> {
   Future<void> _sendBroadcastNotification() async {
     final prefs = await SharedPreferences.getInstance();
 
-    int userId = prefs.getInt('id') ?? 0; 
+    int userId = prefs.getInt('id') ?? 0;
     String firstName = prefs.getString('first_name') ?? "User";
     String lastName = prefs.getString('last_name') ?? "";
-    
-    String fullName = "$firstName $lastName".trim();
+
+    final formattedFirstName = firstName.isNotEmpty
+        ? firstName[0].toUpperCase() + firstName.substring(1).toLowerCase()
+        : '';
+    final formattedLastName = lastName.isNotEmpty
+        ? lastName[0].toUpperCase() + lastName.substring(1).toLowerCase()
+        : '';
+    String fullName = "$formattedFirstName $formattedLastName".trim();
 
     if (userId != 0) {
       context.read<NotificationBloc>().add(
-        BroadcastNotification(
-          userId, // Use the stored user ID
-          "Emergency Alert",
-          "$fullName has triggered an SOS alert!",
-          "SOS"
-        ),
-      );
+            BroadcastNotification(
+                userId, // Use the stored user ID
+                "Emergency Alert",
+                "$fullName has triggered an SOS alert!",
+                "SOS"),
+          );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Error: User ID not found!"))
-      );
+          const SnackBar(content: Text("Error: User ID not found!")));
     }
   }
 
@@ -61,12 +64,10 @@ class _SosSuccessState extends State<SosSuccess> {
         listener: (context, state) {
           if (state is NotificationBroadcasted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text("SOS notification broadcasted!"))
-            );
+                const SnackBar(content: Text("SOS notification broadcasted!")));
           } else if (state is NotificationError) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text("Error: ${state.message}"))
-            );
+                SnackBar(content: Text("Error: ${state.message}")));
           }
         },
         child: Center(
@@ -85,7 +86,9 @@ class _SosSuccessState extends State<SosSuccess> {
                 "SOS sent!!",
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  color: textColor, fontSize: 20, fontWeight: FontWeight.bold,
+                  color: textColor,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
               const SizedBox(height: 20),
