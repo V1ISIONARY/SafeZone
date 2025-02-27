@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../resources/schema/colors.dart';
 import '../../../../resources/schema/texts.dart';
 
 class UserGuide extends StatelessWidget {
@@ -26,73 +27,135 @@ class UserGuide extends StatelessWidget {
           ),
         ),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const CategoryDescripText(
-              text: "Welcome to SafeZone! This guide will help you navigate and utilize the SafeZone app effectively...",
-            ),
-            const Divider(height: 30, thickness: 1),
-            const CategoryText(text: "Getting Started"),
-            buildGuideItem("Downloading and Installing", "iOS: Go to the App Store... Android: Go to the Google Play Store..."),
-            buildGuideItem("Creating an Account", "Open the SafeZone app and select 'Sign Up'..."),
-            buildGuideItem("Logging In", "Open the app and select 'Sign In'..."),
-            const Divider(height: 30, thickness: 1),
-            const CategoryText(text: "Main Features"),
-            buildGuideItem("Dashboard Overview", "The main dashboard displays essential information..."),
-            buildGuideItem("Real-Time Location Tracking", "To enable location tracking, go to the settings..."),
-            buildGuideItem("SOS Alerts", "To send an SOS alert, press and hold the SOS button..."),
-            buildGuideItem("Safe Area Finder", "Use the safe area finder to locate nearby safe spaces..."),
-            buildGuideItem("User Notifications", "Manage your notifications in the settings..."),
-            const Divider(height: 30, thickness: 1),
-            const CategoryText(text: "Using the App"),
-            buildGuideItem("Navigating the Interface", "Use the bottom navigation bar to switch..."),
-            buildGuideItem("Sending Alerts", "Tap the SOS button for immediate assistance..."),
-            buildGuideItem("Viewing Safe Areas", "Access the map from the dashboard..."),
-            const Divider(height: 30, thickness: 1),
-            const CategoryText(text: "Settings and Customization"),
-            buildGuideItem("Account Settings", "Update personal information by going to 'Account Details'..."),
-            buildGuideItem("Notification Preferences", "Customize notification preferences to switch..."),
-            const Divider(height: 30, thickness: 1),
-            const CategoryText(text: "Troubleshooting and Support"),
-            buildGuideItem("Common Issues", "App Crashing: Restart the application..."),
-            buildGuideItem("Contact Support", "If you need additional help..."),
-            const Divider(height: 30, thickness: 1),
-            const CategoryText(text: "Safety Tips"),
-            buildGuideItem("General Safety Tips", "Stay aware of your surroundings..."),
-            buildGuideItem("Using SafeZone Effectively", "Regularly update your app..."),
-            const Divider(height: 30, thickness: 1),
-            const CategoryText(text: "FAQs"),
-            buildGuideItem("Frequently Asked Questions", "Q: How do I update my account information?" ),
-            buildGuideItem("Q: Can I use SafeZone anonymously?", "A: Yes, you can use SafeZone without creating an account..."),
-            const Divider(height: 30, thickness: 1),
-            const CategoryText(text: "Updates and Feedback"),
-            buildGuideItem("App Updates", "Keep your app updated to access new features..."),
-          ],
-        ),
+      body: ListView(
+        padding: const EdgeInsets.all(16.0),
+        children: const [
+          _SectionContent(
+            content:
+                "Welcome to SafeZone! This guide will help you navigate and utilize the SafeZone app effectively to enhance your safety and security.",
+          ),
+          _SectionTitle(title: "Getting Started"),
+          _SectionContent(
+            content:
+                "Downloading and Installing\niOS: Go to the App Store...\nAndroid: Go to the Google Play Store...",
+          ),
+          _SectionContent(
+            content:
+                "Creating an Account\nOpen the SafeZone app and select 'Sign Up'...",
+          ),
+          _SectionContent(
+            content:
+                "Logging In\nOpen the app and select 'Sign In'...",
+          ),
+          _SectionTitle(title: "Main Features"),
+          _SectionContent(
+            content:
+                "Dashboard Overview\nThe main dashboard displays essential information...",
+          ),
+          _SectionContent(
+            content:
+                "Real-Time Location Tracking\nTo enable location tracking, go to the settings...",
+          ),
+          _SectionContent(
+            content:
+                "SOS Alerts\nTo send an SOS alert, press and hold the SOS button...",
+          ),
+          _SectionContent(
+            content:
+                "Safe Area Finder\nUse the safe area finder to locate nearby safe spaces...",
+          ),
+          _SectionContent(
+            content:
+                "User Notifications\nManage your notifications in the settings...",
+          ),
+          _SectionTitle(title: "Using the App"),
+          _SectionContent(
+            content:
+                "Navigating the Interface\nUse the bottom navigation bar to switch between features...",
+          ),
+          _SectionContent(
+            content:
+                "Sending Alerts\nTap the SOS button for immediate assistance...",
+          ),
+          _SectionContent(
+            content:
+                "Viewing Safe Areas\nAccess the map from the dashboard to view safe areas...",
+          ),
+          _SectionTitle(title: "Settings and Customization"),
+          _SectionContent(
+            content:
+                "Account Settings\nUpdate personal information by going to 'Account Details'...",
+          ),
+          _SectionContent(
+            content:
+                "Notification Preferences\nCustomize notification preferences in the settings...",
+          ),
+          _SectionTitle(title: "Troubleshooting and Support"),
+          _SectionContent(
+            content:
+                "Common Issues\nApp Crashing: Restart the application...",
+          ),
+          _SectionContent(
+            content:
+                "Contact Support\nIf you need additional help, contact our support team...",
+          ),
+          _SectionTitle(title: "Safety Tips"),
+          _SectionContent(
+            content:
+                "General Safety Tips\nStay aware of your surroundings and trust your instincts...",
+          ),
+          _SectionContent(
+            content:
+                "Using SafeZone Effectively\nRegularly update your app to access the latest features...",
+          ),
+          _SectionTitle(title: "FAQs"),
+          _SectionContent(
+            content:
+                "Frequently Asked Questions\nQ: How do I update my account information?\nA: Go to 'Account Details' in the settings...",
+          ),
+          _SectionContent(
+            content:
+                "Q: Can I use SafeZone anonymously?\nA: Yes, you can use SafeZone without creating an account...",
+          ),
+          _SectionTitle(title: "Updates and Feedback"),
+          _SectionContent(
+            content:
+                "App Updates\nKeep your app updated to access new features and improvements...",
+          ),
+        ],
       ),
     );
   }
+}
 
-  Widget buildGuideItem(String title, String description) {
+class _SectionTitle extends StatelessWidget {
+  final String title;
+  const _SectionTitle({required this.title});
+
+  @override
+  Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            description,
-            style: const TextStyle(fontSize: 14),
-          ),
-          const SizedBox(height: 10),
-        ],
+      padding: const EdgeInsets.only(top: 16.0, bottom: 8.0),
+      child: Text(
+        title,
+        style: const TextStyle(
+            color: textColor, fontSize: 15, fontWeight: FontWeight.bold),
+      ),
+    );
+  }
+}
+
+class _SectionContent extends StatelessWidget {
+  final String content;
+  const _SectionContent({required this.content});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12.0),
+      child: Text(
+        content,
+        style: const TextStyle(color: labelFormFieldColor, fontSize: 15),
       ),
     );
   }
