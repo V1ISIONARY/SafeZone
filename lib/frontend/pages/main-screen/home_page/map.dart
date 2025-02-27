@@ -590,7 +590,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
           Marker(
             markerId: MarkerId(dangerZone.id.toString()),
             icon: customDangerZoneMarker ?? BitmapDescriptor.defaultMarker,
-            position: LatLng(dangerZone.latitude, dangerZone.longitude),
+            position: LatLng(dangerZone.latitude!, dangerZone.longitude!),
             infoWindow: InfoWindow(
               title: dangerZone.name,
             ),
@@ -599,8 +599,8 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
         circles.add(
           Circle(
             circleId: CircleId(dangerZone.id.toString()),
-            center: LatLng(dangerZone.latitude, dangerZone.longitude),
-            radius: dangerZone.radius,
+            center: LatLng(dangerZone.latitude!, dangerZone.longitude!),
+            radius: dangerZone.radius!,
             strokeWidth: 1,
             strokeColor: Colors.transparent,
             fillColor: Colors.red.withOpacity(0.1),

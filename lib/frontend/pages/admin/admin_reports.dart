@@ -211,6 +211,7 @@ class _AdminReportsState extends State<AdminReports> {
                 child: AdminReportsCard(
                   reportModel: report,
                   address: _addresses[report.id] ?? "Fetching address...",
+                  onRefresh: _loadReports,
                 ),
               );
             },

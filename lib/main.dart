@@ -2,12 +2,14 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:safezone/backend/apiservice/adminApi/analyticsApi/analytics_impl.dart';
+import 'package:safezone/backend/apiservice/adminApi/incident_reportApi/admin_incident_impl.dart';
 import 'package:safezone/backend/apiservice/adminApi/safezoneApi/safezone_impl.dart';
 import 'package:safezone/backend/apiservice/adminApi/safezoneApi/safezone_repo.dart';
 import 'package:safezone/backend/apiservice/circleApi/circle_impl.dart';
 import 'package:safezone/backend/apiservice/notificationApi/notification_impl.dart';
 import 'package:safezone/backend/apiservice/profileApi/profile_impl.dart';
 import 'package:safezone/backend/bloc/adminBloc/analytics/analytics_admin_bloc.dart';
+import 'package:safezone/backend/bloc/adminBloc/incident_report/admin_incident_report_bloc.dart';
 import 'package:safezone/backend/bloc/adminBloc/safezone/safezone_admin_bloc.dart';
 import 'package:safezone/backend/bloc/circleBloc/circle_bloc.dart';
 import 'package:safezone/backend/bloc/notificationBloc/notification_bloc.dart';
@@ -165,6 +167,11 @@ class MyApp extends StatelessWidget {
               BlocProvider(
                   create: (_) =>
                       AdminBloc(adminRepository: AdminRepositoryImpl())),
+              BlocProvider(
+                create: (_) => AdminIncidentReportBloc(
+                  AdminIncidentRepositoryImpl(),
+                ),
+              ),
             ],
             child: MaterialApp.router(
               debugShowCheckedModeBanner: false,
