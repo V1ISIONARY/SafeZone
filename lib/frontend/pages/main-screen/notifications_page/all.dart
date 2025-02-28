@@ -53,7 +53,7 @@ class _AllState extends State<All> {
           } else if (state is NotificationError) {
             return _buildError(state.message);
           } else if (state is NotificationLoaded) {
-            notifications = state.notifications; 
+            notifications = state.notifications;
             return notifications.isNotEmpty
                 ? _buildNotificationList()
                 : _buildPlaceholder();
@@ -70,63 +70,73 @@ class _AllState extends State<All> {
       itemBuilder: (context, index) {
         final notification = notifications[index];
 
-        return Container(
-          width: double.infinity,
-          margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-          decoration: BoxDecoration(
-            color: const Color.fromARGB(10, 0, 0, 0), 
-            borderRadius: BorderRadius.circular(5),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Row(
-              children: [
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.white,
+        return GestureDetector(
+          onTap: () {
+            if (!notification.isRead) {
+              context
+                  .read<NotificationBloc>()
+                  .add(MarkNotificationAsRead(notification.id));
+
+              setState(() {
+                notifications[index] = notification.copyWith(isRead: true);
+              });
+            }
+          },
+          child: Container(
+            width: double.infinity,
+            margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+            decoration: BoxDecoration(
+              color: const Color.fromARGB(10, 0, 0, 0),
+              borderRadius: BorderRadius.circular(5),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Row(
+                children: [
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white,
+                    ),
+                    child: Icon(
+                      Icons.notifications,
+                      color: notification.isRead ? Colors.grey : btnColor,
+                    ),
                   ),
-                  child: Icon(
-                    Icons.notifications,
-                    color: notification.isRead
-                        ? Colors.grey
-                        : btnColor, 
-                  ),
-                ),
-                const SizedBox(width: 16), 
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        notification.title,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: textColor,
-                          fontSize: 15,
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          notification.title,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: textColor,
+                            fontSize: 15,
+                          ),
                         ),
-                      ),
-                      const SizedBox(
-                          height: 4), 
-                      Text(
-                        notification.message,
-                        style: const TextStyle(
-                          color: labelFormFieldColor,
-                          fontSize: 13,
+                        const SizedBox(height: 4),
+                        Text(
+                          notification.message,
+                          style: const TextStyle(
+                            color: labelFormFieldColor,
+                            fontSize: 13,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        notification.createdAt,
-                        style:
-                            const TextStyle(color: Colors.grey, fontSize: 11),
-                      ),
-                    ],
+                        const SizedBox(height: 4),
+                        Text(
+                          notification.createdAt,
+                          style:
+                              const TextStyle(color: Colors.grey, fontSize: 11),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         );

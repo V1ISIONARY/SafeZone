@@ -387,25 +387,25 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
         if (isInsideSafeZone && !_wasInsideSafeZone) {
           _showZoneDialog("Safe Zone", "You have entered a safe zone.");
           _sendBroadcastNotification(
-              "Group member - Safe Zone", " has entered a safe zone.");
+              "Group member - Safe Zone", "has entered a safe zone.");
           _wasInsideSafeZone = true;
         } else if (isInsideDangerZone && !_wasInsideDangerZone) {
           _showZoneDialog("Danger Zone",
               "You have entered a danger zone. Please be cautious.");
           _sendBroadcastNotification("Group member - Danger Zone",
-              " has entered a danger zone. Please be cautious.");
+              "has entered a danger zone. Please be cautious.");
           _wasInsideDangerZone = true;
         }
 
         if (!isInsideSafeZone && _wasInsideSafeZone) {
           _showZoneDialog("Safe Zone", "You have exited the safe zone.");
           _sendBroadcastNotification(
-              "Group member - Safe Zone", " has exited the safe zone.");
+              "Group member - Safe Zone", "has exited the safe zone.");
           _wasInsideSafeZone = false;
         } else if (!isInsideDangerZone && _wasInsideDangerZone) {
           _showZoneDialog("Danger Zone", "You have exited the danger zone.");
           _sendBroadcastNotification(
-              "Group member - Danger Zone", " has exited the danger zone.");
+              "Group member - Danger Zone", "has exited the danger zone.");
           _wasInsideDangerZone = false;
         }
       }
@@ -723,7 +723,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
       ),
     );
   }
-  
+
   // Future<void> _searchLocation(String query) async {
   //   if (query.isEmpty) return;
 
