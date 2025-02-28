@@ -250,22 +250,35 @@ class _LoginState extends State<Login> {
                                 UserLogin(email, password),
                               );
                         },
-                        child: Container(
-                          height: 50,
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                            color: widgetPricolor,
-                            borderRadius: BorderRadius.circular(50),
-                          ),
-                          child: Center(
-                            child: Text(
-                              'Sign In',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.white,
+                        child: BlocBuilder<AuthenticationBloc,
+                            AuthenticationState>(
+                          builder: (context, state) {
+                            return Container(
+                              height: 50,
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                color: widgetPricolor,
+                                borderRadius: BorderRadius.circular(50),
                               ),
-                            ),
-                          ),
+                              child: Center(
+                                child: state is LoginLoading
+                                    ? Container(
+                                        height: 20,
+                                        width: 20,
+                                        child: Center(
+                                            child: CircularProgressIndicator(
+                                                color: Colors.white)),
+                                      )
+                                    : Text(
+                                        'Sign In',
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                              ),
+                            );
+                          },
                         ),
                       )),
                   Container(
@@ -312,27 +325,7 @@ class _LoginState extends State<Login> {
                   ),
                   BlocListener<AuthenticationBloc, AuthenticationState>(
                     listener: (context, state) async {
-                      if (state is LoginLoading) {
-                        // Show a loading dialog while logging in
-                        showDialog(
-                          context: context,
-                          barrierDismissible: false,
-                          builder: (context) => AlertDialog(
-                            backgroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.circular(10), // Rounded corners
-                            ),
-                            content: Row(
-                              children: const [
-                                LoadingState(),
-                                SizedBox(width: 10),
-                                Text("Logging in..."),
-                              ],
-                            ),
-                          ),
-                        );
-                      } else if (state is LoginSuccess) {
+                      if (state is LoginSuccess) {
                         Navigator.pop(
                             context); // Close the loading dialog if it's open
 
