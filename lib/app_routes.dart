@@ -210,7 +210,7 @@ GoRouter appRouter(bool isFirstRun, String? userToken) => GoRouter(
           },
         ),
 
-       GoRoute(
+      GoRoute(
           path: '/admin-safezone-details',
           builder: (context, state) {
             final extra = state.extra as Map<String, dynamic>;
@@ -226,18 +226,19 @@ GoRouter appRouter(bool isFirstRun, String? userToken) => GoRouter(
           },
         ),
 
-        GoRoute(
+      GoRoute(
           path: '/admin-reports-details',
           builder: (context, state) {
             final extra = state.extra as Map<String, dynamic>;
-            final report = extra['report'] as IncidentReportModel; 
+            final reportModel = extra['reportModel'] as IncidentReportModel;
             final address = extra['address'] as String;
-            final Function(IncidentReportModel)? onStatusChanged = extra['onStatusChanged'] as Function(IncidentReportModel)?; 
+            final Function(IncidentReportModel)? onStatusChanged =
+                extra['onStatusChanged'] as Function(IncidentReportModel)?;
 
             return AdminReportsDetails(
-              reportInfo: report,
+              reportInfo: reportModel,
               address: address,
-              onStatusChanged: onStatusChanged, 
+              onStatusChanged: onStatusChanged,
             );
           },
         ),

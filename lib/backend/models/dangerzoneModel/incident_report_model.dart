@@ -72,10 +72,10 @@ class IncidentReportModel {
 class DangerZoneModel {
   final int id;
   final bool isVerified;
-  final double latitude;
-  final double longitude;
-  final double radius;
-  final String name;
+  final double? latitude;
+  final double? longitude;
+  final double? radius;
+  final String? name;
 
   DangerZoneModel({
     required this.id,
@@ -90,10 +90,10 @@ class DangerZoneModel {
     return DangerZoneModel(
       id: json['id'],
       isVerified: json['is_verified'],
-      latitude: json['latitude'].toDouble(),
-      longitude: json['longitude'].toDouble(),
-      radius: json['radius'].toDouble(),
-      name: json['name'],
+      latitude: json['latitude'] != null ? json['latitude'].toDouble() : null, // Handle null
+      longitude: json['longitude'] != null ? json['longitude'].toDouble() : null, // Handle null
+      radius: json['radius'] != null ? json['radius'].toDouble() : null, // Handle null
+      name: json['name'] != null ? json['name'].toString() : null,
     );
   }
 }

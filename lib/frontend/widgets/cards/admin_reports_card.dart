@@ -8,23 +8,34 @@ import '../../../../resources/schema/texts.dart';
 class AdminReportsCard extends StatelessWidget {
   final IncidentReportModel reportModel;
   final String address;
+  final VoidCallback? onRefresh;
+
 
   const AdminReportsCard(
-      {super.key, required this.reportModel, required this.address});
-
+      {super.key, required this.reportModel, required this.address, required this.onRefresh});
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {
-        context.push(
-          "/admin-reports-details",
-          extra: {
-            'reportModel': reportModel,
-            'address': address,
-          },
-        );
-      },
-      child: Container(
+      onTap: () async {
+  final shouldRefresh = await context.push(
+    "/admin-reports-details",
+    extra: {
+      'reportModel': reportModel,
+      'address': address,
+      
+    },
+  );
+   // Log the shouldRefresh value
+  print("shouldRefresh: $shouldRefresh");
+
+  // Refresh the data if needed
+  if (shouldRefresh == true) {
+    print('refreshing');
+    onRefresh!();
+    // Trigger a refresh (you'll need to pass a callback or use a state management solution)
+  }
+},
+       child: Container(
         width: double.infinity,
         height: 70,
         margin: const EdgeInsets.only(bottom: 10),
@@ -51,7 +62,7 @@ class AdminReportsCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  CategoryText(text: reportModel.dangerZone!.name),
+                  CategoryText(text: reportModel.dangerZone!.name!),
                   Row(
                     children: [
                       const Icon(Icons.location_on, size: 12, color: btnColor),
@@ -75,7 +86,8 @@ class AdminReportsCard extends StatelessWidget {
             ),
           ],
         ),
-      ),
-    );
+       )
+      );
+      }
   }
-}
+
