@@ -4,16 +4,16 @@ import 'package:flutter/widgets.dart';
 import '../../../resources/schema/texts.dart';
 
 class Userinfomartion extends StatelessWidget {
-  final String name;
+  final String username;
   final String profileImage;
   final int safeZone;
-  final int dangerZone;
+  final int incidents;
   const Userinfomartion(
       {super.key,
-      required this.name,
+      required this.username,
       required this.profileImage,
       required this.safeZone,
-      required this.dangerZone});
+      required this.incidents});
 
   @override
   Widget build(BuildContext context) {
@@ -21,9 +21,9 @@ class Userinfomartion extends StatelessWidget {
       child: Container(
         width: double.infinity,
         height: 70,
-        margin: EdgeInsets.only(bottom: 10),
+        margin: const EdgeInsets.only(bottom: 10),
         decoration: BoxDecoration(
-            color: Color.fromARGB(10, 0, 0, 0),
+            color: const Color.fromARGB(10, 0, 0, 0),
             borderRadius: BorderRadius.circular(5)),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -32,19 +32,20 @@ class Userinfomartion extends StatelessWidget {
             Container(
               width: 40,
               height: 40,
-              margin: EdgeInsets.only(left: 15),
-              decoration:
-                  BoxDecoration(shape: BoxShape.circle, color: Colors.white),
+              margin: const EdgeInsets.only(left: 15),
+              decoration: const BoxDecoration(
+                  shape: BoxShape.circle, color: Colors.white),
             ),
             Padding(
-                padding: EdgeInsets.only(left: 15),
+                padding: const EdgeInsets.only(left: 15),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    CategoryText(text: name),
+                    CategoryText(text: username),
                     CategoryDescripText(
-                        text: 'SafeZone: $safeZone ⋅ DangerZone: $dangerZone')
+                        text:
+                            'SafeZone: $safeZone ⋅ Incident Reports: $incidents')
                   ],
                 )),
           ],

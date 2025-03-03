@@ -7,6 +7,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   final ProfileRepository profileRepository;
 
   ProfileBloc(this.profileRepository) : super(ProfileInitial()) {
+    // Get Profile Event
     on<GetProfileEvent>((event, emit) async {
       emit(ProfileLoading());
       try {
@@ -21,6 +22,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
       }
     });
 
+    // Update Status Event
     on<UpdateStatusEvent>((event, emit) async {
       emit(UpdateStatusLoading());
       try {
@@ -33,6 +35,38 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         }
       } catch (e) {
         emit(UpdateStatusError("Error updating status: $e"));
+      }
+    });
+
+    // Upload Profile Picture Event
+    on<UploadProfilePictureEvent>((event, emit) async {
+      emit(ProfileLoading());
+      try {
+        final profilePictureUrl = await profileRepository.uploadProfilePicture(
+            event.userId, event.imageFile);
+        if (profilePictureUrl != null) {
+          emit(ProfilePictureUploaded(profilePictureUrl));
+        } else {
+          emit(const ProfileError("Failed to upload profile picture"));
+        }
+      } catch (e) {
+        emit(ProfileError("Error uploading profile picture: $e"));
+      }
+    });
+
+    // Get Profile Picture Event
+    on<GetProfilePictureEvent>((event, emit) async {
+      emit(ProfileLoading());
+      try {
+        final profilePictureUrl =
+            await profileRepository.getProfilePicture(event.userId);
+        if (profilePictureUrl != null) {
+          emit(ProfilePictureLoaded(profilePictureUrl));
+        } else {
+          emit(const ProfileError("Profile picture not found"));
+        }
+      } catch (e) {
+        emit(ProfileError("Error fetching profile picture: $e"));
       }
     });
   }

@@ -20,11 +20,13 @@ class CategoryText extends StatelessWidget {
 class CategoryDescripText extends StatelessWidget {
   final String text;
   final String? alignment;
+  final Color? color;
 
   const CategoryDescripText({
     super.key,
     required this.text,
     this.alignment,
+    this.color
   });
 
   @override
@@ -34,7 +36,7 @@ class CategoryDescripText extends StatelessWidget {
       style: GoogleFonts.poppins(
         fontSize: 9,
         fontWeight: FontWeight.w500,
-        color: Colors.black45,
+        color: color ?? Colors.black45,
       ),
       textAlign: _getTextAlignment(),
     );

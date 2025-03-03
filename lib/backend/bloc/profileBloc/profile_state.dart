@@ -8,10 +8,15 @@ class ProfileState extends Equatable {
   List<Object?> get props => [];
 }
 
+// Initial State
 class ProfileInitial extends ProfileState {}
 
+// Loading States
 class ProfileLoading extends ProfileState {}
 
+class UpdateStatusLoading extends ProfileState {}
+
+// Loaded States
 class ProfileLoaded extends ProfileState {
   final ProfileModel profileData;
 
@@ -21,17 +26,16 @@ class ProfileLoaded extends ProfileState {
   List<Object?> get props => [profileData];
 }
 
-class ProfileError extends ProfileState {
-  final String message;
+class ProfilePictureLoaded extends ProfileState {
+  final String profilePictureUrl;
 
-  const ProfileError(this.message);
+  const ProfilePictureLoaded(this.profilePictureUrl);
 
   @override
-  List<Object?> get props => [message];
+  List<Object?> get props => [profilePictureUrl];
 }
 
-class UpdateStatusLoading extends ProfileState {}
-
+// Success States
 class UpdateStatusSuccess extends ProfileState {
   final String status;
 
@@ -39,6 +43,25 @@ class UpdateStatusSuccess extends ProfileState {
 
   @override
   List<Object?> get props => [status];
+}
+
+class ProfilePictureUploaded extends ProfileState {
+  final String profilePictureUrl;
+
+  const ProfilePictureUploaded(this.profilePictureUrl);
+
+  @override
+  List<Object?> get props => [profilePictureUrl];
+}
+
+// Error States
+class ProfileError extends ProfileState {
+  final String message;
+
+  const ProfileError(this.message);
+
+  @override
+  List<Object?> get props => [message];
 }
 
 class UpdateStatusError extends ProfileState {

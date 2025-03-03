@@ -7,11 +7,10 @@ import 'package:google_maps_flutter/google_maps_flutter.dart' as gmaps;
 import 'package:go_router/go_router.dart';
 import 'package:insta_image_viewer/insta_image_viewer.dart';
 import 'package:lottie/lottie.dart';
-import 'package:safezone/backend/bloc/incident_report/incident_report_bloc.dart';
-import 'package:safezone/backend/bloc/incident_report/incident_report_event.dart';
-import 'package:safezone/backend/bloc/incident_report/incident_report_state.dart';
+import 'package:safezone/backend/bloc/adminBloc/incident_report/admin_incident_report_bloc.dart';
+import 'package:safezone/backend/bloc/adminBloc/incident_report/admin_incident_report_event.dart';
+import 'package:safezone/backend/bloc/adminBloc/incident_report/admin_incident_report_state.dart';
 import 'package:safezone/backend/models/dangerzoneModel/incident_report_model.dart';
-import 'package:safezone/backend/models/dangerzoneModel/incident_report_request_model.dart';
 import 'package:safezone/frontend/widgets/texts/history_information.dart';
 import 'package:safezone/resources/schema/colors.dart';
 import 'package:safezone/resources/schema/texts.dart';
@@ -142,10 +141,10 @@ class _AdminReportsDetailsState extends State<AdminReportsDetails> {
 
   @override
   Widget build(BuildContext context) {
-    final IncidentReportBloc incidentReportBloc =
-        BlocProvider.of<IncidentReportBloc>(context);
+    final AdminIncidentReportBloc adminIncidentReportBloc =
+        BlocProvider.of<AdminIncidentReportBloc>(context);
 
-    return BlocListener<IncidentReportBloc, IncidentReportState>(
+    return BlocListener<AdminIncidentReportBloc, AdminIncidentReportState>(
       listener: (context, state) {
         if (state is IncidentReportLoading) {
           setState(() {
@@ -154,6 +153,7 @@ class _AdminReportsDetailsState extends State<AdminReportsDetails> {
         } else if (state is IncidentReportUpdated) {
           setState(() {
             _isLoading = false;
+            _reportModel = state.reportModel; // Update the report model
           });
 
           // Call the callback to update the parent state
@@ -162,7 +162,7 @@ class _AdminReportsDetailsState extends State<AdminReportsDetails> {
           }
 
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Report status updated successfully!")),
+            SnackBar(content: Text(state.message)),
           );
 
           // Return true to indicate that the data should be refreshed
@@ -172,7 +172,7 @@ class _AdminReportsDetailsState extends State<AdminReportsDetails> {
             _isLoading = false;
           });
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.message)),
+            SnackBar(content: Text(state.error)),
           );
         }
       },
@@ -182,7 +182,7 @@ class _AdminReportsDetailsState extends State<AdminReportsDetails> {
           centerTitle: true,
           title: const CategoryText(text: "Report Details"),
         ),
-        body: BlocBuilder<IncidentReportBloc, IncidentReportState>(
+        body: BlocBuilder<AdminIncidentReportBloc, AdminIncidentReportState>(
           builder: (context, state) {
             if (_isLoading) {
               return Center(
@@ -449,7 +449,7 @@ class _AdminReportsDetailsState extends State<AdminReportsDetails> {
                     ),
                   ),
                   const SizedBox(height: 20),
-                  Row(
+                    Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       const SizedBox(width: 10),
@@ -457,10 +457,8 @@ class _AdminReportsDetailsState extends State<AdminReportsDetails> {
                         child: ElevatedButton.icon(
                           onPressed: () {
                             _showConfirmationDialog('review', () {
-                              print(
-                                  "Review button pressed for ID: ${_reportModel.id}");
-                              incidentReportBloc.add(
-                                  UpdateIncidentReport(_reportModel as IncidentReportRequestModel));
+                              adminIncidentReportBloc.add(
+                                  ReviewIncidentReport(_reportModel.id!));
                             });
                           },
                           icon: const Icon(
@@ -490,10 +488,8 @@ class _AdminReportsDetailsState extends State<AdminReportsDetails> {
                         child: ElevatedButton.icon(
                           onPressed: () {
                             _showConfirmationDialog('verify', () {
-                              print(
-                                  "Verify button pressed for ID: ${_reportModel.id}");
-                              incidentReportBloc.add(
-                                  UpdateIncidentReport(_reportModel as IncidentReportRequestModel));
+                              adminIncidentReportBloc.add(
+                                  VerifyIncidentReport(_reportModel.id!));
                             });
                           },
                           icon: const Icon(
@@ -523,10 +519,8 @@ class _AdminReportsDetailsState extends State<AdminReportsDetails> {
                         child: ElevatedButton.icon(
                           onPressed: () {
                             _showConfirmationDialog('reject', () {
-                              print(
-                                  "Reject button pressed for ID: ${_reportModel.id}");
-                              incidentReportBloc.add(
-                                  UpdateIncidentReport(_reportModel as IncidentReportRequestModel));
+                              adminIncidentReportBloc.add(
+                                  RejectIncidentReport(_reportModel.id!));
                             });
                           },
                           icon: const Icon(

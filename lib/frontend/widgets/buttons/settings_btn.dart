@@ -17,7 +17,8 @@ class Settingsbtn extends StatelessWidget {
   final String svgIcon;
   final String navigateTo;
   final String description;
-  final VoidCallback onTap; // Add this for custom onTap functionality
+  final VoidCallback onTap; 
+  final bool? replace; 
 
   const Settingsbtn({
     super.key,
@@ -25,23 +26,38 @@ class Settingsbtn extends StatelessWidget {
     required this.svgIcon,
     required this.navigateTo,
     required this.description,
-    required this.onTap, // Add onTap to constructor
+    required this.onTap, 
+    this.replace
   });
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        onTap(); // Call the custom onTap function
-
-        Navigator.push(
-          context,
-          PageTransition(
-            child: _getPageForNavigation(navigateTo),
-            type: PageTransitionType.rightToLeft,
-            duration: Duration(milliseconds: 200),
-          ),
-        );
+        onTap(); 
+        if (replace == true) {
+          if (context.mounted) {
+            Navigator.pushReplacement(
+              context,
+              PageTransition(
+                child: _getPageForNavigation(navigateTo),
+                type: PageTransitionType.rightToLeft,
+                duration: const Duration(milliseconds: 200),
+              ),
+            );
+          }
+        } else {
+          if (context.mounted) {
+            Navigator.push(
+              context,
+              PageTransition(
+                child: _getPageForNavigation(navigateTo),
+                type: PageTransitionType.rightToLeft,
+                duration: const Duration(milliseconds: 200),
+              ),
+            );
+          }
+        }
       },
       child: Container(
         width: double.infinity,

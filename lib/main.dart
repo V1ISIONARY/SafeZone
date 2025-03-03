@@ -1,11 +1,15 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:safezone/backend/apiservice/adminApi/analyticsApi/analytics_impl.dart';
+import 'package:safezone/backend/apiservice/adminApi/incident_reportApi/admin_incident_impl.dart';
 import 'package:safezone/backend/apiservice/adminApi/safezoneApi/safezone_impl.dart';
 import 'package:safezone/backend/apiservice/adminApi/safezoneApi/safezone_repo.dart';
 import 'package:safezone/backend/apiservice/circleApi/circle_impl.dart';
 import 'package:safezone/backend/apiservice/notificationApi/notification_impl.dart';
 import 'package:safezone/backend/apiservice/profileApi/profile_impl.dart';
+import 'package:safezone/backend/bloc/adminBloc/analytics/analytics_admin_bloc.dart';
+import 'package:safezone/backend/bloc/adminBloc/incident_report/admin_incident_report_bloc.dart';
 import 'package:safezone/backend/bloc/adminBloc/safezone/safezone_admin_bloc.dart';
 import 'package:safezone/backend/bloc/circleBloc/circle_bloc.dart';
 import 'package:safezone/backend/bloc/notificationBloc/notification_bloc.dart';
@@ -38,6 +42,7 @@ void main() async {
   // Initialize SharedPreferences and dotenv
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   bool isFirstRun = prefs.getBool('isFirstRun') ?? true;
+  String userToken = prefs.getString('userToken') ?? 'guess';
 
   // Load environment variables
   await dotenv.load(fileName: ".env");
@@ -71,30 +76,27 @@ void main() async {
     }
   });
 
-  runApp(MyApp(isFirstRun: isFirstRun));
+  runApp(MyApp(isFirstRun: isFirstRun, userToken: userToken));
 }
 
 class MyApp extends StatelessWidget {
   final bool isFirstRun;
+  final String userToken;
 
-  const MyApp({super.key, required this.isFirstRun});
+  const MyApp({super.key, required this.isFirstRun, required this.userToken});
 
   Future<void> _initializeApp() async {
     await Firebase.initializeApp();
     await dotenv.load(fileName: ".env");
   }
 
-  // Function to trigger a test notification
   Future<void> _sendTestNotification() async {
-    // Check if notifications are allowed
     bool isAllowed = await AwesomeNotifications().isNotificationAllowed();
 
     if (!isAllowed) {
-      // Request permission to send notifications
       await AwesomeNotifications().requestPermissionToSendNotifications();
     }
 
-    // Create the notification after permission is granted
     await AwesomeNotifications().createNotification(
       content: NotificationContent(
         id: 10,
@@ -124,7 +126,6 @@ class MyApp extends StatelessWidget {
             ),
           );
         } else {
-          // Trigger the notification test after app initialization
           _sendTestNotification();
 
           return MultiBlocProvider(
@@ -158,10 +159,18 @@ class MyApp extends StatelessWidget {
               BlocProvider(
                   create: (_) =>
                       NotificationBloc(NotificationImplementation())),
+              BlocProvider(
+                  create: (_) =>
+                      AdminBloc(adminRepository: AdminRepositoryImpl())),
+              BlocProvider(
+                create: (_) => AdminIncidentReportBloc(
+                  AdminIncidentRepositoryImpl(),
+                ),
+              ),
             ],
             child: MaterialApp.router(
               debugShowCheckedModeBanner: false,
-              routerConfig: appRouter(isFirstRun),
+              routerConfig: appRouter(isFirstRun, userToken),
               theme: AppTheme.lightTheme,
               title: "SafeZone",
             ),

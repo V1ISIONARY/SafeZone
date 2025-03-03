@@ -10,6 +10,7 @@ import 'package:safezone/backend/bloc/authBloc/auth_state.dart';
 import 'package:safezone/backend/bloc/notificationBloc/notification_polling.dart';
 import 'package:safezone/frontend/pages/authentication/register.dart';
 import 'package:safezone/frontend/widgets/bottom_navigation.dart';
+import 'package:safezone/frontend/widgets/loadingstate.dart';
 import 'package:safezone/resources/schema/colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -44,7 +45,6 @@ class _LoginState extends State<Login> {
       backgroundColor: Colors.white,
       body: Stack(
         children: [
-          // Background Image (Positioned at the top)
           Positioned(
             top: 0,
             left: 0,
@@ -52,11 +52,9 @@ class _LoginState extends State<Login> {
             child: Image.asset(
               'lib/resources/images/login.png',
               width: double.infinity,
-              fit: BoxFit.cover, // Adjust as needed
+              fit: BoxFit.cover,
             ),
           ),
-
-          // Foreground Content
           SingleChildScrollView(
             keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
             child: Padding(
@@ -252,22 +250,35 @@ class _LoginState extends State<Login> {
                                 UserLogin(email, password),
                               );
                         },
-                        child: Container(
-                          height: 50,
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                            color: widgetPricolor,
-                            borderRadius: BorderRadius.circular(50),
-                          ),
-                          child: Center(
-                            child: Text(
-                              'Sign In',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.white,
+                        child: BlocBuilder<AuthenticationBloc,
+                            AuthenticationState>(
+                          builder: (context, state) {
+                            return Container(
+                              height: 50,
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                color: widgetPricolor,
+                                borderRadius: BorderRadius.circular(50),
                               ),
-                            ),
-                          ),
+                              child: Center(
+                                child: state is LoginLoading
+                                    ? Container(
+                                        height: 20,
+                                        width: 20,
+                                        child: Center(
+                                            child: CircularProgressIndicator(
+                                                color: Colors.white)),
+                                      )
+                                    : Text(
+                                        'Sign In',
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                              ),
+                            );
+                          },
                         ),
                       )),
                   Container(
@@ -315,10 +326,13 @@ class _LoginState extends State<Login> {
                   BlocListener<AuthenticationBloc, AuthenticationState>(
                     listener: (context, state) async {
                       if (state is LoginSuccess) {
-                        // Once login is successful, navigate and start polling
+                        Navigator.pop(
+                            context); // Close the loading dialog if it's open
+
                         final SharedPreferences prefs =
                             await SharedPreferences.getInstance();
                         int userId = prefs.getInt('id') ?? 0;
+                        await prefs.setString('userToken', userId.toString());
 
                         if (userId != 0) {
                           int intervalInSeconds = 10;
@@ -329,16 +343,19 @@ class _LoginState extends State<Login> {
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
-                              builder: (context) =>
-                                  BottomNavigationWidget(userToken: 'who')),
+                            builder: (context) => BottomNavigationWidget(
+                                userToken: userId.toString()),
+                          ),
                         );
                         print(state);
                       } else if (state is LoginError) {
+                        Navigator.pop(
+                            context); // Close the loading dialog if it's open
                         print(state.message);
                       }
                     },
                     child: Container(),
-                  ),
+                  )
                 ],
               ),
             ),

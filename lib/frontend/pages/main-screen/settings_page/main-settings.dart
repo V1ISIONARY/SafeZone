@@ -1,4 +1,3 @@
-// ignore_for_file: prefer_const_constructors, unused_element
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -20,21 +19,65 @@ class Settings extends StatefulWidget {
 
 class _SettingsState extends State<Settings> {
   bool isToggled = false;
-
   int selectedItem = 0;
+  bool? isAdmin;
+
+  Future<String> _getUserName() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final firstName = prefs.getString('first_name') ?? '';
+    final lastName = prefs.getString('last_name') ?? '';
+
+    // Capitalize the first letter and make the rest lowercase
+    final formattedFirstName = firstName.isNotEmpty
+        ? firstName[0].toUpperCase() + firstName.substring(1).toLowerCase()
+        : '';
+    final formattedLastName = lastName.isNotEmpty
+        ? lastName[0].toUpperCase() + lastName.substring(1).toLowerCase()
+        : '';
+
+    return '$formattedFirstName $formattedLastName'.trim();
+  }
+
+  Future<void> _saveMapType(int index) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('mapType', index);
+  }
+
+  // Load saved MapType index
+  Future<void> _loadSelectedMapType() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    int? savedIndex = prefs.getInt('mapType');
+
+    if (savedIndex != null) {
+      setState(() {
+        selectedItem = savedIndex;
+      });
+    }
+  }
 
   void onItemTap(int index) {
     setState(() {
       selectedItem = index;
+    });
+    _saveMapType(index);
+  }
+
+  Future<void> _loadAdminStatus() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool adminStatus = prefs.getBool('is_admin') ?? false;
+
+    print("DEBUG: Loaded isAdmin from SharedPreferences: $adminStatus");
+
+    setState(() {
+      isAdmin = adminStatus;
     });
   }
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      // _showSnackBar();
-    });
+    _loadAdminStatus();
+    _loadSelectedMapType();
   }
 
   @override
@@ -80,10 +123,14 @@ class _SettingsState extends State<Settings> {
                               height: 130,
                               color: Colors.white,
                               child: ClipRRect(
+                                  borderRadius: BorderRadius.only(
+                                    bottomLeft: Radius.circular(10),
+                                    topLeft: Radius.circular(10),
+                                  ),
                                   child: Image.asset(
-                                'lib/resources/images/location.png',
-                                fit: BoxFit.cover,
-                              ))),
+                                    'lib/resources/images/profile.jpg',
+                                    fit: BoxFit.cover,
+                                  ))),
                           Container(
                             width: 150,
                             height: 130,
@@ -124,33 +171,67 @@ class _SettingsState extends State<Settings> {
                                                                   .white70),
                                                     ),
                                                   ])
-                                            : Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                    Text(
-                                                      'Louise Romero',
+                                            : FutureBuilder<String>(
+                                                future: _getUserName(),
+                                                builder: (context, snapshot) {
+                                                  if (snapshot
+                                                          .connectionState ==
+                                                      ConnectionState.waiting) {
+                                                    return Text(
+                                                      'Loading...',
                                                       style:
                                                           GoogleFonts.poppins(
-                                                              fontSize: 15,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w500,
-                                                              color:
-                                                                  Colors.white),
-                                                    ),
-                                                    Text(
-                                                      '(+63) 970 815 2371',
+                                                        fontSize: 15,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        color: Colors.white,
+                                                      ),
+                                                    );
+                                                  } else if (snapshot
+                                                      .hasError) {
+                                                    return Text(
+                                                      'Error loading name',
                                                       style:
                                                           GoogleFonts.poppins(
-                                                              fontSize: 9,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w400,
-                                                              color: Colors
-                                                                  .white70),
-                                                    ),
-                                                  ])
+                                                        fontSize: 15,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        color: Colors.white,
+                                                      ),
+                                                    );
+                                                  } else {
+                                                    return Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Text(
+                                                          snapshot.data ??
+                                                              'Unknown User',
+                                                          style: GoogleFonts
+                                                              .poppins(
+                                                            fontSize: 15,
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                            color: Colors.white,
+                                                          ),
+                                                        ),
+                                                        Text(
+                                                          '(+63) 970 815 2371',
+                                                          style: GoogleFonts
+                                                              .poppins(
+                                                            fontSize: 9,
+                                                            fontWeight:
+                                                                FontWeight.w400,
+                                                            color:
+                                                                Colors.white70,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    );
+                                                  }
+                                                },
+                                              )
                                       ],
                                     )),
                                 Positioned(
@@ -221,18 +302,18 @@ class _SettingsState extends State<Settings> {
             widget.UserToken == 'guess'
                 ? SizedBox()
                 : Column(children: [
-                    Padding(
-                      padding: EdgeInsets.only(top: 10),
-                      child: Settingsbtn(
-                        title: 'Account Details',
-                        svgIcon: 'lib/resources/svg/account.svg',
-                        navigateTo: 'AccountDetails',
-                        description:
-                            'Protecting personal data and ensuring safety from threats.',
-                        onTap: () {},
-                      ),
-                    ),
-                    widget.UserToken == 'admin'
+                    // Padding(
+                    //   padding: EdgeInsets.only(top: 10),
+                    //   child: Settingsbtn(
+                    //     title: 'Account Details',
+                    //     svgIcon: 'lib/resources/svg/account.svg',
+                    //     navigateTo: 'AccountDetails',
+                    //     description:
+                    //         'Protecting personal data and ensuring safety from threats.',
+                    //     onTap: () {},
+                    //   ),
+                    // ),
+                    isAdmin == false
                         ? Container()
                         : Settingsbtn(
                             title: 'Report Analytics',
@@ -300,7 +381,7 @@ class _SettingsState extends State<Settings> {
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                PrimaryText(text: "Notification"),
+                                PrimaryText(text: 'Notification'),
                                 DescriptionText(
                                   text: "Control your notification",
                                 )
@@ -391,6 +472,7 @@ class _SettingsState extends State<Settings> {
                     svgIcon: 'lib/resources/svg/logout.svg',
                     navigateTo: 'Starter',
                     description: 'Start your journey now!',
+                    replace: true,
                     onTap: () {},
                   )
                 : Settingsbtn(
@@ -398,22 +480,12 @@ class _SettingsState extends State<Settings> {
                     svgIcon: 'lib/resources/svg/logout.svg',
                     navigateTo: 'Login',
                     description: 'Hello love GoodBye',
+                    replace: true,
                     onTap: () async {
-                      print("12313123213123123");
-                      print("12313123213123123");
-                      print("12313123213123123");
-                      print("12313123213123123");
-                      print("12313123213123123");
-                      print("12313123213123123");
-                      print("12313123213123123");
-                      print("12313123213123123");
                       NotificationPollingService().stopPolling();
-
-                      // Clear the SharedPreferences
                       final SharedPreferences prefs =
                           await SharedPreferences.getInstance();
-                      prefs
-                          .clear(); // Clears all the stored data in SharedPreferences
+                      prefs.clear();
                     },
                   ),
             Container(
@@ -442,27 +514,6 @@ class _SettingsState extends State<Settings> {
     );
   }
 
-  void _showSnackBar() {
-    final snackBar = SnackBar(
-      content: Text(
-        'You need to sign in to access all feature.',
-        style: TextStyle(color: Colors.white),
-      ),
-      duration: Duration(seconds: 5),
-      behavior: SnackBarBehavior.floating, // Allows movement via margin
-      backgroundColor: widgetPricolor,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10),
-      ),
-      margin: EdgeInsets.only(
-        bottom: 90, // Adjust this value to move it higher
-        left: 16,
-        right: 16,
-      ),
-    );
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
-  }
-
   Widget _buildItem(int index, String label, String imgStyle) {
     bool isSelected = selectedItem == index;
 
@@ -471,7 +522,7 @@ class _SettingsState extends State<Settings> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         GestureDetector(
-          onTap: () => onItemTap(index), // Handle tap
+          onTap: () => onItemTap(index),
           child: Container(
             width: 60,
             height: 60,

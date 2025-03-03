@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:ui' as ui;
 import 'package:flutter/services.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -16,12 +17,16 @@ import 'package:safezone/backend/bloc/dangerzoneBloc/dangerzone_event.dart';
 import 'package:safezone/backend/bloc/mapBloc/map_bloc.dart';
 import 'package:safezone/backend/bloc/mapBloc/map_event.dart';
 import 'package:safezone/backend/bloc/mapBloc/map_state.dart';
+import 'package:safezone/backend/bloc/notificationBloc/notification_bloc.dart';
+import 'package:safezone/backend/bloc/notificationBloc/notification_event.dart';
+import 'package:safezone/backend/bloc/notificationBloc/notification_state.dart';
 import 'package:safezone/backend/services/first_run_service.dart';
 import 'package:safezone/frontend/utils/marker_utils.dart';
 import 'package:safezone/frontend/utils/safezone_navigator.dart';
 import 'package:safezone/frontend/widgets/dialogs/dialogs.dart';
 import 'package:safezone/frontend/widgets/loadingstate.dart';
 import 'package:safezone/resources/schema/colors.dart';
+import 'package:safezone/resources/schema/texts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -55,6 +60,8 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
   bool _showMarkers = true;
   bool _showOptions = false;
   bool _isSafeZoneShown = false;
+  bool _wasInsideSafeZone = false;
+  bool _wasInsideDangerZone = false;
 
   BitmapDescriptor? customMarker;
   BitmapDescriptor? customDangerZoneMarker;
@@ -95,12 +102,13 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
   void initState() {
     super.initState();
     _loadUserId();
+    _loadMapType();
 
     context.read<MapBloc>().add(FetchMapData());
     context.read<DangerZoneBloc>().add(FetchDangerZones());
     _checkFirstRun();
     _createCustomMarker().then((_) {
-      _fetchLocation(); 
+      _fetchLocation();
     });
     print("Members list before fetching: $members");
 
@@ -150,6 +158,31 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
     });
 
     _startLocationUpdates();
+  }
+
+  Future<void> _loadMapType() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    int? mapTypeIndex = prefs.getInt('mapType');
+
+    if (mapTypeIndex != null) {
+      setState(() {
+        _currentMapType = _mapTypeFromIndex(mapTypeIndex);
+      });
+    }
+  }
+
+  // Convert saved index to MapType
+  MapType _mapTypeFromIndex(int index) {
+    switch (index) {
+      case 1:
+        return MapType.satellite;
+      case 2:
+        return MapType.terrain;
+      case 3:
+        return MapType.hybrid;
+      default:
+        return MapType.normal;
+    }
   }
 
   @override
@@ -293,6 +326,8 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
 
       if (response.statusCode == 200) {
         print('Location updated successfully!');
+        print('$latitude');
+        print('$longitude');
       } else {
         print('Failed to update location');
       }
@@ -310,20 +345,22 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
         accuracy: LocationAccuracy.high,
         distanceFilter: 10,
       ),
-    ).listen((Position position) {
+    ).listen((Position position) async {
       print(
           "Location updated: Latitude: ${position.latitude}, Longitude: ${position.longitude}");
+
+      LatLng userLocation = LatLng(position.latitude, position.longitude);
 
       if (googleMapController != null) {
         googleMapController!.animateCamera(CameraUpdate.newCameraPosition(
           CameraPosition(
-            target: LatLng(position.latitude, position.longitude),
+            target: userLocation,
             zoom: 14.0,
           ),
         ));
 
         setState(() {
-          _currentUserLocation = LatLng(position.latitude, position.longitude);
+          _currentUserLocation = userLocation;
           markers.clear();
           markers.add(Marker(
             markerId: const MarkerId("My Location"),
@@ -334,8 +371,76 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
         });
 
         updateLocation(position.latitude, position.longitude);
+
+        bool isInsideSafeZone = _isInsideZone(
+            userLocation,
+            circles
+                .where((circle) =>
+                    circle.fillColor == Colors.green.withOpacity(0.1))
+                .toList());
+        bool isInsideDangerZone = _isInsideZone(
+            userLocation,
+            circles
+                .where(
+                    (circle) => circle.fillColor == Colors.red.withOpacity(0.1))
+                .toList());
+
+        if (isInsideSafeZone && !_wasInsideSafeZone) {
+          _showZoneDialog("Safe Zone", "You have entered a safe zone.");
+          _sendBroadcastNotification(
+              "Group member - Safe Zone", "has entered a safe zone.");
+          _wasInsideSafeZone = true;
+        } else if (isInsideDangerZone && !_wasInsideDangerZone) {
+          _showZoneDialog("Danger Zone",
+              "You have entered a danger zone. Please be cautious.");
+          _sendBroadcastNotification("Group member - Danger Zone",
+              "has entered a danger zone. Please be cautious.");
+          _wasInsideDangerZone = true;
+        }
+
+        if (!isInsideSafeZone && _wasInsideSafeZone) {
+          _showZoneDialog("Safe Zone", "You have exited the safe zone.");
+          _sendBroadcastNotification(
+              "Group member - Safe Zone", "has exited the safe zone.");
+          _wasInsideSafeZone = false;
+        } else if (!isInsideDangerZone && _wasInsideDangerZone) {
+          _showZoneDialog("Danger Zone", "You have exited the danger zone.");
+          _sendBroadcastNotification(
+              "Group member - Danger Zone", "has exited the danger zone.");
+          _wasInsideDangerZone = false;
+        }
       }
     });
+  }
+
+  Future<void> _sendBroadcastNotification(String title, String message) async {
+    final prefs = await SharedPreferences.getInstance();
+    int userId = prefs.getInt('id') ?? 0;
+    String firstName = prefs.getString('first_name') ?? "User";
+    String lastName = prefs.getString('last_name') ?? "";
+
+    final formattedFirstName = firstName.isNotEmpty
+        ? firstName[0].toUpperCase() + firstName.substring(1).toLowerCase()
+        : '';
+    final formattedLastName = lastName.isNotEmpty
+        ? lastName[0].toUpperCase() + lastName.substring(1).toLowerCase()
+        : '';
+    String fullName = "$formattedFirstName $formattedLastName".trim();
+
+    if (userId != 0) {
+      context.read<NotificationBloc>().add(
+            BroadcastNotification(
+              userId,
+              title,
+              "$fullName $message",
+              "Zone Alert",
+            ),
+          );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Error: User ID not found!")),
+      );
+    }
   }
 
   // MARKERS
@@ -350,7 +455,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
         86,
       );
       customSafeZoneMarker = await MarkerUtils.resizeMarker(
-        'lib/resources/images/safezone.png',
+        'lib/resources/images/marker_safezone.png',
         58,
         86,
       );
@@ -366,12 +471,14 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
   Future<void> _preloadMemberMarkers(List<Map<String, dynamic>> members) async {
     for (var member in members) {
       String userId = member['user_id'].toString();
+      String name = member['first_name'];
+      String firstLetter = name.isNotEmpty ? name[0] : '';
 
       if (userId == _userId.toString()) {
         continue;
       }
 
-      BitmapDescriptor marker = await _loadCustomMemberMarker(userId);
+      BitmapDescriptor marker = await _loadCustomMemberMarker(firstLetter);
       memberMarkers[userId] = marker;
     }
   }
@@ -398,7 +505,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
 
   Future<BitmapDescriptor> _loadCustomMemberMarker(String letter) async {
     ByteData data =
-        await rootBundle.load('lib/resources/images/member_icon1.png');
+        await rootBundle.load('lib/resources/images/marker_member.png');
     ui.Codec codec = await ui.instantiateImageCodec(
       data.buffer.asUint8List(),
       targetWidth: 100,
@@ -418,7 +525,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
         text: letter,
         style: const TextStyle(
           color: ui.Color.fromARGB(255, 71, 71, 71),
-          fontSize: 100 * 0.4,
+          fontSize: 100 * 0.35,
           fontWeight: FontWeight.bold,
         ),
       ),
@@ -458,6 +565,8 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
     if (state is MapDataLoaded) {
       for (var member in state.members) {
         String userId = member['user_id'].toString();
+        String firstName = member['first_name'];
+        String lastName = member['last_name'];
         double latitude = member['latitude'];
         double longitude = member['longitude'];
 
@@ -472,7 +581,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
             markerId: MarkerId(userId),
             position: LatLng(latitude, longitude),
             icon: memberMarker ?? BitmapDescriptor.defaultMarker,
-            infoWindow: InfoWindow(title: 'User $userId'),
+            infoWindow: InfoWindow(title: '$firstName $lastName'),
           ),
         );
       }
@@ -482,7 +591,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
           Marker(
             markerId: MarkerId(dangerZone.id.toString()),
             icon: customDangerZoneMarker ?? BitmapDescriptor.defaultMarker,
-            position: LatLng(dangerZone.latitude, dangerZone.longitude),
+            position: LatLng(dangerZone.latitude!, dangerZone.longitude!),
             infoWindow: InfoWindow(
               title: dangerZone.name,
             ),
@@ -491,8 +600,8 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
         circles.add(
           Circle(
             circleId: CircleId(dangerZone.id.toString()),
-            center: LatLng(dangerZone.latitude, dangerZone.longitude),
-            radius: dangerZone.radius,
+            center: LatLng(dangerZone.latitude!, dangerZone.longitude!),
+            radius: dangerZone.radius!,
             strokeWidth: 1,
             strokeColor: Colors.transparent,
             fillColor: Colors.red.withOpacity(0.1),
@@ -530,6 +639,44 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
     }
 
     return markers;
+  }
+
+  // TRIGGERS WHEN USER ENTERS OR EXITS A ZONE :>
+
+  bool _isInsideZone(LatLng userLocation, List<Circle> zones) {
+    for (var zone in zones) {
+      double distance = Geolocator.distanceBetween(
+        userLocation.latitude,
+        userLocation.longitude,
+        zone.center.latitude,
+        zone.center.longitude,
+      );
+
+      if (distance <= zone.radius) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  void _showZoneDialog(String title, String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title),
+          content: Text(message),
+          actions: <Widget>[
+            TextButton(
+              child: const Text("Oki"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   // FINDING ROUTE TO SAFEZONE
@@ -578,6 +725,33 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
     );
   }
 
+  // Future<void> _searchLocation(String query) async {
+  //   if (query.isEmpty) return;
+
+  //   try {
+  //     List<Location> locations = await locationFromAddress(query);
+  //     if (locations.isNotEmpty) {
+  //       Location location = locations.first;
+  //       LatLng newPosition = LatLng(location.latitude, location.longitude);
+
+  //       googleMapController?.animateCamera(
+  //         CameraUpdate.newCameraPosition(
+  //           CameraPosition(target: newPosition, zoom: 16.0),
+  //         ),
+  //       );
+
+  //       setState(() {
+  //         _currentUserLocation = newPosition;
+  //         markers = {
+  //           Marker(markerId: MarkerId("searchLocation"), position: newPosition),
+  //         };
+  //       });
+  //     }
+  //   } catch (e) {
+  //     print("Location not found: $e");
+  //   }
+  // }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -587,14 +761,32 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
         height: double.infinity,
         child: Stack(
           children: [
-            BlocListener<MapBloc, MapState>(
-              listener: (context, state) {
-                if (state is MemberLocationUpdated) {
-                  print("iz changingggggg");
-                  _updateMemberMarker(
-                      state.userId, state.latitude, state.longitude);
-                }
-              },
+            MultiBlocListener(
+              listeners: [
+                BlocListener<MapBloc, MapState>(
+                  listener: (context, state) {
+                    if (state is MemberLocationUpdated) {
+                      print("iz changingggggg");
+                      _updateMemberMarker(
+                          state.userId, state.latitude, state.longitude);
+                    }
+                  },
+                ),
+                BlocListener<NotificationBloc, NotificationState>(
+                  listener: (context, state) {
+                    if (state is NotificationBroadcasted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                            content: Text("Zone notification broadcasted!")),
+                      );
+                    } else if (state is NotificationError) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text("Error: ${state.message}")),
+                      );
+                    }
+                  },
+                ),
+              ],
               child: BlocBuilder<MapBloc, MapState>(
                 builder: (context, state) {
                   if (state is MapLoading) {
@@ -622,23 +814,23 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                     onMapCreated: (GoogleMapController controller) async {
                       googleMapController = controller;
                       String style = '''
-                              [
-                                {
-                                  "featureType": "poi.business",
-                                  "elementType": "labels",
-                                  "stylers": [
-                                    { "visibility": "off" }
-                                  ]
-                                },
-                                {
-                                  "featureType": "poi",
-                                  "elementType": "labels.text",
-                                  "stylers": [
-                                    { "visibility": "off" }
-                                  ]
-                                }
-                              ]
-                              ''';
+                        [
+                          {
+                            "featureType": "poi.business",
+                            "elementType": "labels",
+                            "stylers": [
+                              { "visibility": "off" }
+                            ]
+                          },
+                          {
+                            "featureType": "poi",
+                            "elementType": "labels.text",
+                            "stylers": [
+                              { "visibility": "off" }
+                            ]
+                          }
+                        ]
+                        ''';
                       controller.setMapStyle(style);
                       _mapController.complete(controller);
 
@@ -691,6 +883,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                 Positioned.fill(
                                   child: TextField(
                                     controller: _textEditingController,
+                                    // onSubmitted: _searchLocation,
                                     focusNode: _focusNode,
                                     style: const TextStyle(
                                       color: Colors.black,
@@ -788,50 +981,54 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                           ),
                                         ),
                                       ),
-                                      SlideTransition(
-                                        position: _hintAnimation,
-                                        child: AnimatedBuilder(
-                                          animation: _hintColorAnimation,
-                                          builder: (context, child) {
-                                            return GestureDetector(
-                                              onTap: () {
-                                                FocusScope.of(context)
-                                                    .requestFocus(_focusNode);
-                                              },
-                                              child: Text(
-                                                hints[_currentHintIndex],
-                                                style: TextStyle(
-                                                  color:
-                                                      _hintColorAnimation.value,
-                                                  fontSize: 13,
+                                      Transform.translate(
+                                        offset: Offset(-5, 0),
+                                        child: SlideTransition(
+                                          position: _hintAnimation,
+                                          child: AnimatedBuilder(
+                                            animation: _hintColorAnimation,
+                                            builder: (context, child) {
+                                              return GestureDetector(
+                                                onTap: () {
+                                                  FocusScope.of(context)
+                                                      .requestFocus(_focusNode);
+                                                },
+                                                child: Text(
+                                                  hints[_currentHintIndex],
+                                                  style: TextStyle(
+                                                    color:
+                                                        _hintColorAnimation.value,
+                                                    fontSize: 13,
+                                                  ),
                                                 ),
-                                              ),
-                                            );
-                                          },
-                                        ),
+                                              );
+                                            },
+                                          ),
+                                        )
                                       )
                                     ],
                                   ),
                                 ),
                                 Positioned(
-                                    top: 0,
-                                    right: 5,
-                                    child: GestureDetector(
-                                      onTap: () {},
-                                      child: Container(
-                                        height: 40,
-                                        width: 40,
-                                        alignment: Alignment.center,
-                                        color: Colors.transparent,
-                                        child: SvgPicture.asset(
-                                          'lib/resources/svg/mic.svg',
-                                          color: Colors.black87,
-                                          height: 22,
-                                          width: 22,
-                                          fit: BoxFit.contain,
-                                        ),
+                                  top: 0,
+                                  right: 5,
+                                  child: GestureDetector(
+                                    onTap: () {},
+                                    child: Container(
+                                      height: 40,
+                                      width: 40,
+                                      alignment: Alignment.center,
+                                      color: Colors.transparent,
+                                      child: SvgPicture.asset(
+                                        'lib/resources/svg/mic.svg',
+                                        color: Colors.black87,
+                                        height: 22,
+                                        width: 22,
+                                        fit: BoxFit.contain,
                                       ),
-                                    )),
+                                    ),
+                                  )
+                                ),
                               ],
                             ),
                           ),
@@ -852,7 +1049,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                         color: _isSafeZoneShown
                             ? Colors.grey[300]
                             : Colors.white, // Toggle color
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(50),
                         boxShadow: const [
                           BoxShadow(
                             color: Colors.grey,
@@ -861,13 +1058,17 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                           ),
                         ],
                       ),
-                      child: const Center(
-                        child: Text(
-                          "Show nearest safe zone", // Keep the text constant
-                          style: TextStyle(
-                              color: labelFormFieldColor, fontSize: 11),
-                        ),
-                      ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          SizedBox(width: 5),
+                          Icon(
+                            Icons.safety_check, color: Colors.green,
+                          ),
+                          CategoryDescripText(text: "Show nearest safe zone", color: Colors.black)
+                        ]
+                      )
                     ),
                   ),
                 )
@@ -876,53 +1077,62 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
             Positioned(
               bottom: 90,
               left: 15,
-              child: Row(
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _showOptions = !_showOptions;
-                      });
-                    },
-                    child: AnimatedRotation(
-                      turns: _showOptions ? 0.5 : 0,
-                      duration: const Duration(milliseconds: 200),
-                      child: _buildButton(Icons.keyboard_arrow_right),
-                    ),
-                  ),
-                  const SizedBox(width: 7),
-                  AnimatedOpacity(
-                    opacity: _showOptions ? 1.0 : 0.0,
-                    duration: const Duration(milliseconds: 200),
-                    child: Row(
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              _currentMapType =
-                                  _currentMapType == MapType.normal
-                                      ? MapType.satellite
-                                      : MapType.normal;
-                            });
-                          },
-                          child: _buildButton(Icons.map),
-                        ),
-                        SizedBox(width: 7),
-                        GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              _showMarkers = !_showMarkers;
-                            });
-                          },
-                          child: _buildButton(_showMarkers
-                              ? Icons.visibility
-                              : Icons.visibility_off),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+              child: GestureDetector(
+                onTap: () {
+                  setState(() {
+                    _showMarkers = !_showMarkers;
+                  });
+                },
+                child: _buildButton(
+                    _showMarkers ? Icons.visibility : Icons.visibility_off),
               ),
+              // Row(
+              //   children: [
+              //     GestureDetector(
+              //       onTap: () {
+              //         setState(() {
+              //           _showOptions = !_showOptions;
+              //         });
+              //       },
+              //       child: AnimatedRotation(
+              //         turns: _showOptions ? 0.5 : 0,
+              //         duration: const Duration(milliseconds: 200),
+              //         child: _buildButton(Icons.keyboard_arrow_right),
+              //       ),
+              //     ),
+              //     const SizedBox(width: 7),
+              //     AnimatedOpacity(
+              //       opacity: _showOptions ? 1.0 : 0.0,
+              //       duration: const Duration(milliseconds: 200),
+              //       child: Row(
+              //         children: [
+              //           // GestureDetector(
+              //           //   onTap: () {
+              //           //     setState(() {
+              //           //       _currentMapType =
+              //           //           _currentMapType == MapType.normal
+              //           //               ? MapType.satellite
+              //           //               : MapType.normal;
+              //           //     });
+              //           //   },
+              //           //   child: _buildButton(Icons.map),
+              //           // ),
+              //           // SizedBox(width: 7),
+              //           GestureDetector(
+              //             onTap: () {
+              //               setState(() {
+              //                 _showMarkers = !_showMarkers;
+              //               });
+              //             },
+              //             child: _buildButton(_showMarkers
+              //                 ? Icons.visibility
+              //                 : Icons.visibility_off),
+              //           ),
+              //         ],
+              //       ),
+              //     ),
+              //   ],
+              // ),
             ),
 
             // Floating buttons

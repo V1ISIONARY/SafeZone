@@ -7,7 +7,7 @@ import 'package:safezone/frontend/pages/admin/admin_reports.dart';
 import 'package:safezone/frontend/pages/admin/admin_reports_details.dart';
 import 'package:safezone/frontend/pages/admin/admin_safezone_details.dart';
 import 'package:safezone/frontend/pages/admin/admin_safezones.dart';
-import 'package:safezone/frontend/pages/admin/main_analytics.dart';
+//import 'package:safezone/frontend/pages/admin/main_analytics.dart';
 import 'package:safezone/frontend/pages/authentication/register.dart';
 import 'package:safezone/backend/models/dangerzoneModel/incident_report_model.dart';
 import 'package:safezone/frontend/pages/authentication/login.dart';
@@ -34,14 +34,14 @@ import 'package:safezone/frontend/pages/main-screen/sos_page/sos_countdown.dart'
 import 'package:safezone/frontend/pages/main-screen/sos_page/sos_success.dart';
 import 'package:safezone/frontend/widgets/bottom_navigation.dart';
 
-GoRouter appRouter(bool isFirstRun) => GoRouter(
+GoRouter appRouter(bool isFirstRun, String? userToken) => GoRouter(
       initialLocation: '/',
       routes: [
         GoRoute(
           path: '/',
           builder: (context, state) => isFirstRun
               ? const SplashScreen()
-              : const BottomNavigationWidget(userToken: 'guess'),
+              : BottomNavigationWidget(userToken: userToken ?? 'guess'),
         ),
         // // GoRoute(
         // //   path: '/',
@@ -50,7 +50,7 @@ GoRouter appRouter(bool isFirstRun) => GoRouter(
         GoRoute(
           path: '/home',
           builder: (context, state) =>
-              const BottomNavigationWidget(userToken: 'guess'),
+              BottomNavigationWidget(userToken: userToken ?? 'guess'),
         ),
 
         GoRoute(
@@ -210,7 +210,7 @@ GoRouter appRouter(bool isFirstRun) => GoRouter(
           },
         ),
 
-       GoRoute(
+      GoRoute(
           path: '/admin-safezone-details',
           builder: (context, state) {
             final extra = state.extra as Map<String, dynamic>;
@@ -220,6 +220,23 @@ GoRouter appRouter(bool isFirstRun) => GoRouter(
 
             return AdminSafezoneDetails(
               safezonemodel: safezone,
+              address: address,
+              onStatusChanged: onStatusChanged,
+            );
+          },
+        ),
+
+      GoRoute(
+          path: '/admin-reports-details',
+          builder: (context, state) {
+            final extra = state.extra as Map<String, dynamic>;
+            final reportModel = extra['reportModel'] as IncidentReportModel;
+            final address = extra['address'] as String;
+            final Function(IncidentReportModel)? onStatusChanged =
+                extra['onStatusChanged'] as Function(IncidentReportModel)?;
+
+            return AdminReportsDetails(
+              reportInfo: reportModel,
               address: address,
               onStatusChanged: onStatusChanged,
             );
