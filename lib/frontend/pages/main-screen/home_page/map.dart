@@ -1068,53 +1068,62 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
             Positioned(
               bottom: 90,
               left: 15,
-              child: Row(
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _showOptions = !_showOptions;
-                      });
-                    },
-                    child: AnimatedRotation(
-                      turns: _showOptions ? 0.5 : 0,
-                      duration: const Duration(milliseconds: 200),
-                      child: _buildButton(Icons.keyboard_arrow_right),
-                    ),
-                  ),
-                  const SizedBox(width: 7),
-                  AnimatedOpacity(
-                    opacity: _showOptions ? 1.0 : 0.0,
-                    duration: const Duration(milliseconds: 200),
-                    child: Row(
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              _currentMapType =
-                                  _currentMapType == MapType.normal
-                                      ? MapType.satellite
-                                      : MapType.normal;
-                            });
-                          },
-                          child: _buildButton(Icons.map),
-                        ),
-                        SizedBox(width: 7),
-                        GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              _showMarkers = !_showMarkers;
-                            });
-                          },
-                          child: _buildButton(_showMarkers
-                              ? Icons.visibility
-                              : Icons.visibility_off),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+              child: GestureDetector(
+                onTap: () {
+                  setState(() {
+                    _showMarkers = !_showMarkers;
+                  });
+                },
+                child: _buildButton(
+                    _showMarkers ? Icons.visibility : Icons.visibility_off),
               ),
+              // Row(
+              //   children: [
+              //     GestureDetector(
+              //       onTap: () {
+              //         setState(() {
+              //           _showOptions = !_showOptions;
+              //         });
+              //       },
+              //       child: AnimatedRotation(
+              //         turns: _showOptions ? 0.5 : 0,
+              //         duration: const Duration(milliseconds: 200),
+              //         child: _buildButton(Icons.keyboard_arrow_right),
+              //       ),
+              //     ),
+              //     const SizedBox(width: 7),
+              //     AnimatedOpacity(
+              //       opacity: _showOptions ? 1.0 : 0.0,
+              //       duration: const Duration(milliseconds: 200),
+              //       child: Row(
+              //         children: [
+              //           // GestureDetector(
+              //           //   onTap: () {
+              //           //     setState(() {
+              //           //       _currentMapType =
+              //           //           _currentMapType == MapType.normal
+              //           //               ? MapType.satellite
+              //           //               : MapType.normal;
+              //           //     });
+              //           //   },
+              //           //   child: _buildButton(Icons.map),
+              //           // ),
+              //           // SizedBox(width: 7),
+              //           GestureDetector(
+              //             onTap: () {
+              //               setState(() {
+              //                 _showMarkers = !_showMarkers;
+              //               });
+              //             },
+              //             child: _buildButton(_showMarkers
+              //                 ? Icons.visibility
+              //                 : Icons.visibility_off),
+              //           ),
+              //         ],
+              //       ),
+              //     ),
+              //   ],
+              // ),
             ),
 
             // Floating buttons

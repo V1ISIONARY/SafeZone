@@ -59,7 +59,7 @@ class _SettingsState extends State<Settings> {
     setState(() {
       selectedItem = index;
     });
-    _saveMapType(index); 
+    _saveMapType(index);
   }
 
   Future<void> _loadAdminStatus() async {
@@ -123,10 +123,14 @@ class _SettingsState extends State<Settings> {
                               height: 130,
                               color: Colors.white,
                               child: ClipRRect(
+                                  borderRadius: BorderRadius.only(
+                                    bottomLeft: Radius.circular(10),
+                                    topLeft: Radius.circular(10),
+                                  ),
                                   child: Image.asset(
-                                'lib/resources/images/location.png',
-                                fit: BoxFit.cover,
-                              ))),
+                                    'lib/resources/images/profile.jpg',
+                                    fit: BoxFit.cover,
+                                  ))),
                           Container(
                             width: 150,
                             height: 130,
@@ -298,17 +302,17 @@ class _SettingsState extends State<Settings> {
             widget.UserToken == 'guess'
                 ? SizedBox()
                 : Column(children: [
-                    Padding(
-                      padding: EdgeInsets.only(top: 10),
-                      child: Settingsbtn(
-                        title: 'Account Details',
-                        svgIcon: 'lib/resources/svg/account.svg',
-                        navigateTo: 'AccountDetails',
-                        description:
-                            'Protecting personal data and ensuring safety from threats.',
-                        onTap: () {},
-                      ),
-                    ),
+                    // Padding(
+                    //   padding: EdgeInsets.only(top: 10),
+                    //   child: Settingsbtn(
+                    //     title: 'Account Details',
+                    //     svgIcon: 'lib/resources/svg/account.svg',
+                    //     navigateTo: 'AccountDetails',
+                    //     description:
+                    //         'Protecting personal data and ensuring safety from threats.',
+                    //     onTap: () {},
+                    //   ),
+                    // ),
                     isAdmin == false
                         ? Container()
                         : Settingsbtn(
@@ -517,7 +521,7 @@ class _SettingsState extends State<Settings> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         GestureDetector(
-          onTap: () => onItemTap(index), 
+          onTap: () => onItemTap(index),
           child: Container(
             width: 60,
             height: 60,
