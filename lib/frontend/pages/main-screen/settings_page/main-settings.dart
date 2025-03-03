@@ -472,6 +472,7 @@ class _SettingsState extends State<Settings> {
                     svgIcon: 'lib/resources/svg/logout.svg',
                     navigateTo: 'Starter',
                     description: 'Start your journey now!',
+                    replace: true,
                     onTap: () {},
                   )
                 : Settingsbtn(
@@ -479,9 +480,9 @@ class _SettingsState extends State<Settings> {
                     svgIcon: 'lib/resources/svg/logout.svg',
                     navigateTo: 'Login',
                     description: 'Hello love GoodBye',
+                    replace: true,
                     onTap: () async {
                       NotificationPollingService().stopPolling();
-
                       final SharedPreferences prefs =
                           await SharedPreferences.getInstance();
                       prefs.clear();

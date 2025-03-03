@@ -90,17 +90,13 @@ class MyApp extends StatelessWidget {
     await dotenv.load(fileName: ".env");
   }
 
-  // Function to trigger a test notification
   Future<void> _sendTestNotification() async {
-    // Check if notifications are allowed
     bool isAllowed = await AwesomeNotifications().isNotificationAllowed();
 
     if (!isAllowed) {
-      // Request permission to send notifications
       await AwesomeNotifications().requestPermissionToSendNotifications();
     }
 
-    // Create the notification after permission is granted
     await AwesomeNotifications().createNotification(
       content: NotificationContent(
         id: 10,
@@ -130,7 +126,6 @@ class MyApp extends StatelessWidget {
             ),
           );
         } else {
-          // Trigger the notification test after app initialization
           _sendTestNotification();
 
           return MultiBlocProvider(

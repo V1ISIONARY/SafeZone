@@ -26,6 +26,7 @@ import 'package:safezone/frontend/utils/safezone_navigator.dart';
 import 'package:safezone/frontend/widgets/dialogs/dialogs.dart';
 import 'package:safezone/frontend/widgets/loadingstate.dart';
 import 'package:safezone/resources/schema/colors.dart';
+import 'package:safezone/resources/schema/texts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -980,50 +981,54 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                           ),
                                         ),
                                       ),
-                                      SlideTransition(
-                                        position: _hintAnimation,
-                                        child: AnimatedBuilder(
-                                          animation: _hintColorAnimation,
-                                          builder: (context, child) {
-                                            return GestureDetector(
-                                              onTap: () {
-                                                FocusScope.of(context)
-                                                    .requestFocus(_focusNode);
-                                              },
-                                              child: Text(
-                                                hints[_currentHintIndex],
-                                                style: TextStyle(
-                                                  color:
-                                                      _hintColorAnimation.value,
-                                                  fontSize: 13,
+                                      Transform.translate(
+                                        offset: Offset(-5, 0),
+                                        child: SlideTransition(
+                                          position: _hintAnimation,
+                                          child: AnimatedBuilder(
+                                            animation: _hintColorAnimation,
+                                            builder: (context, child) {
+                                              return GestureDetector(
+                                                onTap: () {
+                                                  FocusScope.of(context)
+                                                      .requestFocus(_focusNode);
+                                                },
+                                                child: Text(
+                                                  hints[_currentHintIndex],
+                                                  style: TextStyle(
+                                                    color:
+                                                        _hintColorAnimation.value,
+                                                    fontSize: 13,
+                                                  ),
                                                 ),
-                                              ),
-                                            );
-                                          },
-                                        ),
+                                              );
+                                            },
+                                          ),
+                                        )
                                       )
                                     ],
                                   ),
                                 ),
                                 Positioned(
-                                    top: 0,
-                                    right: 5,
-                                    child: GestureDetector(
-                                      onTap: () {},
-                                      child: Container(
-                                        height: 40,
-                                        width: 40,
-                                        alignment: Alignment.center,
-                                        color: Colors.transparent,
-                                        child: SvgPicture.asset(
-                                          'lib/resources/svg/mic.svg',
-                                          color: Colors.black87,
-                                          height: 22,
-                                          width: 22,
-                                          fit: BoxFit.contain,
-                                        ),
+                                  top: 0,
+                                  right: 5,
+                                  child: GestureDetector(
+                                    onTap: () {},
+                                    child: Container(
+                                      height: 40,
+                                      width: 40,
+                                      alignment: Alignment.center,
+                                      color: Colors.transparent,
+                                      child: SvgPicture.asset(
+                                        'lib/resources/svg/mic.svg',
+                                        color: Colors.black87,
+                                        height: 22,
+                                        width: 22,
+                                        fit: BoxFit.contain,
                                       ),
-                                    )),
+                                    ),
+                                  )
+                                ),
                               ],
                             ),
                           ),
@@ -1044,7 +1049,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                         color: _isSafeZoneShown
                             ? Colors.grey[300]
                             : Colors.white, // Toggle color
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(50),
                         boxShadow: const [
                           BoxShadow(
                             color: Colors.grey,
@@ -1053,13 +1058,17 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                           ),
                         ],
                       ),
-                      child: const Center(
-                        child: Text(
-                          "Show nearest safe zone", // Keep the text constant
-                          style: TextStyle(
-                              color: labelFormFieldColor, fontSize: 11),
-                        ),
-                      ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          SizedBox(width: 5),
+                          Icon(
+                            Icons.safety_check, color: Colors.green,
+                          ),
+                          CategoryDescripText(text: "Show nearest safe zone", color: Colors.black)
+                        ]
+                      )
                     ),
                   ),
                 )
