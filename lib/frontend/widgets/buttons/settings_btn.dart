@@ -35,29 +35,14 @@ class Settingsbtn extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         onTap(); 
-        if (replace == true) {
-          if (context.mounted) {
-            Navigator.pushReplacement(
-              context,
-              PageTransition(
-                child: _getPageForNavigation(navigateTo),
-                type: PageTransitionType.rightToLeft,
-                duration: const Duration(milliseconds: 200),
-              ),
-            );
-          }
-        } else {
-          if (context.mounted) {
-            Navigator.push(
-              context,
-              PageTransition(
-                child: _getPageForNavigation(navigateTo),
-                type: PageTransitionType.rightToLeft,
-                duration: const Duration(milliseconds: 200),
-              ),
-            );
-          }
-        }
+        Navigator.pushReplacement(
+          context,
+          PageTransition(
+            child: _getPageForNavigation(navigateTo),
+            type: PageTransitionType.rightToLeft,
+            duration: const Duration(milliseconds: 200),
+          ),
+        );
       },
       child: Container(
         width: double.infinity,

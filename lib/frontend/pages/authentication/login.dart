@@ -267,7 +267,7 @@ class _LoginState extends State<Login> {
                                         width: 20,
                                         child: Center(
                                             child: CircularProgressIndicator(
-                                                color: Colors.white)),
+                                                color: Colors.white, strokeWidth: 1)),
                                       )
                                     : Text(
                                         'Sign In',
