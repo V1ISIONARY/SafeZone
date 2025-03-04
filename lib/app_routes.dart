@@ -7,11 +7,14 @@ import 'package:safezone/frontend/pages/admin/admin_reports.dart';
 import 'package:safezone/frontend/pages/admin/admin_reports_details.dart';
 import 'package:safezone/frontend/pages/admin/admin_safezone_details.dart';
 import 'package:safezone/frontend/pages/admin/admin_safezones.dart';
+import 'package:safezone/frontend/pages/admin/main_analytics.dart';
+import 'package:safezone/frontend/pages/authentication/account_details.dart';
 //import 'package:safezone/frontend/pages/admin/main_analytics.dart';
 import 'package:safezone/frontend/pages/authentication/register.dart';
 import 'package:safezone/backend/models/dangerzoneModel/incident_report_model.dart';
 import 'package:safezone/frontend/pages/authentication/login.dart';
 import 'package:safezone/frontend/pages/introduction/splash_screen.dart';
+import 'package:safezone/frontend/pages/introduction/starter.dart';
 import 'package:safezone/frontend/pages/main-screen/home_page/circle/create_new_group.dart';
 import 'package:safezone/frontend/pages/main-screen/home_page/circle/generate_new_code.dart';
 import 'package:safezone/frontend/pages/main-screen/home_page/circle/join_group.dart';
@@ -29,6 +32,10 @@ import 'package:safezone/frontend/pages/main-screen/home_page/safe-zone/mark_saf
 import 'package:safezone/frontend/pages/main-screen/home_page/safe-zone/create_safe_zone.dart';
 import 'package:safezone/frontend/pages/main-screen/home_page/safe-zone/review_safe_zone.dart';
 import 'package:safezone/frontend/pages/main-screen/notifications_page/safezone/safe_zone_status_history.dart';
+import 'package:safezone/frontend/pages/main-screen/settings_page/about.dart';
+import 'package:safezone/frontend/pages/main-screen/settings_page/privacy_security.dart';
+import 'package:safezone/frontend/pages/main-screen/settings_page/term-policy/main_terms_policy.dart';
+import 'package:safezone/frontend/pages/main-screen/settings_page/user_guide.dart';
 import 'package:safezone/frontend/pages/main-screen/sos_page/sos.dart';
 import 'package:safezone/frontend/pages/main-screen/sos_page/sos_countdown.dart';
 import 'package:safezone/frontend/pages/main-screen/sos_page/sos_success.dart';
@@ -183,6 +190,41 @@ GoRouter appRouter(bool isFirstRun, String? userToken) => GoRouter(
         GoRoute(
           path: '/join-group',
           builder: (context, state) => const JoinGroup(),
+        ),
+
+        // SETTINGS ROUTES
+
+        GoRoute(
+          path: '/accountDetails',
+          builder: (context, state) => const AccountDetails(),
+        ),
+        GoRoute(
+          path: '/privacySecurity',
+          builder: (context, state) => const PrivacySecurity(),
+        ),
+        GoRoute(
+          path: '/termsPolicy',
+          builder: (context, state) => const TermsPolicy(),
+        ),
+        GoRoute(
+          path: '/userGuide',
+          builder: (context, state) => const UserGuide(),
+        ),
+        GoRoute(
+          path: '/analytics',
+          builder: (context, state) => const MainAnalytics(initialPage: 0),
+        ),
+        GoRoute(
+          path: '/about',
+          builder: (context, state) => const About(),
+        ),
+        GoRoute(
+          path: '/starter',
+          builder: (context, state) => const Starter(),
+        ),
+        GoRoute(
+          path: '/login',
+          builder: (context, state) => const Login(),
         ),
 
         // ADMIN ROUTES

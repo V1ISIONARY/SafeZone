@@ -1,24 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:page_transition/page_transition.dart';
-import 'package:safezone/frontend/pages/admin/main_analytics.dart';
-import 'package:safezone/frontend/pages/authentication/login.dart';
-import 'package:safezone/frontend/pages/main-screen/settings_page/about.dart';
-import 'package:safezone/frontend/pages/main-screen/settings_page/user_guide.dart';
-
+import 'package:go_router/go_router.dart';
 import '../../../resources/schema/texts.dart';
-import '../../pages/authentication/account_details.dart';
-import '../../pages/introduction/starter.dart';
-import '../../pages/main-screen/settings_page/privacy_security.dart';
-import '../../pages/main-screen/settings_page/term-policy/main_terms_policy.dart';
 
 class Settingsbtn extends StatelessWidget {
   final String title;
   final String svgIcon;
   final String navigateTo;
   final String description;
-  final VoidCallback onTap; 
-  final bool? replace; 
+  final VoidCallback onTap;
+  final bool? replace;
 
   const Settingsbtn({
     super.key,
@@ -26,23 +17,20 @@ class Settingsbtn extends StatelessWidget {
     required this.svgIcon,
     required this.navigateTo,
     required this.description,
-    required this.onTap, 
-    this.replace
+    required this.onTap,
+    this.replace,
   });
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        onTap(); 
-        Navigator.push(
-          context,
-          PageTransition(
-            child: _getPageForNavigation(navigateTo),
-            type: PageTransitionType.rightToLeft,
-            duration: const Duration(milliseconds: 200),
-          ),
-        );
+        onTap();
+        if (replace != null && replace == true) {
+          context.go('/$navigateTo');
+        } else {
+          context.push('/$navigateTo');
+        }
       },
       child: Container(
         width: double.infinity,
@@ -91,28 +79,5 @@ class Settingsbtn extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  Widget _getPageForNavigation(String page) {
-    switch (page) {
-      case "AccountDetails":
-        return const AccountDetails();
-      case "PrivacySecurity":
-        return const PrivacySecurity();
-      case "TermsPolicy":
-        return const TermsPolicy();
-      case "UserGuide":
-        return const UserGuide();
-      case "Analytics":
-        return const MainAnalytics(initialPage: 0);
-      case "About":
-        return const About();
-      case "Starter":
-        return const Starter();
-      case "Login":
-        return const Login();
-      default:
-        return Container();
-    }
   }
 }
