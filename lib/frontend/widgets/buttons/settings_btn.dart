@@ -35,7 +35,7 @@ class Settingsbtn extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         onTap(); 
-        Navigator.pushReplacement(
+        Navigator.push(
           context,
           PageTransition(
             child: _getPageForNavigation(navigateTo),
