@@ -343,12 +343,9 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
     _positionStreamSubscription = Geolocator.getPositionStream(
       locationSettings: const LocationSettings(
         accuracy: LocationAccuracy.high,
-        distanceFilter: 10,
+        distanceFilter: 5,
       ),
     ).listen((Position position) async {
-      print(
-          "Location updated: Latitude: ${position.latitude}, Longitude: ${position.longitude}");
-
       LatLng userLocation = LatLng(position.latitude, position.longitude);
 
       if (googleMapController != null) {
@@ -370,45 +367,45 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
           ));
         });
 
-        updateLocation(position.latitude, position.longitude);
+        await updateLocation(position.latitude, position.longitude);
+      }
 
-        bool isInsideSafeZone = _isInsideZone(
-            userLocation,
-            circles
-                .where((circle) =>
-                    circle.fillColor == Colors.green.withOpacity(0.1))
-                .toList());
-        bool isInsideDangerZone = _isInsideZone(
-            userLocation,
-            circles
-                .where(
-                    (circle) => circle.fillColor == Colors.red.withOpacity(0.1))
-                .toList());
+      bool isInsideSafeZone = _isInsideZone(
+          userLocation,
+          circles
+              .where(
+                  (circle) => circle.fillColor == Colors.green.withOpacity(0.1))
+              .toList());
+      bool isInsideDangerZone = _isInsideZone(
+          userLocation,
+          circles
+              .where(
+                  (circle) => circle.fillColor == Colors.red.withOpacity(0.1))
+              .toList());
 
-        if (isInsideSafeZone && !_wasInsideSafeZone) {
-          _showZoneDialog("Safe Zone", "You have entered a safe zone.");
-          _sendBroadcastNotification(
-              "Group member - Safe Zone", "has entered a safe zone.");
-          _wasInsideSafeZone = true;
-        } else if (isInsideDangerZone && !_wasInsideDangerZone) {
-          _showZoneDialog("Danger Zone",
-              "You have entered a danger zone. Please be cautious.");
-          _sendBroadcastNotification("Group member - Danger Zone",
-              "has entered a danger zone. Please be cautious.");
-          _wasInsideDangerZone = true;
-        }
+      if (isInsideSafeZone && !_wasInsideSafeZone) {
+        _showZoneDialog("Safe Zone", "You have entered a safe zone.");
+        _sendBroadcastNotification(
+            "Group member - Safe Zone", "has entered a safe zone.");
+        _wasInsideSafeZone = true;
+      } else if (!isInsideSafeZone && _wasInsideSafeZone) {
+        _showZoneDialog("Safe Zone", "You have exited the safe zone.");
+        _sendBroadcastNotification(
+            "Group member - Safe Zone", "has exited the safe zone.");
+        _wasInsideSafeZone = false; 
+      }
 
-        if (!isInsideSafeZone && _wasInsideSafeZone) {
-          _showZoneDialog("Safe Zone", "You have exited the safe zone.");
-          _sendBroadcastNotification(
-              "Group member - Safe Zone", "has exited the safe zone.");
-          _wasInsideSafeZone = false;
-        } else if (!isInsideDangerZone && _wasInsideDangerZone) {
-          _showZoneDialog("Danger Zone", "You have exited the danger zone.");
-          _sendBroadcastNotification(
-              "Group member - Danger Zone", "has exited the danger zone.");
-          _wasInsideDangerZone = false;
-        }
+      if (isInsideDangerZone && !_wasInsideDangerZone) {
+        _showZoneDialog("Danger Zone",
+            "You have entered a danger zone. Please be cautious.");
+        _sendBroadcastNotification("Group member - Danger Zone",
+            "has entered a danger zone. Please be cautious.");
+        _wasInsideDangerZone = true;
+      } else if (!isInsideDangerZone && _wasInsideDangerZone) {
+        _showZoneDialog("Danger Zone", "You have exited the danger zone.");
+        _sendBroadcastNotification(
+            "Group member - Danger Zone", "has exited the danger zone.");
+        _wasInsideDangerZone = false;
       }
     });
   }
@@ -982,53 +979,52 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                         ),
                                       ),
                                       Transform.translate(
-                                        offset: Offset(-5, 0),
-                                        child: SlideTransition(
-                                          position: _hintAnimation,
-                                          child: AnimatedBuilder(
-                                            animation: _hintColorAnimation,
-                                            builder: (context, child) {
-                                              return GestureDetector(
-                                                onTap: () {
-                                                  FocusScope.of(context)
-                                                      .requestFocus(_focusNode);
-                                                },
-                                                child: Text(
-                                                  hints[_currentHintIndex],
-                                                  style: TextStyle(
-                                                    color:
-                                                        _hintColorAnimation.value,
-                                                    fontSize: 13,
+                                          offset: Offset(-5, 0),
+                                          child: SlideTransition(
+                                            position: _hintAnimation,
+                                            child: AnimatedBuilder(
+                                              animation: _hintColorAnimation,
+                                              builder: (context, child) {
+                                                return GestureDetector(
+                                                  onTap: () {
+                                                    FocusScope.of(context)
+                                                        .requestFocus(
+                                                            _focusNode);
+                                                  },
+                                                  child: Text(
+                                                    hints[_currentHintIndex],
+                                                    style: TextStyle(
+                                                      color: _hintColorAnimation
+                                                          .value,
+                                                      fontSize: 13,
+                                                    ),
                                                   ),
-                                                ),
-                                              );
-                                            },
-                                          ),
-                                        )
-                                      )
+                                                );
+                                              },
+                                            ),
+                                          ))
                                     ],
                                   ),
                                 ),
                                 Positioned(
-                                  top: 0,
-                                  right: 5,
-                                  child: GestureDetector(
-                                    onTap: () {},
-                                    child: Container(
-                                      height: 40,
-                                      width: 40,
-                                      alignment: Alignment.center,
-                                      color: Colors.transparent,
-                                      child: SvgPicture.asset(
-                                        'lib/resources/svg/mic.svg',
-                                        color: Colors.black87,
-                                        height: 22,
-                                        width: 22,
-                                        fit: BoxFit.contain,
+                                    top: 0,
+                                    right: 5,
+                                    child: GestureDetector(
+                                      onTap: () {},
+                                      child: Container(
+                                        height: 40,
+                                        width: 40,
+                                        alignment: Alignment.center,
+                                        color: Colors.transparent,
+                                        child: SvgPicture.asset(
+                                          'lib/resources/svg/mic.svg',
+                                          color: Colors.black87,
+                                          height: 22,
+                                          width: 22,
+                                          fit: BoxFit.contain,
+                                        ),
                                       ),
-                                    ),
-                                  )
-                                ),
+                                    )),
                               ],
                             ),
                           ),
@@ -1042,34 +1038,35 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                   child: GestureDetector(
                     onTap: _findRoute,
                     child: Container(
-                      margin: const EdgeInsets.only(right: 20),
-                      width: 150,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: _isSafeZoneShown
-                            ? Colors.grey[300]
-                            : Colors.white, // Toggle color
-                        borderRadius: BorderRadius.circular(50),
-                        boxShadow: const [
-                          BoxShadow(
-                            color: Colors.grey,
-                            blurRadius: 2,
-                            offset: Offset(1, 1),
-                          ),
-                        ],
-                      ),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          SizedBox(width: 5),
-                          Icon(
-                            Icons.safety_check, color: Colors.green,
-                          ),
-                          CategoryDescripText(text: "Show nearest safe zone", color: Colors.black)
-                        ]
-                      )
-                    ),
+                        margin: const EdgeInsets.only(right: 20),
+                        width: 150,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: _isSafeZoneShown
+                              ? Colors.grey[300]
+                              : Colors.white, // Toggle color
+                          borderRadius: BorderRadius.circular(50),
+                          boxShadow: const [
+                            BoxShadow(
+                              color: Colors.grey,
+                              blurRadius: 2,
+                              offset: Offset(1, 1),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              SizedBox(width: 5),
+                              Icon(
+                                Icons.safety_check,
+                                color: Colors.green,
+                              ),
+                              CategoryDescripText(
+                                  text: "Show nearest safe zone",
+                                  color: Colors.black)
+                            ])),
                   ),
                 )
               ],

@@ -89,7 +89,9 @@ class _ListOfMembersState extends State<ListOfMembers> {
               id: widget.circleInfo.id,
               name: widget.circleInfo.name,
               code: state.code,
-              codeExpiry: state.expiry, isActive: true, createdAt: '',
+              codeExpiry: state.expiry,
+              isActive: true,
+              createdAt: '',
             );
             isLoading = false;
           });
@@ -183,17 +185,17 @@ class _ListOfMembersState extends State<ListOfMembers> {
                                               Clipboard.setData(ClipboardData(
                                                   text: _updatedCircleInfo!
                                                       .code));
-                                              ScaffoldMessenger.of(context)
-                                                  .showSnackBar(
-                                                const SnackBar(
-                                                  backgroundColor:
-                                                      greenStatusColor,
-                                                  content: Text(
-                                                      "Code copied to clipboard!"),
-                                                  duration:
-                                                      Duration(seconds: 2),
-                                                ),
-                                              );
+                                              // ScaffoldMessenger.of(context)
+                                              //     .showSnackBar(
+                                              //   const SnackBar(
+                                              //     backgroundColor:
+                                              //         greenStatusColor,
+                                              //     content: Text(
+                                              //         "Code copied to clipboard!"),
+                                              //     duration:
+                                              //         Duration(seconds: 2),
+                                              //   ),
+                                              // );
                                             },
                                             style: ElevatedButton.styleFrom(
                                               backgroundColor:
