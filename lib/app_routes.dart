@@ -37,6 +37,7 @@ import 'package:safezone/frontend/pages/main-screen/settings_page/privacy_securi
 import 'package:safezone/frontend/pages/main-screen/settings_page/term-policy/main_terms_policy.dart';
 import 'package:safezone/frontend/pages/main-screen/settings_page/user_guide.dart';
 import 'package:safezone/frontend/pages/main-screen/sos_page/sos.dart';
+import 'package:safezone/frontend/pages/main-screen/sos_page/sos_cancel.dart';
 import 'package:safezone/frontend/pages/main-screen/sos_page/sos_countdown.dart';
 import 'package:safezone/frontend/pages/main-screen/sos_page/sos_success.dart';
 import 'package:safezone/frontend/widgets/bottom_navigation.dart';
@@ -157,6 +158,10 @@ GoRouter appRouter(bool isFirstRun, String? userToken) => GoRouter(
           path: '/sos-success',
           builder: (context, state) => const SosSuccess(),
         ),
+        GoRoute(
+          path: '/sos-cancelled',
+          builder: (context, state) => const SosCancelled(),
+        ),
 
         // CIRCLE/GROUP ROUTES
 
@@ -252,13 +257,14 @@ GoRouter appRouter(bool isFirstRun, String? userToken) => GoRouter(
           },
         ),
 
-      GoRoute(
+        GoRoute(
           path: '/admin-safezone-details',
           builder: (context, state) {
             final extra = state.extra as Map<String, dynamic>;
             final safezone = extra['safezone'] as SafeZoneModel;
             final address = extra['address'] as String;
-            final Function(SafeZoneModel)? onStatusChanged = extra['onStatusChanged'] as Function(SafeZoneModel)?;
+            final Function(SafeZoneModel)? onStatusChanged =
+                extra['onStatusChanged'] as Function(SafeZoneModel)?;
 
             return AdminSafezoneDetails(
               safezonemodel: safezone,
@@ -268,7 +274,7 @@ GoRouter appRouter(bool isFirstRun, String? userToken) => GoRouter(
           },
         ),
 
-      GoRoute(
+        GoRoute(
           path: '/admin-reports-details',
           builder: (context, state) {
             final extra = state.extra as Map<String, dynamic>;

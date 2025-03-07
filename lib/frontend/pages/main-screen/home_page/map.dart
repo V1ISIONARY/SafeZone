@@ -31,6 +31,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'dart:convert';
+import 'package:location/location.dart' as locs;
 
 class Maps extends StatefulWidget {
   final String UserToken;
@@ -50,6 +51,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
   Set<Polyline> _polylines = {};
   List<LatLng> _safeZones = [];
   static const LatLng sourceLocation = LatLng(16.0471, 120.3425);
+  final locs.Location location = locs.Location();
 
   final Completer<GoogleMapController> _mapController = Completer();
   final GlobalKey _searchKey = GlobalKey();
@@ -293,6 +295,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
 
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
+      serviceEnabled = await location.requestService();
       return Future.error('Location services are disabled');
     }
 
