@@ -75,7 +75,7 @@ class _SplashScreenState extends State<SplashScreen> {
               right: 0,
               child: Center(
                 child: GestureDetector(
-                  child: Text(
+                  child: const Text(
                     'Visionary 0.0.1',
                     style: TextStyle(
                       color: widgetPricolor,

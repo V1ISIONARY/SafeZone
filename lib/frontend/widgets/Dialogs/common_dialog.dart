@@ -16,7 +16,7 @@ class AlertDialogButton extends StatelessWidget {
         showDialog(
           context: context,
           builder: (BuildContext context) {
-            return CurvedAlertDialog();
+            return const CurvedAlertDialog();
           },
         );
       },
@@ -66,13 +66,13 @@ class _CurvedAlertDialogState extends State<CurvedAlertDialog> {
       context: context,
       barrierDismissible: false, // Prevent dismissal by tapping outside
       builder: (BuildContext context) {
-        return AlertDialog(
+        return const AlertDialog(
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Icon(Icons.check_circle, color: Colors.green, size: 50),
-              const SizedBox(height: 15),
-              const Text('Contact Added', style: TextStyle(fontSize: 16)),
+              SizedBox(height: 15),
+              Text('Contact Added', style: TextStyle(fontSize: 16)),
             ],
           ),
         );

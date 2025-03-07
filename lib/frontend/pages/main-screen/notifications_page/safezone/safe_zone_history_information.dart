@@ -219,14 +219,14 @@ class _SafeZoneHistoryDetailsState extends State<SafeZoneHistoryDetails> {
                               fit: BoxFit.contain,
                             ),
                           ),
-                          Expanded(
+                          const Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
                                   "Check status history",
                                   style: TextStyle(
-                                      color: primary_textColor,
+                                      color: primaryTextColor,
                                       fontSize: 13,
                                       fontWeight: FontWeight.w200),
                                 ),

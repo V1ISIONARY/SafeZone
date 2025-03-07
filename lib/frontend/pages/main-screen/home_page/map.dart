@@ -990,7 +990,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                         ),
                                       ),
                                       Transform.translate(
-                                          offset: Offset(-5, 0),
+                                          offset: const Offset(-5, 0),
                                           child: SlideTransition(
                                             position: _hintAnimation,
                                             child: AnimatedBuilder(
@@ -1065,7 +1065,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                             ),
                           ],
                         ),
-                        child: Row(
+                        child: const Row(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [

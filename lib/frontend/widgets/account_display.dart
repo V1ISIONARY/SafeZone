@@ -23,7 +23,7 @@ class AccountDisplay extends StatelessWidget {
       },
       child: Container(
         width: double.infinity,
-        margin: EdgeInsets.symmetric(
+        margin: const EdgeInsets.symmetric(
           vertical: 15
         ),
         child: Stack(
@@ -34,7 +34,7 @@ class AccountDisplay extends StatelessWidget {
                 Container(
                   height: 25,
                   width: 25,
-                  margin: EdgeInsets.only(right: 17),
+                  margin: const EdgeInsets.only(right: 17),
                   child: SvgPicture.asset(
                     svgIcon,
                     color: const Color.fromARGB(179, 0, 0, 0),

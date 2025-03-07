@@ -21,11 +21,11 @@ class Starter extends StatelessWidget {
           Column(
             children: [
               Expanded(
-                child: Container(
+                child: SizedBox(
                   width: double.infinity,
                   child: Stack(
                     children: [
-                      Container(
+                      SizedBox(
                         width: double.infinity,
                         child: Image.asset(
                           'lib/resources/images/starter.png',
@@ -50,19 +50,19 @@ class Starter extends StatelessWidget {
               Container(
                 width: double.infinity,
                 color: Colors.transparent,
-                margin: EdgeInsets.only(right: 15, left: 15, bottom: 50),
+                margin: const EdgeInsets.only(right: 15, left: 15, bottom: 50),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Padding(
-                      padding: EdgeInsets.only(top: 20),
-                      child: Container(
+                      padding: const EdgeInsets.only(top: 20),
+                      child: SizedBox(
                         width: double.infinity,
                         child: Center(
                           child: Column(
                             children: [
                               RichText(
-                                text: TextSpan(
+                                text: const TextSpan(
                                   text: 'Elevate Your ',
                                   style: TextStyle(fontSize: 20, color: Colors.black, fontWeight: FontWeight.w600, letterSpacing: 1),
                                   children: [
@@ -82,7 +82,7 @@ class Starter extends StatelessWidget {
                                 ),
                                 textAlign: TextAlign.center,
                               ),
-                              Padding(
+                              const Padding(
                                 padding: EdgeInsets.only(top: 40),
                                 child: CategoryDescripText(
                                   text: "Experience next-level safety with our advanced solutions, designed\n to enhance your peace of mind wherever you are.", alignment: 'center',
@@ -96,18 +96,18 @@ class Starter extends StatelessWidget {
                     Container(
                       height: 50,
                       width: double.infinity,
-                      margin: EdgeInsets.symmetric(vertical: 40, horizontal: 20),
-                      child: OvalBtn(text: "Let's Get Started", navigateTo: 'Slides'),
+                      margin: const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
+                      child: const OvalBtn(text: "Let's Get Started", navigateTo: 'Slides'),
                     ),
                     Container(
                       width: double.infinity,
-                      margin: EdgeInsets.symmetric(horizontal: 20),
+                      margin: const EdgeInsets.symmetric(horizontal: 20),
                       child: Center(
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text(
+                            const Text(
                               "Already have an account?",
                               style: TextStyle(
                                 fontSize: 11,
@@ -115,19 +115,19 @@ class Starter extends StatelessWidget {
                               ),
                             ),
                             Padding(
-                              padding: EdgeInsets.only(left: 7),
+                              padding: const EdgeInsets.only(left: 7),
                               child: GestureDetector(
                                 onTap: () {
                                   Navigator.push(
                                     context,
                                     PageTransition(
-                                      child: Login(),
+                                      child: const Login(),
                                       type: PageTransitionType.rightToLeft,
-                                      duration: Duration(milliseconds: 300),
+                                      duration: const Duration(milliseconds: 300),
                                     ),
                                   );
                                 },
-                                child: Text(
+                                child: const Text(
                                   "Sign In",
                                   style: TextStyle(
                                     fontSize: 11,
@@ -155,16 +155,16 @@ class Starter extends StatelessWidget {
                   context,
                   PageTransition(
                     type: PageTransitionType.rightToLeft,
-                    duration: Duration(milliseconds: 300), child: BottomNavigationWidget(userToken: 'guest',),
+                    duration: const Duration(milliseconds: 300), child: const BottomNavigationWidget(userToken: 'guest',),
                   ),
                 );
               },
-              child: Container(
+              child: SizedBox(
                 width: 120,
                 height: 120,
                 child: SvgPicture.asset(
                   'lib/resources/svg/tringle.svg',
-                  color: Color.fromRGBO(219, 101, 95, 0.795),
+                  color: const Color.fromRGBO(219, 101, 95, 0.795),
                 )
               )
             )
@@ -178,11 +178,11 @@ class Starter extends StatelessWidget {
                   context,
                   PageTransition(
                     type: PageTransitionType.rightToLeft,
-                    duration: Duration(milliseconds: 300), child: BottomNavigationWidget(userToken: 'guest',),
+                    duration: const Duration(milliseconds: 300), child: const BottomNavigationWidget(userToken: 'guest',),
                   ),
                 );
               },
-              child: Text(
+              child: const Text(
                 "Guest",
                 style: TextStyle(fontSize: 13, color: Colors.white),
               ),

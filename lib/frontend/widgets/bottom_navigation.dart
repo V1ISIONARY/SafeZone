@@ -72,12 +72,12 @@ class _BottomNavigationWidgetState extends State<BottomNavigationWidget> {
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: [
                               Padding(
-                                padding: EdgeInsets.only(top: 15),
+                                padding: const EdgeInsets.only(top: 15),
                                 child: _buildIconItem(
                                     "Map", "lib/resources/svg/map.svg", 0),
                               ),
                               Padding(
-                                padding: EdgeInsets.only(top: 15),
+                                padding: const EdgeInsets.only(top: 15),
                                 child: _buildIconItem("Contacts",
                                     "lib/resources/svg/contacts.svg", 1),
                               ),
@@ -85,7 +85,7 @@ class _BottomNavigationWidgetState extends State<BottomNavigationWidget> {
                                 children: [
                                   // The grey container moved upwards by 40 pixels
                                   Transform.translate(
-                                    offset: Offset(0,
+                                    offset: const Offset(0,
                                         -25), // Offset it upwards by 40 pixels
                                     child: GestureDetector(
                                       onTap: () {
@@ -95,8 +95,8 @@ class _BottomNavigationWidgetState extends State<BottomNavigationWidget> {
                                         width: 70,
                                         height:
                                             150, // The height of the grey container
-                                        decoration: BoxDecoration(
-                                            color: const Color.fromARGB(
+                                        decoration: const BoxDecoration(
+                                            color: Color.fromARGB(
                                                 255, 217, 212, 212),
                                             shape: BoxShape.circle),
                                         // Center the white container inside the grey one
@@ -104,10 +104,10 @@ class _BottomNavigationWidgetState extends State<BottomNavigationWidget> {
                                           child: Container(
                                             width: 50,
                                             height: 50,
-                                            decoration: BoxDecoration(
+                                            decoration: const BoxDecoration(
                                                 color: widgetPricolor,
                                                 shape: BoxShape.circle),
-                                            child: Center(
+                                            child: const Center(
                                               child: Text(
                                                 'SOS',
                                                 style: TextStyle(
@@ -122,12 +122,12 @@ class _BottomNavigationWidgetState extends State<BottomNavigationWidget> {
                                 ],
                               ),
                               Padding(
-                                padding: EdgeInsets.only(top: 15),
+                                padding: const EdgeInsets.only(top: 15),
                                 child: _buildIconItem("Notification",
                                     "lib/resources/svg/notification.svg", 2),
                               ),
                               Padding(
-                                padding: EdgeInsets.only(top: 15),
+                                padding: const EdgeInsets.only(top: 15),
                                 child: _buildIconItem("Settings",
                                     "lib/resources/svg/settings.svg", 3),
                               ),
@@ -166,7 +166,7 @@ class _BottomNavigationWidgetState extends State<BottomNavigationWidget> {
               ),
             ),
             Padding(
-              padding: EdgeInsets.only(top: 7),
+              padding: const EdgeInsets.only(top: 7),
               child: Flexible(
                 child: Container(
                   width: double.infinity,

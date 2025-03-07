@@ -39,7 +39,7 @@ class _AdminReportsUsersState extends State<AdminReportsUsers> {
   void _onSearchChanged() {
     final state = context.read<AdminBloc>().state;
     if (state is UsersWithDataLoaded) {
-      final usersData = state.data as List<dynamic>;
+      final usersData = state.data;
       final query = _searchController.text.toLowerCase();
 
       setState(() {
@@ -59,8 +59,7 @@ class _AdminReportsUsersState extends State<AdminReportsUsers> {
           if (state is AdminLoading) {
             return const Center(child: CircularProgressIndicator());
           } else if (state is UsersWithDataLoaded) {
-            final usersData = state.data as List<dynamic>;
-            final usersCount = usersData.length; // Total number of users
+            final usersData = state.data;
 
             // Initialize filtered users if empty
             if (_filteredUsers.isEmpty) {
@@ -107,15 +106,15 @@ class _AdminReportsUsersState extends State<AdminReportsUsers> {
                             horizontal: 12.0, vertical: 12.0),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(5.0),
-                          borderSide: BorderSide(color: widgetPricolor),
+                          borderSide: const BorderSide(color: widgetPricolor),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(5.0),
-                          borderSide: BorderSide(color: widgetPricolor),
+                          borderSide: const BorderSide(color: widgetPricolor),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(5.0),
-                          borderSide: BorderSide(color: widgetPricolor),
+                          borderSide: const BorderSide(color: widgetPricolor),
                         ),
                       ),
                     ),
@@ -144,7 +143,7 @@ class _AdminReportsUsersState extends State<AdminReportsUsers> {
                       safeZone: safeZonesCount,
                       incidents: incidentsCount,
                     );
-                  }).toList(),
+                  }),
                 ],
               ),
             );

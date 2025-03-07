@@ -66,7 +66,7 @@ class AdminSafeZonesCard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   CategoryText(text: safeZone.name!),
-                  SizedBox(height: 1),
+                  const SizedBox(height: 1),
                   Row(
                     children: [
                       const Icon(Icons.location_on, size: 12, color: btnColor),
@@ -82,7 +82,7 @@ class AdminSafeZonesCard extends StatelessWidget {
                   safeZone.description == null || safeZone.description!.isEmpty
                     ? Container()
                     : Padding(
-                      padding: EdgeInsets.only(top: 1),
+                      padding: const EdgeInsets.only(top: 1),
                       child: CategoryDescripTextEllipsis(text: safeZone.description!),
                     )
                 ],

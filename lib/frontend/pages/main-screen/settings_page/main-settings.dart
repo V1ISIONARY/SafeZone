@@ -98,7 +98,7 @@ class _SettingsState extends State<Settings> {
             ),
           ),
           body: Container(
-            margin: EdgeInsets.symmetric(horizontal: 15),
+            margin: const EdgeInsets.symmetric(horizontal: 15),
             child: ListView(
               children: [
                 Container(
@@ -315,7 +315,7 @@ class _SettingsState extends State<Settings> {
                     ? const SizedBox()
                     : Column(children: [
                         Padding(
-                          padding: EdgeInsets.only(top: 10),
+                          padding: const EdgeInsets.only(top: 10),
                           child: Settingsbtn(
                             title: 'Account Details',
                             svgIcon: 'lib/resources/svg/account.svg',

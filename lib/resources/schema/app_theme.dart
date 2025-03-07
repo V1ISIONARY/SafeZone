@@ -3,7 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:safezone/resources/schema/colors.dart';
 
 class AppTheme {
-  static final textFont = GoogleFonts.inter; // Removed 'const'
+  static const textFont = GoogleFonts.inter; // Removed 'const'
 
   static final lightTheme = ThemeData(
     primaryColor: btnColor,

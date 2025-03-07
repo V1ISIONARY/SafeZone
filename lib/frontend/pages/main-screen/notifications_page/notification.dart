@@ -126,7 +126,7 @@ class _NotifState extends State<Notif> with SingleTickerProviderStateMixin {
                               height: 5.0,
                               color: widgetPricolor, 
                             )
-                          : SizedBox(), 
+                          : const SizedBox(), 
                         ),
                       ),
                     )

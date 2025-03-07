@@ -36,7 +36,8 @@ class _AdminReportsDetailsState extends State<AdminReportsDetails> {
   late IncidentReportModel _reportModel;
   bool _isLoading = false;
 
-  Future<void> _showConfirmationDialog(String action, Function onConfirm) async {
+  Future<void> _showConfirmationDialog(
+      String action, Function onConfirm) async {
     return showDialog<void>(
       context: context,
       barrierDismissible: false, // User must tap button to dismiss
@@ -211,7 +212,8 @@ class _AdminReportsDetailsState extends State<AdminReportsDetails> {
                           width: double.infinity,
                           padding: const EdgeInsets.all(15),
                           decoration: BoxDecoration(
-                            gradient: statusGradient(_reportModel.status ?? 'pending'),
+                            gradient: statusGradient(
+                                _reportModel.status ?? 'pending'),
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -226,7 +228,8 @@ class _AdminReportsDetailsState extends State<AdminReportsDetails> {
                               ),
                               const SizedBox(height: 10),
                               Text(
-                                reportStatusMessage(_reportModel.status ?? 'pending'),
+                                reportStatusMessage(
+                                    _reportModel.status ?? 'pending'),
                                 style: const TextStyle(
                                   fontSize: 13,
                                   fontWeight: FontWeight.w200,
@@ -261,14 +264,15 @@ class _AdminReportsDetailsState extends State<AdminReportsDetails> {
                                     fit: BoxFit.contain,
                                   ),
                                 ),
-                                Expanded(
+                                const Expanded(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         "Check status history",
                                         style: TextStyle(
-                                            color: primary_textColor,
+                                            color: primaryTextColor,
                                             fontSize: 13,
                                             fontWeight: FontWeight.w200),
                                       ),
@@ -305,16 +309,19 @@ class _AdminReportsDetailsState extends State<AdminReportsDetails> {
                                   child: gmaps.GoogleMap(
                                     initialCameraPosition:
                                         const gmaps.CameraPosition(
-                                      target: gmaps.LatLng(16.043859, 120.335182),
+                                      target:
+                                          gmaps.LatLng(16.043859, 120.335182),
                                       zoom: 14.0,
                                     ),
                                     markers: {
                                       gmaps.Marker(
-                                        markerId:
-                                            const gmaps.MarkerId("pinned location"),
+                                        markerId: const gmaps.MarkerId(
+                                            "pinned location"),
                                         position: gmaps.LatLng(
-                                          _reportModel.dangerZone?.latitude ?? 0.0,
-                                          _reportModel.dangerZone?.longitude ?? 0.0,
+                                          _reportModel.dangerZone?.latitude ??
+                                              0.0,
+                                          _reportModel.dangerZone?.longitude ??
+                                              0.0,
                                         ),
                                         infoWindow: const gmaps.InfoWindow(
                                             title: "Pinned Location"),
@@ -329,7 +336,8 @@ class _AdminReportsDetailsState extends State<AdminReportsDetails> {
                               ),
                               const SizedBox(height: 20),
                               Text(
-                                _reportModel.dangerZone?.name ?? "Incident Report",
+                                _reportModel.dangerZone?.name ??
+                                    "Incident Report",
                                 style: const TextStyle(
                                     fontSize: 15,
                                     fontWeight: FontWeight.w700,
@@ -380,11 +388,12 @@ class _AdminReportsDetailsState extends State<AdminReportsDetails> {
                                   dividerColor: Colors.transparent,
                                 ),
                                 child: ExpansionTile(
-                                  backgroundColor: const Color.fromARGB(5, 0, 0, 0),
+                                  backgroundColor:
+                                      const Color.fromARGB(5, 0, 0, 0),
                                   title: const Text(
                                     "View photos",
-                                    style:
-                                        TextStyle(color: textColor, fontSize: 13),
+                                    style: TextStyle(
+                                        color: textColor, fontSize: 13),
                                   ),
                                   children: [
                                     if (_reportModel.images != null &&
@@ -401,7 +410,8 @@ class _AdminReportsDetailsState extends State<AdminReportsDetails> {
                                                   crossAxisSpacing: 10,
                                                   mainAxisSpacing: 10,
                                                   childAspectRatio: 1.5),
-                                          itemCount: _reportModel.images!.length,
+                                          itemCount:
+                                              _reportModel.images!.length,
                                           itemBuilder: (context, index) {
                                             return ClipRRect(
                                               borderRadius:
@@ -415,8 +425,9 @@ class _AdminReportsDetailsState extends State<AdminReportsDetails> {
                                                           Widget child,
                                                           ImageChunkEvent?
                                                               loadingProgress) {
-                                                    if (loadingProgress == null)
+                                                    if (loadingProgress == null) {
                                                       return child;
+                                                    }
                                                     return Center(
                                                       child: Lottie.asset(
                                                         'lib/resources/lottie/loading.json',
@@ -436,7 +447,8 @@ class _AdminReportsDetailsState extends State<AdminReportsDetails> {
                                         padding: EdgeInsets.all(10.0),
                                         child: Text(
                                           "No images available",
-                                          style: TextStyle(color: Colors.black54),
+                                          style:
+                                              TextStyle(color: Colors.black54),
                                         ),
                                       ),
                                   ],
@@ -449,7 +461,7 @@ class _AdminReportsDetailsState extends State<AdminReportsDetails> {
                     ),
                   ),
                   const SizedBox(height: 20),
-                    Row(
+                  Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       const SizedBox(width: 10),
@@ -457,8 +469,8 @@ class _AdminReportsDetailsState extends State<AdminReportsDetails> {
                         child: ElevatedButton.icon(
                           onPressed: () {
                             _showConfirmationDialog('review', () {
-                              adminIncidentReportBloc.add(
-                                  ReviewIncidentReport(_reportModel.id!));
+                              adminIncidentReportBloc
+                                  .add(ReviewIncidentReport(_reportModel.id!));
                             });
                           },
                           icon: const Icon(
@@ -470,7 +482,8 @@ class _AdminReportsDetailsState extends State<AdminReportsDetails> {
                             style: TextStyle(fontSize: 13, color: textColor),
                           ),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color.fromARGB(37, 94, 98, 117),
+                            backgroundColor:
+                                const Color.fromARGB(37, 94, 98, 117),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(7),
                               side: const BorderSide(
@@ -488,8 +501,8 @@ class _AdminReportsDetailsState extends State<AdminReportsDetails> {
                         child: ElevatedButton.icon(
                           onPressed: () {
                             _showConfirmationDialog('verify', () {
-                              adminIncidentReportBloc.add(
-                                  VerifyIncidentReport(_reportModel.id!));
+                              adminIncidentReportBloc
+                                  .add(VerifyIncidentReport(_reportModel.id!));
                             });
                           },
                           icon: const Icon(
@@ -501,7 +514,8 @@ class _AdminReportsDetailsState extends State<AdminReportsDetails> {
                             style: TextStyle(fontSize: 13, color: textColor),
                           ),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color.fromARGB(38, 94, 117, 106),
+                            backgroundColor:
+                                const Color.fromARGB(38, 94, 117, 106),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(7),
                               side: const BorderSide(
@@ -519,8 +533,8 @@ class _AdminReportsDetailsState extends State<AdminReportsDetails> {
                         child: ElevatedButton.icon(
                           onPressed: () {
                             _showConfirmationDialog('reject', () {
-                              adminIncidentReportBloc.add(
-                                  RejectIncidentReport(_reportModel.id!));
+                              adminIncidentReportBloc
+                                  .add(RejectIncidentReport(_reportModel.id!));
                             });
                           },
                           icon: const Icon(
@@ -532,7 +546,8 @@ class _AdminReportsDetailsState extends State<AdminReportsDetails> {
                             style: TextStyle(fontSize: 13, color: textColor),
                           ),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color.fromARGB(37, 117, 94, 94),
+                            backgroundColor:
+                                const Color.fromARGB(37, 117, 94, 94),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(7),
                               side: const BorderSide(

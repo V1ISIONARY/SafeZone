@@ -24,7 +24,7 @@ class _SlidesState extends State<Slides> {
     if (currentPage < totalPages - 1) { 
       _pageController.animateToPage(
         currentPage + 1,
-        duration: Duration(milliseconds: 300),
+        duration: const Duration(milliseconds: 300),
         curve: Curves.ease,
       );
       setState(() {
@@ -37,7 +37,7 @@ class _SlidesState extends State<Slides> {
     if (currentPage > 0) {
       _pageController.animateToPage(
         currentPage - 1,
-        duration: Duration(milliseconds: 300),
+        duration: const Duration(milliseconds: 300),
         curve: Curves.ease,
       );
       setState(() {
@@ -52,7 +52,7 @@ class _SlidesState extends State<Slides> {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Container(
+      body: SizedBox(
         width: double.infinity,
         height: double.infinity,
         child: Stack(
@@ -83,11 +83,11 @@ class _SlidesState extends State<Slides> {
                     context,
                     PageTransition(
                       type: PageTransitionType.rightToLeft,
-                      duration: Duration(milliseconds: 300), child: RegisterScreen(),
+                      duration: const Duration(milliseconds: 300), child: const RegisterScreen(),
                     ),
                   );
                 },
-                child: Text(
+                child: const Text(
                   "Skip",
                   style: TextStyle(fontSize: 13, color: widgetPricolor),
                 ),
@@ -106,7 +106,7 @@ class _SlidesState extends State<Slides> {
                     Container(
                       width: double.infinity,
                       height: 50,
-                      margin: EdgeInsets.symmetric(horizontal: 20),
+                      margin: const EdgeInsets.symmetric(horizontal: 20),
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -165,9 +165,9 @@ class _SlidesState extends State<Slides> {
                                 Navigator.pushReplacement(
                                   context,
                                   PageTransition(
-                                    child: RegisterScreen(),
+                                    child: const RegisterScreen(),
                                     type: PageTransitionType.rightToLeft,
-                                    duration: Duration(milliseconds: 300),
+                                    duration: const Duration(milliseconds: 300),
                                   ),
                                 );
                               } else {
@@ -177,7 +177,7 @@ class _SlidesState extends State<Slides> {
                             child: Container(
                               width: 50,
                               height: 50,
-                              decoration: BoxDecoration(
+                              decoration: const BoxDecoration(
                                 shape: BoxShape.circle,
                                 color: widgetPricolor,
                               ),
@@ -213,7 +213,7 @@ class Page1 extends StatelessWidget {
     return Column(
       children: [
         Expanded(
-          child: Container(
+          child: SizedBox(
             width: double.infinity,
             child: Stack(
               children: [
@@ -221,8 +221,8 @@ class Page1 extends StatelessWidget {
                   top: 0,
                   right: 0,
                   child: Transform.translate(
-                    offset: Offset(180, -200),
-                    child: Container(
+                    offset: const Offset(180, -200),
+                    child: SizedBox(
                       height: 400,
                       width: 400,
                       child: SvgPicture.asset(
@@ -235,8 +235,8 @@ class Page1 extends StatelessWidget {
                   bottom: 0,
                   left: 0,
                   child: Transform.translate(
-                    offset: Offset(-100, 100),
-                    child: Container(
+                    offset: const Offset(-100, 100),
+                    child: SizedBox(
                       height: 300,
                       width: 300,
                       child: SvgPicture.asset(
@@ -250,7 +250,7 @@ class Page1 extends StatelessWidget {
                   bottom: 0,
                   left: 0,
                   child: Transform.translate(
-                    offset: Offset(-70, 130),
+                    offset: const Offset(-70, 130),
                     child: Container(
                       height: 150,
                       width: 250,
@@ -262,7 +262,7 @@ class Page1 extends StatelessWidget {
                   bottom: 0,
                   right: 0,
                   left: 0,
-                  child: Container(
+                  child: SizedBox(
                     width: double.infinity,
                     height: MediaQuery.of(context).size.width * 1.36,
                     child: Image.asset(
@@ -287,9 +287,9 @@ class Page1 extends StatelessWidget {
           ),
         ),
         Padding(
-          padding: EdgeInsets.only(top: 40),
+          padding: const EdgeInsets.only(top: 40),
           child: RichText(
-            text: TextSpan(
+            text: const TextSpan(
               text: 'Staying Safe: ',
               style: TextStyle(fontSize: 20, color: Colors.black, fontWeight: FontWeight.w600, letterSpacing: 1),
               children: [
@@ -310,14 +310,14 @@ class Page1 extends StatelessWidget {
             textAlign: TextAlign.center,
           ),
         ),
-        Padding(
+        const Padding(
           padding: EdgeInsets.only(top: 40, right: 50, left: 50),
           child: CategoryDescripText(
             text: "being aware of safe and danger zones is crucial for recognizing risks and staying protected.",
             alignment: 'center', 
           )
         ),
-        Container(
+        const SizedBox(
           height: 150,
           width: double.infinity,
         )
@@ -334,7 +334,7 @@ class Page2 extends StatelessWidget {
     return Column(
       children: [
         Expanded(
-          child: Container(
+          child: SizedBox(
             width: double.infinity,
             child: Stack(
               children: [
@@ -342,8 +342,8 @@ class Page2 extends StatelessWidget {
                   top: 0,
                   left: 0,
                   child: Transform.translate(
-                    offset: Offset(-180, -200),
-                    child: Container(
+                    offset: const Offset(-180, -200),
+                    child: SizedBox(
                       height: 400,
                       width: 400,
                       child: SvgPicture.asset(
@@ -356,8 +356,8 @@ class Page2 extends StatelessWidget {
                   bottom: 0,
                   right: 0,
                   child: Transform.translate(
-                    offset: Offset(100, 100), 
-                    child: Container(
+                    offset: const Offset(100, 100), 
+                    child: SizedBox(
                       height: 300,
                       width: 300,
                       child: SvgPicture.asset(
@@ -371,7 +371,7 @@ class Page2 extends StatelessWidget {
                   bottom: 0,
                   right: 0,
                   child: Transform.translate(
-                    offset: Offset(-130, 70),
+                    offset: const Offset(-130, 70),
                     child: Container(
                       height: 150,
                       width: 250,
@@ -383,7 +383,7 @@ class Page2 extends StatelessWidget {
                   bottom: 0,
                   right: 0,
                   left: 0,
-                  child: Container(
+                  child: SizedBox(
                     width: double.infinity,
                     height: MediaQuery.of(context).size.width * 1.36,
                     child: Image.asset(
@@ -408,9 +408,9 @@ class Page2 extends StatelessWidget {
           ),
         ),
         Padding(
-          padding: EdgeInsets.only(top: 40),
+          padding: const EdgeInsets.only(top: 40),
           child: RichText(
-            text: TextSpan(
+            text: const TextSpan(
               text: 'Real-Time ',
               style: TextStyle(fontSize: 20, color: Colors.black, fontWeight: FontWeight.w600, letterSpacing: 1),
               children: [
@@ -431,14 +431,14 @@ class Page2 extends StatelessWidget {
             textAlign: TextAlign.center,
           ),
         ),
-        Padding(
+        const Padding(
           padding: EdgeInsets.only(top: 40, right: 50, left: 50),
           child: CategoryDescripText(
             text: "provides real-time updates for better monitoring, quick decisions, and improved control.",
             alignment: 'center', 
           )
         ),
-        Container(
+        const SizedBox(
           height: 150,
           width: double.infinity,
         )
@@ -455,7 +455,7 @@ class Page3 extends StatelessWidget {
     return Column(
       children: [
         Expanded(
-          child: Container(
+          child: SizedBox(
             width: double.infinity,
             child: Stack(
               children: [
@@ -463,8 +463,8 @@ class Page3 extends StatelessWidget {
                   top: 0,
                   right: 0,
                   child: Transform.translate(
-                    offset: Offset(180, -200),
-                    child: Container(
+                    offset: const Offset(180, -200),
+                    child: SizedBox(
                       height: 400,
                       width: 400,
                       child: SvgPicture.asset(
@@ -477,8 +477,8 @@ class Page3 extends StatelessWidget {
                   bottom: 0,
                   left: 0,
                   child: Transform.translate(
-                    offset: Offset(-100, 100),
-                    child: Container(
+                    offset: const Offset(-100, 100),
+                    child: SizedBox(
                       height: 300,
                       width: 300,
                       child: SvgPicture.asset(
@@ -492,7 +492,7 @@ class Page3 extends StatelessWidget {
                   bottom: 0,
                   left: 0,
                   child: Transform.translate(
-                    offset: Offset(-70, 130),
+                    offset: const Offset(-70, 130),
                     child: Container(
                       height: 150,
                       width: 250,
@@ -504,7 +504,7 @@ class Page3 extends StatelessWidget {
                   bottom: 0,
                   right: 0,
                   left: 0,
-                  child: Container(
+                  child: SizedBox(
                     width: double.infinity,
                     height: MediaQuery.of(context).size.width * 1.36,
                     child: Image.asset(
@@ -529,9 +529,9 @@ class Page3 extends StatelessWidget {
           ),
         ),
         Padding(
-          padding: EdgeInsets.only(top: 40),
+          padding: const EdgeInsets.only(top: 40),
           child: RichText(
-            text: TextSpan(
+            text: const TextSpan(
               text: 'Your Security ',
               style: TextStyle(fontSize: 20, color: Colors.black, fontWeight: FontWeight.w600, letterSpacing: 1),
               children: [
@@ -552,14 +552,14 @@ class Page3 extends StatelessWidget {
             textAlign: TextAlign.center,
           )
         ),
-        Padding(
+        const Padding(
           padding: EdgeInsets.only(top: 40, right: 50, left: 50),
           child: CategoryDescripText(
             text: "means we are dedicated to ensuring your protection and peace of mind at all times.",
             alignment: 'center', 
           )
         ),
-        Container(
+        const SizedBox(
           height: 150,
           width: double.infinity,
         )

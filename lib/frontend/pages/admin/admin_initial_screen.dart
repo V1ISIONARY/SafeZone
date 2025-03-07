@@ -65,7 +65,7 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> {
       body: BlocBuilder<AdminBloc, AdminState>(
         builder: (context, state) {
           if (state is AdminLoading) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           } else if (state is AdminError) {
             return Center(child: Text('Error: ${state.message}'));
           } else if (state is AllDataLoaded) {
@@ -201,7 +201,7 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> {
               ],
             );
           } else {
-            return Center(child: Text('No data available'));
+            return const Center(child: Text('No data available'));
           }
         },
       ),

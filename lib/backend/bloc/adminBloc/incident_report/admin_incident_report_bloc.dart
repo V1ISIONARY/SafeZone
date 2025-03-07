@@ -22,7 +22,7 @@ class AdminIncidentReportBloc extends Bloc<AdminIncidentReportEvent, AdminIncide
       if (updatedReport != null) {
         emit(IncidentReportUpdated(updatedReport, "Report verified successfully."));
       } else {
-        emit(IncidentReportError("Failed to verify report."));
+        emit(const IncidentReportError("Failed to verify report."));
       }
     } catch (e) {
       emit(IncidentReportError("Failed to verify report: ${e.toString()}"));
@@ -38,7 +38,7 @@ class AdminIncidentReportBloc extends Bloc<AdminIncidentReportEvent, AdminIncide
       if (updatedReport != null) {
         emit(IncidentReportUpdated(updatedReport, "Report rejected successfully."));
       } else {
-        emit(IncidentReportError("Failed to reject report."));
+        emit(const IncidentReportError("Failed to reject report."));
       }
     } catch (e) {
       emit(IncidentReportError("Failed to reject report: ${e.toString()}"));
@@ -54,7 +54,7 @@ class AdminIncidentReportBloc extends Bloc<AdminIncidentReportEvent, AdminIncide
       if (updatedReport != null) {
         emit(IncidentReportUpdated(updatedReport, "Report under review."));
       } else {
-        emit(IncidentReportError("Failed to review report."));
+        emit(const IncidentReportError("Failed to review report."));
       }
     } catch (e) {
       emit(IncidentReportError("Failed to review report: ${e.toString()}"));

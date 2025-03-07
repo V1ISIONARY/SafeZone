@@ -21,8 +21,8 @@ class PercentageAverage extends StatelessWidget {
     return GestureDetector(
       child: Container(
         height: 90,
-        margin: EdgeInsets.only(bottom: 15),
-        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+        margin: const EdgeInsets.only(bottom: 15),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(5),
           color: const Color.fromARGB(10, 0, 0, 0)
@@ -39,7 +39,7 @@ class PercentageAverage extends StatelessWidget {
               ),
             ),
             CategoryDescripText(text: title),
-            Spacer(),
+            const Spacer(),
             Container(
               height: 10,
               width: double.infinity,
@@ -59,7 +59,7 @@ class PercentageAverage extends StatelessWidget {
                 ),
               ),
             ),
-            Spacer(),
+            const Spacer(),
           ],
         ),
       ),

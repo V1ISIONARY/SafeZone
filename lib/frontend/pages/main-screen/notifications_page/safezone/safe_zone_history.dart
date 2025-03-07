@@ -81,7 +81,7 @@ class _SafezoneHistoryState extends State<SafezoneHistory>
           automaticallyImplyLeading: false,
           centerTitle: true,
           title: Transform.translate(
-            offset: Offset(-15, 0),
+            offset: const Offset(-15, 0),
             child: Row(
               children: [
                 GestureDetector(
@@ -99,7 +99,7 @@ class _SafezoneHistoryState extends State<SafezoneHistory>
                     child: const Icon(Icons.arrow_back, color: Colors.black, size: 10),
                   ),
                 ),
-                CategoryText(text: "Safe Zones History")
+                const CategoryText(text: "Safe Zones History")
               ]
             ),
           ),

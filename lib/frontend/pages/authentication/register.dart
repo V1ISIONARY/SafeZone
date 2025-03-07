@@ -202,31 +202,31 @@ class _RegisterScreenState extends State<RegisterScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          CategoryText(
+          const CategoryText(
             text: 'Enter your email address',
           ),
           const SizedBox(height: 5),
-          CategoryDescripText(
+          const CategoryDescripText(
             text:
                 'Make sure to enter a valid email address for account verification.',
           ),
           const SizedBox(height: 30),
           TextField(
             controller: emailController,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w200,
               color: textColor,
             ),
             decoration: InputDecoration(
               hintText: "Email Address",
-              hintStyle: TextStyle(
+              hintStyle: const TextStyle(
                   fontSize: 13,
                   color: labelFormFieldColor,
                   fontWeight: FontWeight.w200),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: widgetPricolor, width: 2),
+                borderSide: const BorderSide(color: widgetPricolor, width: 2),
               ),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
@@ -242,12 +242,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
             child: Container(
               height: 50,
               width: double.infinity,
-              margin: EdgeInsets.only(bottom: 30),
+              margin: const EdgeInsets.only(bottom: 30),
               decoration: BoxDecoration(
                 color: widgetPricolor,
                 borderRadius: BorderRadius.circular(50),
               ),
-              child: Center(
+              child: const Center(
                 child: Text(
                   'Send Code',
                   style: TextStyle(
@@ -294,7 +294,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   fontWeight: FontWeight.w200),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: widgetPricolor, width: 2),
+                borderSide: const BorderSide(color: widgetPricolor, width: 2),
               ),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
@@ -309,7 +309,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               onTap: () {
                 codeController.clear();
               },
-              child: Text(
+              child: const Text(
                 "Clear",
                 style: TextStyle(
                   fontSize: 11,
@@ -378,27 +378,27 @@ class _RegisterScreenState extends State<RegisterScreen> {
               text: "Tell Us About Yourself",
             ),
             const SizedBox(height: 5),
-            CategoryDescripText(
+            const CategoryDescripText(
               text:
                   'We’re almost there! Add these details to set up your account.',
             ),
             const SizedBox(height: 30),
             TextField(
               controller: firstNameController,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w200,
                 color: textColor,
               ),
               decoration: InputDecoration(
                 hintText: "Enter First Name",
-                hintStyle: TextStyle(
+                hintStyle: const TextStyle(
                     fontSize: 13,
                     color: labelFormFieldColor,
                     fontWeight: FontWeight.w200),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide(color: widgetPricolor, width: 2),
+                  borderSide: const BorderSide(color: widgetPricolor, width: 2),
                 ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
@@ -409,20 +409,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
             const SizedBox(height: 10),
             TextField(
               controller: lastNameController,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w200,
                 color: textColor,
               ),
               decoration: InputDecoration(
                 hintText: "Enter Last Name",
-                hintStyle: TextStyle(
+                hintStyle: const TextStyle(
                     fontSize: 13,
                     color: labelFormFieldColor,
                     fontWeight: FontWeight.w200),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide(color: widgetPricolor, width: 2),
+                  borderSide: const BorderSide(color: widgetPricolor, width: 2),
                 ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
@@ -446,13 +446,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
               },
               decoration: InputDecoration(
                 hintText: "Gender",
-                hintStyle: TextStyle(
+                hintStyle: const TextStyle(
                     fontSize: 13,
                     color: labelFormFieldColor,
                     fontWeight: FontWeight.w200),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide(color: widgetPricolor, width: 2),
+                  borderSide: const BorderSide(color: widgetPricolor, width: 2),
                 ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
@@ -463,20 +463,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
             const SizedBox(height: 10),
             TextField(
               controller: usernameController,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w200,
                 color: textColor,
               ),
               decoration: InputDecoration(
                 hintText: "Enter Username",
-                hintStyle: TextStyle(
+                hintStyle: const TextStyle(
                     fontSize: 13,
                     color: labelFormFieldColor,
                     fontWeight: FontWeight.w200),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide(color: widgetPricolor, width: 2),
+                  borderSide: const BorderSide(color: widgetPricolor, width: 2),
                 ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
@@ -488,20 +488,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
             TextField(
               controller: passwordController,
               obscureText: true,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w200,
                 color: textColor,
               ),
               decoration: InputDecoration(
                 hintText: "Enter Password",
-                hintStyle: TextStyle(
+                hintStyle: const TextStyle(
                     fontSize: 13,
                     color: labelFormFieldColor,
                     fontWeight: FontWeight.w200),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide(color: widgetPricolor, width: 2),
+                  borderSide: const BorderSide(color: widgetPricolor, width: 2),
                 ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
@@ -513,20 +513,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
             TextField(
               controller: confirmPasswordController,
               obscureText: true,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w200,
                 color: textColor,
               ),
               decoration: InputDecoration(
                 hintText: "Confirm Password",
-                hintStyle: TextStyle(
+                hintStyle: const TextStyle(
                     fontSize: 13,
                     color: labelFormFieldColor,
                     fontWeight: FontWeight.w200),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide(color: widgetPricolor, width: 2),
+                  borderSide: const BorderSide(color: widgetPricolor, width: 2),
                 ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
@@ -566,13 +566,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
               },
               child: Container(
                 height: 50,
-                margin: EdgeInsets.only(bottom: 30),
+                margin: const EdgeInsets.only(bottom: 30),
                 width: double.infinity,
                 decoration: BoxDecoration(
                   color: widgetPricolor,
                   borderRadius: BorderRadius.circular(50),
                 ),
-                child: Center(
+                child: const Center(
                   child: Text(
                     'Create new account',
                     style: TextStyle(

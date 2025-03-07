@@ -16,7 +16,7 @@ class PolicyText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.only(bottom: 10),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -25,10 +25,10 @@ class PolicyText extends StatelessWidget {
             width: 2,
             color: widgetPricolor,
           ),
-          SizedBox(width: 8),
+          const SizedBox(width: 8),
           Expanded(
             child: Transform.translate(
-              offset: Offset(0, -4),
+              offset: const Offset(0, -4),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,

@@ -187,7 +187,7 @@ class _AllState extends State<All> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.error, color: Colors.red, size: 50),
+          const Icon(Icons.error, color: Colors.red, size: 50),
           const SizedBox(height: 10),
           Text(
             "Error: $message",

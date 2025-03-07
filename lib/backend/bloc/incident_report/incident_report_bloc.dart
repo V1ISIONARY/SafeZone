@@ -65,7 +65,7 @@ class IncidentReportBloc
             .getIncidentReportsByUserId(event.userId);
         emit(IncidentReportLoaded(reports));
       } catch (e) {
-        emit(IncidentReportError('Failed to load reports'));
+        emit(const IncidentReportError('Failed to load reports'));
       }
     });
 

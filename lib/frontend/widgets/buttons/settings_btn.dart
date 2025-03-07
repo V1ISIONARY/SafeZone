@@ -44,7 +44,7 @@ class Settingsbtn extends StatelessWidget {
                 Container(
                   height: 25,
                   width: 25,
-                  margin: EdgeInsets.only(right: 17),
+                  margin: const EdgeInsets.only(right: 17),
                   child: SvgPicture.asset(
                     svgIcon,
                     color: const Color.fromARGB(179, 0, 0, 0),
@@ -68,7 +68,7 @@ class Settingsbtn extends StatelessWidget {
               child: Container(
                 height: 20,
                 width: 20,
-                margin: EdgeInsets.only(right: 17),
+                margin: const EdgeInsets.only(right: 17),
                 child: SvgPicture.asset(
                   'lib/resources/svg/proceed.svg',
                   color: const Color.fromARGB(179, 0, 0, 0),

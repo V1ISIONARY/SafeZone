@@ -19,9 +19,9 @@ class IdentifiedZone extends StatelessWidget {
       child: Container(
         width: double.infinity,
         height: 70,
-        margin: EdgeInsets.only(bottom: 10),
+        margin: const EdgeInsets.only(bottom: 10),
         decoration: BoxDecoration(
-            color: Color.fromARGB(10, 0, 0, 0),
+            color: const Color.fromARGB(10, 0, 0, 0),
             borderRadius: BorderRadius.circular(5)),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -30,12 +30,12 @@ class IdentifiedZone extends StatelessWidget {
             Container(
               width: 40,
               height: 40,
-              margin: EdgeInsets.only(left: 15),
+              margin: const EdgeInsets.only(left: 15),
               decoration:
-                  BoxDecoration(shape: BoxShape.circle, color: Colors.white),
+                  const BoxDecoration(shape: BoxShape.circle, color: Colors.white),
             ),
             Padding(
-                padding: EdgeInsets.only(left: 15),
+                padding: const EdgeInsets.only(left: 15),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,

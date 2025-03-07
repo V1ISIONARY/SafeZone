@@ -4,7 +4,6 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:safezone/backend/apiservice/profileApi/profile_repo.dart';
 import 'package:safezone/backend/models/userModel/profile_model.dart';
-import 'package:safezone/backend/apiservice/vercel_url.dart';
 import 'package:http_parser/http_parser.dart';
 
 class ProfileImplementation extends ProfileRepository {

@@ -18,12 +18,12 @@ class WhiteBackgroundPainter extends CustomPainter {
       ..shader = LinearGradient(
         begin: begin,
         end: end,
-        colors: [
+        colors: const [
           Color.fromARGB(0, 255, 255, 255),  // Fully transparent
           Color.fromARGB(150, 255, 255, 255), // Soft fade
           Color.fromARGB(255, 255, 255, 255), // Solid white
         ],
-        stops: [0.0, 0.5, 1.0], // Ensure a gradual fade
+        stops: const [0.0, 0.5, 1.0], // Ensure a gradual fade
       ).createShader(
           Rect.fromLTWH(0, size.height * height, size.width, size.height * (1 - height)));
 

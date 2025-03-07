@@ -78,7 +78,7 @@ class AdminReportsCard extends StatelessWidget {
                   reportModel.description == null || reportModel.description!.isEmpty
                     ? Container()
                     : Padding(
-                      padding: EdgeInsets.only(top: 1),
+                      padding: const EdgeInsets.only(top: 1),
                       child: CategoryDescripTextEllipsis(text: reportModel.description!),
                     )
                 ],

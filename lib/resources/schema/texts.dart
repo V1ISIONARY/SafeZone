@@ -22,12 +22,8 @@ class CategoryDescripText extends StatelessWidget {
   final String? alignment;
   final Color? color;
 
-  const CategoryDescripText({
-    super.key,
-    required this.text,
-    this.alignment,
-    this.color
-  });
+  const CategoryDescripText(
+      {super.key, required this.text, this.alignment, this.color});
 
   @override
   Widget build(BuildContext context) {
@@ -106,7 +102,7 @@ class PrimaryText extends StatelessWidget {
     return (Text(
       text,
       style: GoogleFonts.poppins(
-          fontWeight: FontWeight.w500, color: primary_textColor, fontSize: 11),
+          fontWeight: FontWeight.w500, color: primaryTextColor, fontSize: 11),
     ));
   }
 }
@@ -122,7 +118,7 @@ class DescriptionText extends StatelessWidget {
       text,
       style: GoogleFonts.poppins(
           fontWeight: FontWeight.w500,
-          color: description_textColor,
+          color: descriptionTextColor,
           fontSize: 8),
     ));
   }

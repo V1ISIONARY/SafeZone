@@ -206,14 +206,14 @@ class _ReportsHistoryDetailsState extends State<ReportsHistoryDetails> {
                               fit: BoxFit.contain,
                             ),
                           ),
-                          Expanded(
+                          const Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
                                   "Check status history",
                                   style: TextStyle(
-                                      color: primary_textColor,
+                                      color: primaryTextColor,
                                       fontSize: 13,
                                       fontWeight: FontWeight.w200),
                                 ),
@@ -364,8 +364,9 @@ class _ReportsHistoryDetailsState extends State<ReportsHistoryDetails> {
                                                       Widget child,
                                                       ImageChunkEvent?
                                                           loadingProgress) {
-                                                if (loadingProgress == null)
+                                                if (loadingProgress == null) {
                                                   return child;
+                                                }
                                                 return Center(
                                                   child: Lottie.asset(
                                                     'lib/resources/lottie/loading.json',

@@ -75,7 +75,7 @@ class _LoginState extends State<Login> {
                           color: Colors.black,
                           fontWeight: FontWeight.w600,
                           letterSpacing: 1),
-                      children: [
+                      children: const [
                         TextSpan(
                           text: 'SafeZone',
                           style: TextStyle(

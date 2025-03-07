@@ -28,7 +28,7 @@ class _OvalBtnState extends State<OvalBtn> {
           PageTransition(
             child: _getNavigateToScreen(widget.navigateTo), 
             type: PageTransitionType.rightToLeft,
-            duration: Duration(milliseconds: 300),
+            duration: const Duration(milliseconds: 300),
           ),
         );
       },
@@ -42,7 +42,7 @@ class _OvalBtnState extends State<OvalBtn> {
         child: Center(
           child: Text(
             widget.text, 
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 12,
               color: Colors.white,
             ),
@@ -55,7 +55,7 @@ class _OvalBtnState extends State<OvalBtn> {
   Widget _getNavigateToScreen(String navigateTo) {
     switch (navigateTo) {
       case 'Slides':
-        return Slides();
+        return const Slides();
       case 'SignIn':
         return Container();
       default:

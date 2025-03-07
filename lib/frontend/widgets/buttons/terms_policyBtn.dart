@@ -25,7 +25,7 @@ class TermsPolicyBtn extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.only(bottom: 15),
+      margin: const EdgeInsets.only(bottom: 15),
       width: double.infinity,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
@@ -45,16 +45,16 @@ class TermsPolicyBtn extends StatelessWidget {
             PageTransition(
               child: _getPageForNavigation(navigateTo),
               type: PageTransitionType.rightToLeft,
-              duration: Duration(milliseconds: 200)
+              duration: const Duration(milliseconds: 200)
             )
           );
         },
         child: Container(
-          margin: EdgeInsets.symmetric(horizontal: 15),
+          margin: const EdgeInsets.symmetric(horizontal: 15),
           color: Colors.white,
           child: Container(
             width: double.infinity,
-            margin: EdgeInsets.symmetric(
+            margin: const EdgeInsets.symmetric(
               vertical: 15
             ),
             child: Stack(
@@ -65,7 +65,7 @@ class TermsPolicyBtn extends StatelessWidget {
                     Container(
                       height: 27,
                       width: 27,
-                      margin: EdgeInsets.only(right: 17),
+                      margin: const EdgeInsets.only(right: 17),
                       child: SvgPicture.asset(
                         svgIcon
                       )
@@ -90,7 +90,7 @@ class TermsPolicyBtn extends StatelessWidget {
                   child: Container(
                     height: 20,
                     width: 20,
-                    margin: EdgeInsets.only(right: 17),
+                    margin: const EdgeInsets.only(right: 17),
                     child: SvgPicture.asset(
                       'lib/resources/svg/proceed.svg',
                       color: Colors.black,

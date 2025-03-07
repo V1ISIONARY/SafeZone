@@ -15,9 +15,9 @@ class _AdminDangerzonesState extends State<AdminDangerzones> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: Container(
-        margin: EdgeInsets.only(top: 15, left: 15, right: 15),
+        margin: const EdgeInsets.only(top: 15, left: 15, right: 15),
         child: ListView(
-          children: [
+          children: const [
             IdentifiedZone(
                 name: "Miro Abnormal",
                 profileImage: '',

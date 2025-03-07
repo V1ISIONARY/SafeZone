@@ -15,8 +15,12 @@ import 'package:safezone/resources/schema/colors.dart';
 import 'package:safezone/resources/schema/texts.dart';
 
 class AdminSafezoneDetails extends StatefulWidget {
-  const AdminSafezoneDetails(
-      {super.key, required this.safezonemodel, required this.address,  this.onStatusChanged,});
+  const AdminSafezoneDetails({
+    super.key,
+    required this.safezonemodel,
+    required this.address,
+    this.onStatusChanged,
+  });
 
   final SafeZoneModel safezonemodel;
   final String address;
@@ -30,37 +34,36 @@ class _AdminSafezoneDetailsState extends State<AdminSafezoneDetails> {
   late SafeZoneModel _safeZoneModel;
   bool _isLoading = false;
 
-  Future<void> _showConfirmationDialog(
-    String action, Function onConfirm) {
-  return showDialog<void>(
-    context: context,
-    barrierDismissible: false, // User must tap button to dismiss
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: Text('Confirm $action'),
-        content: Text('Are you sure you want to $action this safe zone?'),
-        backgroundColor: Colors.white,
-        actions: <Widget>[
-          TextButton(
-            style: TextButton.styleFrom(foregroundColor: Colors.black),
-            child: const Text('Cancel'),
-            onPressed: () {
-              Navigator.of(context).pop(); // Dismiss the dialog
-            },
-          ),
-          TextButton(
-            style: TextButton.styleFrom(foregroundColor: Colors.black),
-            child: Text(action[0].toUpperCase() + action.substring(1)),
-            onPressed: () {
-              onConfirm(); // Call the action function
-              Navigator.of(context).pop(); // Dismiss the dialog
-            },
-          ),
-        ],
-      );
-    },
-  );
-}
+  Future<void> _showConfirmationDialog(String action, Function onConfirm) {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // User must tap button to dismiss
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Confirm $action'),
+          content: Text('Are you sure you want to $action this safe zone?'),
+          backgroundColor: Colors.white,
+          actions: <Widget>[
+            TextButton(
+              style: TextButton.styleFrom(foregroundColor: Colors.black),
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop(); // Dismiss the dialog
+              },
+            ),
+            TextButton(
+              style: TextButton.styleFrom(foregroundColor: Colors.black),
+              child: Text(action[0].toUpperCase() + action.substring(1)),
+              onPressed: () {
+                onConfirm(); // Call the action function
+                Navigator.of(context).pop(); // Dismiss the dialog
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   Gradient statusGradient(String status) {
     switch (status.toLowerCase()) {
@@ -134,89 +137,90 @@ class _AdminSafezoneDetailsState extends State<AdminSafezoneDetails> {
     _safeZoneModel = widget.safezonemodel;
   }
 
- @override
-Widget build(BuildContext context) {
-  final SafeZoneAdminBloc safeZoneAdminBloc =
-      BlocProvider.of<SafeZoneAdminBloc>(context);
- return BlocListener<SafeZoneAdminBloc, SafeZoneAdminState>(
-    listener: (context, state) {
-      if (state is SafeZoneAdminLoading) {
-        setState(() {
-          _isLoading = true; 
-        });
-      } else if (state is SafeZoneAdminSuccess) {
-        if (state.safeZoneModel != null) {
-          setState(() {
-            _safeZoneModel = state.safeZoneModel;
-            _isLoading = false; 
-          });
+  @override
+  Widget build(BuildContext context) {
+    final SafeZoneAdminBloc safeZoneAdminBloc =
+        BlocProvider.of<SafeZoneAdminBloc>(context);
+    return BlocListener<SafeZoneAdminBloc, SafeZoneAdminState>(
+        listener: (context, state) {
+          if (state is SafeZoneAdminLoading) {
+            setState(() {
+              _isLoading = true;
+            });
+          } else if (state is SafeZoneAdminSuccess) {
+            if (state.safeZoneModel != null) {
+              setState(() {
+                _safeZoneModel = state.safeZoneModel;
+                _isLoading = false;
+              });
 
-          // Call the callback to update the parent state
-          if (widget.onStatusChanged != null) {
-            widget.onStatusChanged!(_safeZoneModel);
+              // Call the callback to update the parent state
+              if (widget.onStatusChanged != null) {
+                widget.onStatusChanged!(_safeZoneModel);
+              }
+
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                    content: Text("Safe zone status updated successfully!")),
+              );
+              print("Navigating back with shouldRefresh = true");
+
+              // Return true to indicate that the data should be refreshed
+              context.pop(true);
+            } else {
+              print("❌ SafeZoneModel is null");
+              setState(() {
+                _isLoading = false;
+              });
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                    content: Text("Failed to update safe zone: Invalid data")),
+              );
+            }
+          } else if (state is SafeZoneAdminFailure) {
+            setState(() {
+              _isLoading = false;
+            });
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(state.error)),
+            );
           }
-
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Safe zone status updated successfully!")),
-          );
-            print("Navigating back with shouldRefresh = true");
-
-          // Return true to indicate that the data should be refreshed
-          context.pop(true); 
-        } else {
-          print("❌ SafeZoneModel is null");
-          setState(() {
-            _isLoading = false; 
-          });
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Failed to update safe zone: Invalid data")),
-          );
-        }
-      } else if (state is SafeZoneAdminFailure) {
-        setState(() {
-          _isLoading = false; 
-        });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(state.error)),
-        );
-      }
-    },
-  child: Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.white,
-          automaticallyImplyLeading: false,
-          centerTitle: true,
-          title: const CategoryText(text: "Safe zone Details"),
-          leading: GestureDetector(
-            onTap: () {
-              Navigator.pop(context);
-            },
-            child: Container(
-              margin: const EdgeInsets.all(15),
-              decoration: BoxDecoration(
-                border: Border.all(width: 1, color: Colors.black),
-                shape: BoxShape.circle,
+        },
+        child: Scaffold(
+          appBar: AppBar(
+            backgroundColor: Colors.white,
+            automaticallyImplyLeading: false,
+            centerTitle: true,
+            title: const CategoryText(text: "Safe zone Details"),
+            leading: GestureDetector(
+              onTap: () {
+                Navigator.pop(context);
+              },
+              child: Container(
+                margin: const EdgeInsets.all(15),
+                decoration: BoxDecoration(
+                  border: Border.all(width: 1, color: Colors.black),
+                  shape: BoxShape.circle,
+                ),
+                child:
+                    const Icon(Icons.arrow_back, color: Colors.black, size: 10),
               ),
-              child: const Icon(Icons.arrow_back, color: Colors.black, size: 10),
             ),
           ),
-        ),
-        body: BlocBuilder<SafeZoneAdminBloc, SafeZoneAdminState>(
-          builder: (context, state) {
+          body: BlocBuilder<SafeZoneAdminBloc, SafeZoneAdminState>(
+              builder: (context, state) {
             if (_isLoading) {
               return Expanded(
-                child: Center(
-                  child: Transform.translate(
-                    offset: const Offset(0, -60), 
-                    child: Lottie.asset(
-                      'lib/resources/lottie/loading.json',
-                      width: 80,
-                      height: 80,
-                      fit: BoxFit.cover,
-                    ),
-                  )
-                )
-              );
+                  child: Center(
+                      child: Transform.translate(
+                offset: const Offset(0, -60),
+                child: Lottie.asset(
+                  'lib/resources/lottie/loading.json',
+                  width: 80,
+                  height: 80,
+                  fit: BoxFit.cover,
+                ),
+              )));
             }
             return SingleChildScrollView(
               child: Column(
@@ -232,14 +236,15 @@ Widget build(BuildContext context) {
                           width: double.infinity,
                           padding: const EdgeInsets.all(15),
                           decoration: BoxDecoration(
-                            gradient: statusGradient(_safeZoneModel.status ?? 'pending'), 
+                            gradient: statusGradient(
+                                _safeZoneModel.status ?? 'pending'),
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
                               Text(
-                                _safeZoneModel.status ?? 'pending', 
+                                _safeZoneModel.status ?? 'pending',
                                 style: const TextStyle(
                                     fontSize: 15,
                                     fontWeight: FontWeight.w600,
@@ -247,7 +252,8 @@ Widget build(BuildContext context) {
                               ),
                               const SizedBox(height: 10),
                               Text(
-                                reportStatusMessage(_safeZoneModel.status ?? 'pending'),
+                                reportStatusMessage(
+                                    _safeZoneModel.status ?? 'pending'),
                                 style: const TextStyle(
                                   fontSize: 13,
                                   fontWeight: FontWeight.w200,
@@ -259,7 +265,8 @@ Widget build(BuildContext context) {
                         ),
                         GestureDetector(
                           onTap: () {
-                            GoRouter.of(context).push('/safezone-status-history',
+                            GoRouter.of(context).push(
+                                '/safezone-status-history',
                                 extra: _safeZoneModel);
                           },
                           child: Container(
@@ -282,14 +289,15 @@ Widget build(BuildContext context) {
                                     fit: BoxFit.contain,
                                   ),
                                 ),
-                                Expanded(
+                                const Expanded(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         "Check status history",
                                         style: TextStyle(
-                                            color: primary_textColor,
+                                            color: primaryTextColor,
                                             fontSize: 13,
                                             fontWeight: FontWeight.w200),
                                       ),
@@ -308,340 +316,342 @@ Widget build(BuildContext context) {
                             ),
                           ),
                         ),
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 16),
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
-                      ),
-                      child: Column(
-                        children: [
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(3),
-                            child: SizedBox(
-                              height: 215,
-                              width: double.infinity,
-                              child: gmaps.GoogleMap(
-                                initialCameraPosition:
-                                    const gmaps.CameraPosition(
-                                  target: gmaps.LatLng(16.043859, 120.335182),
-                                  zoom: 14.0,
-                                ),
-                                markers: {
-                                  gmaps.Marker(
-                                    markerId:
-                                        const gmaps.MarkerId("pinned location"),
-                                    position: gmaps.LatLng(
-                                      widget.safezonemodel.latitude ?? 0.0,
-                                      widget.safezonemodel.longitude ?? 0.0,
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 16),
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                          ),
+                          child: Column(
+                            children: [
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(3),
+                                child: SizedBox(
+                                  height: 215,
+                                  width: double.infinity,
+                                  child: gmaps.GoogleMap(
+                                    initialCameraPosition:
+                                        const gmaps.CameraPosition(
+                                      target:
+                                          gmaps.LatLng(16.043859, 120.335182),
+                                      zoom: 14.0,
                                     ),
-                                    infoWindow: const gmaps.InfoWindow(
-                                        title: "Pinned Location"),
+                                    markers: {
+                                      gmaps.Marker(
+                                        markerId: const gmaps.MarkerId(
+                                            "pinned location"),
+                                        position: gmaps.LatLng(
+                                          widget.safezonemodel.latitude ?? 0.0,
+                                          widget.safezonemodel.longitude ?? 0.0,
+                                        ),
+                                        infoWindow: const gmaps.InfoWindow(
+                                            title: "Pinned Location"),
+                                      ),
+                                    },
+                                    onMapCreated:
+                                        (gmaps.GoogleMapController controller) {
+                                      _mapController.complete(controller);
+                                    },
                                   ),
-                                },
-                                onMapCreated:
-                                    (gmaps.GoogleMapController controller) {
-                                  _mapController.complete(controller);
-                                },
+                                ),
                               ),
-                            ),
-                          ),
-                          const SizedBox(height: 20),
-                          Text(
-                            widget.safezonemodel.name ?? "My Safe Zone",
-                            style: const TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.bold,
-                                color: textColor),
-                          ),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: const BoxDecoration(
-                                color: Color.fromARGB(5, 0, 0, 0)),
-                            child: Wrap(
-                              children: [
-                                const Text("Location: ",
-                                    style: TextStyle(
-                                        fontSize: 13,
-                                        fontWeight: FontWeight.w400,
-                                        color: Colors.black87)),
-                                Container(
-                                  height: 10,
+                              const SizedBox(height: 20),
+                              Text(
+                                widget.safezonemodel.name ?? "My Safe Zone",
+                                style: const TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.bold,
+                                    color: textColor),
+                              ),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: const BoxDecoration(
+                                    color: Color.fromARGB(5, 0, 0, 0)),
+                                child: Wrap(
+                                  children: [
+                                    const Text("Location: ",
+                                        style: TextStyle(
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.w400,
+                                            color: Colors.black87)),
+                                    Container(
+                                      height: 10,
+                                    ),
+                                    Text(
+                                      widget.address,
+                                      style: const TextStyle(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w400,
+                                          color: Colors.black87),
+                                    ),
+                                  ],
                                 ),
-                                Text(
-                                  widget.address,
-                                  style: const TextStyle(
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.w400,
-                                      color: Colors.black87),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 20),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: List.generate(5, (index) {
-                              int ratingValue = index + 1;
-                              return Container(
-                                margin: const EdgeInsets.all(3),
-                                width: 60,
-                                height: 50,
-                                decoration: BoxDecoration(
-                                  color:
-                                      widget.safezonemodel.scale == ratingValue
+                              ),
+                              const SizedBox(height: 20),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: List.generate(5, (index) {
+                                  int ratingValue = index + 1;
+                                  return Container(
+                                    margin: const EdgeInsets.all(3),
+                                    width: 60,
+                                    height: 50,
+                                    decoration: BoxDecoration(
+                                      color: widget.safezonemodel.scale ==
+                                              ratingValue
                                           ? btnColor.withOpacity(0.1)
                                           : bgColor,
-                                  border: Border.all(
-                                    color: widget.safezonemodel.scale ==
-                                            ratingValue
-                                        ? btnColor
-                                        : const Color(0xff707070)
-                                            .withOpacity(0.5),
-                                    width: 1.5,
-                                  ),
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: Center(
-                                  child: Text(
-                                    ratingValue.toString(),
-                                    style: const TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w400,
-                                      color: textColor,
+                                      border: Border.all(
+                                        color: widget.safezonemodel.scale ==
+                                                ratingValue
+                                            ? btnColor
+                                            : const Color(0xff707070)
+                                                .withOpacity(0.5),
+                                        width: 1.5,
+                                      ),
+                                      borderRadius: BorderRadius.circular(8),
                                     ),
+                                    child: Center(
+                                      child: Text(
+                                        ratingValue.toString(),
+                                        style: const TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w400,
+                                          color: textColor,
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                }),
+                              ),
+                              const SizedBox(height: 20),
+                              Align(
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  widget.safezonemodel.description!,
+                                  style: const TextStyle(
+                                      fontSize: 13, color: textColor),
+                                ),
+                              ),
+                              const SizedBox(height: 20),
+                              const Align(
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  "What time of day do you feel this area is safe?",
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: textColor,
                                   ),
                                 ),
-                              );
-                            }),
-                          ),
-                          const SizedBox(height: 20),
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                              widget.safezonemodel.description!,
-                              style: const TextStyle(
-                                  fontSize: 13, color: textColor),
-                            ),
-                          ),
-                          const SizedBox(height: 20),
-                          const Align(
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                              "What time of day do you feel this area is safe?",
-                              style: TextStyle(
-                                fontSize: 13,
-                                color: textColor,
                               ),
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Column(
-                            children: [
-                              CustomRadioButton(
-                                value: "Daytime",
-                                groupValue: widget.safezonemodel.timeOfDay!,
-                                label: "Daytime",
-                                onChanged: null,
+                              const SizedBox(height: 4),
+                              Column(
+                                children: [
+                                  CustomRadioButton(
+                                    value: "Daytime",
+                                    groupValue: widget.safezonemodel.timeOfDay!,
+                                    label: "Daytime",
+                                    onChanged: null,
+                                  ),
+                                  CustomRadioButton(
+                                    value: "Nighttime",
+                                    groupValue: widget.safezonemodel.timeOfDay!,
+                                    label: "Nighttime",
+                                    onChanged: null,
+                                  ),
+                                  CustomRadioButton(
+                                    value: "Both",
+                                    groupValue: widget.safezonemodel.timeOfDay!,
+                                    label: "Both",
+                                    onChanged: null,
+                                  ),
+                                ],
                               ),
-                              CustomRadioButton(
-                                value: "Nighttime",
-                                groupValue: widget.safezonemodel.timeOfDay!,
-                                label: "Nighttime",
-                                onChanged: null,
+                              const SizedBox(height: 12),
+                              const Align(
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  "How often do you visit this area?",
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: textColor,
+                                  ),
+                                ),
                               ),
-                              CustomRadioButton(
-                                value: "Both",
-                                groupValue: widget.safezonemodel.timeOfDay!,
-                                label: "Both",
-                                onChanged: null,
+                              const SizedBox(height: 4),
+                              Column(
+                                children: [
+                                  CustomRadioButton(
+                                    value: "Daily",
+                                    groupValue: widget.safezonemodel.frequency!,
+                                    label: "Daily",
+                                    onChanged: null,
+                                  ),
+                                  CustomRadioButton(
+                                    value: "Weekly",
+                                    groupValue: widget.safezonemodel.frequency!,
+                                    label: "Weekly",
+                                    onChanged: null,
+                                  ),
+                                  CustomRadioButton(
+                                    value: "Occasionally",
+                                    groupValue: widget.safezonemodel.frequency!,
+                                    label: "Occasionally",
+                                    onChanged: null,
+                                  ),
+                                  CustomRadioButton(
+                                    value: "Rarely",
+                                    groupValue: widget.safezonemodel.frequency!,
+                                    label: "Rarely",
+                                    onChanged: null,
+                                  ),
+                                ],
                               ),
+                              const SizedBox(height: 10),
                             ],
                           ),
-                          const SizedBox(height: 12),
-                          const Align(
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                              "How often do you visit this area?",
-                              style: TextStyle(
-                                fontSize: 13,
-                                color: textColor,
-                              ),
-                            ),
+                        ),
+                        const SizedBox(
+                          height: 1,
+                        ),
+                        Container(
+                          width: double.infinity,
+                          margin: const EdgeInsets.only(bottom: 15),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 16),
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
                           ),
-                          const SizedBox(height: 4),
-                          Column(
-                            children: [
-                              CustomRadioButton(
-                                value: "Daily",
-                                groupValue: widget.safezonemodel.frequency!,
-                                label: "Daily",
-                                onChanged: null,
-                              ),
-                              CustomRadioButton(
-                                value: "Weekly",
-                                groupValue: widget.safezonemodel.frequency!,
-                                label: "Weekly",
-                                onChanged: null,
-                              ),
-                              CustomRadioButton(
-                                value: "Occasionally",
-                                groupValue: widget.safezonemodel.frequency!,
-                                label: "Occasionally",
-                                onChanged: null,
-                              ),
-                              CustomRadioButton(
-                                value: "Rarely",
-                                groupValue: widget.safezonemodel.frequency!,
-                                label: "Rarely",
-                                onChanged: null,
-                              ),
-                            ],
+                          child: HistoryInformationText(
+                            text: "Date",
+                            data: widget.safezonemodel.reportTimestamp!,
                           ),
-                          const SizedBox(height: 10),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(
-                      height: 1,
-                    ),
-                    Container(
-                      width: double.infinity,
-                      margin: const EdgeInsets.only(bottom: 15),
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 16),
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
-                      ),
-                      child: HistoryInformationText(
-                        text: "Date",
-                        data: widget.safezonemodel.reportTimestamp!,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: ElevatedButton.icon(
-                      onPressed: () {
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: () {
                             _showConfirmationDialog('review', () {
                               print(
-                            "Review button pressed for ID: ${widget.safezonemodel.id}");
-                              safeZoneAdminBloc
-                            .add(ReviewSafeZone(widget.safezonemodel.id!));
+                                  "Review button pressed for ID: ${widget.safezonemodel.id}");
+                              safeZoneAdminBloc.add(
+                                  ReviewSafeZone(widget.safezonemodel.id!));
                             });
-                      },
-                      icon: const Icon(
-                        Icons.timelapse,
-                        color: Color.fromARGB(171, 73, 87, 124),
-                      ),
-                      label: const Text(
-                        "Review",
-                        style: TextStyle(fontSize: 13, color: textColor),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color.fromARGB(37, 94, 98, 117),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(7),
-                          side: const BorderSide(
-                            color: Color.fromARGB(126, 94, 100, 117),
-                            width: 1,
+                          },
+                          icon: const Icon(
+                            Icons.timelapse,
+                            color: Color.fromARGB(171, 73, 87, 124),
+                          ),
+                          label: const Text(
+                            "Review",
+                            style: TextStyle(fontSize: 13, color: textColor),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor:
+                                const Color.fromARGB(37, 94, 98, 117),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(7),
+                              side: const BorderSide(
+                                color: Color.fromARGB(126, 94, 100, 117),
+                                width: 1,
+                              ),
+                            ),
+                            padding: const EdgeInsets.all(15),
+                            alignment: Alignment.centerLeft,
                           ),
                         ),
-                        padding: const EdgeInsets.all(15),
-                        alignment: Alignment.centerLeft,
                       ),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: ElevatedButton.icon(
-                      onPressed: () {
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: () {
                             _showConfirmationDialog('verify', () {
                               print(
-                            "Verify button pressed for ID: ${widget.safezonemodel.id}");
-                              safeZoneAdminBloc
-                            .add(VerifySafeZone(widget.safezonemodel.id!));
+                                  "Verify button pressed for ID: ${widget.safezonemodel.id}");
+                              safeZoneAdminBloc.add(
+                                  VerifySafeZone(widget.safezonemodel.id!));
                             });
-                      },
-                      icon: const Icon(
-                        Icons.check_circle,
-                        color: Color.fromARGB(179, 81, 116, 99),
-                      ),
-                      label: const Text(
-                        "Verify",
-                        style: TextStyle(fontSize: 13, color: textColor),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color.fromARGB(38, 94, 117, 106),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(7),
-                          side: const BorderSide(
-                            color: Color.fromARGB(127, 94, 117, 106),
-                            width: 1,
+                          },
+                          icon: const Icon(
+                            Icons.check_circle,
+                            color: Color.fromARGB(179, 81, 116, 99),
+                          ),
+                          label: const Text(
+                            "Verify",
+                            style: TextStyle(fontSize: 13, color: textColor),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor:
+                                const Color.fromARGB(38, 94, 117, 106),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(7),
+                              side: const BorderSide(
+                                color: Color.fromARGB(127, 94, 117, 106),
+                                width: 1,
+                              ),
+                            ),
+                            padding: const EdgeInsets.all(15),
+                            alignment: Alignment.centerLeft,
                           ),
                         ),
-                        padding: const EdgeInsets.all(15),
-                        alignment: Alignment.centerLeft,
                       ),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: ElevatedButton.icon(
-                      onPressed: () {
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: () {
                             _showConfirmationDialog('reject', () {
                               print(
-                            "Reject button pressed for ID: ${widget.safezonemodel.id}");
-                              safeZoneAdminBloc
-                            .add(RejectSafeZone(widget.safezonemodel.id!));
+                                  "Reject button pressed for ID: ${widget.safezonemodel.id}");
+                              safeZoneAdminBloc.add(
+                                  RejectSafeZone(widget.safezonemodel.id!));
                             });
-                      },
-                      icon: const Icon(
-                        Icons.cancel,
-                        color: Color.fromARGB(197, 133, 97, 94),
-                      ),
-                      label: const Text(
-                        "Reject",
-                        style: TextStyle(fontSize: 13, color: textColor),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color.fromARGB(37, 117, 94, 94),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(7),
-                          side: const BorderSide(
-                            color: Color.fromARGB(126, 117, 96, 94),
-                            width: 1,
+                          },
+                          icon: const Icon(
+                            Icons.cancel,
+                            color: Color.fromARGB(197, 133, 97, 94),
+                          ),
+                          label: const Text(
+                            "Reject",
+                            style: TextStyle(fontSize: 13, color: textColor),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor:
+                                const Color.fromARGB(37, 117, 94, 94),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(7),
+                              side: const BorderSide(
+                                color: Color.fromARGB(126, 117, 96, 94),
+                                width: 1,
+                              ),
+                            ),
+                            padding: const EdgeInsets.all(15),
+                            alignment: Alignment.centerLeft,
                           ),
                         ),
-                        padding: const EdgeInsets.all(15),
-                        alignment: Alignment.centerLeft,
                       ),
-                    ),
+                      const SizedBox(width: 10),
+                    ],
                   ),
-                  const SizedBox(width: 10),
+                  const SizedBox(
+                    height: 50,
+                  ),
                 ],
               ),
-              const SizedBox(
-                height: 50,
-              ),
-            ],
-          ),
-        );
-          }
-      ),
-      )
-    );
+            );
+          }),
+        ));
   }
 }

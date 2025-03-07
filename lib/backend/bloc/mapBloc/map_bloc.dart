@@ -14,7 +14,7 @@ class MapBloc extends Bloc<MapPageEvent, MapState> {
   final DangerZoneRepository dangerZoneRepository;
   final CircleRepository circleRepository;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  Map<String, StreamSubscription<DocumentSnapshot>> _locationListeners = {};
+  final Map<String, StreamSubscription<DocumentSnapshot>> _locationListeners = {};
 
   MapBloc({
     required this.safeZoneRepository,
@@ -40,7 +40,7 @@ class MapBloc extends Bloc<MapPageEvent, MapState> {
       if (members != null && members.isNotEmpty) {
         emit(MapDataLoaded(safeZones, dangerZones, members));
       } else {
-        emit(MapDataLoaded(safeZones, dangerZones, []));
+        emit(MapDataLoaded(safeZones, dangerZones, const []));
       }
     } catch (e) {
       emit(MapError(e.toString()));

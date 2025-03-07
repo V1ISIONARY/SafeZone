@@ -89,48 +89,46 @@ class _AccountDetailsState extends State<AccountDetails> {
                   // ],
                 ),
                 child: Center(
-                  child: Container(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Container(
-                            height: 100,
-                            width: 100,
-                            decoration: BoxDecoration(
-                                color: Colors.black38, shape: BoxShape.circle),
-                            child: ClipRRect(
-                                borderRadius: BorderRadius.circular(50),
-                                child: Image.asset(
-                                  'lib/resources/images/profile.jpg',
-                                  fit: BoxFit.cover,
-                                ))),
-                        SizedBox(height: 10),
-                        CategoryText(text: "$firstName $lastName"),
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Container(
-                              width: 13,
-                              height: 13,
-                              child: SvgPicture.asset(
-                                'lib/resources/svg/verified.svg',
-                                color: widgetPricolor,
-                              ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                          height: 100,
+                          width: 100,
+                          decoration: BoxDecoration(
+                              color: Colors.black38, shape: BoxShape.circle),
+                          child: ClipRRect(
+                              borderRadius: BorderRadius.circular(50),
+                              child: Image.asset(
+                                'lib/resources/images/profile.jpg',
+                                fit: BoxFit.cover,
+                              ))),
+                      SizedBox(height: 10),
+                      CategoryText(text: "$firstName $lastName"),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SizedBox(
+                            width: 13,
+                            height: 13,
+                            child: SvgPicture.asset(
+                              'lib/resources/svg/verified.svg',
+                              color: widgetPricolor,
                             ),
-                            SizedBox(width: 5),
-                            CategoryDescripText(text: "Verified at Safezone"),
-                          ],
-                        )
-                      ],
-                    ),
+                          ),
+                          SizedBox(width: 5),
+                          CategoryDescripText(text: "Verified at Safezone"),
+                        ],
+                      )
+                    ],
                   ),
                 ),
               ),
               Padding(
                 padding: EdgeInsets.symmetric(vertical: 15),
-                child: Container(
+                child: SizedBox(
                   width: double.infinity,
                   child: Stack(
                     children: [
@@ -139,7 +137,7 @@ class _AccountDetailsState extends State<AccountDetails> {
                           right: 0,
                           top: 0,
                           bottom: 0,
-                          child: Container(
+                          child: SizedBox(
                             width: 20,
                             height: 20,
                             child:
@@ -205,7 +203,7 @@ class _AccountDetailsState extends State<AccountDetails> {
                       margin: EdgeInsets.only(left: 10, right: 10),
                       child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
+                          children: const [
                             AccountDisplay(
                                 title: "Two-step Authentication",
                                 svgIcon: "lib/resources/svg/two-step.svg",

@@ -289,7 +289,7 @@ class _ListOfGroupsState extends State<ListOfGroups> {
                       ),
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 20,
                     child: VerticalDivider(
                       color: Colors.grey,

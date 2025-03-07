@@ -23,7 +23,7 @@ class SafeZoneAdminBloc extends Bloc<SafeZoneAdminEvent, SafeZoneAdminState> {
       print("✅ SafeZone Verified in Database");
       emit(SafeZoneAdminSuccess(response, "brah"));
     } else {
-      emit(SafeZoneAdminFailure("❌ SafeZone Verification Failed"));
+      emit(const SafeZoneAdminFailure("❌ SafeZone Verification Failed"));
     }
   } catch (e) {
     print("❌ Error Verifying SafeZone: ${e.toString()}");
@@ -39,7 +39,7 @@ Future<void> _onRejectSafeZone(
     if (updatedSafeZone != null) {
       emit(SafeZoneAdminSuccess(updatedSafeZone, "SafeZone rejected successfully."));
     } else {
-      emit(SafeZoneAdminFailure("Failed to reject SafeZone."));
+      emit(const SafeZoneAdminFailure("Failed to reject SafeZone."));
     }
   } catch (e) {
     emit(SafeZoneAdminFailure("Failed to reject SafeZone: ${e.toString()}"));
@@ -57,7 +57,7 @@ Future<void> _onReviewSafeZone(
       emit(SafeZoneAdminSuccess(updatedSafeZone, "SafeZone under review."));
     } else {
       print("❌ SafeZone Review Failed");
-      emit(SafeZoneAdminFailure("Failed to review SafeZone."));
+      emit(const SafeZoneAdminFailure("Failed to review SafeZone."));
     }
   } catch (e) {
     print("❌ Error Review SafeZone: ${e.toString()}");

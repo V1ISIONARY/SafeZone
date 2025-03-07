@@ -82,7 +82,7 @@ class _ReportsHistoryState extends State<ReportsHistory>
           automaticallyImplyLeading: false,
           centerTitle: false,
           title: Transform.translate(
-            offset: Offset(-15, 0),
+            offset: const Offset(-15, 0),
             child: Row(
               children: [
                 GestureDetector(
@@ -100,7 +100,7 @@ class _ReportsHistoryState extends State<ReportsHistory>
                     child: const Icon(Icons.arrow_back, color: Colors.black, size: 10),
                   ),
                 ),
-                CategoryText(text: "My Incident Reports")
+                const CategoryText(text: "My Incident Reports")
               ]
             ),
           ),

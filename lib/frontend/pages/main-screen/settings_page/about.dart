@@ -49,19 +49,19 @@ class About extends StatelessWidget {
               text: 'Meet the Team',
             ),
             const SizedBox(height: 10),
-            Padding(
+            const Padding(
               padding: EdgeInsets.only(left: 10, top: 15),
               child: PolicyText(title: 'Asuncion, Miro R.', description: 'Project Manager/Backend Developer \n\n[Short bio]')
             ),
-            Padding(
+            const Padding(
               padding: EdgeInsets.only(left: 10, top: 15),
               child: PolicyText(title: 'Maylan, Glaiza Darlene T.', description: 'Document Writer, Frontend Developer \n\n[Short bio]')
             ),
-            Padding(
+            const Padding(
               padding: EdgeInsets.only(left: 10, top: 15),
               child: PolicyText(title: 'Solis, Jaira Fredniecole B.', description: 'Frontend Developer, Backend Developer \n\n[Short bio]')
             ),
-            Padding(
+            const Padding(
               padding: EdgeInsets.only(left: 10, top: 15),
               child: PolicyText(title: 'Romero, Justine Louise V.', description: 'Frontend Developer, Backend Developer \n\n[Short bio]')
             ),
