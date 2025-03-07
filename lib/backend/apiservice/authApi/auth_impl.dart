@@ -39,6 +39,8 @@ class AuthenticationImplementation extends AuthenticationRepository {
       await prefs.setBool('is_girl', data['profile']['is_girl']);
       await prefs.setBool('is_verified', data['profile']['is_verified']);
       await prefs.setInt('circle', data['profile']['active_circle'] ?? 0);
+      await prefs.setBool('wasInsideSafeZone', false); 
+      await prefs.setBool('wasInsideDangerZone', false);
 
       print("Login successful, data saved to SharedPreferences");
 

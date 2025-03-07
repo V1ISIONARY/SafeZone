@@ -58,10 +58,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
   final GlobalKey _safeKey = GlobalKey();
 
   bool _showMarkers = true;
-  bool _showOptions = false;
   bool _isSafeZoneShown = false;
-  bool _wasInsideSafeZone = false;
-  bool _wasInsideDangerZone = false;
 
   BitmapDescriptor? customMarker;
   BitmapDescriptor? customDangerZoneMarker;
@@ -79,6 +76,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
   late Animation<Color?> _colorAnimation;
   late TextEditingController _textEditingController;
   late AnimationController _mapCategoryHint;
+  late SharedPreferences _prefs;
 
   final List<String> hints = [
     'Barangay',
@@ -103,7 +101,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
     super.initState();
     _loadUserId();
     _loadMapType();
-
+    _initSharedPreferences();
     context.read<MapBloc>().add(FetchMapData());
     context.read<DangerZoneBloc>().add(FetchDangerZones());
     _checkFirstRun();
@@ -158,6 +156,10 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
     });
 
     _startLocationUpdates();
+  }
+
+  Future<void> _initSharedPreferences() async {
+    _prefs = await SharedPreferences.getInstance();
   }
 
   Future<void> _loadMapType() async {
@@ -383,29 +385,35 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                   (circle) => circle.fillColor == Colors.red.withOpacity(0.1))
               .toList());
 
-      if (isInsideSafeZone && !_wasInsideSafeZone) {
+      bool wasInsideSafeZone = _prefs.getBool('wasInsideSafeZone') ?? false;
+      bool wasInsideDangerZone = _prefs.getBool('wasInsideDangerZone') ?? false;
+
+      print("Safe Zone: $isInsideSafeZone");
+      print("Danger Zone: $isInsideDangerZone");
+
+      if (isInsideSafeZone && !wasInsideSafeZone) {
         _showZoneDialog("Safe Zone", "You have entered a safe zone.");
         _sendBroadcastNotification(
             "Group member - Safe Zone", "has entered a safe zone.");
-        _wasInsideSafeZone = true;
-      } else if (!isInsideSafeZone && _wasInsideSafeZone) {
+        await _prefs.setBool('wasInsideSafeZone', true);
+      } else if (!isInsideSafeZone && wasInsideSafeZone) {
         _showZoneDialog("Safe Zone", "You have exited the safe zone.");
         _sendBroadcastNotification(
             "Group member - Safe Zone", "has exited the safe zone.");
-        _wasInsideSafeZone = false; 
+        await _prefs.setBool('wasInsideSafeZone', false);
       }
 
-      if (isInsideDangerZone && !_wasInsideDangerZone) {
+      if (isInsideDangerZone && !wasInsideDangerZone) {
         _showZoneDialog("Danger Zone",
             "You have entered a danger zone. Please be cautious.");
         _sendBroadcastNotification("Group member - Danger Zone",
             "has entered a danger zone. Please be cautious.");
-        _wasInsideDangerZone = true;
-      } else if (!isInsideDangerZone && _wasInsideDangerZone) {
+        await _prefs.setBool('wasInsideDangerZone', true);
+      } else if (!isInsideDangerZone && wasInsideDangerZone) {
         _showZoneDialog("Danger Zone", "You have exited the danger zone.");
         _sendBroadcastNotification(
             "Group member - Danger Zone", "has exited the danger zone.");
-        _wasInsideDangerZone = false;
+        await _prefs.setBool('wasInsideDangerZone', false);
       }
     });
   }
