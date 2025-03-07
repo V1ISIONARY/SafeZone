@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:safezone/backend/cubic/analytics.dart';
 import 'package:safezone/frontend/pages/admin/admin_dangerzones.dart';
@@ -70,9 +69,6 @@ class _MainAnalyticsState extends State<MainAnalytics>
     );
   }
 
-  void _startShake() {
-    _controller.forward();
-  }
 
   @override
   void dispose() {

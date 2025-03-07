@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../../resources/schema/texts.dart';
-import '../../../../widgets/buttons/terms_policyBtn.dart';
 import '../../../../widgets/texts/policy.dart';
 
 class TermsPolicy extends StatelessWidget {

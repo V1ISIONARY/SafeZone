@@ -148,36 +148,25 @@ class _AdminSafezoneDetailsState extends State<AdminSafezoneDetails> {
               _isLoading = true;
             });
           } else if (state is SafeZoneAdminSuccess) {
-            if (state.safeZoneModel != null) {
-              setState(() {
-                _safeZoneModel = state.safeZoneModel;
-                _isLoading = false;
-              });
+            setState(() {
+              _safeZoneModel = state.safeZoneModel;
+              _isLoading = false;
+            });
 
-              // Call the callback to update the parent state
-              if (widget.onStatusChanged != null) {
-                widget.onStatusChanged!(_safeZoneModel);
-              }
-
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                    content: Text("Safe zone status updated successfully!")),
-              );
-              print("Navigating back with shouldRefresh = true");
-
-              // Return true to indicate that the data should be refreshed
-              context.pop(true);
-            } else {
-              print("❌ SafeZoneModel is null");
-              setState(() {
-                _isLoading = false;
-              });
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                    content: Text("Failed to update safe zone: Invalid data")),
-              );
+            // Call the callback to update the parent state
+            if (widget.onStatusChanged != null) {
+              widget.onStatusChanged!(_safeZoneModel);
             }
-          } else if (state is SafeZoneAdminFailure) {
+
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                  content: Text("Safe zone status updated successfully!")),
+            );
+            print("Navigating back with shouldRefresh = true");
+
+            // Return true to indicate that the data should be refreshed
+            context.pop(true);
+                    } else if (state is SafeZoneAdminFailure) {
             setState(() {
               _isLoading = false;
             });

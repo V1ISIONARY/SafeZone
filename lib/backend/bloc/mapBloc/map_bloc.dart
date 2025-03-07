@@ -37,7 +37,7 @@ class MapBloc extends Bloc<MapPageEvent, MapState> {
 
       final members = await circleRepository.viewMembers(userId);
 
-      if (members != null && members.isNotEmpty) {
+      if (members.isNotEmpty) {
         emit(MapDataLoaded(safeZones, dangerZones, members));
       } else {
         emit(MapDataLoaded(safeZones, dangerZones, const []));

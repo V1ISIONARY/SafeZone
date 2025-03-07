@@ -90,10 +90,10 @@ class DangerZoneModel {
     return DangerZoneModel(
       id: json['id'],
       isVerified: json['is_verified'],
-      latitude: json['latitude'] != null ? json['latitude'].toDouble() : null, // Handle null
-      longitude: json['longitude'] != null ? json['longitude'].toDouble() : null, // Handle null
-      radius: json['radius'] != null ? json['radius'].toDouble() : null, // Handle null
-      name: json['name'] != null ? json['name'].toString() : null,
+      latitude: json['latitude']?.toDouble(), // Handle null
+      longitude: json['longitude']?.toDouble(), // Handle null
+      radius: json['radius']?.toDouble(), // Handle null
+      name: json['name']?.toString(),
     );
   }
 }

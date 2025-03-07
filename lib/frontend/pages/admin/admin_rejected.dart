@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../widgets/buttons/identifiedZone.dart';
+import '../../widgets/buttons/identified_zone.dart';
 
 class AdminRejected extends StatefulWidget {
   const AdminRejected({super.key});
