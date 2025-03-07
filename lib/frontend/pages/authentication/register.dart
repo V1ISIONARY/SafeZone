@@ -156,17 +156,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
           ),
         ),
-        body: Column(
-          children: [
-            _buildProgressIndicator(),
-            Expanded(
-              child: currentStep == 0
-                  ? _buildEmailStep()
-                  : currentStep == 1
-                      ? _buildCodeVerificationStep()
-                      : _buildUserDetailsStep(context),
-            ),
-          ],
+        body: SafeArea(
+          child: Column(
+            children: [
+              _buildProgressIndicator(),
+              Expanded(
+                child: currentStep == 0
+                    ? _buildEmailStep()
+                    : currentStep == 1
+                        ? _buildCodeVerificationStep()
+                        : _buildUserDetailsStep(context),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -267,7 +269,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          CategoryText(
+          const CategoryText(
             text: 'One-Time Code sent',
           ),
           const SizedBox(height: 5),
@@ -278,7 +280,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           const SizedBox(height: 30),
           TextField(
             controller: codeController,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w200,
               color: textColor,
@@ -286,7 +288,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             decoration: InputDecoration(
               hintText: "Enter 6-digit code",
               counterText: "",
-              hintStyle: TextStyle(
+              hintStyle: const TextStyle(
                   fontSize: 13,
                   color: labelFormFieldColor,
                   fontWeight: FontWeight.w200),
@@ -342,12 +344,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
             child: Container(
               height: 50,
               width: double.infinity,
-              margin: EdgeInsets.only(bottom: 30),
+              margin: const EdgeInsets.only(bottom: 30),
               decoration: BoxDecoration(
                 color: widgetPricolor,
                 borderRadius: BorderRadius.circular(50),
               ),
-              child: Center(
+              child: const Center(
                 child: Text(
                   'Verify',
                   style: TextStyle(
@@ -364,221 +366,225 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   Widget _buildUserDetailsStep(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const CategoryText(
-            text: "Tell Us About Yourself",
-          ),
-          const SizedBox(height: 5),
-          CategoryDescripText(
-            text:
-                'We’re almost there! Add these details to set up your account.',
-          ),
-          const SizedBox(height: 30),
-          TextField(
-            controller: firstNameController,
-            style: TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w200,
-              color: textColor,
+    return SingleChildScrollView(
+      padding:
+          EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const CategoryText(
+              text: "Tell Us About Yourself",
             ),
-            decoration: InputDecoration(
-              hintText: "Enter First Name",
-              hintStyle: TextStyle(
-                  fontSize: 13,
-                  color: labelFormFieldColor,
-                  fontWeight: FontWeight.w200),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: widgetPricolor, width: 2),
-              ),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 15),
+            const SizedBox(height: 5),
+            CategoryDescripText(
+              text:
+                  'We’re almost there! Add these details to set up your account.',
             ),
-          ),
-          const SizedBox(height: 10),
-          TextField(
-            controller: lastNameController,
-            style: TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w200,
-              color: textColor,
+            const SizedBox(height: 30),
+            TextField(
+              controller: firstNameController,
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w200,
+                color: textColor,
+              ),
+              decoration: InputDecoration(
+                hintText: "Enter First Name",
+                hintStyle: TextStyle(
+                    fontSize: 13,
+                    color: labelFormFieldColor,
+                    fontWeight: FontWeight.w200),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide(color: widgetPricolor, width: 2),
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 15),
+              ),
             ),
-            decoration: InputDecoration(
-              hintText: "Enter Last Name",
-              hintStyle: TextStyle(
-                  fontSize: 13,
-                  color: labelFormFieldColor,
-                  fontWeight: FontWeight.w200),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: widgetPricolor, width: 2),
+            const SizedBox(height: 10),
+            TextField(
+              controller: lastNameController,
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w200,
+                color: textColor,
               ),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
+              decoration: InputDecoration(
+                hintText: "Enter Last Name",
+                hintStyle: TextStyle(
+                    fontSize: 13,
+                    color: labelFormFieldColor,
+                    fontWeight: FontWeight.w200),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide(color: widgetPricolor, width: 2),
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 15),
               ),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 15),
             ),
-          ),
-          const SizedBox(height: 10),
-          DropdownButtonFormField<String>(
-            value: selectedGender,
-            items: ['Male', 'Female'].map((gender) {
-              return DropdownMenuItem(
-                value: gender,
-                child: Text(gender),
-              );
-            }).toList(),
-            onChanged: (value) {
-              setState(() {
-                selectedGender = value;
-              });
-            },
-            decoration: InputDecoration(
-              hintText: "Gender",
-              hintStyle: TextStyle(
-                  fontSize: 13,
-                  color: labelFormFieldColor,
-                  fontWeight: FontWeight.w200),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: widgetPricolor, width: 2),
-              ),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 15),
-            ),
-          ),
-          const SizedBox(height: 10),
-          TextField(
-            controller: usernameController,
-            style: TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w200,
-              color: textColor,
-            ),
-            decoration: InputDecoration(
-              hintText: "Enter Username",
-              hintStyle: TextStyle(
-                  fontSize: 13,
-                  color: labelFormFieldColor,
-                  fontWeight: FontWeight.w200),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: widgetPricolor, width: 2),
-              ),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 15),
-            ),
-          ),
-          const SizedBox(height: 10),
-          TextField(
-            controller: passwordController,
-            obscureText: true,
-            style: TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w200,
-              color: textColor,
-            ),
-            decoration: InputDecoration(
-              hintText: "Enter Password",
-              hintStyle: TextStyle(
-                  fontSize: 13,
-                  color: labelFormFieldColor,
-                  fontWeight: FontWeight.w200),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: widgetPricolor, width: 2),
-              ),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 15),
-            ),
-          ),
-          const SizedBox(height: 10),
-          TextField(
-            controller: confirmPasswordController,
-            obscureText: true,
-            style: TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w200,
-              color: textColor,
-            ),
-            decoration: InputDecoration(
-              hintText: "Confirm Password",
-              hintStyle: TextStyle(
-                  fontSize: 13,
-                  color: labelFormFieldColor,
-                  fontWeight: FontWeight.w200),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: widgetPricolor, width: 2),
-              ),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 15),
-            ),
-          ),
-          const Spacer(),
-          GestureDetector(
-            onTap: () async {
-              if (passwordController.text != confirmPasswordController.text) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text("Passwords do not match")),
+            const SizedBox(height: 10),
+            DropdownButtonFormField<String>(
+              value: selectedGender,
+              items: ['Male', 'Female'].map((gender) {
+                return DropdownMenuItem(
+                  value: gender,
+                  child: Text(gender),
                 );
-                return;
-              }
-
-              Position position = await Geolocator.getCurrentPosition(
-                  desiredAccuracy: LocationAccuracy.high);
-
-              final signupBloc = context.read<AuthenticationBloc>();
-
-              signupBloc.add(UserSignUpEvent(
-                username: usernameController.text,
-                email: emailController.text,
-                password: passwordController.text,
-                address:
-                    'Some address', // Replace with actual input if required
-                firstname: firstNameController.text,
-                lastname: lastNameController.text,
-                isAdmin: false,
-                isGirl: selectedGender == 'Female',
-                isVerified: true,
-                latitude: position.latitude, // Pass latitude
-                longitude: position.longitude, // Pass longitude
-              ));
-            },
-            child: Container(
-              height: 50,
-              margin: EdgeInsets.only(bottom: 30),
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: widgetPricolor,
-                borderRadius: BorderRadius.circular(50),
+              }).toList(),
+              onChanged: (value) {
+                setState(() {
+                  selectedGender = value;
+                });
+              },
+              decoration: InputDecoration(
+                hintText: "Gender",
+                hintStyle: TextStyle(
+                    fontSize: 13,
+                    color: labelFormFieldColor,
+                    fontWeight: FontWeight.w200),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide(color: widgetPricolor, width: 2),
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 15),
               ),
-              child: Center(
-                child: Text(
-                  'Create new account',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.white,
+            ),
+            const SizedBox(height: 10),
+            TextField(
+              controller: usernameController,
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w200,
+                color: textColor,
+              ),
+              decoration: InputDecoration(
+                hintText: "Enter Username",
+                hintStyle: TextStyle(
+                    fontSize: 13,
+                    color: labelFormFieldColor,
+                    fontWeight: FontWeight.w200),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide(color: widgetPricolor, width: 2),
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 15),
+              ),
+            ),
+            const SizedBox(height: 10),
+            TextField(
+              controller: passwordController,
+              obscureText: true,
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w200,
+                color: textColor,
+              ),
+              decoration: InputDecoration(
+                hintText: "Enter Password",
+                hintStyle: TextStyle(
+                    fontSize: 13,
+                    color: labelFormFieldColor,
+                    fontWeight: FontWeight.w200),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide(color: widgetPricolor, width: 2),
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 15),
+              ),
+            ),
+            const SizedBox(height: 10),
+            TextField(
+              controller: confirmPasswordController,
+              obscureText: true,
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w200,
+                color: textColor,
+              ),
+              decoration: InputDecoration(
+                hintText: "Confirm Password",
+                hintStyle: TextStyle(
+                    fontSize: 13,
+                    color: labelFormFieldColor,
+                    fontWeight: FontWeight.w200),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide(color: widgetPricolor, width: 2),
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 15),
+              ),
+            ),
+            const SizedBox(height: 20),
+            GestureDetector(
+              onTap: () async {
+                if (passwordController.text != confirmPasswordController.text) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text("Passwords do not match")),
+                  );
+                  return;
+                }
+
+                Position position = await Geolocator.getCurrentPosition(
+                    desiredAccuracy: LocationAccuracy.high);
+
+                final signupBloc = context.read<AuthenticationBloc>();
+
+                signupBloc.add(UserSignUpEvent(
+                  username: usernameController.text,
+                  email: emailController.text,
+                  password: passwordController.text,
+                  address:
+                      'Some address', // Replace with actual input if required
+                  firstname: firstNameController.text,
+                  lastname: lastNameController.text,
+                  isAdmin: false,
+                  isGirl: selectedGender == 'Female',
+                  isVerified: true,
+                  latitude: position.latitude, // Pass latitude
+                  longitude: position.longitude, // Pass longitude
+                ));
+              },
+              child: Container(
+                height: 50,
+                margin: EdgeInsets.only(bottom: 30),
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: widgetPricolor,
+                  borderRadius: BorderRadius.circular(50),
+                ),
+                child: Center(
+                  child: Text(
+                    'Create new account',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
