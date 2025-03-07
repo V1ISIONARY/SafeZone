@@ -13,6 +13,7 @@ import 'package:safezone/frontend/widgets/buttons/custom_button.dart';
 import 'package:safezone/frontend/widgets/report-danger-zone/text_row.dart';
 import 'package:safezone/resources/schema/colors.dart';
 import 'package:safezone/resources/schema/texts.dart';
+import 'package:safezone/frontend/widgets/loadingstate.dart';
 
 class ReviewReport extends StatefulWidget {
   const ReviewReport({super.key, required this.reportInfo});
@@ -37,11 +38,7 @@ class _ReviewReportState extends State<ReviewReport> {
       body: BlocListener<IncidentReportBloc, IncidentReportState>(
         listener: (context, state) {
           if (state is IncidentReportLoading) {
-            showDialog(
-              context: context,
-              barrierDismissible: false,
-              builder: (_) => const Center(child: CircularProgressIndicator()),
-            );
+            const LoadingState();
           } else if (state is IncidentReportCreated) {
             Navigator.pop(context);
             context.go('/report-success');
@@ -182,6 +179,6 @@ class _ReviewReportState extends State<ReviewReport> {
           ),
         ),
       ),
-    ); 
+    );
   }
 }

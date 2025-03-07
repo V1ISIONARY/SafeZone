@@ -1,11 +1,8 @@
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
-import 'package:safezone/backend/bloc/notificationBloc/notification_polling.dart';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:safezone/backend/apiservice/authApi/auth_repo.dart';
-
-import '../../models/userModel/profile_model.dart';
 
 class AuthenticationImplementation extends AuthenticationRepository {
   // static const String baseUrl = '${VercelUrl.mainUrl}/user';

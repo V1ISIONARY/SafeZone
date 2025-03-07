@@ -145,7 +145,7 @@ class _UnreadState extends State<Unread> {
   }
 
   Widget _buildPlaceholder() {
-    return widget.userToken == 'guess'
+    return widget.userToken == 'guest'
         ? Container()
         : Center(
             child: Column(

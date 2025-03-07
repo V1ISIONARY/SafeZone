@@ -146,14 +146,14 @@ class _SettingsState extends State<Settings> {
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
                                           children: [
-                                            widget.UserToken == 'guess'
+                                            widget.UserToken == 'guest'
                                                 ? Column(
                                                     crossAxisAlignment:
                                                         CrossAxisAlignment
                                                             .start,
                                                     children: [
                                                         Text(
-                                                          'Guess',
+                                                          'Guest',
                                                           style: GoogleFonts
                                                               .poppins(
                                                                   fontSize: 15,
@@ -246,7 +246,7 @@ class _SettingsState extends State<Settings> {
                                     Positioned(
                                         bottom: 15,
                                         left: 10,
-                                        child: widget.UserToken == 'guess'
+                                        child: widget.UserToken == 'guest'
                                             ? Row(
                                                 crossAxisAlignment:
                                                     CrossAxisAlignment.center,
@@ -311,20 +311,20 @@ class _SettingsState extends State<Settings> {
                         ))
                   ]),
                 ),
-                widget.UserToken == 'guess'
+                widget.UserToken == 'guest'
                     ? const SizedBox()
                     : Column(children: [
-                        // Padding(
-                        //   padding: EdgeInsets.only(top: 10),
-                        //   child: Settingsbtn(
-                        //     title: 'Account Details',
-                        //     svgIcon: 'lib/resources/svg/account.svg',
-                        //     navigateTo: 'accountDetails',
-                        //     description:
-                        //         'Protecting personal data and ensuring safety from threats.',
-                        //     onTap: () {},
-                        //   ),
-                        // ),
+                        Padding(
+                          padding: EdgeInsets.only(top: 10),
+                          child: Settingsbtn(
+                            title: 'Account Details',
+                            svgIcon: 'lib/resources/svg/account.svg',
+                            navigateTo: 'accountDetails',
+                            description:
+                                'Protecting personal data and ensuring safety from threats.',
+                            onTap: () {},
+                          ),
+                        ),
                         isAdmin == false
                             ? Container()
                             : Settingsbtn(
@@ -372,7 +372,7 @@ class _SettingsState extends State<Settings> {
                     )
                   ],
                 ),
-                widget.UserToken == 'guess'
+                widget.UserToken == 'guest'
                     ? const SizedBox()
                     : Container(
                         width: double.infinity,
@@ -448,7 +448,7 @@ class _SettingsState extends State<Settings> {
                           ],
                         )),
                 const CategoryText(text: "Settings"),
-                widget.UserToken == 'guess'
+                widget.UserToken == 'gueguestss'
                     ? const SizedBox()
                     : Settingsbtn(
                         title: 'Privacy and Security',
@@ -480,7 +480,7 @@ class _SettingsState extends State<Settings> {
                   description: 'An overview of who we are and what we do.',
                   onTap: () {},
                 ),
-                widget.UserToken == 'guess'
+                widget.UserToken == 'guest'
                     ? Settingsbtn(
                         title: 'Sign In',
                         svgIcon: 'lib/resources/svg/logout.svg',
@@ -516,7 +516,8 @@ class _SettingsState extends State<Settings> {
                           width: 50,
                         ),
                         const CategoryText(text: "Safezone"),
-                        const CategoryDescripText(text: 'Developed by Visionary Org')
+                        const CategoryDescripText(
+                            text: 'Developed by Visionary Org')
                       ],
                     ),
                   ),

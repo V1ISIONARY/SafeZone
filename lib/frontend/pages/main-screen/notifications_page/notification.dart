@@ -183,7 +183,7 @@ class _NotifState extends State<Notif> with SingleTickerProviderStateMixin {
             ],
           ),
         ),
-        widget.UserToken == 'guess'
+        widget.UserToken == 'guest'
             ? GestureDetector(
                 onTap: _startShake,
                 child: Container(

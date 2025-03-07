@@ -676,7 +676,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
           content: Text(message),
           actions: <Widget>[
             TextButton(
-              child: const Text("Oki"),
+              child: const Text("Ok"),
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -1144,7 +1144,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
             ),
 
             // Floating buttons
-            widget.UserToken == 'guess'
+            widget.UserToken == 'guest'
                 ? const SizedBox()
                 : Positioned(
                     right: 15,

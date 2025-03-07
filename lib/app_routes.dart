@@ -27,7 +27,7 @@ import 'package:safezone/frontend/pages/main-screen/notifications_page/safezone/
 import 'package:safezone/frontend/pages/main-screen/notifications_page/safezone/safe_zone_history_information.dart';
 import 'package:safezone/frontend/pages/main-screen/home_page/report-incident/create_report.dart';
 import 'package:safezone/frontend/pages/main-screen/home_page/report-incident/report_success.dart';
-import 'package:safezone/frontend/pages/main-screen/home_page/report-incident/submit_report.dart';
+import 'package:safezone/frontend/pages/main-screen/home_page/report-incident/review_report.dart';
 import 'package:safezone/frontend/pages/main-screen/home_page/safe-zone/mark_safe_success.dart';
 import 'package:safezone/frontend/pages/main-screen/home_page/safe-zone/create_safe_zone.dart';
 import 'package:safezone/frontend/pages/main-screen/home_page/safe-zone/review_safe_zone.dart';
@@ -49,17 +49,18 @@ GoRouter appRouter(bool isFirstRun, String? userToken) => GoRouter(
           path: '/',
           builder: (context, state) => isFirstRun
               ? const SplashScreen()
-              : BottomNavigationWidget(userToken: userToken ?? 'guess'),
+              : BottomNavigationWidget(userToken: userToken ?? 'guest'),
         ),
         // // GoRoute(
         // //   path: '/',
         // //   builder: (context, state) => MainAnalytics(initialPage: 0),
         // // ),
         GoRoute(
-          path: '/home',
-          builder: (context, state) =>
-              BottomNavigationWidget(userToken: userToken ?? 'guess'),
-        ),
+            path: '/home',
+            builder: (context, state) {
+              final token = state.extra as String;
+              return BottomNavigationWidget(userToken: token ?? 'guest');
+            }),
 
         GoRoute(
           path: '/register',

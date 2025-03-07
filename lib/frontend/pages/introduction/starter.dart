@@ -155,7 +155,7 @@ class Starter extends StatelessWidget {
                   context,
                   PageTransition(
                     type: PageTransitionType.rightToLeft,
-                    duration: Duration(milliseconds: 300), child: BottomNavigationWidget(userToken: 'guess',),
+                    duration: Duration(milliseconds: 300), child: BottomNavigationWidget(userToken: 'guest',),
                   ),
                 );
               },
@@ -178,7 +178,7 @@ class Starter extends StatelessWidget {
                   context,
                   PageTransition(
                     type: PageTransitionType.rightToLeft,
-                    duration: Duration(milliseconds: 300), child: BottomNavigationWidget(userToken: 'guess',),
+                    duration: Duration(milliseconds: 300), child: BottomNavigationWidget(userToken: 'guest',),
                   ),
                 );
               },

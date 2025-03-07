@@ -9,6 +9,7 @@ import 'package:safezone/backend/bloc/safezoneBloc/safezone_event.dart';
 import 'package:safezone/backend/bloc/safezoneBloc/safezone_state.dart';
 import 'package:safezone/backend/models/safezoneModel/safezone_model.dart';
 import 'package:safezone/frontend/widgets/buttons/custom_button.dart';
+import 'package:safezone/frontend/widgets/loadingstate.dart';
 import 'package:safezone/frontend/widgets/report-danger-zone/text_row.dart';
 import 'package:safezone/resources/schema/colors.dart';
 import 'package:safezone/resources/schema/texts.dart';
@@ -50,11 +51,7 @@ class _ReviewSafezoneState extends State<ReviewSafezone> {
       body: BlocListener<SafeZoneBloc, SafeZoneState>(
         listener: (context, state) {
           if (state is SafeZoneLoading) {
-            showDialog(
-              context: context,
-              barrierDismissible: false,
-              builder: (_) => const Center(child: CircularProgressIndicator()),
-            );
+            const LoadingState();
           } else if (state is SafeZoneOperationSuccess) {
             Navigator.pop(context); // Close loading dialog
             context.push('/mark-safe-zone-success');

@@ -127,7 +127,7 @@ class _ReadState extends State<Read> {
   }
 
   Widget _buildPlaceholder() {
-    return widget.userToken == 'guess'
+    return widget.userToken == 'guest'
         ? Container()
         : Center(
             child: Column(

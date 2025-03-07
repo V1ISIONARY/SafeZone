@@ -149,7 +149,7 @@ class _AllState extends State<All> {
   }
 
   Widget _buildPlaceholder() {
-    return widget.userToken == 'guess'
+    return widget.userToken == 'guest'
         ? Container()
         : Center(
             child: Column(

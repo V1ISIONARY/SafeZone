@@ -4,7 +4,6 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:safezone/backend/apiservice/adminApi/analyticsApi/analytics_impl.dart';
 import 'package:safezone/backend/apiservice/adminApi/incident_reportApi/admin_incident_impl.dart';
 import 'package:safezone/backend/apiservice/adminApi/safezoneApi/safezone_impl.dart';
-import 'package:safezone/backend/apiservice/adminApi/safezoneApi/safezone_repo.dart';
 import 'package:safezone/backend/apiservice/circleApi/circle_impl.dart';
 import 'package:safezone/backend/apiservice/notificationApi/notification_impl.dart';
 import 'package:safezone/backend/apiservice/profileApi/profile_impl.dart';
@@ -42,7 +41,7 @@ void main() async {
   // Initialize SharedPreferences and dotenv
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   bool isFirstRun = prefs.getBool('isFirstRun') ?? true;
-  String userToken = prefs.getString('userToken') ?? 'guess';
+  String userToken = prefs.getString('userToken') ?? 'guest';
 
   // Load environment variables
   await dotenv.load(fileName: ".env");
@@ -114,7 +113,7 @@ class MyApp extends StatelessWidget {
       future: _initializeApp(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return MaterialApp(
+          return const MaterialApp(
             home: Scaffold(
               body: Center(child: CircularProgressIndicator()),
             ),

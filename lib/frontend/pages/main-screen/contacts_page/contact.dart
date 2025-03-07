@@ -47,7 +47,7 @@ class _ContactState extends State<Contact> with SingleTickerProviderStateMixin {
   void initState() {
     super.initState();
 
-    widget.UserToken == 'guess'
+    widget.UserToken == 'guest'
       ? const SizedBox()
       : loadUserId();
 
@@ -191,7 +191,7 @@ class _ContactState extends State<Contact> with SingleTickerProviderStateMixin {
                           );
                         } else {
                           return Expanded(
-                            child: widget.UserToken == 'guess'
+                            child: widget.UserToken == 'guest'
                             ? const SizedBox()
                             : const Center(
                                 child: Text("No contacts found."),
@@ -206,7 +206,7 @@ class _ContactState extends State<Contact> with SingleTickerProviderStateMixin {
             ),
           )
         ),
-        widget.UserToken == 'guess'
+        widget.UserToken == 'guest'
           ? GestureDetector(
               onTap: _startShake,
               child: Container(
