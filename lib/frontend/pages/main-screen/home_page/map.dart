@@ -69,7 +69,6 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
   BitmapDescriptor? customMemberMarker;
 
   MapType _currentMapType = MapType.normal;
-  LatLng _initialPosition = sourceLocation; // Define initial position
 
   GoogleMapController? googleMapController;
   late AnimationController _controller;
@@ -115,66 +114,6 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
   double _appBarHeight = 20;
   Color _appBarColor = Colors.transparent;
   bool _showTitle = false;
-
-  Future<void> _getCurrentLocation() async {
-    bool serviceEnabled;
-    LocationPermission permission;
-
-    // Check if location services are enabled
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      return;
-    }
-
-    // Check permission
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.deniedForever) {
-        return;
-      }
-    }
-
-    Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
-    setState(() {
-      _initialPosition = LatLng(position.latitude, position.longitude);
-    });
-
-    _mapController.future.then((controller) {
-      controller.animateCamera(CameraUpdate.newLatLngZoom(_initialPosition, 14.0));
-    });
-  }
-
-  Future<void> _handleSearch() async {
-    Prediction? p = await PlacesAutocomplete.show(
-      context: context,
-      apiKey: _apiKey,
-      mode: Mode.overlay,
-      language: "en",
-      components: [Component(Component.country, "ph")],
-    );
-
-    if (p != null) {
-      _displayPrediction(p);
-    }
-  }
-
-  Future<void> _displayPrediction(Prediction p) async {
-    GoogleMapsPlaces places = GoogleMapsPlaces(apiKey: _apiKey);
-    PlacesDetailsResponse detail = await places.getDetailsByPlaceId(p.placeId!);
-
-    final lat = detail.result.geometry!.location.lat;
-    final lng = detail.result.geometry!.location.lng;
-
-    setState(() {
-      _initialPosition = LatLng(lat, lng);
-    });
-
-    _mapController.future.then((controller) {
-      controller.animateCamera(CameraUpdate.newLatLngZoom(_initialPosition, 14.0));
-    });
-  }
 
   @override
   void initState() {
