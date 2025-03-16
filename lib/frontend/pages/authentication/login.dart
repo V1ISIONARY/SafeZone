@@ -322,36 +322,22 @@ class _LoginState extends State<Login> {
                   BlocListener<AuthenticationBloc, AuthenticationState>(
                     listener: (context, state) async {
                       if (state is LoginSuccess) {
-                        Navigator.pop(
-                            context); // Close the loading dialog if it's open
-
-                        final SharedPreferences prefs =
-                            await SharedPreferences.getInstance();
+                        final SharedPreferences prefs = await SharedPreferences.getInstance();
                         int userId = prefs.getInt('id') ?? 0;
                         await prefs.setString('userToken', userId.toString());
 
                         if (userId != 0) {
                           int intervalInSeconds = 10;
-                          _pollingService.startPolling(
-                              userId, intervalInSeconds);
+                          _pollingService.startPolling(userId, intervalInSeconds);
                         }
 
-                        context.go(
+                        GoRouter.of(context).go(
                           '/home',
                           extra: userId.toString(),
                         );
 
-                        // Navigator.pushReplacement(
-                        //   context,
-                        //   MaterialPageRoute(
-                        //     builder: (context) => BottomNavigationWidget(
-                        //         userToken: userId.toString()),
-                        //   ),
-                        // );
                         print(state);
                       } else if (state is LoginError) {
-                        Navigator.pop(
-                            context); // Close the loading dialog if it's open
                         print(state.message);
                       }
                     },

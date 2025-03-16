@@ -32,6 +32,8 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'dart:convert';
 import 'package:location/location.dart' as locs;
 
+import '../../../widgets/cards/users.dart';
+
 class Maps extends StatefulWidget {
   final String UserToken;
 
@@ -67,6 +69,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
   BitmapDescriptor? customMemberMarker;
 
   MapType _currentMapType = MapType.normal;
+  LatLng _initialPosition = sourceLocation; // Define initial position
 
   GoogleMapController? googleMapController;
   late AnimationController _controller;
@@ -79,12 +82,25 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
   late AnimationController _mapCategoryHint;
   late SharedPreferences _prefs;
 
+  bool _isExpanded = false;
+  
+  void _toggleExpand() {
+    setState(() {
+      _isExpanded = !_isExpanded;
+      if (!_isExpanded) {
+        _textEditingController.clear();
+        _focusNode.unfocus();
+      }
+    });
+  }
+
   final List<String> hints = [
     'Barangay',
     'Hospital',
     'Police Station',
     'Municipal',
   ];
+  
   int? _userId;
   int _currentHintIndex = 0;
   LatLng? _currentUserLocation;
@@ -96,12 +112,76 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
     super.didChangeDependencies();
     _loadUserId();
   }
+  double _appBarHeight = 20;
+  Color _appBarColor = Colors.transparent;
+  bool _showTitle = false;
+
+  Future<void> _getCurrentLocation() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    // Check if location services are enabled
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      return;
+    }
+
+    // Check permission
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.deniedForever) {
+        return;
+      }
+    }
+
+    Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+    setState(() {
+      _initialPosition = LatLng(position.latitude, position.longitude);
+    });
+
+    _mapController.future.then((controller) {
+      controller.animateCamera(CameraUpdate.newLatLngZoom(_initialPosition, 14.0));
+    });
+  }
+
+  Future<void> _handleSearch() async {
+    Prediction? p = await PlacesAutocomplete.show(
+      context: context,
+      apiKey: _apiKey,
+      mode: Mode.overlay,
+      language: "en",
+      components: [Component(Component.country, "ph")],
+    );
+
+    if (p != null) {
+      _displayPrediction(p);
+    }
+  }
+
+  Future<void> _displayPrediction(Prediction p) async {
+    GoogleMapsPlaces places = GoogleMapsPlaces(apiKey: _apiKey);
+    PlacesDetailsResponse detail = await places.getDetailsByPlaceId(p.placeId!);
+
+    final lat = detail.result.geometry!.location.lat;
+    final lng = detail.result.geometry!.location.lng;
+
+    setState(() {
+      _initialPosition = LatLng(lat, lng);
+    });
+
+    _mapController.future.then((controller) {
+      controller.animateCamera(CameraUpdate.newLatLngZoom(_initialPosition, 14.0));
+    });
+  }
 
   @override
   void initState() {
     super.initState();
     _loadUserId();
     _loadMapType();
+    _checkIfShown();
     _initSharedPreferences();
     context.read<MapBloc>().add(FetchMapData());
     context.read<DangerZoneBloc>().add(FetchDangerZones());
@@ -159,6 +239,34 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
     _startLocationUpdates();
   }
 
+  Future<void> _checkIfShown() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool hasShownBefore = prefs.getBool('appBarShown') ?? false;
+
+    if (widget.UserToken != 'guest' && !hasShownBefore) {
+      prefs.setBool('appBarShown', true); // Save state so it won't show again
+      Future.delayed(Duration(milliseconds: 200), () {
+        if (mounted) {
+          setState(() {
+            _appBarHeight = 40;
+            _appBarColor = Colors.green;
+            _showTitle = true;
+          });
+        }
+
+        Future.delayed(Duration(seconds: 5), () {
+          if (mounted) {
+            setState(() {
+              _appBarHeight = 20;
+              _appBarColor = Colors.transparent;
+              _showTitle = false;
+            });
+          }
+        });
+      });
+    }
+  }
+
   Future<void> _initSharedPreferences() async {
     _prefs = await SharedPreferences.getInstance();
   }
@@ -191,7 +299,6 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
   @override
   void dispose() {
     _positionStreamSubscription?.cancel();
-
     _controller.dispose();
     _controllerFade.dispose();
     _mapCategoryHint.dispose();
@@ -450,21 +557,19 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
     }
   }
 
-  // MARKERS
-
   Future<void> _createCustomMarker() async {
     try {
       customMarker =
           await MarkerUtils.createCustomMarker(context, widgetPricolor);
       customDangerZoneMarker = await MarkerUtils.resizeMarker(
         'lib/resources/images/dangerzonee.png',
-        58,
-        86,
+        38,
+        56,
       );
       customSafeZoneMarker = await MarkerUtils.resizeMarker(
         'lib/resources/images/marker_safezone.png',
-        58,
-        86,
+        38,
+        56,
       );
 
       if (mounted) {
@@ -648,8 +753,6 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
     return markers;
   }
 
-  // TRIGGERS WHEN USER ENTERS OR EXITS A ZONE :>
-
   bool _isInsideZone(LatLng userLocation, List<Circle> zones) {
     for (var zone in zones) {
       double distance = Geolocator.distanceBetween(
@@ -685,8 +788,6 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
       },
     );
   }
-
-  // FINDING ROUTE TO SAFEZONE
 
   void _updatePolylines(Set<Polyline> polylines) {
     setState(() {
@@ -741,21 +842,27 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
   //       Location location = locations.first;
   //       LatLng newPosition = LatLng(location.latitude, location.longitude);
 
-  //       googleMapController?.animateCamera(
-  //         CameraUpdate.newCameraPosition(
-  //           CameraPosition(target: newPosition, zoom: 16.0),
-  //         ),
-  //       );
+  //       if (googleMapController != null) {
+  //         googleMapController!.animateCamera(
+  //           CameraUpdate.newCameraPosition(
+  //             CameraPosition(target: newPosition, zoom: 16.0),
+  //           ),
+  //         );
+  //       }
 
-  //       setState(() {
-  //         _currentUserLocation = newPosition;
-  //         markers = {
-  //           Marker(markerId: MarkerId("searchLocation"), position: newPosition),
-  //         };
-  //       });
+  //       if (mounted) {
+  //         setState(() {
+  //           _currentUserLocation = newPosition;
+  //           markers = {
+  //             Marker(markerId: MarkerId("searchLocation"), position: newPosition),
+  //           };
+  //         });
+  //       }
+  //     } else {
+  //       print("No location found for: $query");
   //     }
   //   } catch (e) {
-  //     print("Location not found: $e");
+  //     print("Error fetching location: $e");
   //   }
   // }
 
@@ -854,208 +961,783 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                AppBar(
-                  automaticallyImplyLeading: false,
-                  backgroundColor: Colors.transparent,
-                  toolbarHeight: 20,
-                ),
                 PreferredSize(
-                  preferredSize: const Size.fromHeight(120.0),
-                  child: Container(
-                    width: double.infinity,
-                    height: 60,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      color: Colors.transparent,
-                    ),
-                    margin: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Center(
-                      child: SizedBox(
-                        height: 50,
-                        child: Center(
-                          child: Container(
-                            height: 40,
-                            width: double.infinity,
-                            decoration: const BoxDecoration(
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.grey,
-                                  blurRadius: 2,
-                                  offset: Offset(1, 1),
-                                ),
-                              ],
-                            ),
-                            child: Stack(
-                              children: [
-                                Positioned.fill(
-                                  child: TextField(
-                                    controller: _textEditingController,
-                                    // onSubmitted: _searchLocation,
-                                    focusNode: _focusNode,
-                                    style: const TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 13,
-                                    ),
-                                    decoration: InputDecoration(
-                                      filled: true,
-                                      fillColor: Colors.white,
-                                      hintText: '',
-                                      hintStyle: const TextStyle(
-                                        color: Colors.transparent,
-                                      ),
-                                      contentPadding:
-                                          const EdgeInsets.symmetric(
-                                              horizontal: 12.0, vertical: 12.0),
-                                      border: OutlineInputBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(5.0),
-                                        borderSide: const BorderSide(
-                                            color: Colors.white),
-                                      ),
-                                      focusedBorder: OutlineInputBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(5.0),
-                                        borderSide: const BorderSide(
-                                            color: Colors.white),
-                                      ),
-                                      enabledBorder: OutlineInputBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(5.0),
-                                        borderSide: const BorderSide(
-                                            color: Colors.white),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                Positioned(
-                                  top: 10,
-                                  left: 12,
-                                  right: 12,
-                                  child: Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      GestureDetector(
-                                        key: _searchKey,
-                                        onTap: () {
-                                          FocusScope.of(context)
-                                              .requestFocus(_focusNode);
-                                        },
-                                        child: Padding(
-                                          padding:
-                                              const EdgeInsets.only(right: 4),
-                                          child: AnimatedBuilder(
-                                            animation: _controllerFade,
-                                            builder: (context, child) {
-                                              return Row(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    Transform.translate(
-                                                      offset:
-                                                          const Offset(-5, -10),
-                                                      child: Container(
-                                                        height: 40,
-                                                        width: 40,
-                                                        alignment:
-                                                            Alignment.center,
-                                                        color:
-                                                            Colors.transparent,
-                                                        child: SvgPicture.asset(
-                                                          'lib/resources/svg/search.svg',
-                                                          color: _colorAnimation
-                                                              .value,
-                                                          height: 20,
-                                                          width: 20,
-                                                          fit: BoxFit.contain,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    Transform.translate(
-                                                        offset:
-                                                            const Offset(-5, 0),
-                                                        child: Text(
-                                                          "Search for near",
-                                                          style: TextStyle(
-                                                            color:
-                                                                _colorAnimation
-                                                                    .value,
-                                                            fontSize: 13,
-                                                          ),
-                                                        ))
-                                                  ]);
-                                            },
-                                          ),
-                                        ),
-                                      ),
-                                      Transform.translate(
-                                          offset: const Offset(-5, 0),
-                                          child: SlideTransition(
-                                            position: _hintAnimation,
-                                            child: AnimatedBuilder(
-                                              animation: _hintColorAnimation,
-                                              builder: (context, child) {
-                                                return GestureDetector(
-                                                  onTap: () {
-                                                    FocusScope.of(context)
-                                                        .requestFocus(
-                                                            _focusNode);
-                                                  },
-                                                  child: Text(
-                                                    hints[_currentHintIndex],
-                                                    style: TextStyle(
-                                                      color: _hintColorAnimation
-                                                          .value,
-                                                      fontSize: 13,
-                                                    ),
-                                                  ),
-                                                );
-                                              },
-                                            ),
-                                          ))
-                                    ],
-                                  ),
-                                ),
-                                Positioned(
-                                    top: 0,
-                                    right: 5,
-                                    child: GestureDetector(
-                                      onTap: () {},
-                                      child: Container(
-                                        height: 40,
-                                        width: 40,
-                                        alignment: Alignment.center,
-                                        color: Colors.transparent,
-                                        child: SvgPicture.asset(
-                                          'lib/resources/svg/mic.svg',
-                                          color: Colors.black87,
-                                          height: 22,
-                                          width: 22,
-                                          fit: BoxFit.contain,
-                                        ),
-                                      ),
-                                    )),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
+                  preferredSize: Size.fromHeight(_appBarHeight),
+                  child: AnimatedContainer(
+                    duration: Duration(milliseconds: 500),
+                    height: _appBarHeight,
+                    color: _appBarColor,
+                    child: AppBar(
+                      backgroundColor: _appBarColor,
+                      elevation: 0,
+                      automaticallyImplyLeading: false,
+                      title: _showTitle
+                          ? CategoryDescripText(
+                            text: "You've already logged in",
+                            color: Colors.white,
+                          )
+                          : null,
+                      centerTitle: true,
                     ),
                   ),
                 ),
-                Align(
-                  alignment: Alignment.topRight,
-                  child: GestureDetector(
-                    onTap: _findRoute,
-                    child: Container(
-                        margin: const EdgeInsets.only(right: 20),
-                        width: 150,
+                widget.UserToken == 'guest'
+                  ? Container()
+                  : PreferredSize(
+                      preferredSize: const Size.fromHeight(120.0), 
+                      child: Container(
+                        width: double.infinity,
+                        margin: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 40,
+                              height: 40,
+                              padding: EdgeInsets.all(2),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(10),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Colors.grey,
+                                    blurRadius: 2,
+                                    offset: Offset(1, 1),
+                                  ),
+                                ],
+                              ),
+                              child: Center(
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(10),
+                                  child: Image.asset(
+                                    'lib/resources/images/profile.jpg',
+                                  ),
+                                )
+                              ),
+                            ),
+                            SizedBox(width: 10),
+                            Expanded(
+                              child: Container(
+                                height: 40,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(20),
+                                  boxShadow: const [
+                                    BoxShadow(
+                                      color: Colors.grey,
+                                      blurRadius: 2,
+                                      offset: Offset(1, 1),
+                                    ),
+                                  ],
+                                ),
+                                padding: const EdgeInsets.symmetric(horizontal: 15),
+                                child: Row(
+                                  children: [
+                                    CategoryDescripText(text: 'love bird'),
+                                    SizedBox(width: 40),
+                                    LimitedImageCircles(
+                                      imageUrls: [
+                                        "lib/resources/images/profile.jpg",
+                                        "lib/resources/images/profile.jpg",
+                                        "lib/resources/images/profile.jpg",
+                                        "lib/resources/images/profile.jpg",
+                                      ],
+                                    ),
+                                    Spacer(),
+                                    Icon(Icons.keyboard_arrow_down, color: Colors.black38),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            SizedBox(width: 10), 
+                            Container(
+                              width: 40,
+                              height: 40,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(10),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Colors.grey,
+                                    blurRadius: 2,
+                                    offset: Offset(1, 1),
+                                  ),
+                                ],
+                              ),
+                              child: Center(
+                                child: Icon(
+                                  Icons.person_add,
+                                  size: 20,
+                                  color: widgetPricolor,
+                                ),
+                              ),
+                            ),
+                          ],
+                        )
+                      )
+                    ),
+                SizedBox(height: 5),
+                widget.UserToken == 'guest'
+                  ? Container(
+                      margin: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(
+                            height: 40,
+                            child: Center(
+                              child: Container(
+                                height: 40,
+                                width: double.infinity,
+                                decoration: const BoxDecoration(
+                                  color: Colors.grey,
+                                  borderRadius: BorderRadius.all(Radius.circular(20)),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.grey,
+                                      blurRadius: 2,
+                                      offset: Offset(1, 1),
+                                    ),
+                                  ],
+                                ),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: Stack(
+                                        children: [
+                                          Positioned.fill(
+                                            child: TextField(
+                                              controller: _textEditingController,
+                                              focusNode: _focusNode,
+                                              style: const TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 11,
+                                              ),
+                                              decoration: InputDecoration(
+                                                filled: true,
+                                                fillColor: Colors.white,
+                                                hintText: '',
+                                                hintStyle: const TextStyle(color: Colors.transparent),
+                                                contentPadding: const EdgeInsets.only(left: 35, right: 40, bottom: 8), 
+                                                border: OutlineInputBorder(
+                                                  borderRadius: BorderRadius.circular(20.0),
+                                                  borderSide: const BorderSide(color: widgetPricolor),
+                                                ),
+                                                focusedBorder: OutlineInputBorder(
+                                                  borderRadius: BorderRadius.circular(20.0),
+                                                  borderSide: const BorderSide(color: widgetPricolor),
+                                                ),
+                                                enabledBorder: OutlineInputBorder(
+                                                  borderRadius: BorderRadius.circular(20.0),
+                                                  borderSide: const BorderSide(color: widgetPricolor),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          Row(
+                                            crossAxisAlignment: CrossAxisAlignment.center,
+                                            mainAxisAlignment: MainAxisAlignment.start,
+                                            children: [
+                                              Container(
+                                                height: 40,
+                                                width: 40,
+                                                alignment: Alignment.center,
+                                                color: Colors.transparent,
+                                                child: SvgPicture.asset(
+                                                  'lib/resources/svg/search.svg',
+                                                  color: _colorAnimation.value,
+                                                  height: 20,
+                                                  width: 20,
+                                                  fit: BoxFit.contain,
+                                                ),
+                                              ),
+                                              GestureDetector(
+                                                key: _searchKey,
+                                                onTap: () {
+                                                  FocusScope.of(context).requestFocus(_focusNode); 
+                                                },
+                                                child: Padding(
+                                                  padding: const EdgeInsets.only(right: 4),
+                                                  child: AnimatedBuilder(
+                                                    animation: _controllerFade,
+                                                    builder: (context, child) {
+                                                      return Row(
+                                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                                        children: [
+                                                          Transform.translate(
+                                                            offset: const Offset(-5, 0),
+                                                            child: CategoryDescripText(text: "Search for nearest"),
+                                                          ),
+                                                        ],
+                                                      );
+                                                    },
+                                                  ),
+                                                ),
+                                              ),
+                                              Transform.translate(
+                                                offset: const Offset(-5, 0),
+                                                child: SlideTransition(
+                                                  position: _hintAnimation,
+                                                  child: AnimatedBuilder(
+                                                    animation: _hintColorAnimation,
+                                                    builder: (context, child) {
+                                                      return GestureDetector(
+                                                        onTap: () {
+                                                          FocusScope.of(context).requestFocus(_focusNode);
+                                                        },
+                                                        child: CategoryDescripText(text: hints[_currentHintIndex]),
+                                                      );
+                                                    },
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          Positioned(
+                                            top: 0,
+                                            right: _isExpanded ? 5 : 5, 
+                                            child: GestureDetector(
+                                              onTap: () {},
+                                              child: Container(
+                                                height: 40,
+                                                width: 40,
+                                                alignment: Alignment.center,
+                                                color: Colors.transparent,
+                                                child: SvgPicture.asset(
+                                                  'lib/resources/svg/mic.svg',
+                                                  color: Colors.black87,
+                                                  height: 22,
+                                                  width: 22,
+                                                  fit: BoxFit.contain,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+
+                                        ],
+                                      ),
+                                    ),
+                                    GestureDetector(
+                                      onTap: () {
+                                        if (_isExpanded) {
+                                          _toggleExpand();
+                                        }
+                                      },
+                                      child: Container(
+                                        width: 40,
+                                        height: 40,
+                                        decoration: BoxDecoration(
+                                          color: Colors.grey,
+                                          borderRadius: BorderRadius.only(
+                                            bottomRight: Radius.circular(20),
+                                            topRight: Radius.circular(20)
+                                          ),
+                                        ),
+                                        child: const Center(
+                                          child: Icon(Icons.send, color: Colors.white, size: 18),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                )
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: 5),
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              GestureDetector(
+                                onTap: (){},
+                                child: Container(
+                                  margin: const EdgeInsets.only(right: 10), 
+                                  width: 60,
+                                  height: 40,
+                                  decoration: BoxDecoration(
+                                    color: _isSafeZoneShown ? Colors.grey[300] : Colors.white, 
+                                    borderRadius: BorderRadius.circular(50),
+                                    boxShadow: const [
+                                      BoxShadow(
+                                        color: Colors.grey,
+                                        blurRadius: 2,
+                                        offset: Offset(1, 1),
+                                      ),
+                                    ],
+                                  ),
+                                  child: const Row(
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      SizedBox(width: 5),
+                                      Icon(Icons.safety_check, color: Colors.blue),
+                                      SizedBox(width: 5), 
+                                      Expanded( 
+                                        child: CategoryDescripText(
+                                          text: "All",
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              GestureDetector(
+                                onTap: _findRoute,
+                                child: Container(
+                                  margin: const EdgeInsets.only(right: 10), 
+                                  width: 160,
+                                  height: 40,
+                                  decoration: BoxDecoration(
+                                    color: _isSafeZoneShown ? Colors.grey[300] : Colors.white, 
+                                    borderRadius: BorderRadius.circular(50),
+                                    boxShadow: const [
+                                      BoxShadow(
+                                        color: Colors.grey,
+                                        blurRadius: 2,
+                                        offset: Offset(1, 1),
+                                      ),
+                                    ],
+                                  ),
+                                  child: const Row(
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      SizedBox(width: 5),
+                                      Icon(Icons.safety_check, color: Colors.green),
+                                      SizedBox(width: 5), 
+                                      Expanded( 
+                                        child: CategoryDescripText(
+                                          text: "Show nearest safe zone",
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              GestureDetector(
+                                onTap: (){},
+                                child: Container(
+                                  width: 170,
+                                  height: 40,
+                                  decoration: BoxDecoration(
+                                    color: _isSafeZoneShown ? Colors.grey[300] : Colors.white, 
+                                    borderRadius: BorderRadius.circular(50),
+                                    boxShadow: const [
+                                      BoxShadow(
+                                        color: Colors.grey,
+                                        blurRadius: 2,
+                                        offset: Offset(1, 1),
+                                      ),
+                                    ],
+                                  ),
+                                  child: const Row(
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      SizedBox(width: 5),
+                                      Icon(Icons.safety_check, color: Colors.red),
+                                      SizedBox(width: 5), 
+                                      Expanded( 
+                                        child: CategoryDescripText(
+                                          text: "Show nearest danger zone",
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          )
+                        ],
+                      )
+                  )
+                  :  SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: [
+                          SizedBox(width: 15),
+                          AbsorbPointer(
+                            absorbing: false,
+                            child: GestureDetector(
+                              onTap: () {
+                                if (!_isExpanded) _toggleExpand();
+                              },
+                              child: AnimatedContainer(
+                                duration: const Duration(milliseconds: 300),
+                                margin: EdgeInsets.only(right: 10), 
+                                width: _isExpanded ? 300 : 40, 
+                                height: 40,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(_isExpanded ? 20 : 50),
+                                  boxShadow: const [
+                                    BoxShadow(
+                                      color: Colors.grey,
+                                      blurRadius: 2,
+                                      offset: Offset(1, 1),
+                                    ),
+                                  ],
+                                ),
+                                child: _isExpanded
+                                  ? Center(
+                                      child: SizedBox(
+                                        height: 40,
+                                        child: Center(
+                                          child: Container(
+                                            height: 40,
+                                            width: double.infinity,
+                                            decoration: const BoxDecoration(
+                                              color: Colors.grey,
+                                              borderRadius: BorderRadius.all(Radius.circular(20)),
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: Colors.grey,
+                                                  blurRadius: 2,
+                                                  offset: Offset(1, 1),
+                                                ),
+                                              ],
+                                            ),
+                                            child: Row(
+                                              children: [
+                                                Expanded(
+                                                  child: Stack(
+                                                    children: [
+                                                      Positioned.fill(
+                                                        child: TextField(
+                                                          controller: _textEditingController,
+                                                          focusNode: _focusNode,
+                                                          style: const TextStyle(
+                                                            color: Colors.black,
+                                                            fontSize: 11,
+                                                          ),
+                                                          decoration: InputDecoration(
+                                                            filled: true,
+                                                            fillColor: Colors.white,
+                                                            hintText: '',
+                                                            hintStyle: const TextStyle(color: Colors.transparent),
+                                                            contentPadding: const EdgeInsets.only(left: 35, right: 40, bottom: 8), 
+                                                            border: OutlineInputBorder(
+                                                              borderRadius: BorderRadius.circular(20.0),
+                                                              borderSide: const BorderSide(color: widgetPricolor),
+                                                            ),
+                                                            focusedBorder: OutlineInputBorder(
+                                                              borderRadius: BorderRadius.circular(20.0),
+                                                              borderSide: const BorderSide(color: widgetPricolor),
+                                                            ),
+                                                            enabledBorder: OutlineInputBorder(
+                                                              borderRadius: BorderRadius.circular(20.0),
+                                                              borderSide: const BorderSide(color: widgetPricolor),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      Row(
+                                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                                        mainAxisAlignment: MainAxisAlignment.start,
+                                                        children: [
+                                                          Container(
+                                                            height: 40,
+                                                            width: 40,
+                                                            alignment: Alignment.center,
+                                                            color: Colors.transparent,
+                                                            child: SvgPicture.asset(
+                                                              'lib/resources/svg/search.svg',
+                                                              color: _colorAnimation.value,
+                                                              height: 20,
+                                                              width: 20,
+                                                              fit: BoxFit.contain,
+                                                            ),
+                                                          ),
+                                                          GestureDetector(
+                                                            key: _searchKey,
+                                                            onTap: () {
+                                                              FocusScope.of(context).requestFocus(_focusNode); 
+                                                            },
+                                                            child: Padding(
+                                                              padding: const EdgeInsets.only(right: 4),
+                                                              child: AnimatedBuilder(
+                                                                animation: _controllerFade,
+                                                                builder: (context, child) {
+                                                                  return Row(
+                                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                                    children: [
+                                                                      Transform.translate(
+                                                                        offset: const Offset(-5, 0),
+                                                                        child: CategoryDescripText(text: "Search for nearest"),
+                                                                      ),
+                                                                    ],
+                                                                  );
+                                                                },
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          Transform.translate(
+                                                            offset: const Offset(-5, 0),
+                                                            child: SlideTransition(
+                                                              position: _hintAnimation,
+                                                              child: AnimatedBuilder(
+                                                                animation: _hintColorAnimation,
+                                                                builder: (context, child) {
+                                                                  return GestureDetector(
+                                                                    onTap: () {
+                                                                      FocusScope.of(context).requestFocus(_focusNode);
+                                                                    },
+                                                                    child: CategoryDescripText(text: hints[_currentHintIndex]),
+                                                                  );
+                                                                },
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      Positioned(
+                                                        top: 0,
+                                                        right: _isExpanded ? 5 : 5, 
+                                                        child: GestureDetector(
+                                                          onTap: () {},
+                                                          child: Container(
+                                                            height: 40,
+                                                            width: 40,
+                                                            alignment: Alignment.center,
+                                                            color: Colors.transparent,
+                                                            child: SvgPicture.asset(
+                                                              'lib/resources/svg/mic.svg',
+                                                              color: Colors.black87,
+                                                              height: 22,
+                                                              width: 22,
+                                                              fit: BoxFit.contain,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+
+                                                    ],
+                                                  ),
+                                                ),
+                                                GestureDetector(
+                                                  onTap: () {
+                                                    debugPrint("Close button tapped");
+                                                    if (_isExpanded) {
+                                                      _toggleExpand();
+                                                    }
+                                                  },
+                                                  child: Container(
+                                                    width: 40,
+                                                    height: 40,
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.grey,
+                                                      borderRadius: BorderRadius.only(
+                                                        bottomRight: Radius.circular(20),
+                                                        topRight: Radius.circular(20)
+                                                      ),
+                                                    ),
+                                                    child: const Center(
+                                                      child: Icon(Icons.close, color: Colors.white, size: 18),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            )
+                                          ),
+                                        ),
+                                      ),
+                                    )
+                                  : const Icon(Icons.search, color: Colors.green, size: 20),
+                              ),
+                            )
+                          ),
+                          GestureDetector(
+                            onTap: _findRoute,
+                            child: Container(
+                              margin: const EdgeInsets.only(right: 10), 
+                              width: 60,
+                              height: 40,
+                              decoration: BoxDecoration(
+                                color: _isSafeZoneShown ? Colors.grey[300] : Colors.white, 
+                                borderRadius: BorderRadius.circular(50),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Colors.grey,
+                                    blurRadius: 2,
+                                    offset: Offset(1, 1),
+                                  ),
+                                ],
+                              ),
+                              child: const Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  SizedBox(width: 5),
+                                  Icon(Icons.safety_check, color: Colors.blue),
+                                  SizedBox(width: 5), 
+                                  Expanded( 
+                                    child: CategoryDescripText(
+                                      text: "All",
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: _findRoute,
+                            child: Container(
+                              margin: const EdgeInsets.only(right: 10), 
+                              width: 160,
+                              height: 40,
+                              decoration: BoxDecoration(
+                                color: _isSafeZoneShown ? Colors.grey[300] : Colors.white, 
+                                borderRadius: BorderRadius.circular(50),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Colors.grey,
+                                    blurRadius: 2,
+                                    offset: Offset(1, 1),
+                                  ),
+                                ],
+                              ),
+                              child: const Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  SizedBox(width: 5),
+                                  Icon(Icons.safety_check, color: Colors.green),
+                                  SizedBox(width: 5), 
+                                  Expanded( 
+                                    child: CategoryDescripText(
+                                      text: "Show nearest safe zone",
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: _findRoute,
+                            child: Container(
+                              width: 170,
+                              height: 40,
+                              decoration: BoxDecoration(
+                                color: _isSafeZoneShown ? Colors.grey[300] : Colors.white, 
+                                borderRadius: BorderRadius.circular(50),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Colors.grey,
+                                    blurRadius: 2,
+                                    offset: Offset(1, 1),
+                                  ),
+                                ],
+                              ),
+                              child: const Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  SizedBox(width: 5),
+                                  Icon(Icons.safety_check, color: Colors.red),
+                                  SizedBox(width: 5), 
+                                  Expanded( 
+                                    child: CategoryDescripText(
+                                      text: "Show nearest danger zone",
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+              ],
+            ),
+            widget.UserToken == 'guest' 
+              ? Container(
+                  width: double.infinity,
+                  child: Stack(
+                    children: [
+                      Positioned(
+                        bottom: 90,
+                        left: 0,
+                        child: Container(
+                          margin: EdgeInsets.only(left: 10),
+                          width: 160,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(5),
+                            boxShadow: const [
+                              BoxShadow(
+                                color: Colors.grey,
+                                blurRadius: 2,
+                                offset: Offset(1, 1),
+                              ),
+                            ],
+                          ),
+                          child: Container(
+                            padding: EdgeInsets.symmetric(horizontal: 10),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Icon(
+                                  size: 25,
+                                  Icons.location_on,
+                                  color: widgetPricolor,
+                                ),
+                                SizedBox(width: 10),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    DescriptionText(text: 'My current location'),
+                                    PrimaryText(text: 'Dagupan City')
+                                  ],
+                                )
+                              ],
+                            ),
+                          )
+                        )
+                      ),
+                      Positioned(
+                        bottom: 90,
+                        right: 15,
+                        child: GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _showMarkers = !_showMarkers;
+                            });
+                          },
+                          child: _buildButton(
+                              _showMarkers ? Icons.visibility : Icons.visibility_off),
+                        ),
+                      )
+                    ],
+                  ),
+                )
+              : Positioned(
+                  bottom: 90,
+                  left: 15,
+                  child: Row(
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _showMarkers = !_showMarkers;
+                          });
+                        },
+                        child: _buildButton(
+                            _showMarkers ? Icons.visibility : Icons.visibility_off),
+                      ),
+                      Container(
+                        margin: EdgeInsets.only(left: 10),
+                        width: 160,
                         height: 40,
                         decoration: BoxDecoration(
-                          color: _isSafeZoneShown
-                              ? Colors.grey[300]
-                              : Colors.white, // Toggle color
-                          borderRadius: BorderRadius.circular(50),
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(5),
                           boxShadow: const [
                             BoxShadow(
                               color: Colors.grey,
@@ -1064,85 +1746,33 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                             ),
                           ],
                         ),
-                        child: const Row(
+                        child: Container(
+                          padding: EdgeInsets.symmetric(horizontal: 10),
+                          child: Row(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
-                              SizedBox(width: 5),
                               Icon(
-                                Icons.safety_check,
-                                color: Colors.green,
+                                size: 25,
+                                Icons.location_on,
+                                color: widgetPricolor,
                               ),
-                              CategoryDescripText(
-                                  text: "Show nearest safe zone",
-                                  color: Colors.black)
-                            ])),
-                  ),
-                )
-              ],
-            ),
-            Positioned(
-              bottom: 90,
-              left: 15,
-              child: GestureDetector(
-                onTap: () {
-                  setState(() {
-                    _showMarkers = !_showMarkers;
-                  });
-                },
-                child: _buildButton(
-                    _showMarkers ? Icons.visibility : Icons.visibility_off),
-              ),
-              // Row(
-              //   children: [
-              //     GestureDetector(
-              //       onTap: () {
-              //         setState(() {
-              //           _showOptions = !_showOptions;
-              //         });
-              //       },
-              //       child: AnimatedRotation(
-              //         turns: _showOptions ? 0.5 : 0,
-              //         duration: const Duration(milliseconds: 200),
-              //         child: _buildButton(Icons.keyboard_arrow_right),
-              //       ),
-              //     ),
-              //     const SizedBox(width: 7),
-              //     AnimatedOpacity(
-              //       opacity: _showOptions ? 1.0 : 0.0,
-              //       duration: const Duration(milliseconds: 200),
-              //       child: Row(
-              //         children: [
-              //           // GestureDetector(
-              //           //   onTap: () {
-              //           //     setState(() {
-              //           //       _currentMapType =
-              //           //           _currentMapType == MapType.normal
-              //           //               ? MapType.satellite
-              //           //               : MapType.normal;
-              //           //     });
-              //           //   },
-              //           //   child: _buildButton(Icons.map),
-              //           // ),
-              //           // SizedBox(width: 7),
-              //           GestureDetector(
-              //             onTap: () {
-              //               setState(() {
-              //                 _showMarkers = !_showMarkers;
-              //               });
-              //             },
-              //             child: _buildButton(_showMarkers
-              //                 ? Icons.visibility
-              //                 : Icons.visibility_off),
-              //           ),
-              //         ],
-              //       ),
-              //     ),
-              //   ],
-              // ),
-            ),
-
-            // Floating buttons
+                              SizedBox(width: 10),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  DescriptionText(text: 'My current location'),
+                                  PrimaryText(text: 'Dagupan City')
+                                ],
+                              )
+                            ],
+                          ),
+                        )
+                      )
+                    ],
+                  )
+                ),
             widget.UserToken == 'guest'
                 ? const SizedBox()
                 : Positioned(
@@ -1383,8 +2013,7 @@ Widget _buildButton(IconData icon) {
     height: 40,
     decoration: BoxDecoration(
       color: Colors.white,
-      borderRadius:
-          BorderRadius.circular(10), // Square shape with rounded corners
+      borderRadius: BorderRadius.circular(10), 
       boxShadow: const [
         BoxShadow(
           color: Colors.grey,

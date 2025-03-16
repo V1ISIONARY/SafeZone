@@ -46,101 +46,61 @@ class _BottomNavigationWidgetState extends State<BottomNavigationWidget> {
         children: [
           _pages[_selectedIndex],
           Positioned(
-              bottom: 0,
-              right: 0,
-              left: 0,
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: BottomAppBar(
+              color: Colors.white,
+              height: 65,
+              shape: CircularNotchedRectangle(),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  _buildIconItem("Map", "lib/resources/svg/map.svg", 0),
+                  _buildIconItem("Contacts", "lib/resources/svg/contacts.svg", 1),
+                  SizedBox(width: 48),
+                  _buildIconItem("Notification", "lib/resources/svg/notification.svg", 2),
+                  _buildIconItem("Settings", "lib/resources/svg/settings.svg", 3),
+                ],
+              ),
+            ),
+          )
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.transparent,
+        splashColor: Colors.transparent,
+        highlightElevation: 0,
+        hoverElevation: 0,
+        elevation: 0, 
+        onPressed: () {
+          context.push('/sos-countdown');
+        },
+        child: Container(
+            width: 70,
+            height: 150,
+            color: Colors.transparent,
+            child: Center(
               child: Container(
-                height: 70,
+                width: 50,
+                height: 50,
                 decoration: const BoxDecoration(
-                  color: Colors.white,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey,
-                      blurRadius: 2,
-                      offset: Offset(1, 1),
-                    ),
-                  ],
+                  color: widgetPricolor,
+                  shape: BoxShape.circle,
                 ),
-                child: Center(
-                  child: Container(
-                    height: 70,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Expanded(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.only(top: 15),
-                                child: _buildIconItem(
-                                    "Map", "lib/resources/svg/map.svg", 0),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(top: 15),
-                                child: _buildIconItem("Contacts",
-                                    "lib/resources/svg/contacts.svg", 1),
-                              ),
-                              Stack(
-                                children: [
-                                  // The grey container moved upwards by 40 pixels
-                                  Transform.translate(
-                                    offset: const Offset(0,
-                                        -25), // Offset it upwards by 40 pixels
-                                    child: GestureDetector(
-                                      onTap: () {
-                                        context.push('/sos-countdown');
-                                      },
-                                      child: Container(
-                                        width: 70,
-                                        height:
-                                            150, // The height of the grey container
-                                        decoration: const BoxDecoration(
-                                            color: Color.fromARGB(
-                                                255, 217, 212, 212),
-                                            shape: BoxShape.circle),
-                                        // Center the white container inside the grey one
-                                        child: Center(
-                                          child: Container(
-                                            width: 50,
-                                            height: 50,
-                                            decoration: const BoxDecoration(
-                                                color: widgetPricolor,
-                                                shape: BoxShape.circle),
-                                            child: const Center(
-                                              child: Text(
-                                                'SOS',
-                                                style: TextStyle(
-                                                    color: Colors.white),
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(top: 15),
-                                child: _buildIconItem("Notification",
-                                    "lib/resources/svg/notification.svg", 2),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(top: 15),
-                                child: _buildIconItem("Settings",
-                                    "lib/resources/svg/settings.svg", 3),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
+                child: const Center(
+                  child: Text(
+                    'SOS',
+                    style: TextStyle(
+                      color: Colors.white,
                     ),
                   ),
                 ),
-              ))
-        ],
-      ),
+              ),
+            ),
+          ),
+        ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
 

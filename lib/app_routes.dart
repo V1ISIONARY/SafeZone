@@ -51,17 +51,12 @@ GoRouter appRouter(bool isFirstRun, String? userToken) => GoRouter(
               ? const SplashScreen()
               : BottomNavigationWidget(userToken: userToken ?? 'guest'),
         ),
-        // // GoRoute(
-        // //   path: '/',
-        // //   builder: (context, state) => MainAnalytics(initialPage: 0),
-        // // ),
         GoRoute(
             path: '/home',
             builder: (context, state) {
               final token = state.extra as String;
-              return BottomNavigationWidget(userToken: token ?? 'guest');
+              return BottomNavigationWidget(userToken: token);
             }),
-
         GoRoute(
           path: '/register',
           builder: (context, state) => const RegisterScreen(),
