@@ -69,6 +69,7 @@ dependencies:
   awesome_notifications: ^0.10.1
   google_places_flutter: ^2.1.0
   location: ^8.0.0
+  speech_to_text: ^7.0.0
 
 flutter_launcher_icons:
   android: "launcher_icon"
