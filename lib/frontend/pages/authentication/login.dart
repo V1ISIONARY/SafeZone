@@ -149,7 +149,7 @@ class _LoginState extends State<Login> {
                       color: textColor,
                     ),
                     decoration: InputDecoration(
-                      hintText: "hsl******",
+                      hintText: "pass*****",
                       hintStyle: TextStyle(
                           fontSize: 13,
                           color: labelFormFieldColor,

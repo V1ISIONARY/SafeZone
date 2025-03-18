@@ -121,37 +121,6 @@ class _ContactState extends State<Contact> with SingleTickerProviderStateMixin {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: const Color.fromARGB(255, 216, 216, 216),
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
-                      child: TextField(
-                        decoration: InputDecoration(
-                          filled: true,
-                          fillColor: const Color(0xFFF1F1F1),
-                          prefixIcon: const Padding(
-                            padding: EdgeInsets.only(left: 20, right: 10),
-                            child: Icon(
-                              Icons.search,
-                              size: 20,
-                              color: Colors.grey,
-                            ),
-                          ),
-                          hintText: "Search",
-                          hintStyle: const TextStyle(color: Colors.grey, fontSize: 13),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(5.0),
-                            borderSide: BorderSide.none,
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(vertical: 15.0),
-                        ),
-                        style: const TextStyle(fontSize: 13),
-                        onChanged: (text) {},
-                      ),
-                    ),
-                    const SizedBox(height: 10),
                     BlocBuilder<ContactBloc, ContactState>(
                       builder: (context, state) {
                         if (state is ContactLoading) {
@@ -176,8 +145,8 @@ class _ContactState extends State<Contact> with SingleTickerProviderStateMixin {
                               itemBuilder: (context, index) {
                                 final contact = localContacts[index];
                                 return Contactinfo(
-                                  name: contact.name, // Use actual data here
-                                  phone: contact.phoneNumber, // Use actual data here
+                                  name: contact.name,
+                                  phone: contact.phoneNumber,
                                 );
                               },
                             ),

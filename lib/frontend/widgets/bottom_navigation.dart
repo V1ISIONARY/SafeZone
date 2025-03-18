@@ -42,65 +42,44 @@ class _BottomNavigationWidgetState extends State<BottomNavigationWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        children: [
-          _pages[_selectedIndex],
-          Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            child: BottomAppBar(
-              color: Colors.white,
-              height: 65,
-              shape: CircularNotchedRectangle(),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  _buildIconItem("Map", "lib/resources/svg/map.svg", 0),
-                  _buildIconItem("Contacts", "lib/resources/svg/contacts.svg", 1),
-                  SizedBox(width: 48),
-                  _buildIconItem("Notification", "lib/resources/svg/notification.svg", 2),
-                  _buildIconItem("Settings", "lib/resources/svg/settings.svg", 3),
-                ],
-              ),
-            ),
-          )
-        ],
+      backgroundColor: widgetPricolor,
+      body: _pages[_selectedIndex],
+      bottomNavigationBar: BottomAppBar(
+        color: Colors.white,
+        shape: const CircularNotchedRectangle(), // Notched shape for FAB
+        notchMargin: 6.0, // Space between FAB and BottomAppBar
+        clipBehavior: Clip.antiAlias, // Ensures the notch is smooth
+        child: SizedBox(
+          height: 65, // Proper height for the notch to be visible
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              _buildIconItem("Map", "lib/resources/svg/map.svg", 0),
+              _buildIconItem("Contacts", "lib/resources/svg/contacts.svg", 1),
+              SizedBox(width: 48),
+              _buildIconItem("Notification", "lib/resources/svg/notification.svg", 2),
+              _buildIconItem("Settings", "lib/resources/svg/settings.svg", 3),
+            ],
+          ),
+        ),
       ),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.transparent,
+        backgroundColor: widgetPricolor,
         splashColor: Colors.transparent,
-        highlightElevation: 0,
-        hoverElevation: 0,
-        elevation: 0, 
+        elevation: 5,
+        shape: const CircleBorder(), // Ensures the FAB is circular
         onPressed: () {
           context.push('/sos-countdown');
         },
-        child: Container(
-            width: 70,
-            height: 150,
-            color: Colors.transparent,
-            child: Center(
-              child: Container(
-                width: 50,
-                height: 50,
-                decoration: const BoxDecoration(
-                  color: widgetPricolor,
-                  shape: BoxShape.circle,
-                ),
-                child: const Center(
-                  child: Text(
-                    'SOS',
-                    style: TextStyle(
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              ),
-            ),
+        child: const Text(
+          'SOS',
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
           ),
         ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.miniCenterDocked,
     );
   }
 
@@ -109,7 +88,7 @@ class _BottomNavigationWidgetState extends State<BottomNavigationWidget> {
 
     return GestureDetector(
       onTap: () {
-        _onItemTapped(index); // Update selected index
+        _onItemTapped(index);
       },
       child: Container(
         height: double.infinity,
@@ -149,14 +128,4 @@ class _BottomNavigationWidgetState extends State<BottomNavigationWidget> {
       ),
     );
   }
-
-  // Widget _buildEmptyItem() {
-  //   return GestureDetector(
-  //     onTap: () {},
-  //     child: Container(
-  //       height: double.infinity,
-  //       width: 40,
-  //     ),
-  //   );
-  // }
 }

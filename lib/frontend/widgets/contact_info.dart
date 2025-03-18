@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:safezone/resources/schema/texts.dart';
 import 'package:url_launcher/url_launcher.dart'; // Import the url_launcher package
 import 'package:safezone/resources/schema/colors.dart';
 
@@ -32,18 +33,8 @@ class Contactinfo extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    name,
-                    style: const TextStyle(color: textColor, fontSize: 15),
-                  ),
-                  const SizedBox(
-                    height: 5,
-                  ),
-                  Text(
-                    phone,
-                    style: const TextStyle(
-                        color: labelFormFieldColor, fontSize: 13),
-                  ),
+                  CategoryText(text: name),
+                  CategoryDescripText(text: phone)
                 ],
               ),
             ),

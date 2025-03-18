@@ -1,0 +1,2 @@
+C:/flutterdev/SafeZone/android/app/.cxx/Debug/4b3m4w1a/x86_64/CMakeFiles/edit_cache.dir
+C:/flutterdev/SafeZone/android/app/.cxx/Debug/4b3m4w1a/x86_64/CMakeFiles/rebuild_cache.dir

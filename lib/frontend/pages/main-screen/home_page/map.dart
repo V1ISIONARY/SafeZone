@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
@@ -79,10 +80,12 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
 
   late FocusNode _focusNode;
   late FocusNode _focusNodeText;
+  late FocusNode _focusNodeCircles;
   late stt.SpeechToText _speech;
 
   bool _isListening = false;
   bool _isExpanded = false;
+  bool _circleHeight = false;
   
   late AnimationController _controller;
   late Animation<Color?> _colorAnimation;
@@ -112,8 +115,17 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
     });
   }
 
+  void _toggleCircles() {
+    setState(() {
+      _circleHeight = !_circleHeight;
+      if (!_circleHeight && _focusNodeCircles.hasFocus) {
+        _focusNodeCircles.unfocus();
+      }
+    });
+  }
+
   bool _showTitle = false;
-  double _appBarHeight = 20;
+  double _appBarHeight = 0;
   Color _appBarColor = Colors.transparent;
   
   int? _userId;
@@ -217,7 +229,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
         Future.delayed(Duration(seconds: 5), () {
           if (mounted) {
             setState(() {
-              _appBarHeight = 20;
+              _appBarHeight = 0;
               _appBarColor = Colors.transparent;
               _showTitle = false;
             });
@@ -249,6 +261,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
     _controllerFade.dispose();
     _mapCategoryHint.dispose();
     _focusNode.dispose();
+    _focusNodeCircles.dispose();
     _focusNodeText.dispose();
     _textEditingController.dispose();
     _locationSubscription?.cancel();
@@ -361,7 +374,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
-        return Future.error("Location permission denied");
+        return Future.error("Unknown Location");
       }
     }
 
@@ -794,65 +807,80 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
         height: double.infinity,
         child: Stack(
           children: [
-            MultiBlocListener(
-              listeners: [
-                BlocListener<MapBloc, MapState>(
-                  listener: (context, state) {
-                    if (state is MemberLocationUpdated) {
-                      print("iz changingggggg");
-                      _updateMemberMarker(
-                          state.userId, state.latitude, state.longitude);
-                    }
-                  },
-                ),
-                BlocListener<NotificationBloc, NotificationState>(
-                  listener: (context, state) {
-                    if (state is NotificationBroadcasted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                            content: Text("Zone notification broadcasted!")),
+            Positioned.fill(
+              child: MultiBlocListener(
+                listeners: [
+                  BlocListener<MapBloc, MapState>(
+                    listener: (context, state) {
+                      if (state is MemberLocationUpdated) {
+                        print("iz changingggggg");
+                        _updateMemberMarker(
+                            state.userId, state.latitude, state.longitude);
+                      }
+                    },
+                  ),
+                  BlocListener<NotificationBloc, NotificationState>(
+                    listener: (context, state) {
+                      if (state is NotificationBroadcasted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                              content: Text("Zone notification broadcasted!")),
+                        );
+                      } else if (state is NotificationError) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text("Error: ${state.message}")),
+                        );
+                      }
+                    },
+                  ),
+                ],
+                child: BlocBuilder<MapBloc, MapState>(
+                  builder: (context, state) {
+                    if (state is MapLoading) {
+                      return Expanded(
+                        child: Center(
+                          child: Transform.translate(
+                              offset: const Offset(0, 0),
+                              child: const LoadingState()),
+                        ),
                       );
-                    } else if (state is NotificationError) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text("Error: ${state.message}")),
-                      );
+                    } else if (state is MapDataLoaded) {
+                      _preloadMemberMarkers(state.members);
+                    } else if (state is MapError) {
+                      return Center(child: Text(state.message));
                     }
-                  },
-                ),
-              ],
-              child: BlocBuilder<MapBloc, MapState>(
-                builder: (context, state) {
-                  if (state is MapLoading) {
-                    return Expanded(
-                      child: Center(
-                        child: Transform.translate(
-                            offset: const Offset(0, 0),
-                            child: const LoadingState()),
+                    return GoogleMap(
+                      initialCameraPosition: const CameraPosition(
+                        target: sourceLocation,
+                        zoom: 16.0,
                       ),
-                    );
-                  } else if (state is MapDataLoaded) {
-                    _preloadMemberMarkers(state.members);
-                  } else if (state is MapError) {
-                    return Center(child: Text(state.message));
-                  }
-                  return GoogleMap(
-                    initialCameraPosition: const CameraPosition(
-                      target: sourceLocation,
-                      zoom: 16.0,
-                    ),
-                    mapType: _currentMapType,
-                    markers: _showMarkers ? _createMarkers(state) : {},
-                    circles: circles,
-                    polylines: _polylines,
-                    onMapCreated: (GoogleMapController controller) async {
-                      googleMapController = controller;
-                      String style = '''
+                      mapType: _currentMapType,
+                      markers: _showMarkers ? _createMarkers(state) : {},
+                      circles: circles,
+                      polylines: _polylines,
+                      onMapCreated: (GoogleMapController controller) async {
+                        googleMapController = controller;
+                        String style = '''
                         [
                           {
-                            "featureType": "poi.business",
-                            "elementType": "labels",
+                            "featureType": "administrative",
+                            "elementType": "labels.text",
                             "stylers": [
                               { "visibility": "off" }
+                            ]
+                          },
+                          {
+                            "featureType": "administrative.locality",
+                            "elementType": "labels.text",
+                            "stylers": [
+                              { "visibility": "on" }
+                            ]
+                          },
+                          {
+                            "featureType": "administrative.neighborhood",
+                            "elementType": "labels.text",
+                            "stylers": [
+                              { "visibility": "on" }
                             ]
                           },
                           {
@@ -861,69 +889,167 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                             "stylers": [
                               { "visibility": "off" }
                             ]
+                          },
+                          {
+                            "featureType": "poi.business",
+                            "elementType": "labels",
+                            "stylers": [
+                              { "visibility": "off" }
+                            ]
+                          },
+                          {
+                            "featureType": "poi.government",
+                            "elementType": "labels",
+                            "stylers": [
+                              { "visibility": "on" }
+                            ]
+                          },
+                          {
+                            "featureType": "poi.medical",
+                            "elementType": "labels",
+                            "stylers": [
+                              { "visibility": "on" }
+                            ]
+                          },
+                          {
+                            "featureType": "transit.station.bus",
+                            "elementType": "labels",
+                            "stylers": [
+                              { "visibility": "off" }
+                            ]
+                          },
+                          {
+                            "featureType": "road",
+                            "elementType": "labels",
+                            "stylers": [
+                              { "visibility": "off" }
+                            ]
                           }
                         ]
                         ''';
-                      controller.setMapStyle(style);
-                      _mapController.complete(controller);
+                        controller.setMapStyle(style);
+                        _mapController.complete(controller);
 
-                      _fetchLocation();
-                    },
-                    mapToolbarEnabled: false,
-                    zoomControlsEnabled: false,
-                    myLocationEnabled: true,
-                    myLocationButtonEnabled: false,
-                  );
-                },
-              ),
+                        _fetchLocation();
+                      },
+                      mapToolbarEnabled: false,
+                      zoomControlsEnabled: false,
+                      myLocationEnabled: true,
+                      myLocationButtonEnabled: false,
+                    );
+                  },
+                ),
+              )
             ),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                PreferredSize(
-                  preferredSize: Size.fromHeight(_appBarHeight),
-                  child: AnimatedContainer(
-                    duration: Duration(milliseconds: 500),
-                    height: _appBarHeight,
-                    color: _appBarColor,
-                    child: AppBar(
-                      backgroundColor: _appBarColor,
-                      elevation: 0,
-                      automaticallyImplyLeading: false,
-                      title: _showTitle
-                          ? CategoryDescripText(
-                            text: "You've already logged in",
-                            color: Colors.white,
-                          )
-                          : null,
-                      centerTitle: true,
-                    ),
-                  ),
+                AppBar(
+                  toolbarHeight: 0,
+                  automaticallyImplyLeading: false,
                 ),
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 300),
+                  height: _appBarHeight,
+                  color: _appBarColor,
+                  width: double.infinity,
+                  alignment: Alignment.center,
+                  child: _showTitle
+                      ? CategoryDescripText(
+                        text: "you are already signed in.",
+                        color: Colors.white,
+                      )
+                    : null,
+                  ),
+                SizedBox(height: 10),
                 widget.UserToken == 'guest'
                   ? Container()
                   : PreferredSize(
-                      preferredSize: const Size.fromHeight(120.0), 
-                      child: Container(
-                        width: double.infinity,
-                        margin: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
-                        child: Row(
-                          children: [
-                            GestureDetector(
-                              onTap: (){
-                                Navigator.push(
-                                  context,
-                                  PageTransition(
-                                    child: AccountDetails(),
-                                    type: PageTransitionType.fade,
-                                    duration: const Duration(milliseconds: 300),
+                    preferredSize: const Size.fromHeight(120.0), 
+                    child: Container(
+                      width: double.infinity,
+                      margin: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+                      child: Column(
+                        children: [
+                          Row(
+                            children: [
+                              GestureDetector(
+                                onTap: (){
+                                  Navigator.push(
+                                    context,
+                                    PageTransition(
+                                      child: AccountDetails(),
+                                      type: PageTransitionType.fade,
+                                      duration: const Duration(milliseconds: 300),
+                                    ),
+                                  );
+                                },
+                                child: Container(
+                                  width: 40,
+                                  height: 40,
+                                  padding: EdgeInsets.all(2),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(10),
+                                    boxShadow: const [
+                                      BoxShadow(
+                                        color: Colors.grey,
+                                        blurRadius: 2,
+                                        offset: Offset(1, 1),
+                                      ),
+                                    ],
                                   ),
-                                );
-                              },
-                              child: Container(
+                                  child: Center(
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(10),
+                                      child: Image.asset(
+                                        'lib/resources/images/profile.jpg',
+                                      )
+                                    )
+                                  )
+                                )
+                              ),
+                              SizedBox(width: 10),
+                              Expanded(
+                                child: GestureDetector(
+                                  onTap: _toggleCircles,
+                                  child: Container(
+                                    height: 40,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(20),
+                                      boxShadow: const [
+                                        BoxShadow(
+                                          color: Colors.grey,
+                                          blurRadius: 2,
+                                          offset: Offset(1, 1),
+                                        ),
+                                      ],
+                                    ),
+                                    padding: const EdgeInsets.symmetric(horizontal: 15),
+                                    child: Row(
+                                      children: [
+                                        CategoryDescripText(text: 'love bird', color: Colors.black,),
+                                        SizedBox(width: 40),
+                                        LimitedImageCircles(
+                                          imageUrls: [
+                                            "lib/resources/images/profile.jpg",
+                                            "lib/resources/images/profile.jpg",
+                                            "lib/resources/images/profile.jpg",
+                                            "lib/resources/images/profile.jpg",
+                                          ],
+                                        ),
+                                        Spacer(),
+                                        Icon(Icons.keyboard_arrow_down, color: Colors.black38),
+                                      ]
+                                    )
+                                  )
+                                )
+                              ),
+                              SizedBox(width: 10), 
+                              Container(
                                 width: 40,
                                 height: 40,
-                                padding: EdgeInsets.all(2),
                                 decoration: BoxDecoration(
                                   color: Colors.white,
                                   borderRadius: BorderRadius.circular(10),
@@ -936,77 +1062,45 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                   ],
                                 ),
                                 child: Center(
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(10),
-                                    child: Image.asset(
-                                      'lib/resources/images/profile.jpg',
-                                    )
-                                  )
-                                )
-                              )
-                            ),
-                            SizedBox(width: 10),
-                            Expanded(
-                              child: Container(
-                                height: 40,
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(20),
-                                  boxShadow: const [
-                                    BoxShadow(
-                                      color: Colors.grey,
-                                      blurRadius: 2,
-                                      offset: Offset(1, 1),
-                                    ),
-                                  ],
-                                ),
-                                padding: const EdgeInsets.symmetric(horizontal: 15),
-                                child: Row(
-                                  children: [
-                                    CategoryDescripText(text: 'love bird', color: Colors.black,),
-                                    SizedBox(width: 40),
-                                    LimitedImageCircles(
-                                      imageUrls: [
-                                        "lib/resources/images/profile.jpg",
-                                        "lib/resources/images/profile.jpg",
-                                        "lib/resources/images/profile.jpg",
-                                        "lib/resources/images/profile.jpg",
-                                      ],
-                                    ),
-                                    Spacer(),
-                                    Icon(Icons.keyboard_arrow_down, color: Colors.black38),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            SizedBox(width: 10), 
-                            Container(
-                              width: 40,
-                              height: 40,
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(10),
-                                boxShadow: const [
-                                  BoxShadow(
-                                    color: Colors.grey,
-                                    blurRadius: 2,
-                                    offset: Offset(1, 1),
+                                  child: Icon(
+                                    Icons.person_add,
+                                    size: 20,
+                                    color: widgetPricolor,
                                   ),
-                                ],
-                              ),
-                              child: Center(
-                                child: Icon(
-                                  Icons.person_add,
-                                  size: 20,
-                                  color: widgetPricolor,
                                 ),
                               ),
-                            ),
-                          ],
-                        )
+                            ],
+                          )
+                        ]
                       )
+                    )
+                  ),
+                SizedBox(height: 10),
+                Container(
+                  height: _circleHeight ? 400 : 0,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(5),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Colors.grey,
+                        blurRadius: 2,
+                        offset: Offset(1, 1),
+                      ),
+                    ],
+                  ),
+                  margin: EdgeInsets.only(bottom: _circleHeight ? 10 : 0, left: 15, right: 15),
+                  padding: EdgeInsets.all(15),
+                  child: SingleChildScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    child: Column(
+                      children: [
+                        // dito mo ilagay miro ung sa group na active ganon
+                      ],
                     ),
-                SizedBox(height: 5),
+                  )
+                ),
                 widget.UserToken == 'guest'
                   ? Container(
                       margin: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
@@ -1039,9 +1133,10 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                             child: TextField(
                                               controller: _textEditingController,
                                               focusNode: _focusNodeText,
-                                              style: const TextStyle(
+                                              style: GoogleFonts.poppins(
+                                                fontSize: 9,
+                                                fontWeight: FontWeight.w500,
                                                 color: Colors.black,
-                                                fontSize: 11,
                                               ),
                                               decoration: InputDecoration(
                                                 filled: true,
@@ -1075,7 +1170,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                                 color: Colors.transparent,
                                                 child: SvgPicture.asset(
                                                   'lib/resources/svg/search.svg',
-                                                  color: _colorAnimation.value,
+                                                  color: Colors.black,
                                                   height: 20,
                                                   width: 20,
                                                   fit: BoxFit.contain,
@@ -1096,7 +1191,10 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                                         children: [
                                                           Transform.translate(
                                                             offset: const Offset(-5, 0),
-                                                            child: CategoryDescripText(text: "Search for nearest"),
+                                                            child: CategoryDescripText(
+                                                              text: "Search for nearest",
+                                                              color: _colorAnimation.value,
+                                                            ),
                                                           ),
                                                         ],
                                                       );
@@ -1115,12 +1213,15 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                                         onTap: () {
                                                           FocusScope.of(context).requestFocus(_focusNode);
                                                         },
-                                                        child: CategoryDescripText(text: hints[_currentHintIndex]),
+                                                        child: CategoryDescripText(
+                                                          text: hints[_currentHintIndex], 
+                                                          color: _colorAnimation.value,
+                                                        )
                                                       );
-                                                    },
-                                                  ),
-                                                ),
-                                              ),
+                                                    }
+                                                  )
+                                                )
+                                              )
                                             ],
                                           ),
                                           Positioned(
@@ -1167,9 +1268,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                     ),
                                     GestureDetector(
                                       onTap: () {
-                                        if (_isExpanded) {
-                                          _toggleExpand();
-                                        }
+                                        
                                       },
                                       child: Container(
                                         width: 40,
@@ -1634,11 +1733,11 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                   child: Stack(
                     children: [
                       Positioned(
-                        bottom: 90,
+                        bottom: 10,
                         left: 0,
                         child: Container(
                           margin: EdgeInsets.only(left: 10),
-                          width: 170,
+                          width: 190,
                           height: 40,
                           decoration: BoxDecoration(
                             color: Colors.white,
@@ -1661,15 +1760,6 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                   size: 25,
                                   Icons.location_on,
                                   color: widgetPricolor,
-                                ),
-                                SizedBox(width: 10),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    DescriptionText(text: 'My current location'),
-                                    PrimaryText(text: 'Dagupan City')
-                                  ],
                                 )
                               ],
                             ),
@@ -1677,8 +1767,8 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                         )
                       ),
                       Positioned(
-                        bottom: 90,
-                        right: 15,
+                        bottom: 15,
+                        left: 15,
                         child: GestureDetector(
                           onTap: () {
                             setState(() {
@@ -1693,58 +1783,24 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                   ),
                 )
               : Positioned(
-                  bottom: 90,
+                  bottom: 15,
                   left: 15,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            _showMarkers = !_showMarkers;
-                          });
-                        },
-                        child: _buildButton(
-                            _showMarkers ? Icons.visibility : Icons.visibility_off),
-                      ),
-                      SizedBox(height: 10),
-                      Container(
-                        width: 180,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(5),
-                          boxShadow: const [
-                            BoxShadow(
-                              color: Colors.grey,
-                              blurRadius: 2,
-                              offset: Offset(1, 1),
-                            ),
-                          ],
-                        ),
-                        child: Container(
-                          padding: EdgeInsets.symmetric(horizontal: 10),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Icon(
-                                size: 25,
-                                Icons.location_on,
-                                color: widgetPricolor,
-                              ),
-                              SizedBox(width: 10),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  DescriptionText(text: 'My current location'),
-                                  PrimaryText(text: 'Dagupan City')
-                                ],
-                              )
-                            ],
-                          ),
-                        )
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                _showMarkers = !_showMarkers;
+                              });
+                            },
+                            child: _buildButton(
+                                _showMarkers ? Icons.visibility : Icons.visibility_off),
+                          )
+                        ]
                       )
                     ],
                   )
@@ -1753,7 +1809,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                 ? const SizedBox()
                 : Positioned(
                     right: 15,
-                    bottom: 80,
+                    bottom: 10,
                     child: SizedBox(
                       width: 60,
                       height: 160,
@@ -1786,8 +1842,9 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                               ),
                               child: Center(
                                 child: SvgPicture.asset(
-                                    "lib/resources/svg/connect.svg",
-                                    color: Colors.blue),
+                                  "lib/resources/svg/connect.svg",
+                                  color: Colors.blue
+                                ),
                               ),
                             ),
                           ),
