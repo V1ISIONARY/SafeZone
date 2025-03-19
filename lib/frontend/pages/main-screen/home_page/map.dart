@@ -1100,14 +1100,15 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                   margin: EdgeInsets.only(bottom: _circleHeight ? 10 : 0, left: 15, right: 15),
                   padding: EdgeInsets.all(15),
                   child: SingleChildScrollView(
-physics: const AlwaysScrollableScrollPhysics(),
-      child: Column(
-        children: [
-          for (var circle in _circles)
-            ListTile(
-              title: Text(circle.name),
-            ),
-        ],
+                  physics: const AlwaysScrollableScrollPhysics(),
+                        child: Column(
+                          children: [
+                            for (var circle in _circles)
+                              ListTile(
+                                title: Text(circle.name),
+              subtitle: Text("Status: ${circle.isActive ? 'Active' : 'Inactive'}"),
+                              ),
+                          ],
                     ),
                   )
                 ),
