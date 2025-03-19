@@ -6,6 +6,7 @@ import 'package:safezone/backend/bloc/mapBloc/map_event.dart';
 import 'package:safezone/frontend/widgets/buttons/custom_button.dart';
 import 'package:safezone/resources/schema/colors.dart';
 import 'package:safezone/resources/schema/texts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MarkSafeSuccess extends StatefulWidget {
   const MarkSafeSuccess({super.key});
@@ -21,21 +22,7 @@ class _MarkSafeSuccessState extends State<MarkSafeSuccess> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         automaticallyImplyLeading: false,
-        centerTitle: true,
-        title: const CategoryText(text: ""),
-        leading: GestureDetector(
-          onTap: () {
-            Navigator.pop(context);
-          },
-          child: Container(
-            margin: const EdgeInsets.all(15),
-            decoration: BoxDecoration(
-              border: Border.all(width: 1, color: Colors.black),
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(Icons.arrow_back, color: Colors.black, size: 10),
-          ),
-        ),
+        centerTitle: false,
       ),
       body: Center(
         child: Padding(
@@ -50,7 +37,7 @@ class _MarkSafeSuccessState extends State<MarkSafeSuccess> {
                 width: 150,
                 height: 150,
               ),
-              const SizedBox(height: 30),
+              const SizedBox(height: 50),
               const Text(
                 "Thank you for helping keep the community safe! Your safe zone submission is under review and will be verified shortly.",
                 textAlign: TextAlign.center,
@@ -58,16 +45,33 @@ class _MarkSafeSuccessState extends State<MarkSafeSuccess> {
               ),
               const Spacer(),
               CustomButton(
-                  text: "Go to your safezone history",
-                  onPressed: () {
-                    context.go('/safezone-history');
-                  }),
+                text: "Go to your safezone history",
+                widthSize: true,
+                buttonColor: widgetPricolor,
+                onPressed: () {
+                  context.go('/safezone-history', extra: true);
+                }
+              ),
               const SizedBox(height: 10),
               CustomButton(
+                widthSize: true,
                 text: "Back to Home",
+                textColor: widgetPricolor,
+                buttonColor: widgetPricolor,
                 isOutlined: true,
-                onPressed: () {
-                  context.go('/home');
+                onPressed: () async {
+                  final prefs = await SharedPreferences.getInstance();
+                  final userToken = prefs.getString('userToken'); 
+                  if (userToken != null) {
+                    context.go('/home', extra: userToken);
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text("User token not found! Please log in again."),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
                   context.read<MapBloc>().add(FetchMapData());
                 },
               ),

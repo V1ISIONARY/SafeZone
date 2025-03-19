@@ -256,7 +256,21 @@ class _ListOfGroupsState extends State<ListOfGroups> {
       child: Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.white,
+          automaticallyImplyLeading: false,
           centerTitle: true,
+          leading: GestureDetector(
+            onTap: () {
+              Navigator.pop(context);
+            },
+            child: Container(
+              margin: EdgeInsets.all(15),
+              decoration: BoxDecoration(
+                border: Border.all(width: 1, color: Colors.black),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(Icons.arrow_back, color: Colors.black, size: 10),
+            ),
+          ),
           title: const CategoryText(text: "My Groups"),
         ),
         body: Container(

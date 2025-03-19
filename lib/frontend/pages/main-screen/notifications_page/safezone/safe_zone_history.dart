@@ -5,12 +5,18 @@ import 'package:safezone/backend/bloc/safezoneBloc/safezone_bloc.dart';
 import 'package:safezone/backend/bloc/safezoneBloc/safezone_event.dart';
 import 'package:safezone/backend/bloc/safezoneBloc/safezone_state.dart';
 import 'package:safezone/frontend/widgets/cards/safe_zone_history_card.dart';
+import 'package:safezone/frontend/widgets/loadingstate.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:safezone/resources/schema/colors.dart';
 import 'package:safezone/resources/schema/texts.dart';
 
 class SafezoneHistory extends StatefulWidget {
-  const SafezoneHistory({super.key});
+
+  final bool ?fromSuccess;
+  const SafezoneHistory({
+    super.key,
+    this.fromSuccess
+  });
 
   @override
   State<SafezoneHistory> createState() => _SafezoneHistoryState();
@@ -85,8 +91,24 @@ class _SafezoneHistoryState extends State<SafezoneHistory>
             child: Row(
               children: [
                 GestureDetector(
-                  onTap: () {
-                    Navigator.pop(context);
+                  onTap: () async {
+                    if (widget.fromSuccess == true) {
+                      final prefs = await SharedPreferences.getInstance();
+                      final userToken = prefs.getString('userToken'); // Fetch token from SharedPreferences
+
+                      if (userToken != null) {
+                        context.go('/home', extra: userToken);
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text("User token not found! Please log in again."),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      }
+                    } else {
+                      Navigator.pop(context);
+                    }
                   },
                   child: Container(
                     margin: const EdgeInsets.all(15),
@@ -184,7 +206,14 @@ class _SafezoneHistoryState extends State<SafezoneHistory>
     return BlocBuilder<SafeZoneBloc, SafeZoneState>(
       builder: (context, state) {
         if (state is SafeZoneLoading) {
-          return const Center(child: CircularProgressIndicator());
+          return Expanded(
+            child: Center(
+              child: Transform.translate(
+                offset: const Offset(-30, -60), 
+                child: LoadingState()
+              )
+            )
+          );
         } else if (state is SafeZonesLoaded) {
           final filteredZones = status == 'All'
               ? state.safeZones

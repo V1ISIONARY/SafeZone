@@ -23,7 +23,7 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
-  int currentStep = 0;
+  int currentStep = 2;
 
   final TextEditingController emailController = TextEditingController();
   final TextEditingController codeController = TextEditingController();
@@ -364,6 +364,47 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
+  double strengthWidth = 10; 
+  bool _isPasswordVisible = false;
+  bool showConfirmPassword = false;
+  Color strengthColor = Colors.black12;
+
+  void _checkPasswordStrength(String password) {
+    final RegExp uppercase = RegExp(r'[A-Z]');
+    final RegExp lowercase = RegExp(r'[a-z]');
+    final RegExp digit = RegExp(r'\d');
+    final RegExp specialChar = RegExp(r'[@$!%*?&]');
+
+    int strength = 0;
+
+    if (password.length >= 8) strength++; 
+    if (uppercase.hasMatch(password)) strength++;
+    if (lowercase.hasMatch(password)) strength++; 
+    if (digit.hasMatch(password)) strength++; 
+    if (specialChar.hasMatch(password)) strength++; 
+    if (password.contains(" ")) strength = 0;
+
+    setState(() {
+      if (password.isEmpty) {
+        strengthColor = Colors.grey;
+        strengthWidth = 10;
+        showConfirmPassword = false;
+      } else if (password.length < 8) {
+        strengthColor = Colors.red;
+        strengthWidth = 50.0;
+        showConfirmPassword = false;
+      } else if (strength < 5) {
+        strengthColor = Colors.orange;
+        strengthWidth = 200.0;
+        showConfirmPassword = true; 
+      } else {
+        strengthColor = Colors.green;
+        strengthWidth = MediaQuery.of(context).size.width - 40;
+        showConfirmPassword = true;
+      }
+    });
+  }
+
   Widget _buildUserDetailsStep(BuildContext context) {
     return SingleChildScrollView(
       padding:
@@ -486,7 +527,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
             const SizedBox(height: 10),
             TextField(
               controller: passwordController,
-              obscureText: true,
+              obscureText: !_isPasswordVisible,
+              onChanged: _checkPasswordStrength,
               style: const TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w200,
@@ -495,9 +537,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
               decoration: InputDecoration(
                 hintText: "Enter Password",
                 hintStyle: const TextStyle(
-                    fontSize: 13,
-                    color: labelFormFieldColor,
-                    fontWeight: FontWeight.w200),
+                  fontSize: 13,
+                  color: labelFormFieldColor,
+                  fontWeight: FontWeight.w200,
+                ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
                   borderSide: const BorderSide(color: widgetPricolor, width: 2),
@@ -506,34 +549,65 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 contentPadding: const EdgeInsets.symmetric(horizontal: 15),
+                suffixIcon: Padding(
+                  padding: EdgeInsets.only(right: 15),
+                  child: GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _isPasswordVisible = !_isPasswordVisible; 
+                      });
+                    },
+                    child: Icon(
+                      _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                      color: Colors.grey,
+                    ),
+                  )
+                )
+              )
+            ),
+            SizedBox(height: 20),
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 300), 
+              curve: Curves.easeInOut, 
+              width: strengthWidth,
+              height: 8,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(4),
+                color: strengthColor,
               ),
             ),
-            const SizedBox(height: 10),
-            TextField(
-              controller: confirmPasswordController,
-              obscureText: true,
-              style: const TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w200,
-                color: textColor,
-              ),
-              decoration: InputDecoration(
-                hintText: "Confirm Password",
-                hintStyle: const TextStyle(
+            SizedBox(height: 20),
+
+            if (showConfirmPassword)
+            Column(
+              children: [
+                TextField(
+                  controller: confirmPasswordController,
+                  obscureText: !_isPasswordVisible,
+                  style: const TextStyle(
                     fontSize: 13,
-                    color: labelFormFieldColor,
-                    fontWeight: FontWeight.w200),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  borderSide: const BorderSide(color: widgetPricolor, width: 2),
+                    fontWeight: FontWeight.w200,
+                    color: textColor,
+                  ),
+                  decoration: InputDecoration(
+                    hintText: "Confirm Password",
+                    hintStyle: const TextStyle(
+                        fontSize: 13,
+                        color: labelFormFieldColor,
+                        fontWeight: FontWeight.w200),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: const BorderSide(color: widgetPricolor, width: 2),
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 15),
+                  ),
                 ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 15),
-              ),
+                const SizedBox(height: 20),
+              ],
             ),
-            const SizedBox(height: 20),
             GestureDetector(
               onTap: () async {
                 if (passwordController.text != confirmPasswordController.text) {
@@ -543,25 +617,33 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   return;
                 }
 
-                Position position = await Geolocator.getCurrentPosition(
-                    desiredAccuracy: LocationAccuracy.high);
+                try {
+                  // Get user location
+                  Position position = await Geolocator.getCurrentPosition(
+                    desiredAccuracy: LocationAccuracy.high,
+                  );
 
-                final signupBloc = context.read<AuthenticationBloc>();
+                  final signupBloc = context.read<AuthenticationBloc>();
 
-                signupBloc.add(UserSignUpEvent(
-                  username: usernameController.text,
-                  email: emailController.text,
-                  password: passwordController.text,
-                  address:
-                      'Some address', // Replace with actual input if required
-                  firstname: firstNameController.text,
-                  lastname: lastNameController.text,
-                  isAdmin: false,
-                  isGirl: selectedGender == 'Female',
-                  isVerified: true,
-                  latitude: position.latitude, // Pass latitude
-                  longitude: position.longitude, // Pass longitude
-                ));
+                  // Dispatch event to trigger sign-up
+                  signupBloc.add(UserSignUpEvent(
+                    username: usernameController.text,
+                    email: emailController.text,
+                    password: passwordController.text,
+                    address: 'Some address',
+                    firstname: firstNameController.text,
+                    lastname: lastNameController.text,
+                    isAdmin: false,
+                    isGirl: selectedGender == 'Female',
+                    isVerified: true,
+                    latitude: position.latitude,
+                    longitude: position.longitude,
+                  ));
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text("Failed to get location: ${e.toString()}")),
+                  );
+                }
               },
               child: Container(
                 height: 50,
@@ -571,13 +653,28 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   color: widgetPricolor,
                   borderRadius: BorderRadius.circular(50),
                 ),
-                child: const Center(
-                  child: Text(
-                    'Create new account',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.white,
-                    ),
+                child: Center(
+                  child: BlocBuilder<AuthenticationBloc, AuthenticationState>(
+                    builder: (context, state) {
+                      if (state is SignUpnLoading) {
+                        return const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 1,
+                          ),
+                        );
+                      } else {
+                        return const Text(
+                          'Create new account',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.white,
+                          ),
+                        );
+                      }
+                    },
                   ),
                 ),
               ),

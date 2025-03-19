@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:safezone/frontend/widgets/buttons/custom_button.dart';
 import 'package:safezone/resources/schema/colors.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ReportSuccess extends StatefulWidget {
   const ReportSuccess({super.key});
@@ -30,7 +31,7 @@ class _ReportSuccessState extends State<ReportSuccess> {
                 width: 150,
                 height: 150,
               ),
-              const SizedBox(height: 30),
+              const SizedBox(height: 50),
               const Text(
                 "Thank you for sharing! Your report helps protect women and keep our community safe. We truly appreciate your effort in making the world a safer place for everyone.",
                 textAlign: TextAlign.center,
@@ -38,17 +39,35 @@ class _ReportSuccessState extends State<ReportSuccess> {
               ),
               const Spacer(),
               CustomButton(
-                  text: "Go to reports history",
-                  onPressed: () {
-                    context.go('/reports-history');
-                  }),
+                widthSize: true,
+                text: "Go to reports history",
+                buttonColor: widgetPricolor,
+                onPressed: () {
+                  
+                  context.go('/reports-history', extra: true);
+                }
+              ),
               const SizedBox(height: 10),
               CustomButton(
-                  text: "Back to Home",
-                  isOutlined: true,
-                  onPressed: () {
-                    context.go('/');
-                  }),
+                widthSize: true,
+                isOutlined: true,
+                text: "Back to Home",
+                textColor: widgetPricolor,
+                onPressed: () async {
+                  final prefs = await SharedPreferences.getInstance();
+                  final userToken = prefs.getString('userToken'); 
+                  if (userToken != null) {
+                    context.go('/home', extra: userToken);
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text("User token not found! Please log in again."),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
+                }
+              ),
               const SizedBox(height: 30),
             ],
           ),

@@ -127,7 +127,7 @@ class _ContactState extends State<Contact> with SingleTickerProviderStateMixin {
                           return Expanded(
                             child: Center(
                               child: Transform.translate(
-                                offset: const Offset(0, -60), 
+                                offset: const Offset(-40, -60), 
                                 child: Lottie.asset(
                                   'lib/resources/lottie/loading.json',
                                   width: 80,

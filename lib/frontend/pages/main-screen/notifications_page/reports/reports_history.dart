@@ -1,16 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:lottie/lottie.dart';
 import 'package:safezone/backend/bloc/incident_report/incident_report_bloc.dart';
 import 'package:safezone/backend/bloc/incident_report/incident_report_event.dart';
 import 'package:safezone/backend/bloc/incident_report/incident_report_state.dart';
+import 'package:safezone/frontend/widgets/loadingstate.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:safezone/frontend/widgets/cards/reports_history_card.dart';
 import 'package:safezone/resources/schema/colors.dart';
 import 'package:safezone/resources/schema/texts.dart';
 
 class ReportsHistory extends StatefulWidget {
-  const ReportsHistory({super.key});
+
+  final bool ?fromSuccess;
+  const ReportsHistory({
+    super.key,
+    this.fromSuccess
+  });
 
   @override
   State<ReportsHistory> createState() => _ReportsHistoryState();
@@ -86,8 +93,24 @@ class _ReportsHistoryState extends State<ReportsHistory>
             child: Row(
               children: [
                 GestureDetector(
-                  onTap: () {
-                    Navigator.pop(context);
+                  onTap: () async {
+                    if (widget.fromSuccess == true) {
+                      final prefs = await SharedPreferences.getInstance();
+                      final userToken = prefs.getString('userToken'); // Fetch token from SharedPreferences
+
+                      if (userToken != null) {
+                        context.go('/home', extra: userToken);
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text("User token not found! Please log in again."),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      }
+                    } else {
+                      Navigator.pop(context);
+                    }
                   },
                   child: Container(
                     margin: const EdgeInsets.all(15),
@@ -185,7 +208,14 @@ class _ReportsHistoryState extends State<ReportsHistory>
     return BlocBuilder<IncidentReportBloc, IncidentReportState>(
       builder: (context, state) {
         if (state is IncidentReportLoading) {
-          return const Center(child: CircularProgressIndicator());
+          return Expanded(
+            child: Center(
+              child: Transform.translate(
+                offset: const Offset(-30, -60), 
+                child: LoadingState()
+              )
+            )
+          );
         } else if (state is IncidentReportLoaded) {
           var filteredReports = status == 'All'
               ? state.incidentReports

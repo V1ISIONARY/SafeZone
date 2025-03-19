@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lottie/lottie.dart';
 import 'package:safezone/backend/bloc/notificationBloc/notification_bloc.dart';
 import 'package:safezone/backend/bloc/notificationBloc/notification_event.dart';
 import 'package:safezone/backend/bloc/notificationBloc/notification_state.dart';
@@ -42,7 +43,19 @@ class _ReadState extends State<Read> {
       body: BlocBuilder<NotificationBloc, NotificationState>(
         builder: (context, state) {
           if (state is NotificationLoading) {
-            return const Center(child: CircularProgressIndicator());
+            return Expanded(
+              child: Center(
+                child: Transform.translate(
+                  offset: const Offset(-40, -30), 
+                  child: Lottie.asset(
+                    'lib/resources/lottie/loading.json',
+                    width: 80,
+                    height: 80,
+                    fit: BoxFit.cover,
+                  ),
+                )
+              )
+            );
           } else if (state is NotificationError) {
             return _buildError(state.message);
           } else if (state is NotificationLoaded) {
@@ -61,68 +74,71 @@ class _ReadState extends State<Read> {
   }
 
   Widget _buildNotificationList() {
-    return ListView.builder(
-      itemCount: readNotifications.length,
-      itemBuilder: (context, index) {
-        final notification = readNotifications[index];
-        return Container(
-          width: double.infinity,
-          margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-          decoration: BoxDecoration(
-            color: const Color.fromARGB(10, 0, 0, 0),
-            borderRadius: BorderRadius.circular(5),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Row(
-              children: [
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.white,
-                  ),
-                  child: const Icon(
-                    Icons.notifications,
-                    color: Colors.grey,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        notification.title,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: textColor,
-                          fontSize: 15,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        notification.message,
-                        style: const TextStyle(
-                          color: labelFormFieldColor,
-                          fontSize: 13,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        notification.createdAt,
-                        style:
-                            const TextStyle(color: Colors.grey, fontSize: 11),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+    return Container(
+      margin: const EdgeInsets.only(bottom: 30.0),
+      child: ListView.builder(
+        itemCount: readNotifications.length,
+        itemBuilder: (context, index) {
+          final notification = readNotifications[index];
+          return Container(
+            width: double.infinity,
+            margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+            decoration: BoxDecoration(
+              color: const Color.fromARGB(10, 0, 0, 0),
+              borderRadius: BorderRadius.circular(5),
             ),
-          ),
-        );
-      },
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Row(
+                children: [
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white,
+                    ),
+                    child: const Icon(
+                      Icons.notifications,
+                      color: Colors.grey,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          notification.title,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: textColor,
+                            fontSize: 15,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          notification.message,
+                          style: const TextStyle(
+                            color: labelFormFieldColor,
+                            fontSize: 13,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          notification.createdAt,
+                          style:
+                              const TextStyle(color: Colors.grey, fontSize: 11),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      )
     );
   }
 

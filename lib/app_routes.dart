@@ -87,14 +87,10 @@ GoRouter appRouter(bool isFirstRun, String? userToken) => GoRouter(
         ),
         GoRoute(
           path: '/reports-history',
-          builder: (context, state) => const ReportsHistory(),
-        ),
-        GoRoute(
-          path: '/reports-history-details',
           builder: (context, state) {
-            final incidentReport = state.extra as IncidentReportModel;
-            return ReportsHistoryDetails(reportInfo: incidentReport);
-          },
+            final maybe = state.extra as bool;
+            return ReportsHistory(fromSuccess: maybe);
+          }
         ),
         GoRoute(
           path: '/reports-status-history',
@@ -116,7 +112,10 @@ GoRouter appRouter(bool isFirstRun, String? userToken) => GoRouter(
         ),
         GoRoute(
           path: '/safezone-history',
-          builder: (context, state) => const SafezoneHistory(),
+          builder: (context, state) {
+            final maybe = state.extra as bool;
+            return ReportsHistory(fromSuccess: maybe);
+          }
         ),
         GoRoute(
           path: '/safezone-history-details',

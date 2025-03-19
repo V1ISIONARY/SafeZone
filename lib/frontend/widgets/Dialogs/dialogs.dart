@@ -72,7 +72,7 @@ void showMarkSafeDialog(BuildContext context) {
               const SizedBox(height: 10),
               CategoryText(text: "Mark this place safe"),
               const SizedBox(height: 5),
-              CategoryDescripText(text: "Are you sure this location is safe? Marking it as safe will help\nothers.", alignment: "center",),
+              CategoryDescripText(text: "Are you sure this location is safe? Marking it as safe\nwill help others.", alignment: "center",),
               const SizedBox(height: 20),
               CustomButton(
                 text: "Create safe zone",

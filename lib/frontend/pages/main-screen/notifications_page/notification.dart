@@ -180,6 +180,7 @@ class _NotifState extends State<Notif> with SingleTickerProviderStateMixin {
               ),
               _bodyNavigator(context),
               Expanded(child: _mainWrapperBody()),
+              
             ],
           ),
         ),

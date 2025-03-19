@@ -36,7 +36,7 @@ class NotificationBtn extends StatelessWidget {
         width: double.infinity,
         margin: const EdgeInsets.only(bottom: 15),
         padding: const EdgeInsets.symmetric(
-            horizontal: 16, vertical: 10), // Add padding for better spacing
+            horizontal: 16, vertical: 10),
         decoration: const BoxDecoration(
           color: Colors.white,
         ),

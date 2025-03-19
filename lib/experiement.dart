@@ -1,11 +1,12 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:flutter_svg/svg.dart';
-import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:safezone/resources/schema/colors.dart' show widgetPricolor;
-import 'package:safezone/resources/schema/texts.dart';
-import 'package:speech_to_text/speech_to_text.dart' as stt;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:google_places_flutter/google_places_flutter.dart';
+import 'package:google_places_flutter/model/prediction.dart';
+import 'package:http/http.dart' as http;
 
 class Experiment extends StatefulWidget {
   const Experiment({super.key});
@@ -14,320 +15,156 @@ class Experiment extends StatefulWidget {
   State<Experiment> createState() => _ExperimentState();
 }
 
-class _ExperimentState extends State<Experiment> with TickerProviderStateMixin {
-  bool _isExpanded = false;
-  late FocusNode _focusNodeText;
-  late AnimationController _controller;
-  late AnimationController _controllerFade;
-  late TextEditingController _textEditingController;
-
-  late stt.SpeechToText _speech;
-  bool _isListening = false;
-
-  late Animation<Offset> _hintAnimation;
-  late Animation<Color?> _colorAnimation;
-  late Animation<Color?> _hintColorAnimation;
-
-  int _currentHintIndex = 0;
-  final List<String> hints = [
-    'Barangay',
-    'Hospital',
-    'Police Station',
-    'Municipal',
-  ];
+class _ExperimentState extends State<Experiment> {
+  GoogleMapController? _mapController;
+  LatLng _initialPosition = const LatLng(37.7749, -122.4194); // Default: SF
+  final String apiKey = dotenv.env['GOOGLE_API_KEY'] ?? '';
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-
-    _speech = stt.SpeechToText();
-
-    _controller = AnimationController(
-      duration: const Duration(milliseconds: 400),
-      vsync: this,
-    );
-
-    _controllerFade = AnimationController(
-      duration: const Duration(milliseconds: 400),
-      vsync: this,
-    );
-
-    _hintAnimation = Tween<Offset>(
-      begin: const Offset(0, 0),
-      end: const Offset(0, -2),
-    ).animate(_controller);
-
-    _hintColorAnimation = ColorTween(
-      begin: Colors.black,
-      end: Colors.transparent, 
-    ).animate(_controller);
-
-    _colorAnimation = ColorTween(
-      begin: Colors.black,
-      end: Colors.transparent,
-    ).animate(_controllerFade);
-
-    _focusNodeText = FocusNode();
-    _textEditingController = TextEditingController();
-    _changeHintText();
-
-    _focusNodeText.addListener(() {
-      if (_focusNodeText.hasFocus && _textEditingController.text.isEmpty) {
-        _controllerFade.forward();
-        _controller.forward();
-      } else if (!_focusNodeText.hasFocus && _textEditingController.text.isEmpty) {
-        _controller.reverse();
-        _controllerFade.reverse();
-      }
-    });
+    _getCurrentLocation();
   }
 
-  void _changeHintText() {
-    Future.delayed(const Duration(seconds: 2), () {
-      if (!_focusNodeText.hasFocus && _textEditingController.text.isEmpty) {
-        _controller.forward().then((_) {
-          setState(() {
-            _currentHintIndex = (_currentHintIndex + 1) % hints.length;
-          });
-          _controller.reverse().then((_) {
-            _changeHintText();
-          });
-        });
-      } else {
-        _changeHintText();
+  void _onMapCreated(GoogleMapController controller) {
+    _mapController = controller;
+  }
+
+  Future<void> _getCurrentLocation() async {
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      _showSnackBar("Location services are disabled.");
+      return;
+    }
+
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        _showSnackBar("Location permission denied.");
+        return;
       }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      _showSnackBar("Location permission permanently denied.");
+      return;
+    }
+
+    Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+    _updateMapPosition(LatLng(position.latitude, position.longitude));
+  }
+
+  void _updateMapPosition(LatLng newPosition) {
+    setState(() {
+      _initialPosition = newPosition;
     });
+    _mapController?.animateCamera(CameraUpdate.newLatLngZoom(_initialPosition, 14.0));
+  }
+
+  void _onSearchLocationSelected(Prediction prediction) {
+    if (prediction.lat != null && prediction.lng != null) {
+      try {
+        double latitude = double.parse(prediction.lat!);
+        double longitude = double.parse(prediction.lng!);
+        _updateMapPosition(LatLng(latitude, longitude));
+
+        // Displaying the latitude and longitude
+        _showSnackBar("Latitude: $latitude, Longitude: $longitude");
+      } catch (e) {
+        _showSnackBar("Invalid location coordinates.");
+      }
+    } else {
+      _showSnackBar("Error: Unable to fetch location.");
+    }
+  }
+
+  void _showSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  void _searchLocation() async {
+    if (_searchController.text.isNotEmpty) {
+      String location = _searchController.text;
+      String url = "https://maps.googleapis.com/maps/api/geocode/json?address=$location&key=$apiKey";
+
+      try {
+        final response = await http.get(Uri.parse(url));
+
+        if (response.statusCode == 200) {
+          final data = json.decode(response.body);
+          
+          if (data["status"] == "OK") {
+            double lat = data["results"][0]["geometry"]["location"]["lat"];
+            double lng = data["results"][0]["geometry"]["location"]["lng"];
+
+            _updateMapPosition(LatLng(lat, lng));
+
+            _showSnackBar("Location found: $location\nLat: $lat, Lng: $lng");
+          } else {
+            _showSnackBar("Location not found. Try another search.");
+          }
+        } else {
+          _showSnackBar("Error fetching location. Try again.");
+        }
+      } catch (e) {
+        _showSnackBar("Network error: Unable to fetch location.");
+      }
+    } else {
+      _showSnackBar("Please enter a location to search.");
+    }
   }
 
   @override
-  void dispose() {
-    _focusNodeText.dispose();
-    _controller.dispose();
-    _controllerFade.dispose();
-    _textEditingController.dispose();
-    super.dispose();
-  }
-
-  // @override
-  // Widget build(BuildContext context) {
-  //   return Scaffold(
-  //     body: Center(
-  //       child: GestureDetector(
-  //         onTap: () {
-  //           if (!_isExpanded) {
-  //             setState(() {
-  //               _isExpanded = true;
-  //             });
-  //           }
-  //         },
-  //         child: LayoutBuilder(
-  //           builder: (context, constraints) {
-  //             return AnimatedContainer(
-  //               duration: const Duration(milliseconds: 300),
-  //               margin: const EdgeInsets.only(right: 10),
-  //               width: _isExpanded ? 200 : 40, 
-  //               height: 40,
-  //               decoration: BoxDecoration(
-  //                 color: Colors.white,
-  //                 borderRadius: BorderRadius.circular(_isExpanded ? 20 : 50),
-  //                 boxShadow: const [
-  //                   BoxShadow(
-  //                     color: Colors.grey,
-  //                     blurRadius: 2,
-  //                     offset: Offset(1, 1),
-  //                   ),
-  //                 ],
-  //               ),
-  //               child: _isExpanded
-  //                   ? Center(
-  //                       child: SizedBox(
-  //                         height: 40,
-  //                         child: Container(
-  //                           height: 40,
-  //                           width: double.infinity,
-  //                           decoration: const BoxDecoration(
-  //                             color: Colors.grey,
-  //                             borderRadius: BorderRadius.all(Radius.circular(20)),
-  //                             boxShadow: [
-  //                               BoxShadow(
-  //                                 color: Colors.grey,
-  //                                 blurRadius: 2,
-  //                                 offset: Offset(1, 1),
-  //                               ),
-  //                             ],
-  //                           ),
-  //                           child: Row(
-  //                             children: [
-  //                               Expanded(
-  //                                 child: Stack(
-  //                                   children: [
-  //                                     Positioned.fill(
-  //                                       child: TextField(
-  //                                         controller: _textEditingController,
-  //                                         focusNode: _focusNodeText,
-  //                                         style: GoogleFonts.poppins(
-  //                                           fontSize: 9,
-  //                                           fontWeight: FontWeight.w500,
-  //                                           color: Colors.black,
-  //                                         ),
-  //                                         decoration: InputDecoration(
-  //                                           filled: true,
-  //                                           fillColor: Colors.white,
-  //                                           hintText: '',
-  //                                           hintStyle: const TextStyle(color: Colors.transparent),
-  //                                           contentPadding: const EdgeInsets.only(left: 35, right: 40, bottom: 8),
-  //                                           border: OutlineInputBorder(
-  //                                             borderRadius: BorderRadius.circular(20.0),
-  //                                             borderSide: const BorderSide(color: widgetPricolor),
-  //                                           ),
-  //                                           focusedBorder: OutlineInputBorder(
-  //                                             borderRadius: BorderRadius.circular(20.0),
-  //                                             borderSide: const BorderSide(color: widgetPricolor),
-  //                                           ),
-  //                                           enabledBorder: OutlineInputBorder(
-  //                                             borderRadius: BorderRadius.circular(20.0),
-  //                                             borderSide: const BorderSide(color: widgetPricolor),
-  //                                           ),
-  //                                         ),
-  //                                       ),
-  //                                     ),
-  //                                     Positioned(
-  //                                       left: 0,
-  //                                       child: Container(
-  //                                         height: 40,
-  //                                         width: 40,
-  //                                         alignment: Alignment.center,
-  //                                         child: SvgPicture.asset(
-  //                                           'lib/resources/svg/search.svg',
-  //                                           color: Colors.black,
-  //                                           height: 20,
-  //                                           width: 20,
-  //                                           fit: BoxFit.contain,
-  //                                         ),
-  //                                       ),
-  //                                     ),
-  //                                   ],
-  //                                 ),
-  //                               ),
-  //                               GestureDetector(
-  //                                 onTap: () {
-  //                                   setState(() {
-  //                                     _isExpanded = false;
-  //                                     _textEditingController.clear();
-  //                                     _focusNodeText.unfocus();
-  //                                   });
-  //                                 },
-  //                                 child: Container(
-  //                                   width: 40,
-  //                                   height: 40,
-  //                                   decoration: const BoxDecoration(
-  //                                     color: Colors.grey,
-  //                                     borderRadius: BorderRadius.only(
-  //                                       bottomRight: Radius.circular(20),
-  //                                       topRight: Radius.circular(20),
-  //                                     ),
-  //                                   ),
-  //                                   child: Center(
-  //                                     child: ValueListenableBuilder<TextEditingValue>(
-  //                                       valueListenable: _textEditingController,
-  //                                       builder: (context, value, child) {
-  //                                         return Transform.translate(
-  //                                           offset: Offset(-3.2, 0),
-  //                                           child: Icon(
-  //                                             value.text.isNotEmpty ? Icons.send : Icons.close,
-  //                                             color: Colors.white,
-  //                                             size: 18,
-  //                                           ),
-  //                                         );
-  //                                       },
-  //                                     ),
-  //                                   ),
-  //                                 ),
-  //                               )
-  //                             ],
-  //                           ),
-  //                         ),
-  //                       ),
-  //                     )
-  //                   : const Icon(Icons.search, color: Colors.green, size: 20),
-  //             );
-  //           },
-  //         ),
-  //       ),
-  //     ),
-  //   );
-  // }
-
-  @override
-Widget build(BuildContext context) {
-  return Scaffold(
-    backgroundColor: Colors.grey,
-    body: Stack(
-      children: [
-        Container(
-          width: double.infinity,
-          height: double.infinity,
-          color: Colors.grey,
-        ),
-      ],
-    ),
-    bottomNavigationBar: BottomAppBar(
-      shape: const CircularNotchedRectangle(), // Notched shape for FAB
-      notchMargin: 6.0, // Space between FAB and BottomAppBar
-      clipBehavior: Clip.antiAlias, // Ensures the notch is smooth
-      child: SizedBox(
-        height: 65, // Proper height for the notch to be visible
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Expanded(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Search Location')),
+      body: Stack(
+        children: [
+          GoogleMap(
+            onMapCreated: _onMapCreated,
+            initialCameraPosition: CameraPosition(target: _initialPosition, zoom: 14.0),
+            myLocationEnabled: true,
+          ),
+          Positioned(
+            top: 10,
+            left: 15,
+            right: 15,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(8),
+                boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 5)],
+              ),
+              child: Row(
                 children: [
-                  SizedBox(
-                    height: 17,
-                    child: SvgPicture.asset(
-                      'lib/resources/svg/map.svg',
-                      color: widgetPricolor,
+                  Expanded(
+                    child: GooglePlaceAutoCompleteTextField(
+                      textEditingController: _searchController,
+                      googleAPIKey: apiKey,
+                      isLatLngRequired: true,
+                      getPlaceDetailWithLatLng: _onSearchLocationSelected,
                     ),
                   ),
-                  const SizedBox(height: 7),
-                  Text(
-                    'Map',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 9,
-                      fontWeight: FontWeight.bold,
-                      color: widgetPricolor,
-                    ),
+                  IconButton(
+                    icon: const Icon(Icons.search, color: Colors.blue),
+                    onPressed: _searchLocation,
                   ),
                 ],
               ),
             ),
-            Expanded(child: SizedBox()), // Leaves space for FAB notch
-          ],
-        ),
+          ),
+        ],
       ),
-    ),
-    floatingActionButton: FloatingActionButton(
-      backgroundColor: widgetPricolor,
-      splashColor: Colors.transparent,
-      elevation: 5,
-      shape: const CircleBorder(), // Ensures the FAB is circular
-      onPressed: () {
-        context.push('/sos-countdown');
-      },
-      child: const Text(
-        'SOS',
-        style: TextStyle(
-          color: Colors.white,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-    ),
-    floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked, // Places the FAB inside the notch
-  );
-}
+    );
+  }
 
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
 }

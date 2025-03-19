@@ -7,7 +7,7 @@ class AuthenticationBloc
     extends Bloc<AuthenticationEvent, AuthenticationState> {
   final AuthenticationRepository _authrepo;
   AuthenticationBloc(this._authrepo) : super(AuthenticationInitial()) {
-    //BLOC BY MIRO
+    
     on<UserLogin>((event, emit) async {
       emit(LoginLoading());
       try {
@@ -39,6 +39,7 @@ class AuthenticationBloc
         emit(SignUpError('Sign up failed: ${error.toString()}'));
       }
     });
+    
     on<UpdateLocationEvent>((event, emit) async {
       emit(UpdateLocationLoading());
       try {

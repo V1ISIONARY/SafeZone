@@ -19,11 +19,11 @@ class TextRow extends StatelessWidget {
               color: textColor
             )),
         TextSpan(
-            text: secondText,
-            style: const TextStyle(
-              fontSize: 15,
-              color: textColor
-            ))
+          text: secondText,
+          style: const TextStyle(
+            fontSize: 15,
+            color: textColor
+          ))
       ])),
     );
   }

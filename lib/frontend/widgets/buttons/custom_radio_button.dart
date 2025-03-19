@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:safezone/resources/schema/colors.dart';
+import 'package:safezone/resources/schema/texts.dart';
 
 class CustomRadioButton extends StatelessWidget {
   final String value;
@@ -27,9 +28,9 @@ class CustomRadioButton extends StatelessWidget {
             onChanged: onChanged,
             activeColor: btnColor.withOpacity(0.5),
           ),
-          Text(
-            label,
-            style: const TextStyle(fontSize: 13),
+          CategoryDescripText(
+            text: label,
+            color: Colors.black,
           ),
         ],
       ),

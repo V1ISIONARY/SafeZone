@@ -2,6 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:safezone/resources/schema/colors.dart';
 
 class CustomButton extends StatelessWidget {
+
+  final String text;
+  final VoidCallback onPressed;
+  final Color buttonColor;
+  final Color textColor;
+  final bool isOutlined;
+  final double width;
+  final double height;
+  final bool widthSize;
+  
   const CustomButton({
     super.key,
     required this.text,
@@ -11,31 +21,23 @@ class CustomButton extends StatelessWidget {
     this.isOutlined = false,
     this.width = 350,
     this.height = 50,
+    this.widthSize = false
   });
-
-  final String text;
-  final VoidCallback onPressed;
-  final Color buttonColor;
-  final Color textColor;
-  final bool isOutlined;
-  final double width;
-  final double height;
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: width,
+      width: widthSize ? double.infinity : width,
       height: height,
       child: TextButton(
         style: TextButton.styleFrom(
-          backgroundColor:
-              isOutlined ? buttonColor.withOpacity(0.05) : buttonColor,
+          backgroundColor: isOutlined ? buttonColor.withOpacity(0.05) : buttonColor,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10.0),
             side: BorderSide(
               color: isOutlined ? buttonColor : Colors.transparent,
-            ),
-          ),
+            )
+          )
         ),
         onPressed: onPressed,
         child: Text(
@@ -49,4 +51,5 @@ class CustomButton extends StatelessWidget {
       ),
     );
   }
+
 }

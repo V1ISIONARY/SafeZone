@@ -4,17 +4,42 @@ import 'package:safezone/resources/schema/colors.dart';
 
 class CategoryText extends StatelessWidget {
   final String text;
+  final String? alignment;
+  final Color? color;
 
-  const CategoryText({super.key, required this.text});
+  const CategoryText({
+    super.key, 
+    required this.text,
+    this.alignment,
+    this.color
+  });
 
   @override
   Widget build(BuildContext context) {
-    return (Text(
-      text,
-      style: GoogleFonts.poppins(
-          fontSize: 13, fontWeight: FontWeight.w500, color: Colors.black),
-    ));
+    return (
+      Text(
+        text,
+        style: GoogleFonts.poppins(
+          fontSize: 13, fontWeight: FontWeight.w500, color: color ?? Colors.black
+        ),
+        textAlign: _getTextAlignment(),
+      )
+    );
   }
+
+  TextAlign _getTextAlignment() {
+    switch (alignment?.toLowerCase()) {
+      case "right":
+        return TextAlign.right;
+      case "center":
+        return TextAlign.center;
+      case "left":
+        return TextAlign.left;
+      default:
+        return TextAlign.start;
+    }
+  }
+  
 }
 
 class CategoryDescripText extends StatelessWidget {
@@ -50,6 +75,7 @@ class CategoryDescripText extends StatelessWidget {
         return TextAlign.start;
     }
   }
+
 }
 
 class CategoryDescripTextEllipsis extends StatelessWidget {
@@ -90,6 +116,7 @@ class CategoryDescripTextEllipsis extends StatelessWidget {
         return TextAlign.start;
     }
   }
+  
 }
 
 class PrimaryText extends StatelessWidget {

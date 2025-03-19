@@ -246,37 +246,38 @@ class _LoginState extends State<Login> {
                               );
                         },
                         child: BlocBuilder<AuthenticationBloc,
-                            AuthenticationState>(
-                          builder: (context, state) {
-                            return Container(
-                              height: 50,
-                              width: double.infinity,
-                              decoration: BoxDecoration(
-                                color: widgetPricolor,
-                                borderRadius: BorderRadius.circular(50),
-                              ),
-                              child: Center(
-                                child: state is LoginLoading
-                                    ? Container(
-                                        height: 20,
-                                        width: 20,
-                                        child: Center(
-                                            child: CircularProgressIndicator(
-                                                color: Colors.white,
-                                                strokeWidth: 1)),
-                                      )
-                                    : Text(
-                                        'Sign In',
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          color: Colors.white,
-                                        ),
+                          AuthenticationState>(
+                            builder: (context, state) {
+                          return Container(
+                            height: 50,
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              color: widgetPricolor,
+                              borderRadius: BorderRadius.circular(50),
+                            ),
+                            child: Center(
+                              child: state is LoginLoading
+                                  ? Container(
+                                      height: 20,
+                                      width: 20,
+                                      child: Center(
+                                          child: CircularProgressIndicator(
+                                              color: Colors.white,
+                                              strokeWidth: 1)),
+                                    )
+                                  : Text(
+                                      'Sign In',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.white,
                                       ),
-                              ),
-                            );
-                          },
-                        ),
-                      )),
+                                    ),
+                            ),
+                          );
+                        },
+                      ),
+                    )
+                  ),
                   Container(
                     width: double.infinity,
                     margin: EdgeInsets.symmetric(horizontal: 20),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:safezone/resources/schema/colors.dart';
 
 class TextFieldWidget {
@@ -18,6 +19,11 @@ class TextFieldWidget {
         controller: controller,
         maxLines: maxLines,
         minLines: minLines,
+        style: GoogleFonts.poppins(
+          fontSize: 9,
+          fontWeight: FontWeight.w500,
+          color: Colors.black,
+        ),
         decoration: InputDecoration(
           filled: true,
           fillColor: formFieldColor,
@@ -25,8 +31,9 @@ class TextFieldWidget {
             borderRadius: BorderRadius.circular(5.0),
             borderSide: BorderSide.none,
           ),
-          labelStyle: const TextStyle(
-              color: labelFormFieldColor, height: 1.3, fontSize: 15),
+          labelStyle: GoogleFonts.poppins(
+            color: labelFormFieldColor, height: 1.3, fontSize: 13
+          ),
           labelText: label,
           hintText: hint,
           hintStyle: const TextStyle(

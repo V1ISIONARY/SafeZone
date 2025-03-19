@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lottie/lottie.dart';
 import 'package:safezone/backend/bloc/notificationBloc/notification_bloc.dart';
 import 'package:safezone/backend/bloc/notificationBloc/notification_event.dart';
 import 'package:safezone/backend/bloc/notificationBloc/notification_state.dart';
@@ -49,7 +50,19 @@ class _AllState extends State<All> {
       body: BlocBuilder<NotificationBloc, NotificationState>(
         builder: (context, state) {
           if (state is NotificationLoading) {
-            return const Center(child: CircularProgressIndicator());
+            return Expanded(
+              child: Center(
+                child: Transform.translate(
+                  offset: const Offset(-40, -30), 
+                  child: Lottie.asset(
+                    'lib/resources/lottie/loading.json',
+                    width: 80,
+                    height: 80,
+                    fit: BoxFit.cover,
+                  ),
+                )
+              )
+            );
           } else if (state is NotificationError) {
             return _buildError(state.message);
           } else if (state is NotificationLoaded) {
@@ -66,7 +79,7 @@ class _AllState extends State<All> {
 
   Widget _buildNotificationList() {
     return Container(
-      margin: const EdgeInsets.only(bottom: 75.0),
+      margin: const EdgeInsets.only(bottom: 30.0),
       child: ListView.builder(
         itemCount: notifications.length,
         itemBuilder: (context, index) {
@@ -88,7 +101,7 @@ class _AllState extends State<All> {
               width: double.infinity,
               margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
               decoration: BoxDecoration(
-                color: const Color.fromARGB(10, 0, 0, 0),
+                color: notification.isRead ? Colors.transparent : const Color.fromARGB(10, 0, 0, 0),
                 borderRadius: BorderRadius.circular(5),
               ),
               child: Padding(
@@ -99,13 +112,17 @@ class _AllState extends State<All> {
                     Container(
                       width: 40,
                       height: 40,
-                      decoration: const BoxDecoration(
+                      decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         color: Colors.white,
+                        border: Border.all(
+                          color: notification.isRead ? Color.fromARGB(44, 0, 0, 0) : Colors.transparent,
+                          width: notification.isRead ? 1 : 0,
+                        ),
                       ),
                       child: Icon(
                         Icons.notifications,
-                        color: notification.isRead ? Colors.grey : btnColor,
+                        color: notification.isRead ? Colors.grey : widgetPricolor,
                       ),
                     ),
                     const SizedBox(width: 16),
