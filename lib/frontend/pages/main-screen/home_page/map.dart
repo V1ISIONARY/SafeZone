@@ -22,6 +22,7 @@ import 'package:safezone/backend/bloc/mapBloc/map_state.dart';
 import 'package:safezone/backend/bloc/notificationBloc/notification_bloc.dart';
 import 'package:safezone/backend/bloc/notificationBloc/notification_event.dart';
 import 'package:safezone/backend/bloc/notificationBloc/notification_state.dart';
+import 'package:safezone/backend/models/userModel/circle_model.dart';
 import 'package:safezone/backend/services/first_run_service.dart';
 import 'package:safezone/frontend/pages/authentication/account_details.dart';
 import 'package:safezone/frontend/utils/marker_utils.dart';
@@ -104,6 +105,8 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
     'Police Station',
     'Municipal',
   ];
+
+
   
   void _toggleExpand() {
     setState(() {
@@ -128,6 +131,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
   double _appBarHeight = 0;
   Color _appBarColor = Colors.transparent;
   
+  List<CircleModel> _circles = []; // Local list to store circles
   int? _userId;
   int _currentHintIndex = 0;
   LatLng? _currentUserLocation;
@@ -290,7 +294,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
       setState(() {
         _userId = userId;
       });
-
+      context.read<CircleBloc>().add(FetchCirclesEvent(userId: userId));
       if (circleId != null) {
         context.read<CircleBloc>().add(FetchMembersEvent(circleId: circleId));
       }
@@ -303,6 +307,9 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
         context
             .read<MapBloc>()
             .add(ListenForMemberLocations(state.members, _userId!));
+      }
+      if(state is CircleLoadedState){
+        _circles = state.circles;
       }
     });
   }
@@ -1093,11 +1100,14 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                   margin: EdgeInsets.only(bottom: _circleHeight ? 10 : 0, left: 15, right: 15),
                   padding: EdgeInsets.all(15),
                   child: SingleChildScrollView(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    child: Column(
-                      children: [
-                        // dito mo ilagay miro ung sa group na active ganon
-                      ],
+physics: const AlwaysScrollableScrollPhysics(),
+      child: Column(
+        children: [
+          for (var circle in _circles)
+            ListTile(
+              title: Text(circle.name),
+            ),
+        ],
                     ),
                   )
                 ),
