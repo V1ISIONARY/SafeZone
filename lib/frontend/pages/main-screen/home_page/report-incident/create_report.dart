@@ -103,7 +103,6 @@ class _CreateReportState extends State<CreateReport> {
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Column(
               children: [
-                // Minimalist Search Bar
                 GooglePlaceAutoCompleteTextField(
                   textEditingController: _searchController,
                   googleAPIKey: "AIzaSyCxhTszbhQkmAkCMT3NYnYx_PuQ7s0NaBg",
@@ -289,7 +288,6 @@ class _CreateReportState extends State<CreateReport> {
                         );
                         return;
                       }
-
                       final incidentReport = IncidentReportRequestModel(
                         userId: userId!,
                         description: _descriptionController.text,

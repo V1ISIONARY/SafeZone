@@ -3,6 +3,8 @@ import 'package:safezone/frontend/widgets/buttons/custom_button.dart';
 import 'package:safezone/resources/schema/colors.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../resources/schema/texts.dart';
+
 void showCreateReportDialog(BuildContext context) {
   showDialog(
     context: context,
@@ -13,7 +15,7 @@ void showCreateReportDialog(BuildContext context) {
           borderRadius: BorderRadius.circular(10),
         ),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 25),
+          padding: const EdgeInsets.all(25),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -25,22 +27,9 @@ void showCreateReportDialog(BuildContext context) {
                 height: 74,
               ),
               const SizedBox(height: 10),
-              const Text(
-                "Report an Incident",
-                style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                    color: textColor),
-              ),
-              const SizedBox(height: 10),
-              const Text(
-                "Report any incidents or unsafe situations to help keep you and others safe",
-                style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w100,
-                    color: textColor),
-                textAlign: TextAlign.center,
-              ),
+              CategoryText(text: "Report an Incident"),
+              const SizedBox(height: 5),
+              CategoryDescripText(text: "Report any incidents or unsafe situations to help keep you\nand others safe", alignment: 'center'),
               const SizedBox(height: 20),
               CustomButton(
                 text: "Create Report",
@@ -69,7 +58,7 @@ void showMarkSafeDialog(BuildContext context) {
           borderRadius: BorderRadius.circular(10),
         ),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+          padding: const EdgeInsets.all(25),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -81,22 +70,9 @@ void showMarkSafeDialog(BuildContext context) {
                 height: 74,
               ),
               const SizedBox(height: 10),
-              const Text(
-                "Mark this place safe",
-                style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                    color: textColor),
-              ),
-              const SizedBox(height: 10),
-              const Text(
-                "Are you sure this location is safe? Marking it as safe will help others.",
-                style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w100,
-                    color: textColor),
-                textAlign: TextAlign.center,
-              ),
+              CategoryText(text: "Mark this place safe"),
+              const SizedBox(height: 5),
+              CategoryDescripText(text: "Are you sure this location is safe? Marking it as safe will help\nothers.", alignment: "center",),
               const SizedBox(height: 20),
               CustomButton(
                 text: "Create safe zone",

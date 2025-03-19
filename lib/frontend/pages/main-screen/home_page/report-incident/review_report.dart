@@ -165,12 +165,12 @@ class _ReviewReportState extends State<ReviewReport> {
                   return CustomButton(
                     text: "Submit",
                     onPressed: state is IncidentReportLoading
-                        ? () {}
-                        : () {
-                            context
-                                .read<IncidentReportBloc>()
-                                .add(CreateIncidentReport(widget.reportInfo));
-                          },
+                      ? () {}
+                      : () { 
+                        context
+                        .read<IncidentReportBloc>()
+                        .add(CreateIncidentReport(widget.reportInfo));
+                    },
                   );
                 },
               ),

@@ -34,9 +34,8 @@ class _ListOfGroupsState extends State<ListOfGroups> {
 
     if (userId != null) {
       setState(() {
-        _userId = userId; // Store userId locally
+        _userId = userId;
       });
-      // Check if the circles list is empty to prevent refetching
       context.read<CircleBloc>().add(FetchCirclesEvent(userId: userId));
     } else {
       print("User ID not found in shared preferences.");
@@ -50,12 +49,12 @@ class _ListOfGroupsState extends State<ListOfGroups> {
     return showDialog<void>(
       context: context,
       barrierDismissible:
-          true, // Prevent dismissing by tapping outside the dialog
+          true,
       builder: (BuildContext context) {
         return AlertDialog(
           backgroundColor: Colors.white,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10), // Rounded corners
+            borderRadius: BorderRadius.circular(10),
           ),
           title: const Text(
             'Enter Group Name',
@@ -64,21 +63,21 @@ class _ListOfGroupsState extends State<ListOfGroups> {
           ),
           content: TextField(
             controller: nameController,
-            style: const TextStyle(fontSize: 11), // Set input text size
+            style: const TextStyle(fontSize: 11),
             decoration: InputDecoration(
               labelText: 'Group Name',
               labelStyle: const TextStyle(
-                  fontSize: 11, color: Colors.grey), // Label font size
+                  fontSize: 11, color: Colors.grey), 
               hintText: 'Enter group name',
               hintStyle: const TextStyle(
-                  fontSize: 11, color: Colors.grey), // Hint font size
+                  fontSize: 11, color: Colors.grey),
               contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 12, vertical: 8), // Compact padding
+                  horizontal: 12, vertical: 8),
               border: OutlineInputBorder(
                 borderRadius:
-                    BorderRadius.circular(8), // Slightly smaller radius
+                    BorderRadius.circular(8),
                 borderSide: const BorderSide(
-                    color: Colors.grey, width: 1), // Subtle gray border
+                    color: Colors.grey, width: 1),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
@@ -332,8 +331,7 @@ class _ListOfGroupsState extends State<ListOfGroups> {
                   if (state is CircleCreatedState) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                          content: Text(
-                              'New group "${state.circle.name}" created!')),
+                          content: Text('New group "${state.circle.name}" created!')),
                     );
                   } else if (state is CircleUpdatedState) {
                     ScaffoldMessenger.of(context).showSnackBar(
