@@ -44,18 +44,16 @@ class _UnreadState extends State<Unread> {
         builder: (context, state) {
           if (state is NotificationLoading) {
             return Expanded(
-              child: Center(
-                child: Transform.translate(
-                  offset: const Offset(-40, -30), 
-                  child: Lottie.asset(
-                    'lib/resources/lottie/loading.json',
-                    width: 80,
-                    height: 80,
-                    fit: BoxFit.cover,
-                  ),
-                )
-              )
-            );
+                child: Center(
+                    child: Transform.translate(
+              offset: const Offset(-40, -30),
+              child: Lottie.asset(
+                'lib/resources/lottie/loading.json',
+                width: 80,
+                height: 80,
+                fit: BoxFit.cover,
+              ),
+            )));
           } else if (state is NotificationError) {
             return _buildError(state.message);
           } else if (state is NotificationLoaded) {
@@ -75,90 +73,90 @@ class _UnreadState extends State<Unread> {
 
   Widget _buildNotificationList() {
     return Container(
-      margin: const EdgeInsets.only(bottom: 30.0),
-      child: ListView.builder(
-        itemCount: unreadNotifications.length,
-        itemBuilder: (context, index) {
-
-          final notification = unreadNotifications[index];
-          return GestureDetector(
-            onTap: () {
-              _markAsRead(notification);
-            },
-            child: Container(
-              width: double.infinity,
-              margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-              decoration: BoxDecoration(
-                color: const Color.fromARGB(10, 0, 0, 0),
-                borderRadius: BorderRadius.circular(5),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 40,
-                      height: 40,
-                      decoration: const BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.white,
+        margin: const EdgeInsets.only(bottom: 30.0),
+        child: ListView.builder(
+          itemCount: unreadNotifications.length,
+          itemBuilder: (context, index) {
+            final notification = unreadNotifications[index];
+            return GestureDetector(
+              onTap: () {
+                _markAsRead(notification);
+              },
+              child: Container(
+                width: double.infinity,
+                margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                decoration: BoxDecoration(
+                  color: const Color.fromARGB(10, 0, 0, 0),
+                  borderRadius: BorderRadius.circular(5),
+                ),
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 40,
+                        height: 40,
+                        decoration: const BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.white,
+                        ),
+                        child: const Icon(
+                          Icons.notifications,
+                          color: widgetPricolor,
+                        ),
                       ),
-                      child: const Icon(
-                        Icons.notifications,
-                        color: widgetPricolor,
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            notification.title,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: textColor,
-                              fontSize: 15,
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              notification.title,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: textColor,
+                                fontSize: 15,
+                              ),
                             ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            notification.message,
-                            style: const TextStyle(
-                              color: labelFormFieldColor,
-                              fontSize: 13,
+                            const SizedBox(height: 4),
+                            Text(
+                              notification.message,
+                              style: const TextStyle(
+                                color: labelFormFieldColor,
+                                fontSize: 13,
+                              ),
                             ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            notification.createdAt,
-                            style:
-                                const TextStyle(color: Colors.grey, fontSize: 11),
-                          ),
-                        ],
+                            const SizedBox(height: 4),
+                            Text(
+                              notification.createdAt,
+                              style: const TextStyle(
+                                  color: Colors.grey, fontSize: 11),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ),
-          );
-          
-        },
-      )
-    );
+            );
+          },
+        ));
   }
 
   void _markAsRead(NotificationModel notification) {
     final updatedNotification = notification.copyWith(isRead: true);
 
-    setState(() {
-      unreadNotifications.removeWhere((notif) => notif.id == notification.id);
-    });
-
     context
         .read<NotificationBloc>()
         .add(MarkNotificationAsRead(updatedNotification.id));
+
+    context.read<NotificationBloc>().add(FetchNotifications(userId));
+
+    setState(() {
+      unreadNotifications.removeWhere((notif) => notif.id == notification.id);
+    });
   }
 
   Widget _buildPlaceholder() {

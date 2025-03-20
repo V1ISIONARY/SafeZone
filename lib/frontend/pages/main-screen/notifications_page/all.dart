@@ -51,18 +51,16 @@ class _AllState extends State<All> {
         builder: (context, state) {
           if (state is NotificationLoading) {
             return Expanded(
-              child: Center(
-                child: Transform.translate(
-                  offset: const Offset(-40, -30), 
-                  child: Lottie.asset(
-                    'lib/resources/lottie/loading.json',
-                    width: 80,
-                    height: 80,
-                    fit: BoxFit.cover,
-                  ),
-                )
-              )
-            );
+                child: Center(
+                    child: Transform.translate(
+              offset: const Offset(-40, -30),
+              child: Lottie.asset(
+                'lib/resources/lottie/loading.json',
+                width: 80,
+                height: 80,
+                fit: BoxFit.cover,
+              ),
+            )));
           } else if (state is NotificationError) {
             return _buildError(state.message);
           } else if (state is NotificationLoaded) {
@@ -95,13 +93,19 @@ class _AllState extends State<All> {
                 setState(() {
                   notifications[index] = notification.copyWith(isRead: true);
                 });
+
+                context
+                    .read<NotificationBloc>()
+                    .add(FetchNotifications(userId));
               }
             },
             child: Container(
               width: double.infinity,
               margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
               decoration: BoxDecoration(
-                color: notification.isRead ? Colors.transparent : const Color.fromARGB(10, 0, 0, 0),
+                color: notification.isRead
+                    ? Colors.transparent
+                    : const Color.fromARGB(10, 0, 0, 0),
                 borderRadius: BorderRadius.circular(5),
               ),
               child: Padding(
@@ -116,13 +120,16 @@ class _AllState extends State<All> {
                         shape: BoxShape.circle,
                         color: Colors.white,
                         border: Border.all(
-                          color: notification.isRead ? Color.fromARGB(44, 0, 0, 0) : Colors.transparent,
+                          color: notification.isRead
+                              ? Color.fromARGB(44, 0, 0, 0)
+                              : Colors.transparent,
                           width: notification.isRead ? 1 : 0,
                         ),
                       ),
                       child: Icon(
                         Icons.notifications,
-                        color: notification.isRead ? Colors.grey : widgetPricolor,
+                        color:
+                            notification.isRead ? Colors.grey : widgetPricolor,
                       ),
                     ),
                     const SizedBox(width: 16),
