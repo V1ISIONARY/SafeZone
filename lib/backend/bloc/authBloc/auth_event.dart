@@ -15,6 +15,13 @@ class UpdateLocationEvent extends AuthenticationEvent {
   UpdateLocationEvent({required this.latitude, required this.longitude});
 }
 
+class ChangePasswordEvent extends AuthenticationEvent {
+  final String password;
+  final String newPassword;
+
+  ChangePasswordEvent({required this.password, required this.newPassword});
+}
+
 class UserSignUpEvent extends AuthenticationEvent {
   final String username;
   final String email;

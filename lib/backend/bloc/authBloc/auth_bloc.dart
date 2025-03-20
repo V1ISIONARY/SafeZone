@@ -7,7 +7,6 @@ class AuthenticationBloc
     extends Bloc<AuthenticationEvent, AuthenticationState> {
   final AuthenticationRepository _authrepo;
   AuthenticationBloc(this._authrepo) : super(AuthenticationInitial()) {
-    
     on<UserLogin>((event, emit) async {
       emit(LoginLoading());
       try {
@@ -39,7 +38,7 @@ class AuthenticationBloc
         emit(SignUpError('Sign up failed: ${error.toString()}'));
       }
     });
-    
+
     on<UpdateLocationEvent>((event, emit) async {
       emit(UpdateLocationLoading());
       try {
@@ -49,6 +48,16 @@ class AuthenticationBloc
         emit(UpdateLocationSuccess(event.latitude, event.longitude));
       } catch (e) {
         emit(UpdateLocationError('Failed to update location: ${e.toString()}'));
+      }
+    });
+
+    on<ChangePasswordEvent>((event, emit) async {
+      emit(UpdateLocationLoading());
+      try {
+        await _authrepo.changePassword(event.password, event.newPassword);
+        emit(UpdatePasswordSuccess(event.password, event.newPassword));
+      } catch (e) {
+        emit(UpdatePasswordError('Failed to change password: ${e.toString()}'));
       }
     });
   }

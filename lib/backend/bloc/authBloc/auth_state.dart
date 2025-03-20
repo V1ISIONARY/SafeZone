@@ -83,3 +83,16 @@ class UpdateLocationError extends AuthenticationState {
 
   UpdateLocationError(this.message);
 }
+
+class UpdatePasswordSuccess extends AuthenticationState {
+  final String password;
+  final String newpassword;
+
+  UpdatePasswordSuccess(this.password, this.newpassword);
+}
+
+class UpdatePasswordError extends AuthenticationState {
+  final String message;
+
+  UpdatePasswordError(this.message);
+}

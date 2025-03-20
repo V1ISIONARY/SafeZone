@@ -51,7 +51,6 @@ class Maps extends StatefulWidget {
 }
 
 class _MapsState extends State<Maps> with TickerProviderStateMixin {
-
   Map<String, BitmapDescriptor> memberMarkers = {};
   List<Map<String, dynamic>> members = [];
   Set<Marker> markers = {};
@@ -88,14 +87,14 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
   bool _isListening = false;
   bool _isExpanded = false;
   bool _circleHeight = false;
-  
+
   late AnimationController _controller;
   late Animation<Color?> _colorAnimation;
   late AnimationController _controllerFade;
 
   late Animation<Offset> _hintAnimation;
   late Animation<Color?> _hintColorAnimation;
-  
+
   late TextEditingController _textEditingController;
   late AnimationController _mapCategoryHint;
   late SharedPreferences _prefs;
@@ -107,8 +106,6 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
     'Municipal',
   ];
 
-
-  
   void _toggleExpand() {
     setState(() {
       _isExpanded = !_isExpanded;
@@ -131,7 +128,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
   bool _showTitle = false;
   double _appBarHeight = 0;
   Color _appBarColor = Colors.transparent;
-  
+
   List<CircleModel> _circles = []; // Local list to store circles
   int? _userId;
   int _currentHintIndex = 0;
@@ -154,7 +151,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
     _checkIfShown();
     _checkFirstRun();
     _getCurrentLocation();
-    
+
     _initSharedPreferences();
     context.read<MapBloc>().add(FetchMapData());
     context.read<DangerZoneBloc>().add(FetchDangerZones());
@@ -191,7 +188,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
 
     _hintColorAnimation = ColorTween(
       begin: Colors.black,
-      end: Colors.transparent, 
+      end: Colors.transparent,
     ).animate(_controller);
 
     _colorAnimation = ColorTween(
@@ -209,7 +206,8 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
       if (_focusNodeText.hasFocus && _textEditingController.text.isEmpty) {
         _controllerFade.forward();
         _controller.forward();
-      } else if (!_focusNodeText.hasFocus && _textEditingController.text.isEmpty) {
+      } else if (!_focusNodeText.hasFocus &&
+          _textEditingController.text.isEmpty) {
         _controller.reverse();
         _controllerFade.reverse();
       }
@@ -223,7 +221,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
     bool hasShownBefore = prefs.getBool('appBarShown') ?? false;
 
     if (widget.UserToken != 'guest' && !hasShownBefore) {
-      prefs.setBool('appBarShown', true); 
+      prefs.setBool('appBarShown', true);
       Future.delayed(Duration(milliseconds: 200), () {
         if (mounted) {
           setState(() {
@@ -311,7 +309,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
             .read<MapBloc>()
             .add(ListenForMemberLocations(state.members, _userId!));
       }
-      if(state is CircleLoadedState){
+      if (state is CircleLoadedState) {
         _circles = state.circles;
       }
     });
@@ -830,7 +828,8 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
       return;
     }
 
-  Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+    Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
     _updateMapPosition(LatLng(position.latitude, position.longitude));
   }
 
@@ -840,30 +839,32 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
     });
 
     final GoogleMapController controller = await _mapController.future;
-    controller.animateCamera(CameraUpdate.newLatLngZoom(_initialPosition, 14.0));
+    controller
+        .animateCamera(CameraUpdate.newLatLngZoom(_initialPosition, 14.0));
   }
 
   void _showSnackBar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
   }
 
   void _searchLocation() async {
     if (_textEditingController.text.isNotEmpty) {
       String location = _textEditingController.text;
-      String url = "https://maps.googleapis.com/maps/api/geocode/json?address=$location&key=$apiKey";
+      String url =
+          "https://maps.googleapis.com/maps/api/geocode/json?address=$location&key=$apiKey";
 
       try {
         final response = await http.get(Uri.parse(url));
 
         if (response.statusCode == 200) {
           final data = json.decode(response.body);
-          
+
           if (data["status"] == "OK") {
             double lat = data["results"][0]["geometry"]["location"]["lat"];
             double lng = data["results"][0]["geometry"]["location"]["lng"];
 
             _updateMapPosition(LatLng(lat, lng));
-
           } else {
             // _showSnackBar("Location not found. Try another search.");
           }
@@ -888,59 +889,59 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
         child: Stack(
           children: [
             Positioned.fill(
-              child: MultiBlocListener(
-                listeners: [
-                  BlocListener<MapBloc, MapState>(
-                    listener: (context, state) {
-                      if (state is MemberLocationUpdated) {
-                        print("iz changingggggg");
-                        _updateMemberMarker(
-                            state.userId, state.latitude, state.longitude);
-                      }
-                    },
-                  ),
-                  BlocListener<NotificationBloc, NotificationState>(
-                    listener: (context, state) {
-                      if (state is NotificationBroadcasted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                              content: Text("Zone notification broadcasted!")),
-                        );
-                      } else if (state is NotificationError) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text("Error: ${state.message}")),
-                        );
-                      }
-                    },
-                  ),
-                ],
-                child: BlocBuilder<MapBloc, MapState>(
-                  builder: (context, state) {
-                    if (state is MapLoading) {
-                      return Expanded(
-                        child: Center(
-                          child: Transform.translate(
-                              offset: const Offset(-40, 0),
-                              child: const LoadingState()),
-                        ),
-                      );
-                    } else if (state is MapDataLoaded) {
-                      _preloadMemberMarkers(state.members);
-                    } else if (state is MapError) {
-                      return Center(child: Text(state.message));
+                child: MultiBlocListener(
+              listeners: [
+                BlocListener<MapBloc, MapState>(
+                  listener: (context, state) {
+                    if (state is MemberLocationUpdated) {
+                      print("iz changingggggg");
+                      _updateMemberMarker(
+                          state.userId, state.latitude, state.longitude);
                     }
-                    return GoogleMap(
-                      initialCameraPosition: const CameraPosition(
-                        target: sourceLocation,
-                        zoom: 16.0,
+                  },
+                ),
+                BlocListener<NotificationBloc, NotificationState>(
+                  listener: (context, state) {
+                    if (state is NotificationBroadcasted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                            content: Text("Zone notification broadcasted!")),
+                      );
+                    } else if (state is NotificationError) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text("Error: ${state.message}")),
+                      );
+                    }
+                  },
+                ),
+              ],
+              child: BlocBuilder<MapBloc, MapState>(
+                builder: (context, state) {
+                  if (state is MapLoading) {
+                    return Expanded(
+                      child: Center(
+                        child: Transform.translate(
+                            offset: const Offset(-40, 0),
+                            child: const LoadingState()),
                       ),
-                      mapType: _currentMapType,
-                      markers: _showMarkers ? _createMarkers(state) : {},
-                      circles: circles,
-                      polylines: _polylines,
-                      onMapCreated: (GoogleMapController controller) async {
-                        googleMapController = controller;
-                        String style = '''
+                    );
+                  } else if (state is MapDataLoaded) {
+                    _preloadMemberMarkers(state.members);
+                  } else if (state is MapError) {
+                    return Center(child: Text(state.message));
+                  }
+                  return GoogleMap(
+                    initialCameraPosition: const CameraPosition(
+                      target: sourceLocation,
+                      zoom: 16.0,
+                    ),
+                    mapType: _currentMapType,
+                    markers: _showMarkers ? _createMarkers(state) : {},
+                    circles: circles,
+                    polylines: _polylines,
+                    onMapCreated: (GoogleMapController controller) async {
+                      googleMapController = controller;
+                      String style = '''
                         [
                           {
                             "featureType": "administrative",
@@ -1007,20 +1008,19 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                           }
                         ]
                         ''';
-                        controller.setMapStyle(style);
-                        _mapController.complete(controller);
+                      controller.setMapStyle(style);
+                      _mapController.complete(controller);
 
-                        _fetchLocation();
-                      },
-                      mapToolbarEnabled: false,
-                      zoomControlsEnabled: false,
-                      myLocationEnabled: true,
-                      myLocationButtonEnabled: false,
-                    );
-                  },
-                ),
-              )
-            ),
+                      _fetchLocation();
+                    },
+                    mapToolbarEnabled: false,
+                    zoomControlsEnabled: false,
+                    myLocationEnabled: true,
+                    myLocationButtonEnabled: false,
+                  );
+                },
+              ),
+            )),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -1036,68 +1036,104 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                   alignment: Alignment.center,
                   child: _showTitle
                       ? CategoryDescripText(
-                        text: "you are already signed in.",
-                        color: Colors.white,
-                      )
-                    : null,
-                  ),
+                          text: "you are already signed in.",
+                          color: Colors.white,
+                        )
+                      : null,
+                ),
                 SizedBox(height: 10),
                 widget.UserToken == 'guest'
-                  ? Container()
-                  : PreferredSize(
-                    preferredSize: const Size.fromHeight(120.0), 
-                    child: Container(
-                      width: double.infinity,
-                      margin: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
-                      child: Column(
-                        children: [
-                          Row(
-                            children: [
-                              GestureDetector(
-                                onTap: (){
-                                  Navigator.push(
-                                    context,
-                                    PageTransition(
-                                      child: AccountDetails(),
-                                      type: PageTransitionType.fade,
-                                      duration: const Duration(milliseconds: 300),
-                                    ),
-                                  );
-                                },
-                                child: Container(
-                                  width: 40,
-                                  height: 40,
-                                  padding: EdgeInsets.all(2),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(10),
-                                    boxShadow: const [
-                                      BoxShadow(
-                                        color: Colors.grey,
-                                        blurRadius: 2,
-                                        offset: Offset(1, 1),
-                                      ),
-                                    ],
-                                  ),
-                                  child: Center(
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(10),
-                                      child: Image.asset(
-                                        'lib/resources/images/profile.jpg',
-                                      )
-                                    )
-                                  )
-                                )
-                              ),
-                              SizedBox(width: 10),
-                              Expanded(
-                                child: GestureDetector(
-                                  onTap: _toggleCircles,
-                                  child: Container(
+                    ? Container()
+                    : PreferredSize(
+                        preferredSize: const Size.fromHeight(120.0),
+                        child: Container(
+                            width: double.infinity,
+                            margin: EdgeInsets.symmetric(
+                                horizontal: 15, vertical: 5),
+                            child: Column(children: [
+                              Row(
+                                children: [
+                                  GestureDetector(
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          PageTransition(
+                                            child: AccountDetails(),
+                                            type: PageTransitionType.fade,
+                                            duration: const Duration(
+                                                milliseconds: 300),
+                                          ),
+                                        );
+                                      },
+                                      child: Container(
+                                          width: 40,
+                                          height: 40,
+                                          padding: EdgeInsets.all(2),
+                                          decoration: BoxDecoration(
+                                            color: Colors.white,
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                            boxShadow: const [
+                                              BoxShadow(
+                                                color: Colors.grey,
+                                                blurRadius: 2,
+                                                offset: Offset(1, 1),
+                                              ),
+                                            ],
+                                          ),
+                                          child: Center(
+                                              child: ClipRRect(
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
+                                                  child: Image.asset(
+                                                    'lib/resources/images/profile.jpg',
+                                                  ))))),
+                                  SizedBox(width: 10),
+                                  Expanded(
+                                      child: GestureDetector(
+                                          onTap: _toggleCircles,
+                                          child: Container(
+                                              height: 40,
+                                              decoration: BoxDecoration(
+                                                color: Colors.white,
+                                                borderRadius:
+                                                    BorderRadius.circular(20),
+                                                boxShadow: const [
+                                                  BoxShadow(
+                                                    color: Colors.grey,
+                                                    blurRadius: 2,
+                                                    offset: Offset(1, 1),
+                                                  ),
+                                                ],
+                                              ),
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 15),
+                                              child: Row(children: [
+                                                CategoryDescripText(
+                                                  text: 'love bird',
+                                                  color: Colors.black,
+                                                ),
+                                                SizedBox(width: 40),
+                                                LimitedImageCircles(
+                                                  imageUrls: [
+                                                    "lib/resources/images/profile.jpg",
+                                                    "lib/resources/images/profile.jpg",
+                                                    "lib/resources/images/profile.jpg",
+                                                    "lib/resources/images/profile.jpg",
+                                                  ],
+                                                ),
+                                                Spacer(),
+                                                Icon(Icons.keyboard_arrow_down,
+                                                    color: Colors.black38),
+                                              ])))),
+                                  SizedBox(width: 10),
+                                  Container(
+                                    width: 40,
                                     height: 40,
                                     decoration: BoxDecoration(
                                       color: Colors.white,
-                                      borderRadius: BorderRadius.circular(20),
+                                      borderRadius: BorderRadius.circular(10),
                                       boxShadow: const [
                                         BoxShadow(
                                           color: Colors.grey,
@@ -1106,419 +1142,462 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                         ),
                                       ],
                                     ),
-                                    padding: const EdgeInsets.symmetric(horizontal: 15),
-                                    child: Row(
-                                      children: [
-                                        CategoryDescripText(text: 'love bird', color: Colors.black,),
-                                        SizedBox(width: 40),
-                                        LimitedImageCircles(
-                                          imageUrls: [
-                                            "lib/resources/images/profile.jpg",
-                                            "lib/resources/images/profile.jpg",
-                                            "lib/resources/images/profile.jpg",
-                                            "lib/resources/images/profile.jpg",
-                                          ],
-                                        ),
-                                        Spacer(),
-                                        Icon(Icons.keyboard_arrow_down, color: Colors.black38),
-                                      ]
-                                    )
-                                  )
-                                )
-                              ),
-                              SizedBox(width: 10), 
-                              Container(
-                                width: 40,
-                                height: 40,
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(10),
-                                  boxShadow: const [
-                                    BoxShadow(
-                                      color: Colors.grey,
-                                      blurRadius: 2,
-                                      offset: Offset(1, 1),
+                                    child: Center(
+                                      child: Icon(
+                                        Icons.person_add,
+                                        size: 20,
+                                        color: widgetPricolor,
+                                      ),
                                     ),
-                                  ],
-                                ),
-                                child: Center(
-                                  child: Icon(
-                                    Icons.person_add,
-                                    size: 20,
-                                    color: widgetPricolor,
                                   ),
-                                ),
-                              ),
-                            ],
-                          )
-                        ]
-                      )
-                    )
-                  ),
+                                ],
+                              )
+                            ]))),
                 SizedBox(height: 10),
                 Container(
-                  height: _circleHeight ? 400 : 0,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(5),
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Colors.grey,
-                        blurRadius: 2,
-                        offset: Offset(1, 1),
-                      ),
-                    ],
-                  ),
-                  margin: EdgeInsets.only(bottom: _circleHeight ? 10 : 0, left: 15, right: 15),
-                  padding: EdgeInsets.all(15),
-                  child: SingleChildScrollView(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                      child: Column(
-                        children: [
-                          for (var circle in _circles)
-                          ListTile(
-                            title: Text(circle.name),
-                            subtitle: Text("Status: ${circle.isActive ? 'Active' : 'Inactive'}"),
-                          ),
+                    height: _circleHeight ? 400 : 0,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(5),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Colors.grey,
+                          blurRadius: 2,
+                          offset: Offset(1, 1),
+                        ),
                       ],
                     ),
-                  )
-                ),
-                widget.UserToken == 'guest'
-                  ? Container(
-                      margin: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+                    margin: EdgeInsets.only(
+                        bottom: _circleHeight ? 10 : 0, left: 15, right: 15),
+                    padding: EdgeInsets.all(15),
+                    child: SingleChildScrollView(
+                      physics: const AlwaysScrollableScrollPhysics(),
                       child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          SizedBox(
-                            height: 40,
-                            child: Center(
-                              child: Container(
-                                height: 40,
-                                width: double.infinity,
-                                decoration: const BoxDecoration(
-                                  color: Colors.grey,
-                                  borderRadius: BorderRadius.all(Radius.circular(20)),
-                                  boxShadow: [
-                                    BoxShadow(
+                          for (var circle
+                              in _circles.where((circle) => circle.isActive))
+                            ListTile(
+                              title: Text(circle.name),
+                              subtitle: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text("Status: Active"),
+                                  Text("Code: ${circle.code}"),
+                                ],
+                              ),
+                            ),
+                        ],
+                      ),
+                    )),
+                widget.UserToken == 'guest'
+                    ? Container(
+                        margin:
+                            EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(
+                              height: 40,
+                              child: Center(
+                                child: Container(
+                                    height: 40,
+                                    width: double.infinity,
+                                    decoration: const BoxDecoration(
                                       color: Colors.grey,
-                                      blurRadius: 2,
-                                      offset: Offset(1, 1),
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(20)),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.grey,
+                                          blurRadius: 2,
+                                          offset: Offset(1, 1),
+                                        ),
+                                      ],
                                     ),
-                                  ],
-                                ),
-                                child: Row(
-                                  children: [
-                                    Expanded(
-                                      child: Stack(
-                                        children: [
-                                          Positioned.fill(
-                                            child: TextField(
-                                              controller: _textEditingController,
-                                              focusNode: _focusNodeText,
-                                              style: GoogleFonts.poppins(
-                                                fontSize: 9,
-                                                fontWeight: FontWeight.w500,
-                                                color: Colors.black,
-                                              ),
-                                              decoration: InputDecoration(
-                                                filled: true,
-                                                fillColor: Colors.white,
-                                                hintText: '',
-                                                hintStyle: const TextStyle(color: Colors.transparent),
-                                                contentPadding: const EdgeInsets.only(left: 35, right: 40, bottom: 8), 
-                                                border: OutlineInputBorder(
-                                                  borderRadius: BorderRadius.circular(20.0),
-                                                  borderSide: const BorderSide(color: widgetPricolor),
-                                                ),
-                                                focusedBorder: OutlineInputBorder(
-                                                  borderRadius: BorderRadius.circular(20.0),
-                                                  borderSide: const BorderSide(color: widgetPricolor),
-                                                ),
-                                                enabledBorder: OutlineInputBorder(
-                                                  borderRadius: BorderRadius.circular(20.0),
-                                                  borderSide: const BorderSide(color: widgetPricolor),
-                                                ),
-                                              ),
-                                              onSubmitted: (value) {
-                                                _searchLocation(); 
-                                              },
-                                            ),
-                                          ),
-                                          Row(
-                                            crossAxisAlignment: CrossAxisAlignment.center,
-                                            mainAxisAlignment: MainAxisAlignment.start,
+                                    child: Row(
+                                      children: [
+                                        Expanded(
+                                          child: Stack(
                                             children: [
-                                              Container(
-                                                height: 40,
-                                                width: 40,
-                                                alignment: Alignment.center,
-                                                color: Colors.transparent,
-                                                child: SvgPicture.asset(
-                                                  'lib/resources/svg/search.svg',
-                                                  color: Colors.black,
-                                                  height: 20,
-                                                  width: 20,
-                                                  fit: BoxFit.contain,
+                                              Positioned.fill(
+                                                child: TextField(
+                                                  controller:
+                                                      _textEditingController,
+                                                  focusNode: _focusNodeText,
+                                                  style: GoogleFonts.poppins(
+                                                    fontSize: 9,
+                                                    fontWeight: FontWeight.w500,
+                                                    color: Colors.black,
+                                                  ),
+                                                  decoration: InputDecoration(
+                                                    filled: true,
+                                                    fillColor: Colors.white,
+                                                    hintText: '',
+                                                    hintStyle: const TextStyle(
+                                                        color:
+                                                            Colors.transparent),
+                                                    contentPadding:
+                                                        const EdgeInsets.only(
+                                                            left: 35,
+                                                            right: 40,
+                                                            bottom: 8),
+                                                    border: OutlineInputBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              20.0),
+                                                      borderSide:
+                                                          const BorderSide(
+                                                              color:
+                                                                  widgetPricolor),
+                                                    ),
+                                                    focusedBorder:
+                                                        OutlineInputBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              20.0),
+                                                      borderSide:
+                                                          const BorderSide(
+                                                              color:
+                                                                  widgetPricolor),
+                                                    ),
+                                                    enabledBorder:
+                                                        OutlineInputBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              20.0),
+                                                      borderSide:
+                                                          const BorderSide(
+                                                              color:
+                                                                  widgetPricolor),
+                                                    ),
+                                                  ),
+                                                  onSubmitted: (value) {
+                                                    _searchLocation();
+                                                  },
                                                 ),
                                               ),
-                                              GestureDetector(
-                                                key: _searchKey,
-                                                onTap: () {
-                                                  FocusScope.of(context).requestFocus(_focusNodeText); 
-                                                },
-                                                child: Padding(
-                                                  padding: const EdgeInsets.only(right: 4),
-                                                  child: AnimatedBuilder(
-                                                    animation: _controllerFade,
-                                                    builder: (context, child) {
-                                                      return Row(
-                                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                                        children: [
-                                                          Transform.translate(
-                                                            offset: const Offset(-5, 0),
-                                                            child: CategoryDescripText(
-                                                              text: "Search for nearest",
-                                                              color: _colorAnimation.value,
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      );
+                                              Row(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.center,
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.start,
+                                                children: [
+                                                  Container(
+                                                    height: 40,
+                                                    width: 40,
+                                                    alignment: Alignment.center,
+                                                    color: Colors.transparent,
+                                                    child: SvgPicture.asset(
+                                                      'lib/resources/svg/search.svg',
+                                                      color: Colors.black,
+                                                      height: 20,
+                                                      width: 20,
+                                                      fit: BoxFit.contain,
+                                                    ),
+                                                  ),
+                                                  GestureDetector(
+                                                    key: _searchKey,
+                                                    onTap: () {
+                                                      FocusScope.of(context)
+                                                          .requestFocus(
+                                                              _focusNodeText);
                                                     },
+                                                    child: Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              right: 4),
+                                                      child: AnimatedBuilder(
+                                                        animation:
+                                                            _controllerFade,
+                                                        builder:
+                                                            (context, child) {
+                                                          return Row(
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .start,
+                                                            children: [
+                                                              Transform
+                                                                  .translate(
+                                                                offset:
+                                                                    const Offset(
+                                                                        -5, 0),
+                                                                child:
+                                                                    CategoryDescripText(
+                                                                  text:
+                                                                      "Search for nearest",
+                                                                  color:
+                                                                      _colorAnimation
+                                                                          .value,
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          );
+                                                        },
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  Transform.translate(
+                                                      offset:
+                                                          const Offset(-5, 0),
+                                                      child: SlideTransition(
+                                                          position:
+                                                              _hintAnimation,
+                                                          child:
+                                                              AnimatedBuilder(
+                                                                  animation:
+                                                                      _hintColorAnimation,
+                                                                  builder:
+                                                                      (context,
+                                                                          child) {
+                                                                    return GestureDetector(
+                                                                        onTap:
+                                                                            () {
+                                                                          FocusScope.of(context)
+                                                                              .requestFocus(_focusNode);
+                                                                        },
+                                                                        child:
+                                                                            CategoryDescripText(
+                                                                          text:
+                                                                              hints[_currentHintIndex],
+                                                                          color: _hintAnimation.isCompleted
+                                                                              ? Colors.transparent
+                                                                              : _hintColorAnimation.value,
+                                                                        ));
+                                                                  })))
+                                                ],
+                                              ),
+                                              Positioned(
+                                                top: 0,
+                                                right: _isExpanded ? 5 : 5,
+                                                child: GestureDetector(
+                                                  onTap: () async {
+                                                    if (!_isListening) {
+                                                      bool available =
+                                                          await _speech
+                                                              .initialize();
+                                                      if (available) {
+                                                        setState(() =>
+                                                            _isListening =
+                                                                true);
+                                                        _speech.listen(
+                                                          onResult: (result) {
+                                                            setState(() {
+                                                              _textEditingController
+                                                                      .text =
+                                                                  result
+                                                                      .recognizedWords;
+                                                            });
+                                                          },
+                                                          listenFor: Duration(
+                                                              seconds: 5),
+                                                        );
+                                                      }
+                                                    } else {
+                                                      setState(() =>
+                                                          _isListening = false);
+                                                      _speech.stop();
+                                                    }
+                                                  },
+                                                  child: Container(
+                                                    height: 40,
+                                                    width: 40,
+                                                    alignment: Alignment.center,
+                                                    color: Colors.transparent,
+                                                    child: SvgPicture.asset(
+                                                      'lib/resources/svg/mic.svg',
+                                                      color: Colors.black87,
+                                                      height: 22,
+                                                      width: 22,
+                                                      fit: BoxFit.contain,
+                                                    ),
                                                   ),
                                                 ),
                                               ),
-                                              Transform.translate(
-                                                offset: const Offset(-5, 0),
-                                                child: SlideTransition(
-                                                  position: _hintAnimation,
-                                                  child: AnimatedBuilder(
-                                                    animation: _hintColorAnimation,
-                                                    builder: (context, child) {
-                                                      return GestureDetector(
-                                                        onTap: () {
-                                                          FocusScope.of(context).requestFocus(_focusNode);
-                                                        },
-                                                        child: CategoryDescripText(
-                                                          text: hints[_currentHintIndex], 
-                                                          color: _hintAnimation.isCompleted
-                                                            ? Colors.transparent
-                                                            : _hintColorAnimation.value,
-                                                        )
-                                                      );
-                                                    }
-                                                  )
-                                                )
-                                              )
                                             ],
                                           ),
-                                          Positioned(
-                                            top: 0,
-                                            right: _isExpanded ? 5 : 5, 
-                                            child: GestureDetector(
-                                              onTap: () async {
-                                                if (!_isListening) {
-                                                  bool available = await _speech.initialize();
-                                                  if (available) {
-                                                    setState(() => _isListening = true);
-                                                    _speech.listen(
-                                                      onResult: (result) {
-                                                        setState(() {
-                                                          _textEditingController.text = result.recognizedWords;
-                                                        });
-                                                      },
-                                                      listenFor: Duration(seconds: 5),
-                                                    );
-                                                  }
-                                                } else {
-                                                  setState(() => _isListening = false);
-                                                  _speech.stop();
-                                                }
-                                              },
-                                              child: Container(
-                                                height: 40,
-                                                width: 40,
-                                                alignment: Alignment.center,
-                                                color: Colors.transparent,
-                                                child: SvgPicture.asset(
-                                                  'lib/resources/svg/mic.svg',
-                                                  color: Colors.black87,
-                                                  height: 22,
-                                                  width: 22,
-                                                  fit: BoxFit.contain,
-                                                ),
-                                              ),
+                                        ),
+                                        GestureDetector(
+                                          onTap: () {
+                                            setState(() {
+                                              if (_textEditingController
+                                                  .text.isNotEmpty) {
+                                                _searchLocation();
+                                              } else {
+                                                _isExpanded = false;
+                                                _textEditingController.clear();
+                                                _focusNodeText.unfocus();
+                                              }
+                                            });
+                                          },
+                                          child: Container(
+                                            width: 40,
+                                            height: 40,
+                                            decoration: BoxDecoration(
+                                              color: Colors.grey,
+                                              borderRadius: BorderRadius.only(
+                                                  bottomRight:
+                                                      Radius.circular(20),
+                                                  topRight:
+                                                      Radius.circular(20)),
+                                            ),
+                                            child: const Center(
+                                              child: Icon(Icons.send,
+                                                  color: Colors.white,
+                                                  size: 18),
                                             ),
                                           ),
-                                        ],
-                                      ),
-                                    ),
-                                    GestureDetector(
-                                      onTap: () {
-                                        setState(() {
-                                          if (_textEditingController.text.isNotEmpty) {
-                                            _searchLocation();
-                                          } else {
-                                            _isExpanded = false;
-                                            _textEditingController.clear();
-                                            _focusNodeText.unfocus();
-                                          }
-                                        });
-                                      },
-                                      child: Container(
-                                        width: 40,
-                                        height: 40,
-                                        decoration: BoxDecoration(
-                                          color: Colors.grey,
-                                          borderRadius: BorderRadius.only(
-                                            bottomRight: Radius.circular(20),
-                                            topRight: Radius.circular(20)
-                                          ),
                                         ),
-                                        child: const Center(
-                                          child: Icon(Icons.send, color: Colors.white, size: 18),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                )
+                                      ],
+                                    )),
                               ),
                             ),
-                          ),
-                          SizedBox(height: 10),
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              GestureDetector(
-                                onTap: (){},
-                                child: Container(
-                                  margin: const EdgeInsets.only(right: 10), 
-                                  width: 60,
-                                  height: 40,
-                                  decoration: BoxDecoration(
-                                    color: _isSafeZoneShown ? Colors.grey[300] : Colors.white, 
-                                    borderRadius: BorderRadius.circular(50),
-                                    boxShadow: const [
-                                      BoxShadow(
-                                        color: Colors.grey,
-                                        blurRadius: 2,
-                                        offset: Offset(1, 1),
-                                      ),
-                                    ],
-                                  ),
-                                  child: const Row(
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      SizedBox(width: 5),
-                                      Icon(Icons.safety_check, color: Colors.blue),
-                                      SizedBox(width: 5), 
-                                      Expanded( 
-                                        child: CategoryDescripText(
-                                          text: "All",
-                                          color: Colors.black,
+                            SizedBox(height: 10),
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                GestureDetector(
+                                  onTap: () {},
+                                  child: Container(
+                                    margin: const EdgeInsets.only(right: 10),
+                                    width: 60,
+                                    height: 40,
+                                    decoration: BoxDecoration(
+                                      color: _isSafeZoneShown
+                                          ? Colors.grey[300]
+                                          : Colors.white,
+                                      borderRadius: BorderRadius.circular(50),
+                                      boxShadow: const [
+                                        BoxShadow(
+                                          color: Colors.grey,
+                                          blurRadius: 2,
+                                          offset: Offset(1, 1),
                                         ),
-                                      ),
-                                    ],
+                                      ],
+                                    ),
+                                    child: const Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: [
+                                        SizedBox(width: 5),
+                                        Icon(Icons.safety_check,
+                                            color: Colors.blue),
+                                        SizedBox(width: 5),
+                                        Expanded(
+                                          child: CategoryDescripText(
+                                            text: "All",
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
-                              ),
-                              GestureDetector(
-                                onTap: _findRoute,
-                                child: Container(
-                                  margin: const EdgeInsets.only(right: 10), 
-                                  width: 160,
-                                  height: 40,
-                                  decoration: BoxDecoration(
-                                    color: _isSafeZoneShown ? Colors.grey[300] : Colors.white, 
-                                    borderRadius: BorderRadius.circular(50),
-                                    boxShadow: const [
-                                      BoxShadow(
-                                        color: Colors.grey,
-                                        blurRadius: 2,
-                                        offset: Offset(1, 1),
-                                      ),
-                                    ],
-                                  ),
-                                  child: const Row(
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      SizedBox(width: 5),
-                                      Icon(Icons.safety_check, color: Colors.green),
-                                      SizedBox(width: 5), 
-                                      Expanded( 
-                                        child: CategoryDescripText(
-                                          text: "Show nearest safe zone",
-                                          color: Colors.black,
+                                GestureDetector(
+                                  onTap: _findRoute,
+                                  child: Container(
+                                    margin: const EdgeInsets.only(right: 10),
+                                    width: 160,
+                                    height: 40,
+                                    decoration: BoxDecoration(
+                                      color: _isSafeZoneShown
+                                          ? Colors.grey[300]
+                                          : Colors.white,
+                                      borderRadius: BorderRadius.circular(50),
+                                      boxShadow: const [
+                                        BoxShadow(
+                                          color: Colors.grey,
+                                          blurRadius: 2,
+                                          offset: Offset(1, 1),
                                         ),
-                                      ),
-                                    ],
+                                      ],
+                                    ),
+                                    child: const Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: [
+                                        SizedBox(width: 5),
+                                        Icon(Icons.safety_check,
+                                            color: Colors.green),
+                                        SizedBox(width: 5),
+                                        Expanded(
+                                          child: CategoryDescripText(
+                                            text: "Show nearest safe zone",
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
-                              ),
-                              GestureDetector(
-                                onTap: (){},
-                                child: Container(
-                                  width: 170,
-                                  height: 40,
-                                  decoration: BoxDecoration(
-                                    color: _isSafeZoneShown ? Colors.grey[300] : Colors.white, 
-                                    borderRadius: BorderRadius.circular(50),
-                                    boxShadow: const [
-                                      BoxShadow(
-                                        color: Colors.grey,
-                                        blurRadius: 2,
-                                        offset: Offset(1, 1),
-                                      ),
-                                    ],
-                                  ),
-                                  child: const Row(
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      SizedBox(width: 5),
-                                      Icon(Icons.safety_check, color: Colors.red),
-                                      SizedBox(width: 5), 
-                                      Expanded( 
-                                        child: CategoryDescripText(
-                                          text: "Show nearest danger zone",
-                                          color: Colors.black,
+                                GestureDetector(
+                                  onTap: () {},
+                                  child: Container(
+                                    width: 170,
+                                    height: 40,
+                                    decoration: BoxDecoration(
+                                      color: _isSafeZoneShown
+                                          ? Colors.grey[300]
+                                          : Colors.white,
+                                      borderRadius: BorderRadius.circular(50),
+                                      boxShadow: const [
+                                        BoxShadow(
+                                          color: Colors.grey,
+                                          blurRadius: 2,
+                                          offset: Offset(1, 1),
                                         ),
-                                      ),
-                                    ],
+                                      ],
+                                    ),
+                                    child: const Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: [
+                                        SizedBox(width: 5),
+                                        Icon(Icons.safety_check,
+                                            color: Colors.red),
+                                        SizedBox(width: 5),
+                                        Expanded(
+                                          child: CategoryDescripText(
+                                            text: "Show nearest danger zone",
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
-                              ),
-                            ],
-                          )
-                        ],
-                      )
-                  )
-                  : SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: [
-                        SizedBox(width: 10),
-                        GestureDetector(
-                          onTap: () {
-                            if (!_isExpanded) {
-                              setState(() {
-                                _isExpanded = true;
-                              });
-                            }
-                          },
-                          child: LayoutBuilder(
-                            builder: (context, constraints) {
+                              ],
+                            )
+                          ],
+                        ))
+                    : SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          children: [
+                            SizedBox(width: 10),
+                            GestureDetector(onTap: () {
+                              if (!_isExpanded) {
+                                setState(() {
+                                  _isExpanded = true;
+                                });
+                              }
+                            }, child:
+                                LayoutBuilder(builder: (context, constraints) {
                               return AnimatedContainer(
                                 duration: const Duration(milliseconds: 300),
                                 margin: const EdgeInsets.only(right: 10),
-                                width: _isExpanded ? 330 : 40, 
+                                width: _isExpanded ? 330 : 40,
                                 height: 40,
                                 decoration: BoxDecoration(
                                   color: Colors.white,
-                                  borderRadius: BorderRadius.circular(_isExpanded ? 20 : 50),
+                                  borderRadius: BorderRadius.circular(
+                                      _isExpanded ? 20 : 50),
                                   boxShadow: const [
                                     BoxShadow(
                                       color: Colors.grey,
@@ -1528,346 +1607,454 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                   ],
                                 ),
                                 child: _isExpanded
-                                  ? Center(
-                                      child: SizedBox(
-                                        height: 40,
-                                        child: Container(
-                                          height: 40,
-                                          width: double.infinity,
-                                          decoration: const BoxDecoration(
-                                            color: Colors.grey,
-                                            borderRadius: BorderRadius.all(Radius.circular(20)),
-                                            boxShadow: [
-                                              BoxShadow(
-                                                color: Colors.grey,
-                                                blurRadius: 2,
-                                                offset: Offset(1, 1),
-                                              ),
-                                            ],
-                                          ),
-                                          child: Row(
-                                            children: [
-                                              Expanded(
-                                                child: Stack(
-                                                  children: [
-                                                    Positioned.fill(
-                                                      child: TextField(
-                                                        controller: _textEditingController,
-                                                        focusNode: _focusNodeText,
-                                                        style: GoogleFonts.poppins(
-                                                          fontSize: 9,
-                                                          fontWeight: FontWeight.w500,
-                                                          color: Colors.black,
-                                                        ),
-                                                        decoration: InputDecoration(
-                                                          filled: true,
-                                                          fillColor: Colors.white,
-                                                          hintText: '',
-                                                          hintStyle: const TextStyle(color: Colors.transparent),
-                                                          contentPadding: const EdgeInsets.only(left: 35, right: 40, bottom: 8),
-                                                          border: OutlineInputBorder(
-                                                            borderRadius: BorderRadius.circular(20.0),
-                                                            borderSide: const BorderSide(color: widgetPricolor),
-                                                          ),
-                                                          focusedBorder: OutlineInputBorder(
-                                                            borderRadius: BorderRadius.circular(20.0),
-                                                            borderSide: const BorderSide(color: widgetPricolor),
-                                                          ),
-                                                          enabledBorder: OutlineInputBorder(
-                                                            borderRadius: BorderRadius.circular(20.0),
-                                                            borderSide: const BorderSide(color: widgetPricolor),
-                                                          ),
-                                                        ),
-                                                      ),
+                                    ? Center(
+                                        child: SizedBox(
+                                            height: 40,
+                                            child: Container(
+                                                height: 40,
+                                                width: double.infinity,
+                                                decoration: const BoxDecoration(
+                                                  color: Colors.grey,
+                                                  borderRadius:
+                                                      BorderRadius.all(
+                                                          Radius.circular(20)),
+                                                  boxShadow: [
+                                                    BoxShadow(
+                                                      color: Colors.grey,
+                                                      blurRadius: 2,
+                                                      offset: Offset(1, 1),
                                                     ),
-                                                    Row(
+                                                  ],
+                                                ),
+                                                child: Row(children: [
+                                                  Expanded(
+                                                    child: Stack(
                                                       children: [
-                                                        Container(
-                                                          height: 40,
-                                                          width: 40,
-                                                          alignment: Alignment.center,
-                                                          child: SvgPicture.asset(
-                                                            'lib/resources/svg/search.svg',
-                                                            color: Colors.black,
-                                                            height: 20,
-                                                            width: 20,
-                                                            fit: BoxFit.contain,
+                                                        Positioned.fill(
+                                                          child: TextField(
+                                                            controller:
+                                                                _textEditingController,
+                                                            focusNode:
+                                                                _focusNodeText,
+                                                            style: GoogleFonts
+                                                                .poppins(
+                                                              fontSize: 9,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w500,
+                                                              color:
+                                                                  Colors.black,
+                                                            ),
+                                                            decoration:
+                                                                InputDecoration(
+                                                              filled: true,
+                                                              fillColor:
+                                                                  Colors.white,
+                                                              hintText: '',
+                                                              hintStyle: const TextStyle(
+                                                                  color: Colors
+                                                                      .transparent),
+                                                              contentPadding:
+                                                                  const EdgeInsets
+                                                                      .only(
+                                                                      left: 35,
+                                                                      right: 40,
+                                                                      bottom:
+                                                                          8),
+                                                              border:
+                                                                  OutlineInputBorder(
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            20.0),
+                                                                borderSide:
+                                                                    const BorderSide(
+                                                                        color:
+                                                                            widgetPricolor),
+                                                              ),
+                                                              focusedBorder:
+                                                                  OutlineInputBorder(
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            20.0),
+                                                                borderSide:
+                                                                    const BorderSide(
+                                                                        color:
+                                                                            widgetPricolor),
+                                                              ),
+                                                              enabledBorder:
+                                                                  OutlineInputBorder(
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            20.0),
+                                                                borderSide:
+                                                                    const BorderSide(
+                                                                        color:
+                                                                            widgetPricolor),
+                                                              ),
+                                                            ),
                                                           ),
                                                         ),
-                                                        Padding(
-                                                          padding: const EdgeInsets.only(right: 4),
-                                                          child: AnimatedBuilder(
-                                                            animation: _controllerFade,
-                                                            builder: (context, child) {
-                                                              return Transform.translate(
-                                                                offset: const Offset(-5, 0),
-                                                                child: CategoryDescripText(
-                                                                  text: "Search for nearest",
-                                                                  color: _colorAnimation.value,
+                                                        Row(
+                                                          children: [
+                                                            Container(
+                                                              height: 40,
+                                                              width: 40,
+                                                              alignment:
+                                                                  Alignment
+                                                                      .center,
+                                                              child: SvgPicture
+                                                                  .asset(
+                                                                'lib/resources/svg/search.svg',
+                                                                color: Colors
+                                                                    .black,
+                                                                height: 20,
+                                                                width: 20,
+                                                                fit: BoxFit
+                                                                    .contain,
+                                                              ),
+                                                            ),
+                                                            Padding(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .only(
+                                                                      right: 4),
+                                                              child:
+                                                                  AnimatedBuilder(
+                                                                animation:
+                                                                    _controllerFade,
+                                                                builder:
+                                                                    (context,
+                                                                        child) {
+                                                                  return Transform
+                                                                      .translate(
+                                                                    offset:
+                                                                        const Offset(
+                                                                            -5,
+                                                                            0),
+                                                                    child:
+                                                                        CategoryDescripText(
+                                                                      text:
+                                                                          "Search for nearest",
+                                                                      color: _colorAnimation
+                                                                          .value,
+                                                                    ),
+                                                                  );
+                                                                },
+                                                              ),
+                                                            ),
+                                                            Transform.translate(
+                                                              offset:
+                                                                  const Offset(
+                                                                      -5, 0),
+                                                              child:
+                                                                  SlideTransition(
+                                                                position:
+                                                                    _hintAnimation,
+                                                                child:
+                                                                    AnimatedBuilder(
+                                                                  animation:
+                                                                      _hintColorAnimation,
+                                                                  builder:
+                                                                      (context,
+                                                                          child) {
+                                                                    return CategoryDescripText(
+                                                                      text: hints[
+                                                                          _currentHintIndex],
+                                                                      color: _hintAnimation.isCompleted
+                                                                          ? Colors
+                                                                              .transparent
+                                                                          : _hintColorAnimation
+                                                                              .value,
+                                                                    );
+                                                                  },
                                                                 ),
-                                                              );
-                                                            },
-                                                          ),
+                                                              ),
+                                                            ),
+                                                          ],
                                                         ),
-                                                        Transform.translate(
-                                                          offset: const Offset(-5, 0),
-                                                          child: SlideTransition(
-                                                            position: _hintAnimation,
-                                                            child: AnimatedBuilder(
-                                                              animation: _hintColorAnimation,
-                                                              builder: (context, child) {
-                                                                return CategoryDescripText(
-                                                                  text: hints[_currentHintIndex],
-                                                                  color: _hintAnimation.isCompleted
-                                                                      ? Colors.transparent
-                                                                      : _hintColorAnimation.value,
-                                                                );
-                                                              },
+                                                        Positioned(
+                                                          top: 0,
+                                                          right: 5,
+                                                          child:
+                                                              GestureDetector(
+                                                            onTap: () async {
+                                                              _focusNodeText
+                                                                  .requestFocus();
+                                                              if (!_isListening) {
+                                                                bool available =
+                                                                    await _speech
+                                                                        .initialize();
+                                                                if (available) {
+                                                                  setState(() =>
+                                                                      _isListening =
+                                                                          true);
+                                                                  _speech
+                                                                      .listen(
+                                                                    onResult:
+                                                                        (result) {
+                                                                      setState(
+                                                                          () {
+                                                                        _textEditingController.text =
+                                                                            result.recognizedWords;
+                                                                      });
+                                                                    },
+                                                                    listenFor: Duration(
+                                                                        seconds:
+                                                                            5),
+                                                                  );
+                                                                }
+                                                              } else {
+                                                                setState(() =>
+                                                                    _isListening =
+                                                                        false);
+                                                                _speech.stop();
+                                                              }
+                                                            },
+                                                            child: Container(
+                                                              height: 40,
+                                                              width: 40,
+                                                              alignment:
+                                                                  Alignment
+                                                                      .center,
+                                                              child: SvgPicture
+                                                                  .asset(
+                                                                'lib/resources/svg/mic.svg',
+                                                                color: Colors
+                                                                    .black87,
+                                                                height: 22,
+                                                                width: 22,
+                                                                fit: BoxFit
+                                                                    .contain,
+                                                              ),
                                                             ),
                                                           ),
                                                         ),
                                                       ],
                                                     ),
-                                                    Positioned(
-                                                      top: 0,
-                                                      right: 5,
-                                                      child: GestureDetector(
-                                                        onTap: () async {
-                                                          _focusNodeText.requestFocus();
-                                                          if (!_isListening) {
-                                                            bool available = await _speech.initialize();
-                                                            if (available) {
-                                                              setState(() => _isListening = true);
-                                                              _speech.listen(
-                                                                onResult: (result) {
-                                                                  setState(() {
-                                                                    _textEditingController.text = result.recognizedWords;
-                                                                  });
-                                                                },
-                                                                listenFor: Duration(seconds: 5),
-                                                              );
-                                                            }
-                                                          } else {
-                                                            setState(() => _isListening = false);
-                                                            _speech.stop();
-                                                          }
-                                                        },
-                                                        child: Container(
-                                                          height: 40,
-                                                          width: 40,
-                                                          alignment: Alignment.center,
-                                                          child: SvgPicture.asset(
-                                                            'lib/resources/svg/mic.svg',
-                                                            color: Colors.black87,
-                                                            height: 22,
-                                                            width: 22,
-                                                            fit: BoxFit.contain,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                              GestureDetector(
-                                                onTap: () {
-                                                  setState(() {
-                                                    if (_textEditingController.text.isNotEmpty) {
-                                                      _searchLocation();
-                                                    } else {
-                                                      _isExpanded = false;
-                                                      _textEditingController.clear();
-                                                      _focusNodeText.unfocus();
-                                                    }
-                                                  });
-                                                },
-                                                child: Container(
-                                                  width: 40,
-                                                  height: 40,
-                                                  decoration: const BoxDecoration(
-                                                    color: Colors.grey,
-                                                    borderRadius: BorderRadius.only(
-                                                      bottomRight: Radius.circular(20),
-                                                      topRight: Radius.circular(20),
-                                                    ),
                                                   ),
-                                                  child: Center(
-                                                    child: ValueListenableBuilder<TextEditingValue>(
-                                                      valueListenable: _textEditingController,
-                                                      builder: (context, value, child) {
-                                                        return Transform.translate(
-                                                          offset: Offset(-3.2, 0),
-                                                          child:  Icon(
-                                                            value.text.isNotEmpty ? Icons.send : Icons.close,
-                                                            color: Colors.white,
-                                                            size: 18,
-                                                          )
-                                                        );
+                                                  GestureDetector(
+                                                      onTap: () {
+                                                        setState(() {
+                                                          if (_textEditingController
+                                                              .text
+                                                              .isNotEmpty) {
+                                                            _searchLocation();
+                                                          } else {
+                                                            _isExpanded = false;
+                                                            _textEditingController
+                                                                .clear();
+                                                            _focusNodeText
+                                                                .unfocus();
+                                                          }
+                                                        });
                                                       },
-                                                    )
-                                                  )
-                                                )
-                                              )
-                                            ]
-                                          )
-                                        )
-                                      )
-                                    )
-                                  : const Icon(Icons.search, color: Colors.black, size: 20),
+                                                      child: Container(
+                                                          width: 40,
+                                                          height: 40,
+                                                          decoration:
+                                                              const BoxDecoration(
+                                                            color: Colors.grey,
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .only(
+                                                              bottomRight:
+                                                                  Radius
+                                                                      .circular(
+                                                                          20),
+                                                              topRight: Radius
+                                                                  .circular(20),
+                                                            ),
+                                                          ),
+                                                          child: Center(
+                                                              child: ValueListenableBuilder<
+                                                                  TextEditingValue>(
+                                                            valueListenable:
+                                                                _textEditingController,
+                                                            builder: (context,
+                                                                value, child) {
+                                                              return Transform
+                                                                  .translate(
+                                                                      offset: Offset(
+                                                                          -3.2,
+                                                                          0),
+                                                                      child:
+                                                                          Icon(
+                                                                        value.text.isNotEmpty
+                                                                            ? Icons.send
+                                                                            : Icons.close,
+                                                                        color: Colors
+                                                                            .white,
+                                                                        size:
+                                                                            18,
+                                                                      ));
+                                                            },
+                                                          ))))
+                                                ]))))
+                                    : const Icon(Icons.search,
+                                        color: Colors.black, size: 20),
                               );
-                            }
-                          )
-                        ),
-                        GestureDetector(
-                          onTap: _findRoute,
-                          child: Container(
-                            margin: const EdgeInsets.only(right: 10), 
-                            width: 60,
-                            height: 40,
-                            decoration: BoxDecoration(
-                              color: _isSafeZoneShown ? Colors.grey[300] : Colors.white, 
-                              borderRadius: BorderRadius.circular(50),
-                              boxShadow: const [
-                                BoxShadow(
-                                  color: Colors.grey,
-                                  blurRadius: 2,
-                                  offset: Offset(1, 1),
+                            })),
+                            GestureDetector(
+                              onTap: _findRoute,
+                              child: Container(
+                                margin: const EdgeInsets.only(right: 10),
+                                width: 60,
+                                height: 40,
+                                decoration: BoxDecoration(
+                                  color: _isSafeZoneShown
+                                      ? Colors.grey[300]
+                                      : Colors.white,
+                                  borderRadius: BorderRadius.circular(50),
+                                  boxShadow: const [
+                                    BoxShadow(
+                                      color: Colors.grey,
+                                      blurRadius: 2,
+                                      offset: Offset(1, 1),
+                                    ),
+                                  ],
                                 ),
-                              ],
-                            ),
-                            child: const Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                SizedBox(width: 5),
-                                Icon(Icons.safety_check, color: Colors.blue),
-                                SizedBox(width: 5), 
-                                Expanded( 
-                                  child: CategoryDescripText(
-                                    text: "All",
-                                    color: Colors.black,
-                                  ),
+                                child: const Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    SizedBox(width: 5),
+                                    Icon(Icons.safety_check,
+                                        color: Colors.blue),
+                                    SizedBox(width: 5),
+                                    Expanded(
+                                      child: CategoryDescripText(
+                                        text: "All",
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ],
+                              ),
                             ),
-                          ),
-                        ),
-                        GestureDetector(
-                          onTap: _findRoute,
-                          child: Container(
-                            margin: const EdgeInsets.only(right: 10), 
-                            width: 160,
-                            height: 40,
-                            decoration: BoxDecoration(
-                              color: _isSafeZoneShown ? Colors.grey[300] : Colors.white, 
-                              borderRadius: BorderRadius.circular(50),
-                              boxShadow: const [
-                                BoxShadow(
-                                  color: Colors.grey,
-                                  blurRadius: 2,
-                                  offset: Offset(1, 1),
+                            GestureDetector(
+                              onTap: _findRoute,
+                              child: Container(
+                                margin: const EdgeInsets.only(right: 10),
+                                width: 160,
+                                height: 40,
+                                decoration: BoxDecoration(
+                                  color: _isSafeZoneShown
+                                      ? Colors.grey[300]
+                                      : Colors.white,
+                                  borderRadius: BorderRadius.circular(50),
+                                  boxShadow: const [
+                                    BoxShadow(
+                                      color: Colors.grey,
+                                      blurRadius: 2,
+                                      offset: Offset(1, 1),
+                                    ),
+                                  ],
                                 ),
-                              ],
-                            ),
-                            child: const Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                SizedBox(width: 5),
-                                Icon(Icons.safety_check, color: Colors.green),
-                                SizedBox(width: 5), 
-                                Expanded( 
-                                  child: CategoryDescripText(
-                                    text: "Show nearest safe zone",
-                                    color: Colors.black,
-                                  ),
+                                child: const Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    SizedBox(width: 5),
+                                    Icon(Icons.safety_check,
+                                        color: Colors.green),
+                                    SizedBox(width: 5),
+                                    Expanded(
+                                      child: CategoryDescripText(
+                                        text: "Show nearest safe zone",
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ],
+                              ),
                             ),
-                          ),
-                        ),
-                        GestureDetector(
-                          onTap: _findRoute,
-                          child: Container(
-                            width: 170,
-                            height: 40,
-                            decoration: BoxDecoration(
-                              color: _isSafeZoneShown ? Colors.grey[300] : Colors.white, 
-                              borderRadius: BorderRadius.circular(50),
-                              boxShadow: const [
-                                BoxShadow(
-                                  color: Colors.grey,
-                                  blurRadius: 2,
-                                  offset: Offset(1, 1),
+                            GestureDetector(
+                              onTap: _findRoute,
+                              child: Container(
+                                width: 170,
+                                height: 40,
+                                decoration: BoxDecoration(
+                                  color: _isSafeZoneShown
+                                      ? Colors.grey[300]
+                                      : Colors.white,
+                                  borderRadius: BorderRadius.circular(50),
+                                  boxShadow: const [
+                                    BoxShadow(
+                                      color: Colors.grey,
+                                      blurRadius: 2,
+                                      offset: Offset(1, 1),
+                                    ),
+                                  ],
                                 ),
-                              ],
-                            ),
-                            child: const Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                SizedBox(width: 5),
-                                Icon(Icons.safety_check, color: Colors.red),
-                                SizedBox(width: 5), 
-                                Expanded( 
-                                  child: CategoryDescripText(
-                                    text: "Show nearest danger zone",
-                                    color: Colors.black,
-                                  ),
+                                child: const Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    SizedBox(width: 5),
+                                    Icon(Icons.safety_check, color: Colors.red),
+                                    SizedBox(width: 5),
+                                    Expanded(
+                                      child: CategoryDescripText(
+                                        text: "Show nearest danger zone",
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ],
+                              ),
                             ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  )
-              ],
-            ),
-            widget.UserToken == 'guest' 
-              ? Container(
-                  width: double.infinity,
-                  child: Stack(
-                    children: [
-                      Positioned(
-                        bottom: 15,
-                        left: 15,
-                        child: GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              _showMarkers = !_showMarkers;
-                            });
-                          },
-                          child: _buildButton(
-                              _showMarkers ? Icons.visibility : Icons.visibility_off),
+                          ],
                         ),
                       )
-                    ],
-                  ),
-                )
-              : Positioned(
-                  bottom: 15,
-                  left: 15,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          GestureDetector(
+              ],
+            ),
+            widget.UserToken == 'guest'
+                ? Container(
+                    width: double.infinity,
+                    child: Stack(
+                      children: [
+                        Positioned(
+                          bottom: 15,
+                          left: 15,
+                          child: GestureDetector(
                             onTap: () {
                               setState(() {
                                 _showMarkers = !_showMarkers;
                               });
                             },
-                            child: _buildButton(
-                                _showMarkers ? Icons.visibility : Icons.visibility_off),
-                          )
-                        ]
-                      )
-                    ],
+                            child: _buildButton(_showMarkers
+                                ? Icons.visibility
+                                : Icons.visibility_off),
+                          ),
+                        )
+                      ],
+                    ),
                   )
-                ),
+                : Positioned(
+                    bottom: 15,
+                    left: 15,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    _showMarkers = !_showMarkers;
+                                  });
+                                },
+                                child: _buildButton(_showMarkers
+                                    ? Icons.visibility
+                                    : Icons.visibility_off),
+                              )
+                            ])
+                      ],
+                    )),
             widget.UserToken == 'guest'
                 ? const SizedBox()
                 : Positioned(
@@ -1905,9 +2092,8 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                               ),
                               child: Center(
                                 child: SvgPicture.asset(
-                                  "lib/resources/svg/connect.svg",
-                                  color: Colors.blue
-                                ),
+                                    "lib/resources/svg/connect.svg",
+                                    color: Colors.blue),
                               ),
                             ),
                           ),
@@ -1948,8 +2134,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                               height: 40,
                               decoration: BoxDecoration(
                                 color: Colors.white,
-                                borderRadius: BorderRadius.circular(
-                                    10),
+                                borderRadius: BorderRadius.circular(10),
                                 boxShadow: const [
                                   BoxShadow(
                                     color: Colors.grey,
@@ -2109,7 +2294,7 @@ Widget _buildButton(IconData icon) {
     height: 40,
     decoration: BoxDecoration(
       color: Colors.white,
-      borderRadius: BorderRadius.circular(10), 
+      borderRadius: BorderRadius.circular(10),
       boxShadow: const [
         BoxShadow(
           color: Colors.grey,

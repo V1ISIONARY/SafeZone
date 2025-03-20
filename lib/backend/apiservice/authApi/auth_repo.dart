@@ -14,4 +14,5 @@ abstract class AuthenticationRepository {
       double longitude // New parameter for longitude
       );
   Future<void> updateLocation(double latitude, double longitude);
+  Future<void> changePassword(String password, String newpassword);
 }

@@ -36,7 +36,7 @@ class AuthenticationImplementation extends AuthenticationRepository {
       await prefs.setBool('is_girl', data['profile']['is_girl']);
       await prefs.setBool('is_verified', data['profile']['is_verified']);
       await prefs.setInt('circle', data['profile']['active_circle'] ?? 0);
-      await prefs.setBool('wasInsideSafeZone', false); 
+      await prefs.setBool('wasInsideSafeZone', false);
       await prefs.setBool('wasInsideDangerZone', false);
 
       print("Login successful, data saved to SharedPreferences");
@@ -122,6 +122,37 @@ class AuthenticationImplementation extends AuthenticationRepository {
     } else {
       final errorMessage = jsonDecode(response.body)['error'];
       print("Failed to update location: $errorMessage");
+      throw Exception(errorMessage);
+    }
+  }
+
+  @override
+  Future<void> changePassword(String password, String newpassword) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final int userId = prefs.getInt('id') ?? 0;
+
+    if (userId == 0) {
+      print("User not logged in");
+      return;
+    }
+    final response = await http.patch(
+      Uri.parse("${dotenv.env['API_URL']}/user/change_password"),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: jsonEncode({
+        'user_id': userId,
+        'password': password,
+        'newpassword': newpassword,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      print("Password updated successfully");
+    } else {
+      final errorMessage = jsonDecode(response.body)['error'];
+      print("Failed to update passwordd: $errorMessage");
       throw Exception(errorMessage);
     }
   }
