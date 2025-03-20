@@ -35,12 +35,6 @@ class _AllState extends State<All> {
     if (userId != 0) {
       context.read<NotificationBloc>().add(FetchNotifications(userId));
     }
-    print(userId);
-    print(userId);
-    print(userId);
-    print(userId);
-    print(userId);
-    print(userId);
   }
 
   @override
@@ -86,17 +80,15 @@ class _AllState extends State<All> {
           return GestureDetector(
             onTap: () {
               if (!notification.isRead) {
-                context
-                    .read<NotificationBloc>()
-                    .add(MarkNotificationAsRead(notification.id));
-
+                // Update the notification to read in local state
                 setState(() {
                   notifications[index] = notification.copyWith(isRead: true);
                 });
 
+                // Optionally, mark it as read in the backend as well
                 context
                     .read<NotificationBloc>()
-                    .add(FetchNotifications(userId));
+                    .add(MarkNotificationAsRead(notification.id));
               }
             },
             child: Container(
