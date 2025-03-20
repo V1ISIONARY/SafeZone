@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lottie/lottie.dart';
 import 'package:safezone/backend/bloc/adminBloc/analytics/analytics_admin_bloc.dart';
 import 'package:safezone/backend/bloc/adminBloc/analytics/analytics_admin_event.dart';
 import 'package:safezone/backend/bloc/adminBloc/analytics/analytics_admin_state.dart';
 import 'package:safezone/backend/models/dangerzoneModel/incident_report_model.dart';
+import 'package:safezone/frontend/widgets/loadingstate.dart';
 import 'package:safezone/resources/schema/colors.dart';
 import 'package:safezone/resources/schema/texts.dart';
 import '../../widgets/buttons/userinfomartion.dart';
@@ -24,7 +26,6 @@ class _AdminReportsUsersState extends State<AdminReportsUsers> {
   @override
   void initState() {
     super.initState();
-    // Trigger the event to fetch users with data when the widget is initialized
     context.read<AdminBloc>().add(FetchUsersWithData());
     _searchController.addListener(_onSearchChanged);
   }
@@ -57,7 +58,13 @@ class _AdminReportsUsersState extends State<AdminReportsUsers> {
       body: BlocBuilder<AdminBloc, AdminState>(
         builder: (context, state) {
           if (state is AdminLoading) {
-            return const Center(child: CircularProgressIndicator());
+            return Expanded(
+              child: Center(
+                child: Transform.translate(
+                    offset: const Offset(-20, -30),
+                    child: const LoadingState()),
+              ),
+            );
           } else if (state is UsersWithDataLoaded) {
             final usersData = state.data;
 

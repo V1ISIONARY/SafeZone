@@ -402,12 +402,22 @@ class _ReviewReportState extends State<ReviewReport> {
                     text: "Submit",
                     widthSize: true,
                     buttonColor: widgetPricolor,
-                    onPressed: state is IncidentReportLoading
-                      ? () {}
-                      : () { 
-                        context
-                        .read<IncidentReportBloc>()
-                        .add(CreateIncidentReport(widget.reportInfo));
+                    onPressed: state is IncidentReportLoading || 
+                        !(locationName.contains('Dagupan, Pangasinan, Philippines'))
+                        ? () {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: CategoryText(text: "Location must be in Dagupan, Pangasinan, Philippines. only", color: Colors.white),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                          return;
+                        }
+                        : () { 
+                          context
+                          .read<IncidentReportBloc>()
+                          .add(CreateIncidentReport(widget.reportInfo)
+                        );
                     },
                   );
                 },

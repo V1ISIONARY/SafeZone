@@ -9,6 +9,7 @@ import 'package:safezone/backend/bloc/safezoneBloc/safezone_bloc.dart';
 import 'package:safezone/backend/bloc/safezoneBloc/safezone_event.dart';
 import 'package:safezone/backend/bloc/safezoneBloc/safezone_state.dart';
 import 'package:safezone/frontend/widgets/cards/admin_safezones_card.dart';
+import 'package:safezone/frontend/widgets/loadingstate.dart';
 import 'package:safezone/resources/schema/colors.dart';
 
 class AdminSafezones extends StatefulWidget {
@@ -165,19 +166,13 @@ class _AdminSafezonesState extends State<AdminSafezones> {
       builder: (context, state) {
         if (state is SafeZoneLoading) {
           return Expanded(
-            child: Center(
-              child: Transform.translate(
-                offset: const Offset(0, -60), 
-                child: Lottie.asset(
-                  'lib/resources/lottie/loading.json',
-                  width: 80,
-                  height: 80,
-                  fit: BoxFit.cover,
-                ),
-              )
-            )
-          );
-        } else if (state is SafeZonesLoaded) {
+              child: Center(
+                child: Transform.translate(
+                    offset: const Offset(-20, -30),
+                    child: const LoadingState()),
+              ),
+            );
+          } else if (state is SafeZonesLoaded) {
           List filteredZones = _selectedFilter == 'All'
               ? state.safeZones
               : state.safeZones

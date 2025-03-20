@@ -434,8 +434,17 @@ class _ReviewSafezoneState extends State<ReviewSafezone> {
                     text: "Submit",
                     widthSize: true,
                     buttonColor: widgetPricolor,
-                    onPressed: state is SafeZoneLoading
-                        ? () {}
+                    onPressed: state is SafeZoneLoading || 
+                        !(locationName.contains('Dagupan, Pangasinan, Philippines'))
+                        ? () {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: CategoryText(text: "Location must be in Dagupan, Pangasinan, Philippines.", color: Colors.white),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                          return;
+                        }
                         : () {
                           context
                           .read<SafeZoneBloc>()

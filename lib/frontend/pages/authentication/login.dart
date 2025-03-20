@@ -7,6 +7,7 @@ import 'package:safezone/backend/bloc/authBloc/auth_bloc.dart';
 import 'package:safezone/backend/bloc/authBloc/auth_event.dart';
 import 'package:safezone/backend/bloc/authBloc/auth_state.dart';
 import 'package:safezone/backend/bloc/notificationBloc/notification_polling.dart';
+import 'package:safezone/frontend/pages/authentication/forgot.dart';
 import 'package:safezone/frontend/pages/authentication/register.dart';
 import 'package:safezone/resources/schema/colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -219,6 +220,16 @@ class _LoginState extends State<Login> {
                         ],
                       ),
                       GestureDetector(
+                        onTap: (){
+                          Navigator.push(
+                            context,
+                            PageTransition(
+                              child: Forgot(),
+                              type: PageTransitionType.rightToLeft,
+                              duration: Duration(milliseconds: 300),
+                            ),
+                          );
+                        },
                         child: Text(
                           "Forgot Password?",
                           style: TextStyle(

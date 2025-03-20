@@ -17,10 +17,12 @@ class BottomNavigationWidget extends StatefulWidget {
   _BottomNavigationWidgetState createState() => _BottomNavigationWidgetState();
 }
 
-class _BottomNavigationWidgetState extends State<BottomNavigationWidget> {
+class _BottomNavigationWidgetState extends State<BottomNavigationWidget> with SingleTickerProviderStateMixin {
+  
   int _selectedIndex = 0;
-
   late List<Widget> _pages;
+  late Animation<double> _animation;
+  late AnimationController _controller;
 
   @override
   void initState() {
@@ -31,12 +33,39 @@ class _BottomNavigationWidgetState extends State<BottomNavigationWidget> {
       Notif(UserToken: widget.userToken, initialPage: 0),
       Settings(UserToken: widget.userToken),
     ];
+
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    )..addStatusListener((status) {
+        if (status == AnimationStatus.completed) {
+          _controller.reset();
+        }
+      });
+
+    _animation = TweenSequence([
+      TweenSequenceItem(tween: Tween(begin: 0.0, end: 3.0), weight: 1),
+      TweenSequenceItem(tween: Tween(begin: 3.0, end: -3.0), weight: 1),
+      TweenSequenceItem(tween: Tween(begin: -3.0, end: 3.0), weight: 1),
+      TweenSequenceItem(tween: Tween(begin: 3.0, end: 0.0), weight: 1),
+    ]).animate(_controller);
+
   }
 
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
     });
+  }
+
+  void _startShake() {
+    _controller.forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   @override
@@ -46,11 +75,11 @@ class _BottomNavigationWidgetState extends State<BottomNavigationWidget> {
       body: _pages[_selectedIndex],
       bottomNavigationBar: BottomAppBar(
         color: Colors.white,
-        shape: const CircularNotchedRectangle(), // Notched shape for FAB
-        notchMargin: 6.0, // Space between FAB and BottomAppBar
-        clipBehavior: Clip.antiAlias, // Ensures the notch is smooth
+        shape: const CircularNotchedRectangle(), 
+        notchMargin: 6.0, 
+        clipBehavior: Clip.antiAlias, 
         child: SizedBox(
-          height: 65, // Proper height for the notch to be visible
+          height: 65,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -63,23 +92,63 @@ class _BottomNavigationWidgetState extends State<BottomNavigationWidget> {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: widgetPricolor,
-        splashColor: Colors.transparent,
-        elevation: 5,
-        shape: const CircleBorder(), // Ensures the FAB is circular
-        onPressed: () {
-          context.push('/sos-countdown');
-        },
-        child: const Text(
-          'SOS',
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
+      floatingActionButton: widget.userToken == 'guest'
+        ? FloatingActionButton(
+            backgroundColor: widgetPricolor,
+            splashColor: Colors.transparent,
+            elevation: 5,
+            shape: const CircleBorder(),
+            onPressed: () {
+              _startShake();
+            },
+            child: Stack(
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white38,
+                    shape: BoxShape.circle
+                  ),
+                ),
+                Center(
+                  child: AnimatedBuilder(
+                    animation: _animation,
+                    builder: (context, child) {
+                      return Transform.translate(
+                        offset: Offset(_animation.value, 0),
+                        child: SizedBox(
+                          width: 40,
+                          height: 40,
+                          child: Image.asset(
+                            'lib/resources/images/lock.png',
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ]
+            )
+          )
+        : FloatingActionButton(
+            backgroundColor: widgetPricolor,
+            splashColor: Colors.transparent,
+            elevation: 5,
+            shape: const CircleBorder(),
+            onPressed: () {
+              context.push('/sos-countdown');
+            },
+            child: const Text(
+              'SOS',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
-        ),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.miniCenterDocked,
+        
+    floatingActionButtonLocation: FloatingActionButtonLocation.miniCenterDocked,
+
     );
   }
 

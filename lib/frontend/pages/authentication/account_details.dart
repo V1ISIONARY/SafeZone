@@ -278,12 +278,12 @@ class _AccountDetailsState extends State<AccountDetails> {
                       data: password,
                     ),
                     Divider(height: 0.5, color: Colors.white),
-                    AccountDisplay(
-                      title: "Phone",
-                      svgIcon: "lib/resources/svg/phone.svg",
-                      data: phone,
-                    ),
-                    Divider(height: 0.5, color: Colors.white),
+                    // AccountDisplay(
+                    //   title: "Phone",
+                    //   svgIcon: "lib/resources/svg/phone.svg",
+                    //   data: phone,
+                    // ),
+                    // Divider(height: 0.5, color: Colors.white),
                     AccountDisplay(
                       title: "Email",
                       svgIcon: "lib/resources/svg/mail.svg",

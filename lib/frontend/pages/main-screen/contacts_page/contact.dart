@@ -97,22 +97,22 @@ class _ContactState extends State<Contact> with SingleTickerProviderStateMixin {
                 color: textColor,
               ),
             ),
-            actions: [
-              GestureDetector(
-                onTap: () {
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return const CurvedAlertDialog(); // Display the custom dialog
-                    },
-                  );
-                },
-                child: Padding(
-                  padding: const EdgeInsets.only(right: 20),
-                  child: SvgPicture.asset("lib/resources/svg/add.svg"),
-                ),
-              ),
-            ],
+            // actions: [
+            //   GestureDetector(
+            //     onTap: () {
+            //       showDialog(
+            //         context: context,
+            //         builder: (BuildContext context) {
+            //           return const CurvedAlertDialog(); // Display the custom dialog
+            //         },
+            //       );
+            //     },
+            //     child: Padding(
+            //       padding: const EdgeInsets.only(right: 20),
+            //       child: SvgPicture.asset("lib/resources/svg/add.svg"),
+            //     ),
+            //   ),
+            // ],
           ),
           body: Container(
             margin: const EdgeInsets.symmetric(horizontal: 15),
