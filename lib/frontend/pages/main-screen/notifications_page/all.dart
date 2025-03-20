@@ -18,8 +18,8 @@ class All extends StatefulWidget {
 }
 
 class _AllState extends State<All> {
-  List<NotificationModel> notifications = []; // Store notifications locally
-  int userId = 0; // Default userId
+  List<NotificationModel> notifications = []; 
+  int userId = 0; 
 
   @override
   void initState() {
@@ -30,17 +30,11 @@ class _AllState extends State<All> {
   Future<void> _fetchUserIdAndNotifications() async {
     final prefs = await SharedPreferences.getInstance();
     userId =
-        prefs.getInt('id') ?? 0; // Get stored userId, default to 0 if not found
+        prefs.getInt('id') ?? 0; 
 
     if (userId != 0) {
       context.read<NotificationBloc>().add(FetchNotifications(userId));
     }
-    print(userId);
-    print(userId);
-    print(userId);
-    print(userId);
-    print(userId);
-    print(userId);
   }
 
   @override
@@ -62,7 +56,7 @@ class _AllState extends State<All> {
               ),
             )));
           } else if (state is NotificationError) {
-            return _buildError(state.message);
+            // return _fetchUserIdAndNotifications();
           } else if (state is NotificationLoaded) {
             notifications = state.notifications;
             return notifications.isNotEmpty
@@ -86,17 +80,10 @@ class _AllState extends State<All> {
           return GestureDetector(
             onTap: () {
               if (!notification.isRead) {
-                context
-                    .read<NotificationBloc>()
-                    .add(MarkNotificationAsRead(notification.id));
-
                 setState(() {
                   notifications[index] = notification.copyWith(isRead: true);
                 });
-
-                context
-                    .read<NotificationBloc>()
-                    .add(FetchNotifications(userId));
+                context.read<NotificationBloc>().add(MarkNotificationAsRead(notification.id));
               }
             },
             child: Container(
@@ -109,8 +96,7 @@ class _AllState extends State<All> {
                 borderRadius: BorderRadius.circular(5),
               ),
               child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: Row(
                   children: [
                     Container(
@@ -128,8 +114,7 @@ class _AllState extends State<All> {
                       ),
                       child: Icon(
                         Icons.notifications,
-                        color:
-                            notification.isRead ? Colors.grey : widgetPricolor,
+                        color: notification.isRead ? Colors.grey : widgetPricolor,
                       ),
                     ),
                     const SizedBox(width: 16),
@@ -156,8 +141,7 @@ class _AllState extends State<All> {
                           const SizedBox(height: 4),
                           Text(
                             notification.createdAt,
-                            style: const TextStyle(
-                                color: Colors.grey, fontSize: 11),
+                            style: const TextStyle(color: Colors.grey, fontSize: 11),
                           ),
                         ],
                       ),

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:lottie/lottie.dart';
 import 'package:safezone/backend/bloc/adminBloc/analytics/analytics_admin_bloc.dart';
 import 'package:safezone/backend/bloc/adminBloc/analytics/analytics_admin_event.dart';
 import 'package:safezone/backend/bloc/adminBloc/analytics/analytics_admin_state.dart';
+import 'package:safezone/frontend/widgets/loadingstate.dart';
 import 'package:safezone/resources/schema/colors.dart';
 import '../../../resources/schema/texts.dart';
 import '../../widgets/buttons/percentage_average.dart';
@@ -65,7 +67,13 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> {
       body: BlocBuilder<AdminBloc, AdminState>(
         builder: (context, state) {
           if (state is AdminLoading) {
-            return const Center(child: CircularProgressIndicator());
+            return Expanded(
+              child: Center(
+                child: Transform.translate(
+                    offset: const Offset(-20, -30),
+                    child: const LoadingState()),
+              ),
+            );
           } else if (state is AdminError) {
             return Center(child: Text('Error: ${state.message}'));
           } else if (state is AllDataLoaded) {

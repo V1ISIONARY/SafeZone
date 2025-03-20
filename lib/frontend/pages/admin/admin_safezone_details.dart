@@ -10,6 +10,7 @@ import 'package:safezone/backend/bloc/adminBloc/safezone/safezone_admin_event.da
 import 'package:safezone/backend/bloc/adminBloc/safezone/safezone_admin_state.dart';
 import 'package:safezone/backend/models/safezoneModel/safezone_model.dart';
 import 'package:safezone/frontend/widgets/buttons/custom_radio_button.dart';
+import 'package:safezone/frontend/widgets/loadingstate.dart';
 import 'package:safezone/frontend/widgets/texts/history_information.dart';
 import 'package:safezone/resources/schema/colors.dart';
 import 'package:safezone/resources/schema/texts.dart';
@@ -200,17 +201,13 @@ class _AdminSafezoneDetailsState extends State<AdminSafezoneDetails> {
               builder: (context, state) {
             if (_isLoading) {
               return Expanded(
-                  child: Center(
-                      child: Transform.translate(
-                offset: const Offset(0, -60),
-                child: Lottie.asset(
-                  'lib/resources/lottie/loading.json',
-                  width: 80,
-                  height: 80,
-                  fit: BoxFit.cover,
-                ),
-              )));
-            }
+              child: Center(
+                child: Transform.translate(
+                    offset: const Offset(-20, -30),
+                    child: const LoadingState()),
+              ),
+            );
+          }
             return SingleChildScrollView(
               child: Column(
                 children: [
