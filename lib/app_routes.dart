@@ -3,6 +3,7 @@ import 'package:safezone/backend/models/dangerzoneModel/incident_report_request_
 import 'package:safezone/backend/models/safezoneModel/safezone_model.dart';
 import 'package:safezone/backend/models/userModel/circle_model.dart';
 import 'package:safezone/experiement.dart';
+import 'package:safezone/frontend/pages/admin/admin_dangerzones_details.dart';
 import 'package:safezone/frontend/pages/admin/admin_initial_screen.dart';
 import 'package:safezone/frontend/pages/admin/admin_reports.dart';
 import 'package:safezone/frontend/pages/admin/admin_reports_details.dart';
@@ -53,11 +54,11 @@ GoRouter appRouter(bool isFirstRun, String? userToken) => GoRouter(
               : BottomNavigationWidget(userToken: userToken ?? 'guest'),
         ),
         GoRoute(
-          path: '/home',
-          builder: (context, state) {
-            final token = state.extra as String;
-            return BottomNavigationWidget(userToken: token);
-          }),
+            path: '/home',
+            builder: (context, state) {
+              final token = state.extra as String;
+              return BottomNavigationWidget(userToken: token);
+            }),
         GoRoute(
           path: '/register',
           builder: (context, state) => const RegisterScreen(),
@@ -86,12 +87,11 @@ GoRouter appRouter(bool isFirstRun, String? userToken) => GoRouter(
           builder: (context, state) => const ReportSuccess(),
         ),
         GoRoute(
-          path: '/reports-history',
-          builder: (context, state) {
-            final maybe = state.extra as bool;
-            return ReportsHistory(fromSuccess: maybe);
-          }
-        ),
+            path: '/reports-history',
+            builder: (context, state) {
+              final maybe = state.extra as bool;
+              return ReportsHistory(fromSuccess: maybe);
+            }),
         GoRoute(
           path: '/reports-status-history',
           builder: (context, state) {
@@ -111,12 +111,11 @@ GoRouter appRouter(bool isFirstRun, String? userToken) => GoRouter(
           },
         ),
         GoRoute(
-          path: '/safezone-history',
-          builder: (context, state) {
-            final maybe = state.extra as bool;
-            return ReportsHistory(fromSuccess: maybe);
-          }
-        ),
+            path: '/safezone-history',
+            builder: (context, state) {
+              final maybe = state.extra as bool;
+              return ReportsHistory(fromSuccess: maybe);
+            }),
         GoRoute(
           path: '/safezone-history-details',
           builder: (context, state) {
@@ -254,6 +253,13 @@ GoRouter appRouter(bool isFirstRun, String? userToken) => GoRouter(
 
             return AdminReportsDetails(
                 reportInfo: reportModel, address: address);
+          },
+        ),
+        GoRoute(
+          path: '/admin-danger-zone-details',
+          builder: (context, state) {
+            final dangerzone = state.extra as DangerZoneModel;
+            return AdminDangerZoneDetails(dangerZone: dangerzone);
           },
         ),
 

@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:safezone/backend/cubic/analytics.dart';
 import 'package:safezone/frontend/pages/admin/admin_dangerzones.dart';
 import 'package:safezone/frontend/pages/admin/admin_initial_screen.dart';
-import 'package:safezone/frontend/pages/admin/admin_rejected.dart';
 import 'package:safezone/frontend/pages/admin/admin_reports.dart';
 import 'package:safezone/frontend/pages/admin/admin_users.dart';
 import 'package:safezone/frontend/pages/admin/admin_safezones.dart';
@@ -35,9 +34,8 @@ class _MainAnalyticsState extends State<MainAnalytics>
       const AdminInitialScreen(),
       const AdminReportsUsers(),
       const AdminSafezones(),
-      const AdminReports(),
       const AdminDangerzones(),
-      const AdminRejected()
+      const AdminReports(),
     ];
 
     _controller = AnimationController(
@@ -69,7 +67,6 @@ class _MainAnalyticsState extends State<MainAnalytics>
     );
   }
 
-
   @override
   void dispose() {
     _controller.dispose();
@@ -85,9 +82,8 @@ class _MainAnalyticsState extends State<MainAnalytics>
         _bottomAppBarItem("Overview", 0),
         _bottomAppBarItem("Users", 1),
         _bottomAppBarItem("Safezone", 2),
-        _bottomAppBarItem("Incidents", 3),
-        _bottomAppBarItem("Dangerzone", 4),
-        _bottomAppBarItem("Rejected", 5)
+        _bottomAppBarItem("Dangerzone", 3),
+        _bottomAppBarItem("Incidents", 4),
       ]),
     );
   }
@@ -162,7 +158,8 @@ class _MainAnalyticsState extends State<MainAnalytics>
                 border: Border.all(width: 1, color: Colors.black),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.arrow_back, color: Colors.black, size: 10),
+              child:
+                  const Icon(Icons.arrow_back, color: Colors.black, size: 10),
             ),
           ),
         ),

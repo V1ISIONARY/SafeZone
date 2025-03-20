@@ -14,7 +14,7 @@ class SafeZoneAdminBloc extends Bloc<SafeZoneAdminEvent, SafeZoneAdminState> {
     on<FetchSafeZones>(_onFetchSafeZones);
   }
 
-  Future<void> _onVerifySafeZone(
+  Future<void> _onVerifySafeZone( 
     VerifySafeZone event, Emitter<SafeZoneAdminState> emit) async {
   emit(SafeZoneAdminLoading());
   try {

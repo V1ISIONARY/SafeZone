@@ -9,6 +9,8 @@ abstract class DangerZoneEvent extends Equatable {
 
 class FetchDangerZones extends DangerZoneEvent {}
 
+class FetchAllDangerZones extends DangerZoneEvent {}
+
 class FetchDangerZoneById extends DangerZoneEvent {
   final int id;
 

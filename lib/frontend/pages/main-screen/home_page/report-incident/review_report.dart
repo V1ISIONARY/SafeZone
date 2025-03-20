@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:geocoding/geocoding.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http show get;
@@ -13,7 +12,6 @@ import 'package:safezone/backend/bloc/incident_report/incident_report_event.dart
 import 'package:safezone/backend/bloc/incident_report/incident_report_state.dart';
 import 'package:safezone/backend/models/dangerzoneModel/incident_report_request_model.dart';
 import 'package:safezone/frontend/widgets/buttons/custom_button.dart';
-import 'package:safezone/frontend/widgets/report-danger-zone/text_row.dart';
 import 'package:safezone/resources/schema/colors.dart';
 import 'package:safezone/resources/schema/texts.dart';
 import 'package:safezone/frontend/widgets/loadingstate.dart';
