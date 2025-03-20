@@ -57,6 +57,8 @@ class _AllState extends State<All> {
             )));
           } else if (state is NotificationError) {
             return _buildError(state.message);
+          } else if (state is NotificationUpdated) {
+            _fetchUserIdAndNotifications();
           } else if (state is NotificationLoaded) {
             notifications = state.notifications;
             return notifications.isNotEmpty
@@ -211,10 +213,6 @@ class _AllState extends State<All> {
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 10),
-          ElevatedButton(
-            onPressed: _fetchUserIdAndNotifications,
-            child: const Text("Retry"),
-          ),
         ],
       ),
     );
