@@ -1154,42 +1154,42 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                               )
                             ]))),
                 SizedBox(height: 10),
-                Container(
-                    height: _circleHeight ? 400 : 0,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(5),
-                      boxShadow: const [
-                        BoxShadow(
-                          color: Colors.grey,
-                          blurRadius: 2,
-                          offset: Offset(1, 1),
-                        ),
-                      ],
-                    ),
-                    margin: EdgeInsets.only(
-                        bottom: _circleHeight ? 10 : 0, left: 15, right: 15),
-                    padding: EdgeInsets.all(15),
-                    child: SingleChildScrollView(
-                      physics: const AlwaysScrollableScrollPhysics(),
-                      child: Column(
-                        children: [
-                          for (var circle
-                              in _circles.where((circle) => circle.isActive))
-                            ListTile(
-                              title: Text(circle.name),
-                              subtitle: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text("Status: Active"),
-                                  Text("Code: ${circle.code}"),
-                                ],
-                              ),
-                            ),
-                        ],
-                      ),
-                    )),
+                // Container(
+                //     height: _circleHeight ? 400 : 0,
+                //     width: double.infinity,
+                //     decoration: BoxDecoration(
+                //       color: Colors.white,
+                //       borderRadius: BorderRadius.circular(5),
+                //       boxShadow: const [
+                //         BoxShadow(
+                //           color: Colors.grey,
+                //           blurRadius: 2,
+                //           offset: Offset(1, 1),
+                //         ),
+                //       ],
+                //     ),
+                //     margin: EdgeInsets.only(
+                //         bottom: _circleHeight ? 10 : 0, left: 15, right: 15),
+                //     padding: EdgeInsets.all(15),
+                //     child: SingleChildScrollView(
+                //       physics: const AlwaysScrollableScrollPhysics(),
+                //       child: Column(
+                //         children: [
+                //           for (var circle
+                //               in _circles.where((circle) => circle.isActive))
+                //             ListTile(
+                //               title: Text(circle.name),
+                //               subtitle: Column(
+                //                 crossAxisAlignment: CrossAxisAlignment.start,
+                //                 children: [
+                //                   Text("Status: Active"),
+                //                   Text("Code: ${circle.code}"),
+                //                 ],
+                //               ),
+                //             ),
+                //         ],
+                //       ),
+                //     )),
                 widget.UserToken == 'guest'
                     ? Container(
                         margin:
@@ -1572,23 +1572,26 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                     ),
                                   ),
                                 ),
-                              ],
+                              ]
                             )
-                          ],
-                        ))
-                    : SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Row(
-                          children: [
-                            SizedBox(width: 10),
-                            GestureDetector(onTap: () {
-                              if (!_isExpanded) {
-                                setState(() {
-                                  _isExpanded = true;
-                                });
-                              }
-                            }, child:
-                                LayoutBuilder(builder: (context, constraints) {
+                          ]
+                        )
+                    )
+                  : SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: [
+                        SizedBox(width: 15),
+                        GestureDetector(
+                          onTap: () {
+                            if (!_isExpanded) {
+                              setState(() {
+                                _isExpanded = true;
+                              });
+                            }
+                          },
+                          child: LayoutBuilder(
+                            builder: (context, constraints) {
                               return AnimatedContainer(
                                 duration: const Duration(milliseconds: 300),
                                 margin: const EdgeInsets.only(right: 10),

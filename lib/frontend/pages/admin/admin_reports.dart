@@ -9,6 +9,7 @@ import 'package:safezone/backend/bloc/incident_report/incident_report_bloc.dart'
 import 'package:safezone/backend/bloc/incident_report/incident_report_event.dart';
 import 'package:safezone/backend/bloc/incident_report/incident_report_state.dart';
 import 'package:safezone/frontend/widgets/cards/admin_reports_card.dart';
+import 'package:safezone/frontend/widgets/loadingstate.dart';
 import 'package:safezone/resources/schema/colors.dart';
 
 class AdminReports extends StatefulWidget {
@@ -166,19 +167,13 @@ class _AdminReportsState extends State<AdminReports> {
       builder: (context, state) {
         if (state is IncidentReportLoading) {
           return Expanded(
-            child: Center(
-              child: Transform.translate(
-                offset: const Offset(0, -60), 
-                child: Lottie.asset(
-                  'lib/resources/lottie/loading.json',
-                  width: 80,
-                  height: 80,
-                  fit: BoxFit.cover,
-                ),
-              )
-            )
-          );
-        } else if (state is IncidentReportLoaded) {
+              child: Center(
+                child: Transform.translate(
+                    offset: const Offset(-20, -30),
+                    child: const LoadingState()),
+              ),
+            );
+          } else if (state is IncidentReportLoaded) {
           List filteredZones = _selectedFilter == 'All'
               ? state.incidentReports
               : state.incidentReports

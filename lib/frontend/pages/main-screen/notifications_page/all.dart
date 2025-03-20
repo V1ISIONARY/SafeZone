@@ -18,8 +18,8 @@ class All extends StatefulWidget {
 }
 
 class _AllState extends State<All> {
-  List<NotificationModel> notifications = []; // Store notifications locally
-  int userId = 0; // Default userId
+  List<NotificationModel> notifications = [];
+  int userId = 0;
 
   @override
   void initState() {
@@ -29,18 +29,11 @@ class _AllState extends State<All> {
 
   Future<void> _fetchUserIdAndNotifications() async {
     final prefs = await SharedPreferences.getInstance();
-    userId =
-        prefs.getInt('id') ?? 0; // Get stored userId, default to 0 if not found
+    userId = prefs.getInt('id') ?? 0;
 
     if (userId != 0) {
       context.read<NotificationBloc>().add(FetchNotifications(userId));
     }
-    print(userId);
-    print(userId);
-    print(userId);
-    print(userId);
-    print(userId);
-    print(userId);
   }
 
   @override
@@ -63,6 +56,8 @@ class _AllState extends State<All> {
             )));
           } else if (state is NotificationError) {
             return _buildError(state.message);
+          } else if (state is NotificationUpdated) {
+            _fetchUserIdAndNotifications();
           } else if (state is NotificationLoaded) {
             notifications = state.notifications;
             return notifications.isNotEmpty
@@ -86,17 +81,15 @@ class _AllState extends State<All> {
           return GestureDetector(
             onTap: () {
               if (!notification.isRead) {
-                context
-                    .read<NotificationBloc>()
-                    .add(MarkNotificationAsRead(notification.id));
-
+                // Update the notification to read in local state
                 setState(() {
                   notifications[index] = notification.copyWith(isRead: true);
                 });
 
+                // Optionally, mark it as read in the backend as well
                 context
                     .read<NotificationBloc>()
-                    .add(FetchNotifications(userId));
+                    .add(MarkNotificationAsRead(notification.id));
               }
             },
             child: Container(
@@ -219,10 +212,6 @@ class _AllState extends State<All> {
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 10),
-          ElevatedButton(
-            onPressed: _fetchUserIdAndNotifications,
-            child: const Text("Retry"),
-          ),
         ],
       ),
     );

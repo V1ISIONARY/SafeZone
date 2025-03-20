@@ -656,7 +656,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 child: Center(
                   child: BlocBuilder<AuthenticationBloc, AuthenticationState>(
                     builder: (context, state) {
-                      if (state is SignUpnLoading) {
+                      if (state is LoginLoading) {
                         return const SizedBox(
                           height: 20,
                           width: 20,

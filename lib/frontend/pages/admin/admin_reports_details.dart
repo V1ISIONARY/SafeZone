@@ -11,6 +11,7 @@ import 'package:safezone/backend/bloc/adminBloc/incident_report/admin_incident_r
 import 'package:safezone/backend/bloc/adminBloc/incident_report/admin_incident_report_event.dart';
 import 'package:safezone/backend/bloc/adminBloc/incident_report/admin_incident_report_state.dart';
 import 'package:safezone/backend/models/dangerzoneModel/incident_report_model.dart';
+import 'package:safezone/frontend/widgets/loadingstate.dart';
 import 'package:safezone/frontend/widgets/texts/history_information.dart';
 import 'package:safezone/resources/schema/colors.dart';
 import 'package:safezone/resources/schema/texts.dart';
@@ -186,18 +187,14 @@ class _AdminReportsDetailsState extends State<AdminReportsDetails> {
         body: BlocBuilder<AdminIncidentReportBloc, AdminIncidentReportState>(
           builder: (context, state) {
             if (_isLoading) {
-              return Center(
+              return Expanded(
+              child: Center(
                 child: Transform.translate(
-                  offset: const Offset(0, -60),
-                  child: Lottie.asset(
-                    'lib/resources/lottie/loading.json',
-                    width: 80,
-                    height: 80,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              );
-            }
+                    offset: const Offset(-20, -30),
+                    child: const LoadingState()),
+              ),
+            );
+          }
             return SingleChildScrollView(
               child: Column(
                 children: [

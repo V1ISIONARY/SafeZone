@@ -163,17 +163,17 @@ class _SettingsState extends State<Settings> {
                                                                   color: Colors
                                                                       .white),
                                                         ),
-                                                        Text(
-                                                          'Unknown Number',
-                                                          style: GoogleFonts
-                                                              .poppins(
-                                                                  fontSize: 9,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w400,
-                                                                  color: Colors
-                                                                      .white70),
-                                                        ),
+                                                        // Text(
+                                                        //   'Unknown Number',
+                                                        //   style: GoogleFonts
+                                                        //       .poppins(
+                                                        //           fontSize: 9,
+                                                        //           fontWeight:
+                                                        //               FontWeight
+                                                        //                   .w400,
+                                                        //           color: Colors
+                                                        //               .white70),
+                                                        // ),
                                                       ])
                                                 : FutureBuilder<String>(
                                                     future: _getUserName(),
@@ -224,18 +224,18 @@ class _SettingsState extends State<Settings> {
                                                                     .white,
                                                               ),
                                                             ),
-                                                            Text(
-                                                              '(+63) 970 815 2371',
-                                                              style: GoogleFonts
-                                                                  .poppins(
-                                                                fontSize: 9,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w400,
-                                                                color: Colors
-                                                                    .white70,
-                                                              ),
-                                                            ),
+                                                            // Text(
+                                                            //   '(+63) 970 815 2371',
+                                                            //   style: GoogleFonts
+                                                            //       .poppins(
+                                                            //     fontSize: 9,
+                                                            //     fontWeight:
+                                                            //         FontWeight
+                                                            //             .w400,
+                                                            //     color: Colors
+                                                            //         .white70,
+                                                            //   ),
+                                                            // ),
                                                           ],
                                                         );
                                                       }

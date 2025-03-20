@@ -56,6 +56,9 @@ class _UnreadState extends State<Unread> {
             )));
           } else if (state is NotificationError) {
             return _buildError(state.message);
+          } else if (state is NotificationUpdated) {
+            print("");
+            _fetchUserIdAndNotifications();
           } else if (state is NotificationLoaded) {
             unreadNotifications = state.notifications
                 .where((notification) => !notification.isRead)
