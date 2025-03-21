@@ -156,6 +156,37 @@ class AuthenticationImplementation extends AuthenticationRepository {
       throw Exception(errorMessage);
     }
   }
+
+  @override
+  Future<void> resetPassword(String? email, String password, String newpassword) async {
+
+    if (email == null || email.isEmpty) {
+      print("No Email");
+      return;
+    }
+
+    final response = await http.patch(
+      Uri.parse("${dotenv.env['API_URL']}/user/reset_password"),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: jsonEncode({
+        'email': email,
+        'password': password,
+        'newpassword': newpassword,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      print("Password updated successfully");
+    } else {
+      final errorMessage = jsonDecode(response.body)['error'];
+      print("Failed to update password: $errorMessage");
+      throw Exception(errorMessage);
+    }
+  }
+
 }
 
 void viewSharedPreferences() async {

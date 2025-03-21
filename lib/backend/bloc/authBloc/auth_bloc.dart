@@ -51,6 +51,16 @@ class AuthenticationBloc
       }
     });
 
+    on<ResetPasswordEvent>((event, emit) async {
+      emit(UpdateLocationLoading());
+      try {
+        await _authrepo.resetPassword(event.email, event.password, event.newPassword);
+        emit(UpdateMyPasswordSuccess(event.email, event.password, event.newPassword));
+      } catch (e) {
+        emit(UpdateMyPasswordError('Failed to change password: ${e.toString()}'));
+      }
+    });
+
     on<ChangePasswordEvent>((event, emit) async {
       emit(UpdateLocationLoading());
       try {
@@ -61,4 +71,5 @@ class AuthenticationBloc
       }
     });
   }
+
 }

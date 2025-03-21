@@ -96,3 +96,18 @@ class UpdatePasswordError extends AuthenticationState {
 
   UpdatePasswordError(this.message);
 }
+
+class UpdateMyPasswordSuccess extends AuthenticationState {
+  final String email;
+  final String password;
+  final String newpassword;
+
+  UpdateMyPasswordSuccess(this.email, this.password, this.newpassword);
+}
+
+class UpdateMyPasswordError extends AuthenticationState {
+  final String message;
+
+  UpdateMyPasswordError(this.message);
+}
+

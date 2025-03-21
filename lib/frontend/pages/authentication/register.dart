@@ -109,6 +109,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     } catch (e) {
       print('Error sending OTP: $e');
     }
+
   }
 
   @override
@@ -577,7 +578,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ),
             ),
             SizedBox(height: 20),
-
             if (showConfirmPassword)
             Column(
               children: [

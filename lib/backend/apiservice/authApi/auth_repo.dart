@@ -10,9 +10,10 @@ abstract class AuthenticationRepository {
       bool isAdmin,
       bool isGirl,
       bool isVerified,
-      double latitude, // New parameter for latitude
-      double longitude // New parameter for longitude
+      double latitude,
+      double longitude 
       );
   Future<void> updateLocation(double latitude, double longitude);
   Future<void> changePassword(String password, String newpassword);
+  Future<void> resetPassword(String email, String password, String newpassword);
 }
