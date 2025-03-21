@@ -7,7 +7,6 @@ import 'package:safezone/backend/models/userModel/notifications_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class NotificationPollingService {
-
   static final NotificationPollingService _instance =
       NotificationPollingService._internal();
 
@@ -37,10 +36,16 @@ class NotificationPollingService {
     });
   }
 
-  void stopPolling() {
+  void stopPolling() async {
+    // Stop the timer
     timer?.cancel();
     timer = null;
     print("Polling stopped.");
+
+    // Clear SharedPreferences
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
+    print("SharedPreferences cleared.");
   }
 
   void enablePolling() {
