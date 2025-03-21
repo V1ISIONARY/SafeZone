@@ -58,6 +58,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
   Set<Marker> membersMarkers = {};
   Set<Polyline> _polylines = {};
   List<LatLng> _safeZones = [];
+  List<LatLng> _dangerZones = [];
   final locs.Location location = locs.Location();
   static const LatLng sourceLocation = LatLng(16.0471, 120.3425);
   LatLng _initialPosition = const LatLng(37.7749, -122.4194); // Default: SF
@@ -69,7 +70,9 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
   final Completer<GoogleMapController> _mapController = Completer();
 
   bool _showMarkers = true;
+  bool _isAllZoneShown = false;
   bool _isSafeZoneShown = false;
+  bool _isDangerZoneShown = false;
 
   BitmapDescriptor? customMarker;
   BitmapDescriptor? customDangerZoneMarker;
@@ -671,6 +674,11 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
         );
       }
 
+      _dangerZones = state.dangerZones
+          .map((dangerZone) =>
+              LatLng(dangerZone.latitude!, dangerZone.longitude!))
+          .toList();
+
       for (var dangerZone in state.dangerZones) {
         markers.add(
           Marker(
@@ -768,9 +776,33 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
     });
   }
 
-  void _findRoute() {
+  void _findAllRoute() {
+    if (!_isAllZoneShown) {
+      ZoneNavigator(
+        googleMapController: googleMapController,
+        currentUserLocation: _currentUserLocation,
+        safeZones: _safeZones,
+        dangerZones: _dangerZones,
+        onPolylinesUpdated: _updatePolylines,
+        context: context,
+      ).findNearestZones();
+
+      setState(() {
+        _isAllZoneShown = true;
+        _isDangerZoneShown = false;
+        _isSafeZoneShown = false;
+      });
+    } else {
+      _resetMap();
+      setState(() {
+        _isAllZoneShown = false;
+      });
+    }
+  }
+
+  void _findSafeRoute() {
     if (!_isSafeZoneShown) {
-      SafeZoneNavigator(
+      ZoneNavigator(
         googleMapController: googleMapController,
         currentUserLocation: _currentUserLocation,
         safeZones: _safeZones,
@@ -780,11 +812,36 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
 
       setState(() {
         _isSafeZoneShown = true;
+        _isAllZoneShown = false;
+        _isDangerZoneShown = false;
       });
     } else {
       _resetMap();
       setState(() {
         _isSafeZoneShown = false;
+      });
+    }
+  }
+
+  void _findDangerRoute() {
+    if (!_isDangerZoneShown) {
+      ZoneNavigator(
+        googleMapController: googleMapController,
+        currentUserLocation: _currentUserLocation,
+        dangerZones: _dangerZones,
+        onPolylinesUpdated: _updatePolylines,
+        context: context,
+      ).findNearestDangerZone();
+
+      setState(() {
+        _isDangerZoneShown = true;
+        _isAllZoneShown = false;
+        _isSafeZoneShown = false;
+      });
+    } else {
+      _resetMap();
+      setState(() {
+        _isDangerZoneShown = false;
       });
     }
   }
@@ -1195,403 +1252,414 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                         margin:
                             EdgeInsets.symmetric(horizontal: 15, vertical: 5),
                         child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            SizedBox(
-                              height: 40,
-                              child: Center(
-                                child: Container(
-                                    height: 40,
-                                    width: double.infinity,
-                                    decoration: const BoxDecoration(
-                                      color: Colors.grey,
-                                      borderRadius:
-                                          BorderRadius.all(Radius.circular(20)),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.grey,
-                                          blurRadius: 2,
-                                          offset: Offset(1, 1),
-                                        ),
-                                      ],
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        Expanded(
-                                          child: Stack(
-                                            children: [
-                                              Positioned.fill(
-                                                child: TextField(
-                                                  controller:
-                                                      _textEditingController,
-                                                  focusNode: _focusNodeText,
-                                                  style: GoogleFonts.poppins(
-                                                    fontSize: 9,
-                                                    fontWeight: FontWeight.w500,
-                                                    color: Colors.black,
-                                                  ),
-                                                  decoration: InputDecoration(
-                                                    filled: true,
-                                                    fillColor: Colors.white,
-                                                    hintText: '',
-                                                    hintStyle: const TextStyle(
-                                                        color:
-                                                            Colors.transparent),
-                                                    contentPadding:
-                                                        const EdgeInsets.only(
-                                                            left: 35,
-                                                            right: 40,
-                                                            bottom: 8),
-                                                    border: OutlineInputBorder(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              20.0),
-                                                      borderSide:
-                                                          const BorderSide(
-                                                              color:
-                                                                  widgetPricolor),
-                                                    ),
-                                                    focusedBorder:
-                                                        OutlineInputBorder(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              20.0),
-                                                      borderSide:
-                                                          const BorderSide(
-                                                              color:
-                                                                  widgetPricolor),
-                                                    ),
-                                                    enabledBorder:
-                                                        OutlineInputBorder(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              20.0),
-                                                      borderSide:
-                                                          const BorderSide(
-                                                              color:
-                                                                  widgetPricolor),
-                                                    ),
-                                                  ),
-                                                  onSubmitted: (value) {
-                                                    _searchLocation();
-                                                  },
-                                                ),
-                                              ),
-                                              Row(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.center,
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.start,
-                                                children: [
-                                                  Container(
-                                                    height: 40,
-                                                    width: 40,
-                                                    alignment: Alignment.center,
-                                                    color: Colors.transparent,
-                                                    child: SvgPicture.asset(
-                                                      'lib/resources/svg/search.svg',
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              SizedBox(
+                                height: 40,
+                                child: Center(
+                                  child: Container(
+                                      height: 40,
+                                      width: double.infinity,
+                                      decoration: const BoxDecoration(
+                                        color: Colors.grey,
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(20)),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.grey,
+                                            blurRadius: 2,
+                                            offset: Offset(1, 1),
+                                          ),
+                                        ],
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          Expanded(
+                                            child: Stack(
+                                              children: [
+                                                Positioned.fill(
+                                                  child: TextField(
+                                                    controller:
+                                                        _textEditingController,
+                                                    focusNode: _focusNodeText,
+                                                    style: GoogleFonts.poppins(
+                                                      fontSize: 9,
+                                                      fontWeight:
+                                                          FontWeight.w500,
                                                       color: Colors.black,
-                                                      height: 20,
-                                                      width: 20,
-                                                      fit: BoxFit.contain,
                                                     ),
-                                                  ),
-                                                  GestureDetector(
-                                                    key: _searchKey,
-                                                    onTap: () {
-                                                      FocusScope.of(context)
-                                                          .requestFocus(
-                                                              _focusNodeText);
-                                                    },
-                                                    child: Padding(
-                                                      padding:
+                                                    decoration: InputDecoration(
+                                                      filled: true,
+                                                      fillColor: Colors.white,
+                                                      hintText: '',
+                                                      hintStyle:
+                                                          const TextStyle(
+                                                              color: Colors
+                                                                  .transparent),
+                                                      contentPadding:
                                                           const EdgeInsets.only(
-                                                              right: 4),
-                                                      child: AnimatedBuilder(
-                                                        animation:
-                                                            _controllerFade,
-                                                        builder:
-                                                            (context, child) {
-                                                          return Row(
-                                                            crossAxisAlignment:
-                                                                CrossAxisAlignment
-                                                                    .start,
-                                                            children: [
-                                                              Transform
-                                                                  .translate(
-                                                                offset:
-                                                                    const Offset(
-                                                                        -5, 0),
-                                                                child:
-                                                                    CategoryDescripText(
-                                                                  text:
-                                                                      "Search for nearest",
-                                                                  color:
-                                                                      _colorAnimation
-                                                                          .value,
+                                                              left: 35,
+                                                              right: 40,
+                                                              bottom: 8),
+                                                      border:
+                                                          OutlineInputBorder(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(20.0),
+                                                        borderSide:
+                                                            const BorderSide(
+                                                                color:
+                                                                    widgetPricolor),
+                                                      ),
+                                                      focusedBorder:
+                                                          OutlineInputBorder(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(20.0),
+                                                        borderSide:
+                                                            const BorderSide(
+                                                                color:
+                                                                    widgetPricolor),
+                                                      ),
+                                                      enabledBorder:
+                                                          OutlineInputBorder(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(20.0),
+                                                        borderSide:
+                                                            const BorderSide(
+                                                                color:
+                                                                    widgetPricolor),
+                                                      ),
+                                                    ),
+                                                    onSubmitted: (value) {
+                                                      _searchLocation();
+                                                    },
+                                                  ),
+                                                ),
+                                                Row(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.center,
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.start,
+                                                  children: [
+                                                    Container(
+                                                      height: 40,
+                                                      width: 40,
+                                                      alignment:
+                                                          Alignment.center,
+                                                      color: Colors.transparent,
+                                                      child: SvgPicture.asset(
+                                                        'lib/resources/svg/search.svg',
+                                                        color: Colors.black,
+                                                        height: 20,
+                                                        width: 20,
+                                                        fit: BoxFit.contain,
+                                                      ),
+                                                    ),
+                                                    GestureDetector(
+                                                      key: _searchKey,
+                                                      onTap: () {
+                                                        FocusScope.of(context)
+                                                            .requestFocus(
+                                                                _focusNodeText);
+                                                      },
+                                                      child: Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .only(right: 4),
+                                                        child: AnimatedBuilder(
+                                                          animation:
+                                                              _controllerFade,
+                                                          builder:
+                                                              (context, child) {
+                                                            return Row(
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .start,
+                                                              children: [
+                                                                Transform
+                                                                    .translate(
+                                                                  offset:
+                                                                      const Offset(
+                                                                          -5,
+                                                                          0),
+                                                                  child:
+                                                                      CategoryDescripText(
+                                                                    text:
+                                                                        "Search for nearest",
+                                                                    color: _colorAnimation
+                                                                        .value,
+                                                                  ),
                                                                 ),
-                                                              ),
-                                                            ],
+                                                              ],
+                                                            );
+                                                          },
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    Transform.translate(
+                                                        offset:
+                                                            const Offset(-5, 0),
+                                                        child: SlideTransition(
+                                                            position:
+                                                                _hintAnimation,
+                                                            child:
+                                                                AnimatedBuilder(
+                                                                    animation:
+                                                                        _hintColorAnimation,
+                                                                    builder:
+                                                                        (context,
+                                                                            child) {
+                                                                      return GestureDetector(
+                                                                          onTap:
+                                                                              () {
+                                                                            FocusScope.of(context).requestFocus(_focusNode);
+                                                                          },
+                                                                          child:
+                                                                              CategoryDescripText(
+                                                                            text:
+                                                                                hints[_currentHintIndex],
+                                                                            color: _hintAnimation.isCompleted
+                                                                                ? Colors.transparent
+                                                                                : _hintColorAnimation.value,
+                                                                          ));
+                                                                    })))
+                                                  ],
+                                                ),
+                                                Positioned(
+                                                  top: 0,
+                                                  right: _isExpanded ? 5 : 5,
+                                                  child: GestureDetector(
+                                                    onTap: () async {
+                                                      if (!_isListening) {
+                                                        bool available =
+                                                            await _speech
+                                                                .initialize();
+                                                        if (available) {
+                                                          setState(() =>
+                                                              _isListening =
+                                                                  true);
+                                                          _speech.listen(
+                                                            onResult: (result) {
+                                                              setState(() {
+                                                                _textEditingController
+                                                                        .text =
+                                                                    result
+                                                                        .recognizedWords;
+                                                              });
+                                                            },
+                                                            listenFor: Duration(
+                                                                seconds: 5),
                                                           );
-                                                        },
+                                                        }
+                                                      } else {
+                                                        setState(() =>
+                                                            _isListening =
+                                                                false);
+                                                        _speech.stop();
+                                                      }
+                                                    },
+                                                    child: Container(
+                                                      height: 40,
+                                                      width: 40,
+                                                      alignment:
+                                                          Alignment.center,
+                                                      color: Colors.transparent,
+                                                      child: SvgPicture.asset(
+                                                        'lib/resources/svg/mic.svg',
+                                                        color: Colors.black87,
+                                                        height: 22,
+                                                        width: 22,
+                                                        fit: BoxFit.contain,
                                                       ),
                                                     ),
                                                   ),
-                                                  Transform.translate(
-                                                      offset:
-                                                          const Offset(-5, 0),
-                                                      child: SlideTransition(
-                                                          position:
-                                                              _hintAnimation,
-                                                          child:
-                                                              AnimatedBuilder(
-                                                                  animation:
-                                                                      _hintColorAnimation,
-                                                                  builder:
-                                                                      (context,
-                                                                          child) {
-                                                                    return GestureDetector(
-                                                                        onTap:
-                                                                            () {
-                                                                          FocusScope.of(context)
-                                                                              .requestFocus(_focusNode);
-                                                                        },
-                                                                        child:
-                                                                            CategoryDescripText(
-                                                                          text:
-                                                                              hints[_currentHintIndex],
-                                                                          color: _hintAnimation.isCompleted
-                                                                              ? Colors.transparent
-                                                                              : _hintColorAnimation.value,
-                                                                        ));
-                                                                  })))
-                                                ],
-                                              ),
-                                              Positioned(
-                                                top: 0,
-                                                right: _isExpanded ? 5 : 5,
-                                                child: GestureDetector(
-                                                  onTap: () async {
-                                                    if (!_isListening) {
-                                                      bool available =
-                                                          await _speech
-                                                              .initialize();
-                                                      if (available) {
-                                                        setState(() =>
-                                                            _isListening =
-                                                                true);
-                                                        _speech.listen(
-                                                          onResult: (result) {
-                                                            setState(() {
-                                                              _textEditingController
-                                                                      .text =
-                                                                  result
-                                                                      .recognizedWords;
-                                                            });
-                                                          },
-                                                          listenFor: Duration(
-                                                              seconds: 5),
-                                                        );
-                                                      }
-                                                    } else {
-                                                      setState(() =>
-                                                          _isListening = false);
-                                                      _speech.stop();
-                                                    }
-                                                  },
-                                                  child: Container(
-                                                    height: 40,
-                                                    width: 40,
-                                                    alignment: Alignment.center,
-                                                    color: Colors.transparent,
-                                                    child: SvgPicture.asset(
-                                                      'lib/resources/svg/mic.svg',
-                                                      color: Colors.black87,
-                                                      height: 22,
-                                                      width: 22,
-                                                      fit: BoxFit.contain,
-                                                    ),
-                                                  ),
                                                 ),
+                                              ],
+                                            ),
+                                          ),
+                                          GestureDetector(
+                                            onTap: () {
+                                              setState(() {
+                                                if (_textEditingController
+                                                    .text.isNotEmpty) {
+                                                  _searchLocation();
+                                                } else {
+                                                  _isExpanded = false;
+                                                  _textEditingController
+                                                      .clear();
+                                                  _focusNodeText.unfocus();
+                                                }
+                                              });
+                                            },
+                                            child: Container(
+                                              width: 40,
+                                              height: 40,
+                                              decoration: BoxDecoration(
+                                                color: Colors.grey,
+                                                borderRadius: BorderRadius.only(
+                                                    bottomRight:
+                                                        Radius.circular(20),
+                                                    topRight:
+                                                        Radius.circular(20)),
                                               ),
-                                            ],
-                                          ),
-                                        ),
-                                        GestureDetector(
-                                          onTap: () {
-                                            setState(() {
-                                              if (_textEditingController
-                                                  .text.isNotEmpty) {
-                                                _searchLocation();
-                                              } else {
-                                                _isExpanded = false;
-                                                _textEditingController.clear();
-                                                _focusNodeText.unfocus();
-                                              }
-                                            });
-                                          },
-                                          child: Container(
-                                            width: 40,
-                                            height: 40,
-                                            decoration: BoxDecoration(
-                                              color: Colors.grey,
-                                              borderRadius: BorderRadius.only(
-                                                  bottomRight:
-                                                      Radius.circular(20),
-                                                  topRight:
-                                                      Radius.circular(20)),
-                                            ),
-                                            child: const Center(
-                                              child: Icon(Icons.send,
-                                                  color: Colors.white,
-                                                  size: 18),
+                                              child: const Center(
+                                                child: Icon(Icons.send,
+                                                    color: Colors.white,
+                                                    size: 18),
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                      ],
-                                    )),
+                                        ],
+                                      )),
+                                ),
                               ),
-                            ),
-                            SizedBox(height: 10),
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                GestureDetector(
-                                  onTap: () {},
-                                  child: Container(
-                                    margin: const EdgeInsets.only(right: 10),
-                                    width: 60,
-                                    height: 40,
-                                    decoration: BoxDecoration(
-                                      color: _isSafeZoneShown
-                                          ? Colors.grey[300]
-                                          : Colors.white,
-                                      borderRadius: BorderRadius.circular(50),
-                                      boxShadow: const [
-                                        BoxShadow(
-                                          color: Colors.grey,
-                                          blurRadius: 2,
-                                          offset: Offset(1, 1),
+                              SizedBox(height: 10),
+                              Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    GestureDetector(
+                                      onTap: () {
+                                        _findAllRoute();
+                                      },
+                                      child: Container(
+                                        margin:
+                                            const EdgeInsets.only(right: 10),
+                                        width: 60,
+                                        height: 40,
+                                        decoration: BoxDecoration(
+                                          color: _isAllZoneShown
+                                              ? Colors.grey[300]
+                                              : Colors.white,
+                                          borderRadius:
+                                              BorderRadius.circular(50),
+                                          boxShadow: const [
+                                            BoxShadow(
+                                              color: Colors.grey,
+                                              blurRadius: 2,
+                                              offset: Offset(1, 1),
+                                            ),
+                                          ],
                                         ),
-                                      ],
-                                    ),
-                                    child: const Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      children: [
-                                        SizedBox(width: 5),
-                                        Icon(Icons.safety_check,
-                                            color: Colors.blue),
-                                        SizedBox(width: 5),
-                                        Expanded(
-                                          child: CategoryDescripText(
-                                            text: "All",
-                                            color: Colors.black,
-                                          ),
+                                        child: const Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          children: [
+                                            SizedBox(width: 5),
+                                            Icon(Icons.safety_check,
+                                                color: Colors.blue),
+                                            SizedBox(width: 5),
+                                            Expanded(
+                                              child: CategoryDescripText(
+                                                text: "All",
+                                                color: Colors.black,
+                                              ),
+                                            ),
+                                          ],
                                         ),
-                                      ],
+                                      ),
                                     ),
-                                  ),
-                                ),
-                                GestureDetector(
-                                  onTap: _findRoute,
-                                  child: Container(
-                                    margin: const EdgeInsets.only(right: 10),
-                                    width: 160,
-                                    height: 40,
-                                    decoration: BoxDecoration(
-                                      color: _isSafeZoneShown
-                                          ? Colors.grey[300]
-                                          : Colors.white,
-                                      borderRadius: BorderRadius.circular(50),
-                                      boxShadow: const [
-                                        BoxShadow(
-                                          color: Colors.grey,
-                                          blurRadius: 2,
-                                          offset: Offset(1, 1),
+                                    GestureDetector(
+                                      onTap: _findSafeRoute,
+                                      child: Container(
+                                        margin:
+                                            const EdgeInsets.only(right: 10),
+                                        width: 160,
+                                        height: 40,
+                                        decoration: BoxDecoration(
+                                          color: _isSafeZoneShown
+                                              ? Colors.grey[300]
+                                              : Colors.white,
+                                          borderRadius:
+                                              BorderRadius.circular(50),
+                                          boxShadow: const [
+                                            BoxShadow(
+                                              color: Colors.grey,
+                                              blurRadius: 2,
+                                              offset: Offset(1, 1),
+                                            ),
+                                          ],
                                         ),
-                                      ],
-                                    ),
-                                    child: const Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      children: [
-                                        SizedBox(width: 5),
-                                        Icon(Icons.safety_check,
-                                            color: Colors.green),
-                                        SizedBox(width: 5),
-                                        Expanded(
-                                          child: CategoryDescripText(
-                                            text: "Show nearest safe zone",
-                                            color: Colors.black,
-                                          ),
+                                        child: const Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          children: [
+                                            SizedBox(width: 5),
+                                            Icon(Icons.safety_check,
+                                                color: Colors.green),
+                                            SizedBox(width: 5),
+                                            Expanded(
+                                              child: CategoryDescripText(
+                                                text: "Show nearest safe zone",
+                                                color: Colors.black,
+                                              ),
+                                            ),
+                                          ],
                                         ),
-                                      ],
+                                      ),
                                     ),
-                                  ),
-                                ),
-                                GestureDetector(
-                                  onTap: () {},
-                                  child: Container(
-                                    width: 170,
-                                    height: 40,
-                                    decoration: BoxDecoration(
-                                      color: _isSafeZoneShown
-                                          ? Colors.grey[300]
-                                          : Colors.white,
-                                      borderRadius: BorderRadius.circular(50),
-                                      boxShadow: const [
-                                        BoxShadow(
-                                          color: Colors.grey,
-                                          blurRadius: 2,
-                                          offset: Offset(1, 1),
+                                    GestureDetector(
+                                      onTap: () {
+                                        _findDangerRoute();
+                                      },
+                                      child: Container(
+                                        width: 170,
+                                        height: 40,
+                                        decoration: BoxDecoration(
+                                          color: _isDangerZoneShown
+                                              ? Colors.grey[300]
+                                              : Colors.white,
+                                          borderRadius:
+                                              BorderRadius.circular(50),
+                                          boxShadow: const [
+                                            BoxShadow(
+                                              color: Colors.grey,
+                                              blurRadius: 2,
+                                              offset: Offset(1, 1),
+                                            ),
+                                          ],
                                         ),
-                                      ],
-                                    ),
-                                    child: const Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      children: [
-                                        SizedBox(width: 5),
-                                        Icon(Icons.safety_check,
-                                            color: Colors.red),
-                                        SizedBox(width: 5),
-                                        Expanded(
-                                          child: CategoryDescripText(
-                                            text: "Show nearest danger zone",
-                                            color: Colors.black,
-                                          ),
+                                        child: const Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          children: [
+                                            SizedBox(width: 5),
+                                            Icon(Icons.safety_check,
+                                                color: Colors.red),
+                                            SizedBox(width: 5),
+                                            Expanded(
+                                              child: CategoryDescripText(
+                                                text:
+                                                    "Show nearest danger zone",
+                                                color: Colors.black,
+                                              ),
+                                            ),
+                                          ],
                                         ),
-                                      ],
+                                      ),
                                     ),
-                                  ),
-                                ),
-                              ]
-                            )
-                          ]
-                        )
-                    )
-                  : SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: [
-                        SizedBox(width: 15),
-                        GestureDetector(
-                          onTap: () {
-                            if (!_isExpanded) {
-                              setState(() {
-                                _isExpanded = true;
-                              });
-                            }
-                          },
-                          child: LayoutBuilder(
-                            builder: (context, constraints) {
+                                  ])
+                            ]))
+                    : SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          children: [
+                            SizedBox(width: 15),
+                            GestureDetector(onTap: () {
+                              if (!_isExpanded) {
+                                setState(() {
+                                  _isExpanded = true;
+                                });
+                              }
+                            }, child:
+                                LayoutBuilder(builder: (context, constraints) {
                               return AnimatedContainer(
                                 duration: const Duration(milliseconds: 300),
                                 margin: const EdgeInsets.only(right: 10),
@@ -1901,13 +1969,13 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                               );
                             })),
                             GestureDetector(
-                              onTap: _findRoute,
+                              onTap: _findAllRoute,
                               child: Container(
                                 margin: const EdgeInsets.only(right: 10),
                                 width: 60,
                                 height: 40,
                                 decoration: BoxDecoration(
-                                  color: _isSafeZoneShown
+                                  color: _isAllZoneShown
                                       ? Colors.grey[300]
                                       : Colors.white,
                                   borderRadius: BorderRadius.circular(50),
@@ -1938,7 +2006,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                               ),
                             ),
                             GestureDetector(
-                              onTap: _findRoute,
+                              onTap: _findSafeRoute,
                               child: Container(
                                 margin: const EdgeInsets.only(right: 10),
                                 width: 160,
@@ -1975,12 +2043,12 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                               ),
                             ),
                             GestureDetector(
-                              onTap: _findRoute,
+                              onTap: _findDangerRoute,
                               child: Container(
                                 width: 170,
                                 height: 40,
                                 decoration: BoxDecoration(
-                                  color: _isSafeZoneShown
+                                  color: _isDangerZoneShown
                                       ? Colors.grey[300]
                                       : Colors.white,
                                   borderRadius: BorderRadius.circular(50),

@@ -6,18 +6,20 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:safezone/resources/schema/colors.dart';
 
-class SafeZoneNavigator {
+class ZoneNavigator {
   final GoogleMapController? googleMapController;
   final LatLng? _currentUserLocation;
   final List<LatLng> safeZones;
+  final List<LatLng> dangerZones;
   final Function(Set<Polyline>) onPolylinesUpdated;
   final String googleApiKey = dotenv.env['GOOGLE_API_KEY'] ?? '';
   final BuildContext context;
 
-  SafeZoneNavigator({
+  ZoneNavigator({
     required this.googleMapController,
     required LatLng? currentUserLocation,
-    required this.safeZones,
+    this.safeZones = const [],
+    this.dangerZones = const [],
     required this.onPolylinesUpdated,
     required this.context,
   }) : _currentUserLocation = currentUserLocation;
@@ -31,7 +33,7 @@ class SafeZoneNavigator {
   }
 
   void findNearestSafeZone() async {
-    await _ensureMapControllerReady(); 
+    await _ensureMapControllerReady();
 
     if (_currentUserLocation == null) {
       print("Current user location is null!");
@@ -61,8 +63,8 @@ class SafeZoneNavigator {
           CameraPosition(
             target: nearestSafeZone,
             zoom: 16.0,
-            tilt: 0.0, 
-            bearing: 0.0, 
+            tilt: 0.0,
+            bearing: 0.0,
           ),
         ),
       );
@@ -74,17 +76,159 @@ class SafeZoneNavigator {
           CameraPosition(
             target: _currentUserLocation,
             zoom: 18.0,
-            tilt: 60.0, 
-            bearing: 40.0, 
+            tilt: 60.0,
+            bearing: 40.0,
           ),
         ),
       );
 
-      _drawRoute(_currentUserLocation, nearestSafeZone);
+      _drawRoute(
+          _currentUserLocation, nearestSafeZone, const Color(0xFF77CB9D));
     }
   }
 
-  Future<void> _drawRoute(LatLng start, LatLng end) async {
+  void findNearestDangerZone() async {
+    await _ensureMapControllerReady();
+
+    if (_currentUserLocation == null) {
+      print("Current user location is null!");
+      return;
+    }
+
+    LatLng? nearestDangerZone;
+    double minDistance = double.infinity;
+
+    for (var dangerZone in dangerZones) {
+      double distance = Geolocator.distanceBetween(
+        _currentUserLocation.latitude,
+        _currentUserLocation.longitude,
+        dangerZone.latitude,
+        dangerZone.longitude,
+      );
+
+      if (distance < minDistance) {
+        minDistance = distance;
+        nearestDangerZone = dangerZone;
+      }
+    }
+
+    if (nearestDangerZone != null) {
+      await googleMapController?.animateCamera(
+        CameraUpdate.newCameraPosition(
+          CameraPosition(
+            target: nearestDangerZone,
+            zoom: 16.0,
+            tilt: 0.0,
+            bearing: 0.0,
+          ),
+        ),
+      );
+
+      await Future.delayed(const Duration(seconds: 1));
+
+      await googleMapController?.animateCamera(
+        CameraUpdate.newCameraPosition(
+          CameraPosition(
+            target: _currentUserLocation,
+            zoom: 18.0,
+            tilt: 60.0,
+            bearing: 40.0,
+          ),
+        ),
+      );
+
+      _drawRoute(
+          _currentUserLocation, nearestDangerZone, const Color(0xFFDA6363));
+    }
+  }
+
+  void _showETA(String eta) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          "Estimated arrival time: $eta",
+          style: const TextStyle(color: Colors.white),
+        ),
+        backgroundColor: greenStatusColor,
+        duration: const Duration(seconds: 5),
+      ),
+    );
+  }
+
+  void findNearestZones() async {
+    await _ensureMapControllerReady();
+
+    if (_currentUserLocation == null) {
+      print("Current user location is null!");
+      return;
+    }
+
+    LatLng? nearestSafeZone;
+    LatLng? nearestDangerZone;
+    double minSafeDistance = double.infinity;
+    double minDangerDistance = double.infinity;
+
+    for (var safeZone in safeZones) {
+      double distance = Geolocator.distanceBetween(
+        _currentUserLocation.latitude,
+        _currentUserLocation.longitude,
+        safeZone.latitude,
+        safeZone.longitude,
+      );
+
+      if (distance < minSafeDistance) {
+        minSafeDistance = distance;
+        nearestSafeZone = safeZone;
+      }
+    }
+
+    for (var dangerZone in dangerZones) {
+      double distance = Geolocator.distanceBetween(
+        _currentUserLocation.latitude,
+        _currentUserLocation.longitude,
+        dangerZone.latitude,
+        dangerZone.longitude,
+      );
+
+      if (distance < minDangerDistance) {
+        minDangerDistance = distance;
+        nearestDangerZone = dangerZone;
+      }
+    }
+
+    if (nearestSafeZone != null && nearestDangerZone != null) {
+      await googleMapController?.animateCamera(
+        CameraUpdate.newCameraPosition(
+          CameraPosition(
+            target: nearestSafeZone,
+            zoom: 16.0,
+            tilt: 0.0,
+            bearing: 0.0,
+          ),
+        ),
+      );
+
+      await Future.delayed(const Duration(seconds: 1));
+
+      await googleMapController?.animateCamera(
+        CameraUpdate.newCameraPosition(
+          CameraPosition(
+            target: _currentUserLocation,
+            zoom: 18.0,
+            tilt: 60.0,
+            bearing: 40.0,
+          ),
+        ),
+      );
+
+      _drawRoute(
+          _currentUserLocation, nearestSafeZone, const Color(0xFF77CB9D));
+      _drawRoute(
+          _currentUserLocation, nearestDangerZone, const Color(0xFFDA6363));
+    }
+  }
+
+  Future<void> _drawRoute(LatLng start, LatLng end, Color color) async {
     try {
       final response = await Dio().get(
         "https://maps.googleapis.com/maps/api/directions/json",
@@ -105,7 +249,7 @@ class SafeZoneNavigator {
 
         final eta = data["routes"][0]["legs"][0]["duration"]["text"];
 
-        _updatePolylines(polylineCoordinates);
+        _updatePolylines(polylineCoordinates, color);
         googleMapController?.animateCamera(CameraUpdate.newLatLngZoom(end, 16));
 
         _showETA(eta);
@@ -115,17 +259,17 @@ class SafeZoneNavigator {
     }
   }
 
-  void _showETA(String eta) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          "Estimated arrival time: $eta",
-          style: const TextStyle(color: Colors.white),
-        ),
-        backgroundColor: greenStatusColor,
-        duration: const Duration(seconds: 5),
+  void _updatePolylines(List<LatLng> points, Color color) {
+    Set<Polyline> polylines = {
+      Polyline(
+        polylineId: PolylineId("route_${color.value}"),
+        points: points,
+        color: color,
+        width: 5,
       ),
-    );
+    };
+
+    onPolylinesUpdated(polylines);
   }
 
   List<LatLng> _decodePolyline(String encoded) {
@@ -156,18 +300,5 @@ class SafeZoneNavigator {
       points.add(LatLng(lat / 1E5, lng / 1E5));
     }
     return points;
-  }
-
-  void _updatePolylines(List<LatLng> points) {
-    Set<Polyline> polylines = {
-      Polyline(
-        polylineId: const PolylineId("route"),
-        points: points,
-        color: Colors.blue,
-        width: 5,
-      ),
-    };
-
-    onPolylinesUpdated(polylines);
   }
 }
