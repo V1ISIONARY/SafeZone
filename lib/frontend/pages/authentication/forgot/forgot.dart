@@ -25,7 +25,6 @@ class Forgot extends StatefulWidget {
 }
 
 class _ForgotState extends State<Forgot> {
-
   EmailOTP myauth = EmailOTP();
   String generatedOTP = "";
   final TextEditingController emailController = TextEditingController();
@@ -77,7 +76,6 @@ class _ForgotState extends State<Forgot> {
     } catch (e) {
       print('Error sending OTP: $e');
     }
-    
   }
 
   bool _showTitle = false;
@@ -123,91 +121,91 @@ class _ForgotState extends State<Forgot> {
       });
     });
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        children: [
-          AnimatedContainer(
-            duration: const Duration(milliseconds: 300),
-            height: _appBarHeight,
-            color: _appBarColor,
-            width: double.infinity,
-            alignment: Alignment.center,
-            child: _showTitle
-                ? CategoryDescripText(
-                    text: _notificationText,
-                    color: Colors.white,
-                  )
-                : null,
+        body: Column(children: [
+      AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        height: _appBarHeight,
+        color: _appBarColor,
+        width: double.infinity,
+        alignment: Alignment.center,
+        child: _showTitle
+            ? CategoryDescripText(
+                text: _notificationText,
+                color: Colors.white,
+              )
+            : null,
+      ),
+      AppBar(
+        backgroundColor: Colors.white,
+        automaticallyImplyLeading: false,
+        centerTitle: true,
+        leading: GestureDetector(
+          onTap: () {
+            Navigator.pop(context);
+          },
+          child: Container(
+            margin: EdgeInsets.all(15),
+            decoration: BoxDecoration(
+              border: Border.all(width: 1, color: Colors.black),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(Icons.arrow_back, color: Colors.black, size: 10),
           ),
-          AppBar(
-            backgroundColor: Colors.white,
-            automaticallyImplyLeading: false,
-            centerTitle: true,
-            leading: GestureDetector(
-              onTap: () {
-                Navigator.pop(context);
-              },
-              child: Container(
-                margin: EdgeInsets.all(15),
-                decoration: BoxDecoration(
-                  border: Border.all(width: 1, color: Colors.black),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(Icons.arrow_back, color: Colors.black, size: 10),
+        ),
+      ),
+      Expanded(
+          child: Container(
+        margin: EdgeInsets.symmetric(horizontal: 15),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Forgot Password',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+                fontSize: 20,
               ),
             ),
-          ),
-          Expanded(
-            child: Container(
-              margin: EdgeInsets.symmetric(horizontal: 15),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Forgot Password',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                      fontSize: 20,
-                    ),
-                  ),
-                  SizedBox(height: 5),
-                  Flexible(
-                    child: Text("Enter the email associated with you account and we'll send an email with\nintructions to reset your password.",
-                      style: GoogleFonts.poppins(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.black45,
-                      ),
-                    )
-                  ),
-                  SizedBox(height: 20),
-                  TextField(
-                    controller: emailController,
-                    style: const TextStyle(
+            SizedBox(height: 5),
+            Flexible(
+                child: Text(
+              "Enter the email associated with you account and we'll send an email with\nintructions to reset your password.",
+              style: GoogleFonts.poppins(
+                fontSize: 11,
+                fontWeight: FontWeight.w500,
+                color: Colors.black45,
+              ),
+            )),
+            SizedBox(height: 20),
+            TextField(
+              controller: emailController,
+              style: const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w200,
+                color: textColor,
+              ),
+              decoration: InputDecoration(
+                  hintText: "Email Address",
+                  hintStyle: const TextStyle(
                       fontSize: 13,
-                      fontWeight: FontWeight.w200,
-                      color: textColor,
-                    ),
-                    decoration: InputDecoration(
-                      hintText: "Email Address",
-                      hintStyle: const TextStyle(
-                          fontSize: 13,
-                          color: labelFormFieldColor,
-                          fontWeight: FontWeight.w200),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: const BorderSide(color: widgetPricolor, width: 2),
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 15),
-                      suffixIcon: _showTitleOtp 
-                        ? Padding(
+                      color: labelFormFieldColor,
+                      fontWeight: FontWeight.w200),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide:
+                        const BorderSide(color: widgetPricolor, width: 2),
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 15),
+                  suffixIcon: _showTitleOtp
+                      ? Padding(
                           padding: EdgeInsets.only(right: 15),
                           child: GestureDetector(
                             onTap: () {
@@ -220,120 +218,123 @@ class _ForgotState extends State<Forgot> {
                               Icons.close,
                               color: Colors.grey,
                             ),
-                          )
-                        )
-                        : null
-                    ),
-                  ),
-                  AnimatedContainer(
-                      duration: const Duration(milliseconds: 300),
-                      height: _otp,
-                      width: double.infinity,
-                      alignment: Alignment.center,
-                      margin: EdgeInsets.only(top: _showTitleOtp ? 20 : 0),
-                      child: _showTitleOtp
-                        ? TextField(
-                          controller: codeController,
-                          style: const TextStyle(
+                          ))
+                      : null),
+            ),
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              height: _otp,
+              width: double.infinity,
+              alignment: Alignment.center,
+              margin: EdgeInsets.only(top: _showTitleOtp ? 20 : 0),
+              child: _showTitleOtp
+                  ? TextField(
+                      controller: codeController,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w200,
+                        color: textColor,
+                      ),
+                      decoration: InputDecoration(
+                        hintText: "Enter 6-digit code",
+                        counterText: "",
+                        hintStyle: const TextStyle(
                             fontSize: 13,
-                            fontWeight: FontWeight.w200,
-                            color: textColor,
-                          ),
-                          decoration: InputDecoration(
-                            hintText: "Enter 6-digit code",
-                            counterText: "",
-                            hintStyle: const TextStyle(
-                                fontSize: 13,
-                                color: labelFormFieldColor,
-                                fontWeight: FontWeight.w200),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                              borderSide: const BorderSide(color: widgetPricolor, width: 2),
-                            ),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 15),
-                          ),
-                        )
-                        : null,
-                    ),
-                  SizedBox(height: 20),
-                  _showTitleOtp 
-                    ? SizedBox(
-                      width: double.infinity, 
-                      height: 50,
-                      child: GestureDetector(
-                        onTap: () {
-                          if (codeController.text == generatedOTP) {
-                            _checkIfShown(text: 'OTP verified successfully', color: Colors.green);
-                            Navigator.push(
-                              context,
-                              PageTransition(
-                                child: Createnew(email: emailController.text),
-                                type: PageTransitionType.rightToLeft,
-                                duration: Duration(milliseconds: 300),
-                              ),
-                            );
-                          } else {
-                            _checkIfShown(text: 'Invalid OTP, please try again.', color: Colors.red);
-                          }
-                        },
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: widgetPricolor,
-                            borderRadius: BorderRadius.circular(50),
-                          ),
-                          child: const Center(
-                            child: Text(
-                              'Confirm',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
+                            color: labelFormFieldColor,
+                            fontWeight: FontWeight.w200),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide:
+                              const BorderSide(color: widgetPricolor, width: 2),
                         ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        contentPadding:
+                            const EdgeInsets.symmetric(horizontal: 15),
                       ),
                     )
-                    : SizedBox(
-                      width: double.infinity, 
-                      height: 50,
-                      child: GestureDetector(
-                        onTap: () {
-                          final bloc = context.read<AuthenticationBloc>();
-                          bloc.add(CheckEmailEvent(email: emailController.text));
-                          bloc.stream.listen((state) {
-                            if (state is EmailCheckSuccess) {
-                              _checkIfShownOtp(true);
-                            } else if (state is EmailCheckError) {
-                              _checkIfShown(text: state.message, color: Colors.red); 
-                            }
-                          });
-                        },
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: widgetPricolor,
-                            borderRadius: BorderRadius.circular(50),
-                          ),
-                          child: const Center(
-                            child: Text(
-                              'Send Code',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.white,
-                              ),
+                  : null,
+            ),
+            SizedBox(height: 20),
+            _showTitleOtp
+                ? SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child: GestureDetector(
+                      onTap: () {
+                        if (codeController.text == generatedOTP) {
+                          _checkIfShown(
+                              text: 'OTP verified successfully',
+                              color: Colors.green);
+                          Navigator.push(
+                            context,
+                            PageTransition(
+                              child: Createnew(email: emailController.text),
+                              type: PageTransitionType.rightToLeft,
+                              duration: Duration(milliseconds: 300),
+                            ),
+                          );
+                        } else {
+                          _checkIfShown(
+                              text: 'Invalid OTP, please try again.',
+                              color: Colors.red);
+                        }
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: widgetPricolor,
+                          borderRadius: BorderRadius.circular(50),
+                        ),
+                        child: const Center(
+                          child: Text(
+                            'Confirm',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.white,
                             ),
                           ),
                         ),
                       ),
                     ),
-                ],
-              ),
-            )
-          )
-        ]
-      )
-    );
+                  )
+                : SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child: GestureDetector(
+                      onTap: () {
+                        final bloc = context.read<AuthenticationBloc>();
+                        bloc.add(CheckEmailEvent(email: emailController.text));
+                        bloc.stream.listen((state) {
+                          if (state is EmailCheckSuccess) {
+                            sendOTP(emailController.text);
+                            _checkIfShownOtp(true);
+                          } else if (state is EmailCheckError) {
+                            _checkIfShown(
+                                text: state.message, color: Colors.red);
+                          }
+                        });
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: widgetPricolor,
+                          borderRadius: BorderRadius.circular(50),
+                        ),
+                        child: const Center(
+                          child: Text(
+                            'Send Code',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+          ],
+        ),
+      ))
+    ]));
   }
 }
