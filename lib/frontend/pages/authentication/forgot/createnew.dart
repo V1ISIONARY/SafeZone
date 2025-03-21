@@ -83,7 +83,7 @@ class _CreatenewState extends State<Createnew> {
   Color _appBarColor = Colors.transparent;
 
   Future<void> _checkIfShown({required String text, required Color color}) async {
-    Future.delayed(Duration(milliseconds: 200), () {
+    Future.delayed(Duration(milliseconds: 300), () {
       if (mounted) {
         setState(() {
           _appBarHeight = 40;
@@ -302,15 +302,34 @@ class _CreatenewState extends State<Createnew> {
                         });
                       } else if (newPassword != confirmNewPassword) {
                         setState(() {
+                          _checkIfShown(text: "New password and confirm password not match", color: Colors.orange);
                         });
                       } else {
-                        context.read<AuthenticationBloc>().add(
+                        print("Dispatching ResetPasswordEvent");
+                        print("Email: ${widget.email}");
+                        print("Current Password: $currentPassword");
+                        print("New Password: $newPassword");
+
+                        final bloc = context.read<AuthenticationBloc>();
+                        bloc.add(
                           ResetPasswordEvent(
                             email: widget.email,
                             password: currentPassword,
                             newPassword: newPassword,
                           ),
                         );
+
+                        bloc.stream.listen((state) {
+                          if (state is UpdateMyPasswordSuccess) {
+                            _checkIfShown(text: 'Password updated successfully', color: Colors.green);
+                          } else if (state is UpdateMyPasswordError) {
+                            if (state.message.contains("incorrect password")) {
+                              _checkIfShown(text: "Current password is incorrect.", color: Colors.red);
+                            } else {
+                              _checkIfShown(text: state.message, color: Colors.red);
+                            }
+                          }
+                        });
                       }
                     },
                     child: Container(

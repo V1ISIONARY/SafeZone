@@ -30,6 +30,12 @@ class ResetPasswordEvent extends AuthenticationEvent {
   ResetPasswordEvent({required this.email, required this.password, required this.newPassword});
 }
 
+class CheckEmailEvent extends AuthenticationEvent {
+  final String email;
+  
+  CheckEmailEvent({required this.email});
+}
+
 class UserSignUpEvent extends AuthenticationEvent {
   final String username;
   final String email;

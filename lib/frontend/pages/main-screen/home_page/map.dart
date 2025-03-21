@@ -346,7 +346,6 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
     }
   }
 
-
   Future<void> _fetchLocation() async {
     try {
       Position position = await getCurrentLocation();
@@ -1209,119 +1208,124 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                                 //     color: Colors.black38),
                                               ])))),
                                   SizedBox(width: 10),
-                                  GestureDetector(
-                                    onTap: () {
-                                      bool hasActiveCircle = _circles.any((circle) => circle.isActive);
-                                      if (hasActiveCircle) {
-                                        showModalBottomSheet(
-                                          context: context,
-                                          isScrollControlled: true, 
-                                          shape: const RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
-                                          ),
-                                          builder: (BuildContext context) {
-                                            return FractionallySizedBox(
-                                              heightFactor: 0.3,
-                                              child: Container(
-                                                width: double.infinity,
-                                                decoration: BoxDecoration(
-                                                  borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
-                                                  color: Colors.white,
-                                                ),
-                                                child: Column(
-                                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                                  children: [
-                                                    Container(
-                                                      width: double.infinity,
-                                                      height: 50,
-                                                      child: Row(
-                                                        crossAxisAlignment: CrossAxisAlignment.center,
-                                                        mainAxisAlignment: MainAxisAlignment.center,
-                                                        children: [
-                                                          Expanded(child: SizedBox()),
-                                                          CategoryText(text: 'Invite Code'),
-                                                          Expanded(
-                                                            child: Align(
-                                                              alignment: Alignment.centerRight, 
-                                                              child: Container(
-                                                                margin: EdgeInsets.only(right: 15),
-                                                                child: GestureDetector(
-                                                                  onTap: (){
-                                                                    Navigator.pop(context);
-                                                                  },
-                                                                  child: CategoryDescripText(text: 'Done', color: widgetPricolor),
+                                  for (var circle
+                                    in _circles.where((circle) => circle.isActive))
+                                  circle.code.isEmpty
+                                    ? Container()
+                                    : GestureDetector(
+                                      onTap: () {
+                                        bool hasActiveCircle = _circles.any((circle) => circle.isActive);
+                                        if (hasActiveCircle) {
+                                          showModalBottomSheet(
+                                            context: context,
+                                            isScrollControlled: true, 
+                                            shape: const RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
+                                            ),
+                                            builder: (BuildContext context) {
+                                              return FractionallySizedBox(
+                                                heightFactor: 0.3,
+                                                child: Container(
+                                                  width: double.infinity,
+                                                  decoration: BoxDecoration(
+                                                    borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
+                                                    color: Colors.white,
+                                                  ),
+                                                  child: Column(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: [
+                                                      Container(
+                                                        width: double.infinity,
+                                                        height: 50,
+                                                        child: Row(
+                                                          crossAxisAlignment: CrossAxisAlignment.center,
+                                                          mainAxisAlignment: MainAxisAlignment.center,
+                                                          children: [
+                                                            Expanded(child: SizedBox()),
+                                                            CategoryText(text: 'Invite Code'),
+                                                            Expanded(
+                                                              child: Align(
+                                                                alignment: Alignment.centerRight, 
+                                                                child: Container(
+                                                                  margin: EdgeInsets.only(right: 15),
+                                                                  child: GestureDetector(
+                                                                    onTap: (){
+                                                                      Navigator.pop(context);
+                                                                    },
+                                                                    child: CategoryDescripText(text: 'Done', color: widgetPricolor),
+                                                                  )
+                                                                )
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                        decoration: BoxDecoration(
+                                                          color: Colors.white,
+                                                          boxShadow: const [
+                                                            BoxShadow(
+                                                              color: Colors.grey,
+                                                              blurRadius: 2,
+                                                              offset: Offset(1, 1),
+                                                            ),
+                                                          ],
+                                                          borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
+                                                        ),
+                                                      ),
+                                                      Container(
+                                                        margin: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+                                                        width: double.infinity,
+                                                        child: Column(
+                                                          mainAxisAlignment: MainAxisAlignment.center,
+                                                          crossAxisAlignment: CrossAxisAlignment.center,
+                                                          children: [
+                                                            for (var circle
+                                                              in _circles.where((circle) => circle.isActive))
+                                                            Container(
+                                                              margin: EdgeInsets.symmetric(vertical: 30),
+                                                              child: Text(
+                                                                circle.code, style: TextStyle(
+                                                                  fontWeight: FontWeight.bold,
+                                                                  color: widgetPricolor,
+                                                                  fontSize: 30
                                                                 )
                                                               )
                                                             ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                      decoration: BoxDecoration(
-                                                        color: Colors.white,
-                                                        boxShadow: const [
-                                                          BoxShadow(
-                                                            color: Colors.grey,
-                                                            blurRadius: 2,
-                                                            offset: Offset(1, 1),
-                                                          ),
-                                                        ],
-                                                        borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
-                                                      ),
-                                                    ),
-                                                    Container(
-                                                      margin: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
-                                                      width: double.infinity,
-                                                      child: Column(
-                                                        mainAxisAlignment: MainAxisAlignment.center,
-                                                        crossAxisAlignment: CrossAxisAlignment.center,
-                                                        children: [
-                                                          for (var circle
-                                                            in _circles.where((circle) => circle.isActive))
-                                                          Container(
-                                                            margin: EdgeInsets.symmetric(vertical: 30),
-                                                            child: Text(
-                                                              circle.code, style: TextStyle(
-                                                                fontWeight: FontWeight.bold,
-                                                                color: widgetPricolor,
-                                                                fontSize: 30
-                                                              )
-                                                            )
-                                                          ),
-                                                          CategoryText(text: 'Share this invite code with the\n people you want in your Circle: ', alignment: 'center', color: Colors.black),
-                                                        ],
+                                                            CategoryText(text: 'Share this invite code with the\n people you want in your Circle: ', alignment: 'center', color: Colors.black),
+                                                          ],
+                                                        )
                                                       )
-                                                    )
-                                                  ],
-                                                ),
-                                              )
-                                            );
-                                          },
-                                        );
-                                      } 
-                                    },
-                                    child: Container(
-                                      width: 40,
-                                      height: 40,
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.circular(10),
-                                        boxShadow: const [
-                                          BoxShadow(
-                                            color: Colors.grey,
-                                            blurRadius: 2,
-                                            offset: Offset(1, 1),
-                                          ),
-                                        ],
-                                      ),
-                                      child: Center(
-                                        child: Icon(
-                                          Icons.person_add,
-                                          size: 20,
-                                          color: widgetPricolor,
+                                                    ],
+                                                  ),
+                                                )
+                                              );
+                                            },
+                                          );
+                                        } 
+                                      },
+                                      child: Container(
+                                        width: 40,
+                                        height: 40,
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.circular(10),
+                                          boxShadow: const [
+                                            BoxShadow(
+                                              color: Colors.grey,
+                                              blurRadius: 2,
+                                              offset: Offset(1, 1),
+                                            ),
+                                          ],
+                                        ),
+                                        child: Center(
+                                          child: Icon(
+                                            Icons.person_add,
+                                            size: 20,
+                                            color: widgetPricolor,
+                                          )
                                         )
                                       )
-                                    )
-                                  )
+                                    ) 
+                                    
                                 ],
                               )
                             ]))),

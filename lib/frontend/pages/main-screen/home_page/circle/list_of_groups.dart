@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:safezone/backend/bloc/circleBloc/circle_bloc.dart';
 import 'package:safezone/backend/bloc/circleBloc/circle_event.dart';
@@ -82,15 +83,18 @@ class _ListOfGroupsState extends State<ListOfGroups> {
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
                 borderSide: const BorderSide(
-                    color: Colors.blue, width: 2), // Blue focus effect
+                    color: Colors.blue, width: 2), 
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
                 borderSide: const BorderSide(
                     color: Colors.grey,
-                    width: 1), // Lighter border when not focused
+                    width: 1), 
               ),
             ),
+            inputFormatters: [
+              LengthLimitingTextInputFormatter(15), 
+            ],
           ),
           actions: [
             TextButton(
@@ -115,7 +119,18 @@ class _ListOfGroupsState extends State<ListOfGroups> {
               ),
               onPressed: () {
                 final groupName = nameController.text.trim();
-                if (groupName.isNotEmpty) {
+
+                bool nameExists = _circles.any((circle) => circle.name == groupName);
+
+                if (groupName.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Please enter a group name')),
+                  );
+                } else if (nameExists) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Group name already exists')),
+                  );
+                } else {
                   context.read<CircleBloc>().add(
                       CreateCircleEvent(name: groupName, userId: _userId!));
 
@@ -128,10 +143,6 @@ class _ListOfGroupsState extends State<ListOfGroups> {
                   });
 
                   Navigator.of(context).pop();
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Please enter a group name')),
-                  );
                 }
               },
               child: const Text(
@@ -414,9 +425,17 @@ class _ListOfGroupsState extends State<ListOfGroups> {
                           padding: const EdgeInsets.symmetric(vertical: 8.0),
                           child: ListView.builder(
                             itemCount: _circles.length,
-                            itemBuilder: (context, index) {
-                              final group = _circles[index];
-                              return GestureDetector(
+                              itemBuilder: (context, index) {
+                                
+                                final sortedCircles = _circles..sort((a, b) {
+                                  if (a.isActive && !b.isActive) return -1; 
+                                  if (!a.isActive && b.isActive) return 1;
+                                  return b.id.compareTo(a.id); 
+                                });
+
+                                final group = sortedCircles[index];
+
+                                return GestureDetector(
                                 onTap: () {
                                   context.push('/members/${group.id}',
                                       extra: group);

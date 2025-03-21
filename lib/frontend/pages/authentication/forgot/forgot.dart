@@ -3,11 +3,15 @@ import 'dart:math';
 import 'package:email_otp/email_otp.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mailer/mailer.dart';
 import 'package:mailer/smtp_server/gmail.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:safezone/backend/bloc/authBloc/auth_bloc.dart';
+import 'package:safezone/backend/bloc/authBloc/auth_event.dart';
+import 'package:safezone/backend/bloc/authBloc/auth_state.dart';
 import 'package:safezone/frontend/pages/authentication/forgot/createnew.dart';
 import 'package:safezone/resources/schema/colors.dart';
 
@@ -81,27 +85,23 @@ class _ForgotState extends State<Forgot> {
   String _notificationText = "";
   Color _appBarColor = Colors.transparent;
 
-  Future<void> _checkIfShown() async {
-    Future.delayed(Duration(milliseconds: 300), () {
-        if (mounted) {
-          setState(() {
-            _appBarHeight = 40;
-            _appBarColor = Colors.red;
-            _showTitle = true;
-          });
-        }
+  void _checkIfShown({required String text, required Color color}) {
+    setState(() {
+      _appBarHeight = 40;
+      _appBarColor = color;
+      _showTitle = true;
+      _notificationText = text;
+    });
 
-        Future.delayed(Duration(seconds: 5), () {
-          if (mounted) {
-            setState(() {
-              _appBarHeight = 0;
-              _appBarColor = Colors.transparent;
-              _showTitle = false;
-            });
-          }
+    Future.delayed(Duration(seconds: 5), () {
+      if (mounted) {
+        setState(() {
+          _appBarHeight = 0;
+          _appBarColor = Colors.transparent;
+          _showTitle = false;
         });
       }
-    );
+    });
   }
 
   bool _showTitleOtp = false;
@@ -265,16 +265,19 @@ class _ForgotState extends State<Forgot> {
                       height: 50,
                       child: GestureDetector(
                         onTap: () {
-                          // sendOTP(emailController.text);
-                          Navigator.push(
-                            context,
-                            PageTransition(
-                              child: Createnew(email: emailController.text),
-                              type: PageTransitionType.rightToLeft,
-                              duration: Duration(milliseconds: 300),
-                            ),
-                          );
-                          // _checkIfShown();
+                          if (codeController.text == generatedOTP) {
+                            _checkIfShown(text: 'OTP verified successfully', color: Colors.green);
+                            Navigator.push(
+                              context,
+                              PageTransition(
+                                child: Createnew(email: emailController.text),
+                                type: PageTransitionType.rightToLeft,
+                                duration: Duration(milliseconds: 300),
+                              ),
+                            );
+                          } else {
+                            _checkIfShown(text: 'Invalid OTP, please try again.', color: Colors.red);
+                          }
                         },
                         child: Container(
                           decoration: BoxDecoration(
@@ -298,16 +301,15 @@ class _ForgotState extends State<Forgot> {
                       height: 50,
                       child: GestureDetector(
                         onTap: () {
-                          // sendOTP(emailController.text);
-                          // Navigator.push(
-                          //   context,
-                          //   PageTransition(
-                          //     child: Createnew(),
-                          //     type: PageTransitionType.rightToLeft,
-                          //     duration: Duration(milliseconds: 300),
-                          //   ),
-                          // );
-                          _checkIfShownOtp(true);
+                          final bloc = context.read<AuthenticationBloc>();
+                          bloc.add(CheckEmailEvent(email: emailController.text));
+                          bloc.stream.listen((state) {
+                            if (state is EmailCheckSuccess) {
+                              _checkIfShownOtp(true);
+                            } else if (state is EmailCheckError) {
+                              _checkIfShown(text: state.message, color: Colors.red); 
+                            }
+                          });
                         },
                         child: Container(
                           decoration: BoxDecoration(

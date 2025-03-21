@@ -230,13 +230,19 @@ class _ListOfMembersState extends State<ListOfMembers> {
                                           ),
                                           const SizedBox(height: 20),
                                           Text(
-                                            _updatedCircleInfo!
-                                                .code, // Use the updated code
+                                            (_updatedCircleInfo != null && _updatedCircleInfo!.code.isNotEmpty)
+                                                ? _updatedCircleInfo!.code
+                                                : 'No Generated Code',
                                             textAlign: TextAlign.center,
-                                            style: const TextStyle(
-                                              fontSize: 30,
+                                            style: TextStyle(
+                                              fontSize: (_updatedCircleInfo != null && _updatedCircleInfo!.code.isNotEmpty)
+                                                ? 30 
+                                                : 25,
                                               fontWeight: FontWeight.bold,
-                                              color: textColor,
+                                              color: (_updatedCircleInfo != null && _updatedCircleInfo!.code.isNotEmpty)
+                                                ? widgetPricolor 
+                                                : Colors.black26
+                                              ,
                                             ),
                                           ),
                                           const SizedBox(height: 20),
@@ -247,17 +253,6 @@ class _ListOfMembersState extends State<ListOfMembers> {
                                                 Clipboard.setData(ClipboardData(
                                                     text: _updatedCircleInfo!
                                                         .code));
-                                                // ScaffoldMessenger.of(context)
-                                                //     .showSnackBar(
-                                                //   const SnackBar(
-                                                //     backgroundColor:
-                                                //         greenStatusColor,
-                                                //     content: Text(
-                                                //         "Code copied to clipboard!"),
-                                                //     duration:
-                                                //         Duration(seconds: 2),
-                                                //   ),
-                                                // );
                                               },
                                               style: ElevatedButton.styleFrom(
                                                 backgroundColor: widgetPricolor,

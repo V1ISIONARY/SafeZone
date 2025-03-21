@@ -111,3 +111,10 @@ class UpdateMyPasswordError extends AuthenticationState {
   UpdateMyPasswordError(this.message);
 }
 
+class EmailCheckSuccess extends AuthenticationState {}
+
+class EmailCheckError extends AuthenticationState {
+  final String message;
+  
+  EmailCheckError(this.message);
+}

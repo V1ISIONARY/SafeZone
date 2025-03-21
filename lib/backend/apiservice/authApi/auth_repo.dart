@@ -13,6 +13,7 @@ abstract class AuthenticationRepository {
       double latitude,
       double longitude 
       );
+  Future<void> checkEmail(String email);
   Future<void> updateLocation(double latitude, double longitude);
   Future<void> changePassword(String password, String newpassword);
   Future<void> resetPassword(String email, String password, String newpassword);

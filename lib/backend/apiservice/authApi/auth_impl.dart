@@ -182,7 +182,30 @@ class AuthenticationImplementation extends AuthenticationRepository {
       print("Password updated successfully");
     } else {
       final errorMessage = jsonDecode(response.body)['error'];
-      print("Failed to update password: $errorMessage");
+      print("$errorMessage");
+      throw Exception(errorMessage);
+    }
+  }
+
+  @override
+  Future<void> checkEmail(String email) async {
+    if (email.isEmpty) {
+      print("No Email Provided");
+      throw Exception("Email is required");
+    }
+
+    final response = await http.post(
+      Uri.parse("${dotenv.env['API_URL']}/user/check_email"),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: jsonEncode({'email': email}),
+    );
+
+    if (response.statusCode != 200) {
+      final errorMessage = jsonDecode(response.body)['error'];
+      print("$errorMessage");
       throw Exception(errorMessage);
     }
   }

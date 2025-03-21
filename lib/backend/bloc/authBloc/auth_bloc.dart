@@ -1,4 +1,8 @@
+import 'dart:convert';
+
 import 'package:bloc/bloc.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:http/http.dart' as http;
 import 'package:safezone/backend/apiservice/authApi/auth_repo.dart';
 import 'package:safezone/backend/bloc/authBloc/auth_event.dart';
 import 'package:safezone/backend/bloc/authBloc/auth_state.dart';
@@ -48,6 +52,16 @@ class AuthenticationBloc
         emit(UpdateLocationSuccess(event.latitude, event.longitude));
       } catch (e) {
         emit(UpdateLocationError('Failed to update location: ${e.toString()}'));
+      }
+    });
+
+    on<CheckEmailEvent>((event, emit) async {
+      emit(UpdateLocationLoading());
+      try {
+        final response = await _authrepo.checkEmail(event.email);
+        emit(EmailCheckSuccess());
+      } catch (e) {
+        emit(EmailCheckError("Failed to check email: ${e.toString()}"));
       }
     });
 
