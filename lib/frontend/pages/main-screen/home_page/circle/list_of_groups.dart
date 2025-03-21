@@ -106,7 +106,7 @@ class _ListOfGroupsState extends State<ListOfGroups> {
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color.fromARGB(255, 114, 151, 192),
+                backgroundColor: widgetPricolor,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
@@ -205,7 +205,7 @@ class _ListOfGroupsState extends State<ListOfGroups> {
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color.fromARGB(255, 114, 151, 192),
+                backgroundColor: widgetPricolor,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
@@ -258,88 +258,99 @@ class _ListOfGroupsState extends State<ListOfGroups> {
           backgroundColor: Colors.white,
           automaticallyImplyLeading: false,
           centerTitle: true,
-          leading: GestureDetector(
-            onTap: () {
-              Navigator.pop(context);
-            },
-            child: Container(
-              margin: EdgeInsets.all(15),
-              decoration: BoxDecoration(
-                border: Border.all(width: 1, color: Colors.black),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(Icons.arrow_back, color: Colors.black, size: 10),
+          title: Transform.translate(
+            offset: const Offset(-15, 0),
+            child: Row(
+              children: [
+                GestureDetector(
+                  onTap: () async {
+                    Navigator.pop(context);
+                  },
+                  child: Container(
+                    margin: const EdgeInsets.all(15),
+                    height: 25,
+                    width: 25,
+                    decoration: BoxDecoration(
+                      border: Border.all(width: 1, color: Colors.black),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Icons.arrow_back, color: Colors.black, size: 10),
+                  ),
+                ),
+                const CategoryText(text: "My Groups")
+              ]
             ),
           ),
-          title: const CategoryText(text: "My Groups"),
+          actions: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    _showCreateGroupDialog();
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(10),
+                    alignment: Alignment.center,
+                    child: const Row(
+                      children: [
+                        Icon(
+                          Icons.group_add,
+                          color: btnColor,
+                          size: 15,
+                        ),
+                        SizedBox(
+                          width: 8,
+                        ),
+                        Text("Create Group",
+                            style: TextStyle(color: textColor, fontSize: 11)),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  height: 20,
+                  child: VerticalDivider(
+                    color: Colors.grey,
+                    thickness: 1,
+                    width: 10,
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () {
+                    _showJoinGroupDialog();
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(10),
+                    alignment: Alignment.center,
+                    child: const Row(
+                      children: [
+                        Icon(
+                          Icons.login,
+                          color: btnColor,
+                          size: 15,
+                        ),
+                        SizedBox(
+                          width: 8,
+                        ),
+                        Text(
+                          "Join Group",
+                          style: TextStyle(color: textColor, fontSize: 11),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  width: 8,
+                ),
+              ],
+            ),
+          ],
         ),
         body: Container(
           child: Column(
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      _showCreateGroupDialog();
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.all(10),
-                      alignment: Alignment.center,
-                      child: const Row(
-                        children: [
-                          Icon(
-                            Icons.group_add,
-                            color: btnColor,
-                            size: 15,
-                          ),
-                          SizedBox(
-                            width: 8,
-                          ),
-                          Text("Create Group",
-                              style: TextStyle(color: textColor, fontSize: 11)),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 20,
-                    child: VerticalDivider(
-                      color: Colors.grey,
-                      thickness: 1,
-                      width: 10,
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      _showJoinGroupDialog();
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.all(10),
-                      alignment: Alignment.center,
-                      child: const Row(
-                        children: [
-                          Icon(
-                            Icons.login,
-                            color: btnColor,
-                            size: 15,
-                          ),
-                          SizedBox(
-                            width: 8,
-                          ),
-                          Text(
-                            "Join Group",
-                            style: TextStyle(color: textColor, fontSize: 11),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(
-                    width: 8,
-                  ),
-                ],
-              ),
               BlocListener<CircleBloc, CircleState>(
                 listener: (context, state) {
                   if (state is CircleCreatedState) {
@@ -356,9 +367,7 @@ class _ListOfGroupsState extends State<ListOfGroups> {
                       SnackBar(content: Text(state.message)),
                     );
                   } else if (state is CircleErrorState) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Error: ${state.message}')),
-                    );
+                    
                   } else if (state is CircleAddMemberErrorState) {
                     showDialog(
                       context: context,
@@ -395,9 +404,8 @@ class _ListOfGroupsState extends State<ListOfGroups> {
                       return Expanded(
                         child: Center(
                           child: Transform.translate(
-                            offset: const Offset(0, 0),
-                            child: const LoadingState(),
-                          ),
+                              offset: const Offset(-40, -40),
+                              child: const LoadingState()),
                         ),
                       );
                     } else if (_circles.isNotEmpty) {
@@ -428,8 +436,8 @@ class _ListOfGroupsState extends State<ListOfGroups> {
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
                                       Container(
-                                        width: 50,
-                                        height: 50,
+                                        width: 40,
+                                        height: 40,
                                         margin: const EdgeInsets.symmetric(
                                             horizontal: 15),
                                         decoration: const BoxDecoration(
@@ -510,7 +518,7 @@ class _ListOfGroupsState extends State<ListOfGroups> {
                                                   },
                                             style: TextButton.styleFrom(
                                               backgroundColor: group.isActive
-                                                  ? btnColor
+                                                  ? widgetPricolor
                                                   : const Color.fromARGB(
                                                       255, 155, 155, 155),
                                               shape: RoundedRectangleBorder(
@@ -543,7 +551,7 @@ class _ListOfGroupsState extends State<ListOfGroups> {
                         ),
                       );
                     } else if (state is CircleErrorState) {
-                      return Center(child: Text(state.message));
+                      return Center();
                     } else if (_circles.isEmpty) {
                       // Handle the case where there are no circles
                       return Expanded(

@@ -35,6 +35,33 @@ class _ReviewReportState extends State<ReviewReport> {
   final Completer<GoogleMapController> _mapController = Completer();
   final String apiKey = dotenv.env['GOOGLE_API_KEY'] ?? '';
   String locationName = "Fetching location...";
+
+  bool _showTitle = false;
+  double _appBarHeight = 0;
+  Color _appBarColor = Colors.transparent;
+
+  Future<void> _checkIfShown() async {
+    Future.delayed(Duration(milliseconds: 200), () {
+        if (mounted) {
+          setState(() {
+            _appBarHeight = 40;
+            _appBarColor = Colors.red;
+            _showTitle = true;
+          });
+        }
+
+        Future.delayed(Duration(seconds: 5), () {
+          if (mounted) {
+            setState(() {
+              _appBarHeight = 0;
+              _appBarColor = Colors.transparent;
+              _showTitle = false;
+            });
+          }
+        });
+      }
+    );
+  }
   
   @override
   void initState() {
@@ -250,6 +277,26 @@ class _ReviewReportState extends State<ReviewReport> {
                   ),
                 ),
               ),
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                height: _appBarHeight,
+                width: double.infinity,
+                alignment: Alignment.center,
+                margin: EdgeInsets.only(top: _showTitle ? 20 : 0),
+                decoration: BoxDecoration(
+                  color: Colors.transparent,
+                  border: Border.all(
+                    color: _appBarColor,
+                    width: 1
+                  ),
+                  borderRadius: BorderRadius.circular(10)
+                ),
+                child: _showTitle
+                  ? CategoryDescripTextE(
+                      text: "Location must be in Dagupan, Pangasinan, Philippines.", color: Colors.red
+                    )
+                  : null,
+              ),
               Container(
                 width: double.infinity,
                 margin: EdgeInsets.symmetric(vertical: 20),
@@ -285,7 +332,7 @@ class _ReviewReportState extends State<ReviewReport> {
                                 color: widgetPricolor,
                               ),
                               SizedBox(width: 5),
-                              CategoryDescripText(text: locationName, alignment: 'start')
+                              CategoryDescripTextE(text: locationName, alignment: 'start')
                             ],
                           ),
                           SizedBox(height: 15),
@@ -315,7 +362,7 @@ class _ReviewReportState extends State<ReviewReport> {
                                 color: widgetPricolor,
                               ),
                               SizedBox(width: 5),
-                              CategoryDescripText(
+                              CategoryDescripTextE(
                                 text: "${DateFormat.yMMMMd().format(DateTime.now())} • ${DateFormat.jm().format(DateTime.now())}", 
                                 alignment: 'start'
                               )
@@ -348,7 +395,7 @@ class _ReviewReportState extends State<ReviewReport> {
                                 color: widgetPricolor,
                               ),
                               SizedBox(width: 5),
-                              CategoryDescripText(
+                              CategoryDescripTextE(
                                 text: widget.reportInfo.description!, 
                                 alignment: 'start'
                               )
@@ -403,13 +450,7 @@ class _ReviewReportState extends State<ReviewReport> {
                     onPressed: state is IncidentReportLoading || 
                         !(locationName.contains('Dagupan, Pangasinan, Philippines'))
                         ? () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: CategoryText(text: "Location must be in Dagupan, Pangasinan, Philippines. only", color: Colors.white),
-                              backgroundColor: Colors.red,
-                            ),
-                          );
-                          return;
+                          _checkIfShown();
                         }
                         : () { 
                           context

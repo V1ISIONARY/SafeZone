@@ -23,7 +23,7 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
-  int currentStep = 2;
+  int currentStep = 0;
 
   final TextEditingController emailController = TextEditingController();
   final TextEditingController codeController = TextEditingController();

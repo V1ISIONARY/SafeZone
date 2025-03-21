@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:safezone/resources/schema/colors.dart';
 import 'package:go_router/go_router.dart';
+import 'package:safezone/resources/schema/texts.dart';
 
 class SosCountdown extends StatefulWidget {
   const SosCountdown({super.key});
@@ -34,23 +35,30 @@ class _SosCountdownState extends State<SosCountdown> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: btnColor,
+      backgroundColor: widgetPricolor,
       appBar: AppBar(
-        backgroundColor: btnColor,
+        backgroundColor: widgetPricolor,
+        automaticallyImplyLeading: false,
         centerTitle: true,
-        title: const Text(
-          "SOS",
-          style: TextStyle(
-            color: bgColor,
-            fontSize: 15,
-            fontWeight: FontWeight.w500,
+        leading: GestureDetector(
+          onTap: () {
+            Navigator.pop(context);
+          },
+          child: Container(
+            margin: const EdgeInsets.all(15),
+            decoration: BoxDecoration(
+              border: Border.all(width: 1, color: Colors.white),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(Icons.arrow_back, color: Colors.white, size: 10),
           ),
         ),
+        title: CategoryText(text: "SOS", color: Colors.white),
       ),
       body: GestureDetector(
         onDoubleTap: () => context.go('/sos-cancelled'),
         child: Container(
-          decoration: const BoxDecoration(color: btnColor),
+          decoration: const BoxDecoration(color: widgetPricolor),
           child: Center(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -71,7 +79,7 @@ class _SosCountdownState extends State<SosCountdown> {
                     style: const TextStyle(
                       fontSize: 64,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFFEFEFEF), // Equivalent to #FEFEFE
+                      color: Color(0xFFEFEFEF), 
                     ),
                   ),
                   const SizedBox(height: 60),

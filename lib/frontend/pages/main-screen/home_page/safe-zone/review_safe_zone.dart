@@ -32,6 +32,33 @@ class _ReviewSafezoneState extends State<ReviewSafezone> {
   final String apiKey = dotenv.env['GOOGLE_API_KEY'] ?? '';
   String locationName = "Fetching location...";
 
+  bool _showTitle = false;
+  double _appBarHeight = 0;
+  Color _appBarColor = Colors.transparent;
+
+  Future<void> _checkIfShown() async {
+    Future.delayed(Duration(milliseconds: 200), () {
+        if (mounted) {
+          setState(() {
+            _appBarHeight = 40;
+            _appBarColor = Colors.red;
+            _showTitle = true;
+          });
+        }
+
+        Future.delayed(Duration(seconds: 5), () {
+          if (mounted) {
+            setState(() {
+              _appBarHeight = 0;
+              _appBarColor = Colors.transparent;
+              _showTitle = false;
+            });
+          }
+        });
+      }
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -244,6 +271,26 @@ class _ReviewSafezoneState extends State<ReviewSafezone> {
                   ),
                 ),
               ),
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                height: _appBarHeight,
+                width: double.infinity,
+                alignment: Alignment.center,
+                margin: EdgeInsets.only(top: _showTitle ? 20 : 0),
+                decoration: BoxDecoration(
+                  color: Colors.transparent,
+                  border: Border.all(
+                    color: _appBarColor,
+                    width: 1
+                  ),
+                  borderRadius: BorderRadius.circular(10)
+                ),
+                child: _showTitle
+                  ? CategoryDescripTextE(
+                      text: "Location must be in Dagupan, Pangasinan, Philippines.", color: Colors.red
+                    )
+                  : null,
+              ),
               Container(
                 height: 130,
                 width: double.infinity,
@@ -380,7 +427,7 @@ class _ReviewSafezoneState extends State<ReviewSafezone> {
                                 color: widgetPricolor,
                               ),
                               SizedBox(width: 5),
-                              CategoryDescripText(text: locationName, alignment: 'start')
+                              CategoryDescripTextE(text: locationName, alignment: 'start')
                             ],
                           ),
                           SizedBox(height: 15),
@@ -410,7 +457,7 @@ class _ReviewSafezoneState extends State<ReviewSafezone> {
                                 color: widgetPricolor,
                               ),
                               SizedBox(width: 5),
-                              CategoryDescripText(
+                              CategoryDescripTextE(
                                 text: widget.safeZone.description!, 
                                 alignment: 'start'
                               )
@@ -437,13 +484,7 @@ class _ReviewSafezoneState extends State<ReviewSafezone> {
                     onPressed: state is SafeZoneLoading || 
                         !(locationName.contains('Dagupan, Pangasinan, Philippines'))
                         ? () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: CategoryText(text: "Location must be in Dagupan, Pangasinan, Philippines.", color: Colors.white),
-                              backgroundColor: Colors.red,
-                            ),
-                          );
-                          return;
+                          _checkIfShown();
                         }
                         : () {
                           context
