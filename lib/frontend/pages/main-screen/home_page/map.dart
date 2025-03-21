@@ -718,7 +718,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
             position: LatLng(safeZone.latitude!, safeZone.longitude!),
             infoWindow: InfoWindow(
               title: safeZone.name,
-              snippet: "${safeZone.radius}",
+              snippet: safeZone.description,
             ),
           ),
         );
