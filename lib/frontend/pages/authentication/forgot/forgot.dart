@@ -126,6 +126,10 @@ class _ForgotState extends State<Forgot> {
   Widget build(BuildContext context) {
     return Scaffold(
         body: Column(children: [
+          AppBar(
+                  toolbarHeight: 0,
+                  automaticallyImplyLeading: false,
+                ),
       AnimatedContainer(
         duration: const Duration(milliseconds: 300),
         height: _appBarHeight,

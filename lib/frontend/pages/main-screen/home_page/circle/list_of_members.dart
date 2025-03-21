@@ -129,6 +129,10 @@ class _ListOfMembersState extends State<ListOfMembers> {
       child: Scaffold(
         body: Column(
           children: [
+            AppBar(
+              toolbarHeight: 0,
+              automaticallyImplyLeading: false,
+            ),
             AnimatedContainer(
               duration: const Duration(milliseconds: 300),
               height: _appBarHeight,

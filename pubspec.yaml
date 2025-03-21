@@ -72,7 +72,6 @@ dependencies:
   google_maps_flutter_android: ^2.14.12
   google_maps_flutter_platform_interface: ^2.9.5
 
-
 flutter_launcher_icons:
   android: "launcher_icon"
   ios: true
