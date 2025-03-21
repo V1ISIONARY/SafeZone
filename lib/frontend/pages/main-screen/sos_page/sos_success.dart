@@ -148,8 +148,19 @@ class _SosSuccessState extends State<SosSuccess> {
                       buttonColor: widgetPricolor,
                       textColor: widgetPricolor,
                       isOutlined: true,
-                      onPressed: () {
-                        context.push('/');
+                      onPressed: () async {
+                        final prefs = await SharedPreferences.getInstance();
+                        final userToken = prefs.getString('userToken'); 
+                        if (userToken != null) {
+                          context.go('/home', extra: userToken);
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text("User token not found! Please log in again."),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                        }
                       },
                     ),
                     const SizedBox(height: 30),

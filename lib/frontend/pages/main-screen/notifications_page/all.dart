@@ -167,7 +167,7 @@ class _AllState extends State<All> {
 
   Widget _buildPlaceholder() {
     return widget.userToken == 'guest'
-        ? Container()
+        ? SizedBox.shrink()
         : Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,

@@ -1635,137 +1635,139 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                 ),
                               ),
                               SizedBox(height: 10),
-                              Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    GestureDetector(
-                                      onTap: () {
-                                        _findAllRoute();
-                                      },
-                                      child: Container(
-                                        margin:
-                                            const EdgeInsets.only(right: 10),
-                                        width: 60,
-                                        height: 40,
-                                        decoration: BoxDecoration(
-                                          color: _isAllZoneShown
-                                              ? Colors.grey[300]
-                                              : Colors.white,
-                                          borderRadius:
-                                              BorderRadius.circular(50),
-                                          boxShadow: const [
-                                            BoxShadow(
-                                              color: Colors.grey,
-                                              blurRadius: 2,
-                                              offset: Offset(1, 1),
-                                            ),
-                                          ],
-                                        ),
-                                        child: const Row(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.center,
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.start,
-                                          children: [
-                                            SizedBox(width: 5),
-                                            Icon(Icons.safety_check,
-                                                color: Colors.blue),
-                                            SizedBox(width: 5),
-                                            Expanded(
-                                              child: CategoryDescripText(
-                                                text: "All",
-                                                color: Colors.black,
+                              SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                child: Row(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      GestureDetector(
+                                        onTap: () {
+                                          _findAllRoute();
+                                        },
+                                        child: Container(
+                                          margin:
+                                              const EdgeInsets.only(right: 10),
+                                          width: 60,
+                                          height: 40,
+                                          decoration: BoxDecoration(
+                                            color: _isAllZoneShown
+                                                ? Colors.grey[300]
+                                                : Colors.white,
+                                            borderRadius:
+                                                BorderRadius.circular(50),
+                                            boxShadow: const [
+                                              BoxShadow(
+                                                color: Colors.grey,
+                                                blurRadius: 2,
+                                                offset: Offset(1, 1),
                                               ),
-                                            ),
-                                          ],
+                                            ],
+                                          ),
+                                          child: const Row(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                            children: [
+                                              SizedBox(width: 5),
+                                              Icon(Icons.safety_check,
+                                                  color: Colors.blue),
+                                              SizedBox(width: 5),
+                                              Expanded(
+                                                child: CategoryDescripText(
+                                                  text: "All",
+                                                  color: Colors.black,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                    GestureDetector(
-                                      onTap: _findSafeRoute,
-                                      child: Container(
-                                        margin:
-                                            const EdgeInsets.only(right: 10),
-                                        width: 160,
-                                        height: 40,
-                                        decoration: BoxDecoration(
-                                          color: _isSafeZoneShown
-                                              ? Colors.grey[300]
-                                              : Colors.white,
-                                          borderRadius:
-                                              BorderRadius.circular(50),
-                                          boxShadow: const [
-                                            BoxShadow(
-                                              color: Colors.grey,
-                                              blurRadius: 2,
-                                              offset: Offset(1, 1),
-                                            ),
-                                          ],
-                                        ),
-                                        child: const Row(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.center,
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.start,
-                                          children: [
-                                            SizedBox(width: 5),
-                                            Icon(Icons.safety_check,
-                                                color: Colors.green),
-                                            SizedBox(width: 5),
-                                            Expanded(
-                                              child: CategoryDescripText(
-                                                text: "Show nearest safe zone",
-                                                color: Colors.black,
+                                      GestureDetector(
+                                        onTap: _findSafeRoute,
+                                        child: Container(
+                                          margin:
+                                              const EdgeInsets.only(right: 10),
+                                          width: 160,
+                                          height: 40,
+                                          decoration: BoxDecoration(
+                                            color: _isSafeZoneShown
+                                                ? Colors.grey[300]
+                                                : Colors.white,
+                                            borderRadius:
+                                                BorderRadius.circular(50),
+                                            boxShadow: const [
+                                              BoxShadow(
+                                                color: Colors.grey,
+                                                blurRadius: 2,
+                                                offset: Offset(1, 1),
                                               ),
-                                            ),
-                                          ],
+                                            ],
+                                          ),
+                                          child: const Row(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                            children: [
+                                              SizedBox(width: 5),
+                                              Icon(Icons.safety_check,
+                                                  color: Colors.green),
+                                              SizedBox(width: 5),
+                                              Expanded(
+                                                child: CategoryDescripText(
+                                                  text: "Show nearest safe zone",
+                                                  color: Colors.black,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                    GestureDetector(
-                                      onTap: () {
-                                        _findDangerRoute();
-                                      },
-                                      child: Container(
-                                        width: 170,
-                                        height: 40,
-                                        decoration: BoxDecoration(
-                                          color: _isDangerZoneShown
-                                              ? Colors.grey[300]
-                                              : Colors.white,
-                                          borderRadius:
-                                              BorderRadius.circular(50),
-                                          boxShadow: const [
-                                            BoxShadow(
-                                              color: Colors.grey,
-                                              blurRadius: 2,
-                                              offset: Offset(1, 1),
-                                            ),
-                                          ],
-                                        ),
-                                        child: const Row(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.center,
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.start,
-                                          children: [
-                                            SizedBox(width: 5),
-                                            Icon(Icons.safety_check,
-                                                color: Colors.red),
-                                            SizedBox(width: 5),
-                                            Expanded(
-                                              child: CategoryDescripText(
-                                                text:
-                                                    "Show nearest danger zone",
-                                                color: Colors.black,
+                                      GestureDetector(
+                                        onTap: () {
+                                          _findDangerRoute();
+                                        },
+                                        child: Container(
+                                          width: 170,
+                                          height: 40,
+                                          decoration: BoxDecoration(
+                                            color: _isDangerZoneShown
+                                                ? Colors.grey[300]
+                                                : Colors.white,
+                                            borderRadius:
+                                                BorderRadius.circular(50),
+                                            boxShadow: const [
+                                              BoxShadow(
+                                                color: Colors.grey,
+                                                blurRadius: 2,
+                                                offset: Offset(1, 1),
                                               ),
-                                            ),
-                                          ],
+                                            ],
+                                          ),
+                                          child: const Row(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                            children: [
+                                              SizedBox(width: 5),
+                                              Icon(Icons.safety_check,
+                                                  color: Colors.red),
+                                              SizedBox(width: 5),
+                                              Expanded(
+                                                child: CategoryDescripText(
+                                                  text:
+                                                      "Show nearest danger zone",
+                                                  color: Colors.black,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                  ])
-                            ]))
+                                    ])
+                    )]))
                     : SingleChildScrollView(
                         scrollDirection: Axis.horizontal,
                         child: Row(
