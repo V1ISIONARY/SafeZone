@@ -10,6 +10,8 @@ import 'package:safezone/resources/schema/colors.dart';
 import 'package:safezone/resources/schema/texts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../../widgets/loadingstate.dart';
+
 class ListOfMembers extends StatefulWidget {
   final int circleId;
   final CircleModel circleInfo;
@@ -24,8 +26,34 @@ class ListOfMembers extends StatefulWidget {
 class _ListOfMembersState extends State<ListOfMembers> {
   List<Map<String, dynamic>> members = [];
   bool isLoading = true;
-  int? _userId; // Store userId locally
-  CircleModel? _updatedCircleInfo; // Store updated circle info
+  int? _userId; 
+  CircleModel? _updatedCircleInfo; 
+
+  bool _showTitle = false;
+  double _appBarHeight = 0;
+  Color _appBarColor = Colors.transparent;
+
+  Future<void> _checkIfShown() async {
+    Future.delayed(Duration(milliseconds: 200), () {
+      if (mounted) {
+        setState(() {
+          _appBarHeight = 40;
+          _appBarColor = Colors.green;
+          _showTitle = true;
+        });
+      }
+
+      Future.delayed(Duration(seconds: 5), () {
+        if (mounted) {
+          setState(() {
+            _appBarHeight = 0;
+            _appBarColor = Colors.transparent;
+            _showTitle = false;
+          });
+        }
+      });
+    });
+  }
 
   @override
   void initState() {
@@ -35,7 +63,7 @@ class _ListOfMembersState extends State<ListOfMembers> {
         .add(FetchMembersEvent(circleId: widget.circleId));
     _loadUserId();
     _updatedCircleInfo =
-        widget.circleInfo; // Initialize with the passed circleInfo
+        widget.circleInfo; 
   }
 
   // Load userId from shared preferences
@@ -95,228 +123,266 @@ class _ListOfMembersState extends State<ListOfMembers> {
             );
             isLoading = false;
           });
-
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text("New code generated successfully!"),
-            ),
-          );
+          _checkIfShown();
         }
       },
       child: Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.white,
-          centerTitle: true,
-          title: const CategoryText(text: "Members"),
-          actions: <Widget>[
-            IconButton(
-              icon: const Icon(Icons.exit_to_app),
-              onPressed: _leaveGroup,
+        body: Column(
+          children: [
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              height: _appBarHeight,
+              color: _appBarColor,
+              width: double.infinity,
+              alignment: Alignment.center,
+              child: _showTitle
+                  ? CategoryDescripText(
+                      text: "New code generated successfully!",
+                      color: Colors.white,
+                    )
+                  : null,
             ),
-          ],
-        ),
-        body: isLoading
-            ? const Center(child: CircularProgressIndicator())
-            : members.isEmpty
-                ? const Center(child: Text("No members found"))
-                : Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Theme(
-                            data: Theme.of(context).copyWith(
-                                dividerColor:
-                                    const Color.fromARGB(6, 92, 92, 92)),
-                            child: ExpansionTile(
-                              title: const Text(
-                                "Invite Members",
-                                style:
-                                    TextStyle(color: textColor, fontSize: 13),
-                              ),
-                              children: [
-                                Center(
-                                  child: Container(
-                                    width:
-                                        MediaQuery.of(context).size.width * 0.9,
-                                    padding: const EdgeInsets.all(12),
-                                    decoration: BoxDecoration(
-                                      color: const Color.fromARGB(
-                                          29, 151, 163, 175),
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        const SizedBox(height: 10),
-                                        const Text(
-                                          "Invite Members",
-                                          style: TextStyle(
-                                            color: textColor,
-                                            fontSize: 13,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 5),
-                                        const Text(
-                                          "Copy the code below and share it to invite others.",
-                                          style: TextStyle(
-                                            color: labelFormFieldColor,
-                                            fontSize: 11,
-                                          ),
-                                          textAlign: TextAlign.center,
-                                        ),
-                                        const SizedBox(height: 10),
-                                        Text(
-                                          _updatedCircleInfo!
-                                              .code, // Use the updated code
-                                          textAlign: TextAlign.center,
-                                          style: const TextStyle(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.bold,
-                                            color: textColor,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 12),
-                                        SizedBox(
-                                          width: double.infinity,
-                                          child: ElevatedButton.icon(
-                                            onPressed: () {
-                                              Clipboard.setData(ClipboardData(
-                                                  text: _updatedCircleInfo!
-                                                      .code));
-                                              // ScaffoldMessenger.of(context)
-                                              //     .showSnackBar(
-                                              //   const SnackBar(
-                                              //     backgroundColor:
-                                              //         greenStatusColor,
-                                              //     content: Text(
-                                              //         "Code copied to clipboard!"),
-                                              //     duration:
-                                              //         Duration(seconds: 2),
-                                              //   ),
-                                              // );
-                                            },
-                                            style: ElevatedButton.styleFrom(
-                                              backgroundColor:
-                                                  const Color.fromARGB(
-                                                      255, 114, 151, 192),
-                                              foregroundColor: Colors.white,
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      vertical: 12),
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(8),
-                                              ),
-                                              elevation: 2,
-                                            ),
-                                            icon: const Icon(
-                                              Icons.copy,
-                                              size: 20,
-                                              color: Colors.white,
-                                            ),
-                                            label: const Text(
-                                              "Copy code",
-                                              style: TextStyle(
-                                                fontSize: 13,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        const SizedBox(height: 10),
-                                        SizedBox(
-                                          width: double.infinity,
-                                          child: ElevatedButton(
-                                            onPressed: () {
-                                              context.read<CircleBloc>().add(
-                                                    GenerateCodeEvent(
-                                                        circleId:
-                                                            widget.circleId),
-                                                  );
-                                            },
-                                            style: ElevatedButton.styleFrom(
-                                              backgroundColor:
-                                                  const Color.fromARGB(
-                                                      255, 114, 151, 192),
-                                              foregroundColor: Colors.white,
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      vertical: 12),
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(8),
-                                              ),
-                                              elevation: 2,
-                                            ),
-                                            child: const Text(
-                                              "Generate new code",
-                                              style: TextStyle(
-                                                fontSize: 13,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        const SizedBox(height: 10),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            )),
-                        const Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 20),
-                          child: Divider(
-                            color: labelFormFieldColor,
-                            thickness: 0.1,
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                        Expanded(
-                          child: ListView.builder(
-                            itemCount: members.length,
-                            itemBuilder: (context, index) {
-                              final member = members[index];
-                              final fullName =
-                                  '${member['first_name']} ${member['last_name']}';
-                              final status = member['status'];
-
-                              return ListTile(
-                                leading: Padding(
-                                  padding: const EdgeInsets.only(left: 15.0),
-                                  child: Container(
-                                    width: 35,
-                                    height: 35,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color:
-                                          const Color.fromARGB(255, 48, 72, 92)
-                                              .withOpacity(0.2),
-                                    ),
-                                    child: const Icon(
-                                      Icons.person,
-                                      color: textColor,
-                                      size: 20,
-                                    ),
-                                  ),
-                                ),
-                                title: Text(
-                                  fullName,
-                                  style: const TextStyle(
-                                      color: textColor, fontSize: 13),
-                                ),
-                                subtitle: Text(
-                                  'Status: $status',
-                                  style: const TextStyle(
-                                      color: labelFormFieldColor, fontSize: 11),
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
+            AppBar(
+              backgroundColor: Colors.white,
+              automaticallyImplyLeading: false,
+              centerTitle: true,
+              leading: GestureDetector(
+                onTap: () {
+                  Navigator.pop(context);
+                },
+                child: Container(
+                  margin: const EdgeInsets.all(15),
+                  decoration: BoxDecoration(
+                    border: Border.all(width: 1, color: Colors.black),
+                    shape: BoxShape.circle,
                   ),
+                  child: const Icon(Icons.arrow_back, color: Colors.black, size: 10),
+                ),
+              ),
+              actions: <Widget>[
+                IconButton(
+                  icon: const Icon(Icons.exit_to_app),
+                  onPressed: _leaveGroup,
+                ),
+                SizedBox(width: 5),
+              ],
+              title: CategoryText(text: "Members"),
+            ),
+            isLoading
+                ? Expanded(
+                    child: Center(
+                      child: Transform.translate(
+                          offset: const Offset(-40, -40),
+                          child: const LoadingState()),
+                    ),
+                  )
+                : members.isEmpty
+                  ? Expanded(
+                    child: Center(child: Text("No members found"))
+                  )
+                  : Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Theme(
+                              data: Theme.of(context).copyWith(
+                                  dividerColor:
+                                      const Color.fromARGB(6, 92, 92, 92)),
+                              child: ExpansionTile(
+                                title: const Text(
+                                  "Invite Members",
+                                  style:
+                                      TextStyle(color: textColor, fontSize: 13),
+                                ),
+                                children: [
+                                  Center(
+                                    child: Container(
+                                      width:
+                                          MediaQuery.of(context).size.width * 0.9,
+                                      padding: const EdgeInsets.all(12),
+                                      decoration: BoxDecoration(
+                                        color: const Color.fromARGB(
+                                            29, 151, 163, 175),
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          const SizedBox(height: 10),
+                                          const Text(
+                                            "Invite Members",
+                                            style: TextStyle(
+                                              color: textColor,
+                                              fontSize: 13,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 5),
+                                          const Text(
+                                            "Copy the code below and share it to invite others.",
+                                            style: TextStyle(
+                                              color: labelFormFieldColor,
+                                              fontSize: 11,
+                                            ),
+                                            textAlign: TextAlign.center,
+                                          ),
+                                          const SizedBox(height: 20),
+                                          Text(
+                                            _updatedCircleInfo!
+                                                .code, // Use the updated code
+                                            textAlign: TextAlign.center,
+                                            style: const TextStyle(
+                                              fontSize: 30,
+                                              fontWeight: FontWeight.bold,
+                                              color: textColor,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 20),
+                                          SizedBox(
+                                            width: double.infinity,
+                                            child: ElevatedButton.icon(
+                                              onPressed: () {
+                                                Clipboard.setData(ClipboardData(
+                                                    text: _updatedCircleInfo!
+                                                        .code));
+                                                // ScaffoldMessenger.of(context)
+                                                //     .showSnackBar(
+                                                //   const SnackBar(
+                                                //     backgroundColor:
+                                                //         greenStatusColor,
+                                                //     content: Text(
+                                                //         "Code copied to clipboard!"),
+                                                //     duration:
+                                                //         Duration(seconds: 2),
+                                                //   ),
+                                                // );
+                                              },
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor: widgetPricolor,
+                                                foregroundColor: Colors.white,
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        vertical: 12),
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(8),
+                                                ),
+                                                elevation: 2,
+                                              ),
+                                              icon: const Icon(
+                                                Icons.copy,
+                                                size: 20,
+                                                color: Colors.white,
+                                              ),
+                                              label: const Text(
+                                                "Copy code",
+                                                style: TextStyle(
+                                                  fontSize: 13,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(height: 10),
+                                          SizedBox(
+                                            width: double.infinity,
+                                            child: ElevatedButton(
+                                              onPressed: () {
+                                                context.read<CircleBloc>().add(
+                                                      GenerateCodeEvent(
+                                                          circleId:
+                                                              widget.circleId),
+                                                    );
+                                              },
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor:widgetPricolor,
+                                                foregroundColor: Colors.white,
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        vertical: 12),
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(8),
+                                                ),
+                                                elevation: 2,
+                                              ),
+                                              child: const Text(
+                                                "Generate new code",
+                                                style: TextStyle(
+                                                  fontSize: 13,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(height: 10),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              )),
+                          const Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 20),
+                            child: Divider(
+                              color: labelFormFieldColor,
+                              thickness: 0.1,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          Expanded(
+                            child: ListView.builder(
+                              itemCount: members.length,
+                              itemBuilder: (context, index) {
+                                final member = members[index];
+                                final fullName =
+                                    '${member['first_name']} ${member['last_name']}';
+                                final status = member['status'];
+                                return Container(
+                                  margin: EdgeInsets.only(bottom: 15),
+                                  child: Row(
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.only(left: 15.0),
+                                        child: Container(
+                                          width: 35,
+                                          height: 35,
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            color: const Color.fromARGB(255, 48, 72, 92).withOpacity(0.2),
+                                          ),
+                                          child: const Icon(
+                                            Icons.person,
+                                            color: textColor,
+                                            size: 20,
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 10),
+                                      Expanded( 
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start, 
+                                          children: [
+                                            CategoryText(text: fullName),
+                                            const SizedBox(height: 2),
+                                            CategoryDescripText(text: 'Status: $status', alignment: 'start'),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  )
+                                );
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+          ]
+        )
       ),
     );
   }

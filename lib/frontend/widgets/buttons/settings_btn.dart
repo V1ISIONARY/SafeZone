@@ -7,7 +7,7 @@ class Settingsbtn extends StatelessWidget {
   final String title;
   final String svgIcon;
   final String navigateTo;
-  final String description;
+  final String? description;
   final VoidCallback onTap;
   final bool? replace;
 
@@ -16,7 +16,7 @@ class Settingsbtn extends StatelessWidget {
     required this.title,
     required this.svgIcon,
     required this.navigateTo,
-    required this.description,
+    this.description,
     required this.onTap,
     this.replace,
   });
@@ -40,6 +40,7 @@ class Settingsbtn extends StatelessWidget {
           children: [
             Row(
               crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 Container(
                   height: 25,
@@ -54,9 +55,8 @@ class Settingsbtn extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     PrimaryText(text: title),
-                    DescriptionText(
-                      text: description,
-                    ),
+                    if (description != null) 
+                      DescriptionText(text: description!)
                   ],
                 ),
               ],

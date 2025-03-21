@@ -418,13 +418,22 @@ class _SettingsState extends State<Settings> {
                         title: 'Logout',
                         svgIcon: 'lib/resources/svg/logout.svg',
                         navigateTo: 'login',
-                        description: 'Hello love GoodBye',
                         replace: true,
                         onTap: () async {
                           NotificationPollingService().stopPolling();
-                          final SharedPreferences prefs =
-                              await SharedPreferences.getInstance();
-                          prefs.clear();
+                          final SharedPreferences prefs = await SharedPreferences.getInstance();
+                          Map<String, bool> firstRunFlags = {};
+                          for (String key in prefs.getKeys()) {
+                            if (key.startsWith('isFirstRunFlag_')) {
+                              firstRunFlags[key] = prefs.getBool(key) ?? true;
+                            }
+                          }
+
+                          await prefs.clear();
+
+                          for (var entry in firstRunFlags.entries) {
+                            await prefs.setBool(entry.key, entry.value);
+                          }
                         },
                       ),
                 Container(

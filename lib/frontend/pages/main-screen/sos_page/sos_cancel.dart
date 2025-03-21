@@ -52,6 +52,9 @@ class _SosCancelledState extends State<SosCancelled> {
               const Spacer(),
               CustomButton(
                 text: "Back to Home",
+                widthSize: true,
+                buttonColor: widgetPricolor,
+                textColor: widgetPricolor,
                 isOutlined: true,
                 onPressed: () {
                   context.push('/');

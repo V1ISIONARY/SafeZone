@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:safezone/resources/schema/colors.dart';
+import 'package:safezone/resources/schema/textLimit.dart';
 
 class CategoryText extends StatelessWidget {
   final String text;
@@ -47,13 +48,17 @@ class CategoryDescripText extends StatelessWidget {
   final String? alignment;
   final Color? color;
 
-  const CategoryDescripText(
-      {super.key, required this.text, this.alignment, this.color});
+  const CategoryDescripText({
+    super.key,
+    required this.text,
+    this.alignment,
+    this.color,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Text(
-      text,
+      text, 
       style: GoogleFonts.poppins(
         fontSize: 9,
         fontWeight: FontWeight.w500,
@@ -77,6 +82,54 @@ class CategoryDescripText extends StatelessWidget {
   }
 
 }
+
+class CategoryDescripTextE extends StatelessWidget {
+  final String text;
+  final String? alignment;
+  final Color? color;
+
+  const CategoryDescripTextE({
+    super.key,
+    required this.text,
+    this.alignment,
+    this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Flexible(
+      child: Text(
+        text,
+        style: GoogleFonts.poppins(
+          fontSize: 9,
+          fontWeight: FontWeight.w500,
+          color: color ?? Colors.black45,
+        ),
+        textAlign: _getTextAlignment(),
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
+      ),
+    );
+  }
+
+  TextAlign _getTextAlignment() {
+    switch (alignment?.toLowerCase()) {
+      case "right":
+        return TextAlign.right;
+      case "center":
+        return TextAlign.center;
+      case "left":
+        return TextAlign.left;
+      default:
+        return TextAlign.start;
+    }
+  }
+
+  String limitText(String text, int maxLength) {
+    return text.length > maxLength ? '${text.substring(0, maxLength)}...' : text;
+  }
+}
+
 
 class CategoryDescripTextEllipsis extends StatelessWidget {
   final String text;

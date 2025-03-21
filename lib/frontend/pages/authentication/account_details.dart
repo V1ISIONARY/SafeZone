@@ -167,12 +167,12 @@ class _AccountDetailsState extends State<AccountDetails> {
             Navigator.pop(context);
           },
           child: Container(
-            margin: EdgeInsets.all(15),
+            margin: const EdgeInsets.all(15),
             decoration: BoxDecoration(
               border: Border.all(width: 1, color: Colors.black),
               shape: BoxShape.circle,
             ),
-            child: Icon(Icons.arrow_back, color: Colors.black, size: 16),
+            child: const Icon(Icons.arrow_back, color: Colors.black, size: 10),
           ),
         ),
         title: CategoryText(text: "Account Details"),
@@ -181,7 +181,6 @@ class _AccountDetailsState extends State<AccountDetails> {
         margin: EdgeInsets.symmetric(horizontal: 15),
         child: ListView(
           children: [
-            // User Profile Section
             Container(
               width: double.infinity,
               height: 250,
