@@ -58,6 +58,10 @@ class _SplashScreenState extends State<SplashScreen> {
         color: Colors.white,
         child: Stack(
           children: [
+            AppBar(
+              toolbarHeight: 0,
+              automaticallyImplyLeading: false,
+            ),
             Center(
               child: Container(
                 width: 120,

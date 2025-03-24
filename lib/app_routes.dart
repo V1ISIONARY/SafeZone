@@ -93,6 +93,13 @@ GoRouter appRouter(bool isFirstRun, String? userToken) => GoRouter(
               return ReportsHistory(fromSuccess: maybe);
             }),
         GoRoute(
+          path: '/reports-history-details',
+          builder: (context, state) {
+            final incidentReport = state.extra as IncidentReportModel;
+            return ReportsHistoryDetails(reportInfo: incidentReport);
+          },
+        ),
+        GoRoute(
           path: '/reports-status-history',
           builder: (context, state) {
             final incidentReport = state.extra as IncidentReportModel;

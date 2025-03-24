@@ -57,6 +57,10 @@ class _SlidesState extends State<Slides> {
         height: double.infinity,
         child: Stack(
           children: [
+            AppBar(
+              toolbarHeight: 0,
+              automaticallyImplyLeading: false,
+            ),
             Container(
               height: mediaHeight,
               color: Colors.white,

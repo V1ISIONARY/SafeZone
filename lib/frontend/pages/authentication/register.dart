@@ -38,6 +38,30 @@ class _RegisterScreenState extends State<RegisterScreen> {
   String generatedOTP = "";
   String? selectedGender;
 
+  bool _showTitle = false;
+  double _appBarHeight = 0;
+  String _notificationText = "";
+  Color _appBarColor = Colors.transparent;
+
+  void _checkIfShown({required String text, required Color color}) {
+    setState(() {
+      _appBarHeight = 40;
+      _appBarColor = color;
+      _showTitle = true;
+      _notificationText = text;
+    });
+
+    Future.delayed(Duration(seconds: 5), () {
+      if (mounted) {
+        setState(() {
+          _appBarHeight = 0;
+          _appBarColor = Colors.transparent;
+          _showTitle = false;
+        });
+      }
+    });
+  }
+
   @override
   void dispose() {
     emailController.dispose();
@@ -131,34 +155,51 @@ class _RegisterScreenState extends State<RegisterScreen> {
         }
       },
       child: Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.white,
-          elevation: 0,
-          automaticallyImplyLeading: false,
-          centerTitle: true,
-          title: const CategoryText(text: "Sign Up"),
-          leading: GestureDetector(
-            onTap: () {
-              if (currentStep > 0) {
-                previousStep();
-              } else {
-                Navigator.pop(context);
-              }
-            },
-            child: Container(
-              margin: const EdgeInsets.all(15),
-              decoration: BoxDecoration(
-                border: Border.all(width: 1, color: Colors.black),
-                shape: BoxShape.circle,
-              ),
-              child:
-                  const Icon(Icons.arrow_back, color: Colors.black, size: 10),
-            ),
-          ),
-        ),
         body: SafeArea(
           child: Column(
             children: [
+              AppBar(
+                toolbarHeight: 0,
+                automaticallyImplyLeading: false,
+              ),
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                height: _appBarHeight,
+                color: _appBarColor,
+                width: double.infinity,
+                alignment: Alignment.center,
+                child: _showTitle
+                    ? CategoryDescripText(
+                        text: _notificationText,
+                        color: Colors.white,
+                      )
+                    : null,
+              ),
+              AppBar(
+                backgroundColor: Colors.white,
+                elevation: 0,
+                automaticallyImplyLeading: false,
+                centerTitle: true,
+                title: const CategoryText(text: "Sign Up"),
+                leading: GestureDetector(
+                  onTap: () {
+                    if (currentStep > 0) {
+                      previousStep();
+                    } else {
+                      Navigator.pop(context);
+                    }
+                  },
+                  child: Container(
+                    margin: const EdgeInsets.all(15),
+                    decoration: BoxDecoration(
+                      border: Border.all(width: 1, color: Colors.black),
+                      shape: BoxShape.circle,
+                    ),
+                    child:
+                        const Icon(Icons.arrow_back, color: Colors.black, size: 10),
+                  ),
+                ),
+              ),
               _buildProgressIndicator(),
               Expanded(
                 child: currentStep == 0
@@ -237,6 +278,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
           const Spacer(),
           GestureDetector(
             onTap: () {
+              final bloc = context.read<AuthenticationBloc>();
+              bloc.add(CheckEmailEvent(email: emailController.text));
+              bloc.stream.listen((state) {
+                if (state is EmailCheckSuccess) {
+                  sendOTP(emailController.text);
+                } else if (state is EmailCheckError) {
+                  _checkIfShown(
+                      text: state.message, color: Colors.red);
+                }
+              });
               sendOTP(emailController.text);
             },
             child: Container(

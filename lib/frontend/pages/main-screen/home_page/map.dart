@@ -543,13 +543,13 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
           await MarkerUtils.createCustomMarker(context, widgetPricolor);
       customDangerZoneMarker = await MarkerUtils.resizeMarker(
         'lib/resources/images/dangerzonee.png',
-        38,
-        56,
+        48,
+        66,
       );
       customSafeZoneMarker = await MarkerUtils.resizeMarker(
         'lib/resources/images/marker_safezone.png',
-        38,
-        56,
+        48,
+        66,
       );
 
       if (mounted) {
@@ -1488,8 +1488,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                                             const EdgeInsets
                                                                 .only(right: 4),
                                                         child: AnimatedBuilder(
-                                                          animation:
-                                                              _controllerFade,
+                                                          animation: _controllerFade,
                                                           builder:
                                                               (context, child) {
                                                             return Row(

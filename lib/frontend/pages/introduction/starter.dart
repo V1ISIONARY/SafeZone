@@ -18,6 +18,10 @@ class Starter extends StatelessWidget {
       backgroundColor: Colors.white,
       body: Stack(
         children: [
+          AppBar(
+            toolbarHeight: 0,
+            automaticallyImplyLeading: false,
+          ),
           Column(
             children: [
               Expanded(

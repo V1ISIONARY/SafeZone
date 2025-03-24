@@ -85,7 +85,7 @@ class _BottomNavigationWidgetState extends State<BottomNavigationWidget> with Si
             children: [
               _buildIconItem("Map", "lib/resources/svg/map.svg", 0),
               _buildIconItem("Contacts", "lib/resources/svg/contacts.svg", 1),
-              SizedBox(width: 48),
+              Expanded(child: SizedBox(width: 48)),
               _buildIconItem("Notification", "lib/resources/svg/notification.svg", 2),
               _buildIconItem("Settings", "lib/resources/svg/settings.svg", 3),
             ],
@@ -155,46 +155,49 @@ class _BottomNavigationWidgetState extends State<BottomNavigationWidget> with Si
   Widget _buildIconItem(String label, String iconPath, int index) {
     bool isSelected = _selectedIndex == index;
 
-    return GestureDetector(
-      onTap: () {
-        _onItemTapped(index);
-      },
-      child: Container(
-        height: double.infinity,
-        width: 55,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              height: 17,
-              width: double.infinity,
-              child: SvgPicture.asset(
-                iconPath,
-                color: isSelected ? widgetPricolor : Colors.black45,
+    return Expanded(
+      child: GestureDetector(
+        onTap: () {
+          _onItemTapped(index);
+        },
+        child: Container(
+          height: double.infinity,
+          width: 55,
+          color: Colors.white,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                height: 17,
+                width: double.infinity,
+                child: SvgPicture.asset(
+                  iconPath,
+                  color: isSelected ? widgetPricolor : Colors.black45,
+                ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 7),
-              child: Flexible(
-                child: Container(
-                  width: double.infinity,
-                  child: Text(
-                    label,
-                    overflow: TextOverflow.visible,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 9,
-                      fontWeight:
-                          isSelected ? FontWeight.bold : FontWeight.w400,
-                      color: isSelected ? widgetPricolor : Colors.black45,
+              Padding(
+                padding: const EdgeInsets.only(top: 7),
+                child: Flexible(
+                  child: Container(
+                    width: double.infinity,
+                    child: Text(
+                      label,
+                      overflow: TextOverflow.visible,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 9,
+                        fontWeight:
+                            isSelected ? FontWeight.bold : FontWeight.w400,
+                        color: isSelected ? widgetPricolor : Colors.black45,
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
-      ),
+      )
     );
   }
 }
