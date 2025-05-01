@@ -11,7 +11,8 @@ abstract class AuthenticationRepository {
       bool isGirl,
       bool isVerified,
       double latitude, // New parameter for latitude
-      double longitude // New parameter for longitude
+      double longitude,
+      int age // New parameter for longitude
       );
   Future<void> updateLocation(double latitude, double longitude);
 }

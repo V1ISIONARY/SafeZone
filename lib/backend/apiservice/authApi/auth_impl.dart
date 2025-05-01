@@ -61,7 +61,8 @@ class AuthenticationImplementation extends AuthenticationRepository {
       bool isGirl,
       bool isVerified,
       double latitude,
-      double longitude) async {
+      double longitude,
+      int age) async {
     final response = await http.post(
       Uri.parse('$baseUrl/create_account'),
       headers: {
@@ -79,7 +80,8 @@ class AuthenticationImplementation extends AuthenticationRepository {
         'is_girl': isGirl,
         'is_verified': isVerified,
         'latitude': latitude,
-        'longitude': longitude
+        'longitude': longitude,
+        'age' : age
       }),
     );
 

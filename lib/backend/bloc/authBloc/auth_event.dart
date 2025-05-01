@@ -27,6 +27,7 @@ class UserSignUpEvent extends AuthenticationEvent {
   final bool isVerified;
   final double longitude;
   final double latitude;
+  final int age;
 
   UserSignUpEvent({
     required this.username,
@@ -40,5 +41,6 @@ class UserSignUpEvent extends AuthenticationEvent {
     required this.isVerified,
     required this.longitude,
     required this.latitude,
+    required this.age,
   });
 }

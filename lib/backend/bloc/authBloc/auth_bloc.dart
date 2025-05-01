@@ -32,7 +32,8 @@ class AuthenticationBloc
             event.isGirl,
             event.isVerified,
             event.longitude,
-            event.latitude);
+            event.latitude,
+            event.age);
 
         emit(SignUpSuccess());
       } catch (error) {

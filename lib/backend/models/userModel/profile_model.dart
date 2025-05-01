@@ -9,6 +9,7 @@ class ProfileModel {
   final int? circleId;
   final String profilePicture;
   final String phoneNumber;
+  final int age;
 
   ProfileModel({
     required this.id,
@@ -21,6 +22,7 @@ class ProfileModel {
     required this.circleId,
     required this.profilePicture,
     required this.phoneNumber,
+    required this.age
   });
 
   factory ProfileModel.fromJson(Map<String, dynamic> json) {
@@ -35,6 +37,7 @@ class ProfileModel {
       circleId: json['active_circle'] ?? 0,
       profilePicture: json['profile_picture'] ?? "Safe",
       phoneNumber: json['phone_number'] ?? "Safe",
+      age: json['age'] ?? 0
     );
   }
 
@@ -50,6 +53,7 @@ class ProfileModel {
       'active_circle': circleId,
       'profile_picture': profilePicture,
       'phone_number': phoneNumber,
+      'age': age
     };
   }
 }
