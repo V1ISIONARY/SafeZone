@@ -45,7 +45,7 @@ class _SosPageState extends State<SosPage> {
               ),
               const SizedBox(height: 60),
               const Text(
-                "Your SOS will be sent to your trusted circle. Check who’s in your circle",
+                "Your SOS will be sent to your trusted circle. Check who’s in your circles",
                 textAlign: TextAlign.center,
                 style: TextStyle(color: textColor, fontSize: 15),
               ),

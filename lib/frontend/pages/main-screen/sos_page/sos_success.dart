@@ -7,6 +7,7 @@ import 'package:safezone/backend/bloc/notificationBloc/notification_state.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:safezone/frontend/widgets/buttons/custom_button.dart';
 import 'package:safezone/resources/schema/colors.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:safezone/resources/schema/texts.dart';
 
 class SosSuccess extends StatefulWidget {
@@ -17,6 +18,7 @@ class SosSuccess extends StatefulWidget {
 }
 
 class _SosSuccessState extends State<SosSuccess> {
+  late SharedPreferences prefs;
   @override
   void initState() {
     super.initState();
@@ -39,11 +41,13 @@ class _SosSuccessState extends State<SosSuccess> {
     String fullName = "$formattedFirstName $formattedLastName".trim();
 
     if (userId != 0) {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? address = prefs.getString('currentAddress');
       context.read<NotificationBloc>().add(
             BroadcastNotification(
                 userId, // Use the stored user ID
                 "Emergency Alert",
-                "$fullName has triggered an SOS alert!",
+                "$fullName has triggered an SOS alert! - Location: $address",
                 "SOS"),
           );
     } else {

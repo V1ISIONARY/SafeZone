@@ -561,6 +561,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   isVerified: true,
                   latitude: position.latitude, // Pass latitude
                   longitude: position.longitude, // Pass longitude
+                  age: 18 // TEMPORARY
                 ));
               },
               child: Container(

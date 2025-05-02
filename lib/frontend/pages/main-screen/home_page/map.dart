@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'dart:ui' as ui;
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
@@ -51,6 +53,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
   List<LatLng> _safeZones = [];
   static const LatLng sourceLocation = LatLng(16.0471, 120.3425);
   final locs.Location location = locs.Location();
+  final apiKey = dotenv.env['GOOGLE_API_KEY'];
 
   final Completer<GoogleMapController> _mapController = Completer();
   final GlobalKey _searchKey = GlobalKey();
@@ -343,6 +346,26 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
     }
   }
 
+  Future<String?> getAddressFromCoordinates(double latitude, double longitude) async {
+      final url =
+          'https://maps.googleapis.com/maps/api/geocode/json?latlng=$latitude,$longitude&key=$apiKey';
+
+      try {
+        final response = await http.get(Uri.parse(url));
+        final data = json.decode(response.body);
+
+        if (data['status'] == 'OK') {
+          return data['results'][0]['formatted_address'];
+        } else {
+          print('Failed to get address: ${data['status']}');
+          return null;
+        }
+      } catch (e) {
+        print('Error fetching address: $e');
+        return null;
+      }
+    }
+
   void _startLocationUpdates() {
     _positionStreamSubscription = Geolocator.getPositionStream(
       locationSettings: const LocationSettings(
@@ -370,8 +393,16 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
             infoWindow: const InfoWindow(title: 'My Location'),
           ));
         });
-
+        //prefs.setString('currentAddress', )
         await updateLocation(position.latitude, position.longitude);
+        String? currentAddress = await getAddressFromCoordinates(position.latitude, position.longitude);
+        if (currentAddress != null) {
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          prefs.setDouble('latitude', position.latitude);
+          prefs.setDouble('longitude', position.longitude);
+          prefs.setString('currentAddress', currentAddress);
+          print('User address: $currentAddress');
+        }
       }
 
       bool isInsideSafeZone = _isInsideZone(
@@ -418,6 +449,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
         await _prefs.setBool('wasInsideDangerZone', false);
       }
     });
+    
   }
 
   Future<void> _sendBroadcastNotification(String title, String message) async {
