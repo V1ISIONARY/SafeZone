@@ -31,9 +31,9 @@ class _CreateReportState extends State<CreateReport> {
   List<File> selectedImages = [];
   int? userId;
   String reportTimestamp = "";
+  final TextEditingController _nameController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _searchController = TextEditingController();
-  LatLng _initialCameraPosition = LatLng(16.043859, 120.335182);
 
   final Completer<GoogleMapController> _mapController = Completer();
   LatLng? _pinnedLocation;
@@ -42,10 +42,25 @@ class _CreateReportState extends State<CreateReport> {
   double _radius = 50.0;
   final Set<Circle> _circles = {};
 
-  CameraPosition _majorCamera = CameraPosition(
+  final CameraPosition _majorCamera = const CameraPosition(
     target: LatLng(16.043859, 120.335182),
     zoom: 14.0,
   );
+
+  final List<String> _reportTypes = [
+    'Harassment',
+    'Assault',
+    'Theft',
+    'Suspicious Activity',
+    'Verbal Abuse',
+    'Stalking',
+    'Domestic Violence',
+    'Unsafe Environment',
+    'Others',
+  ];
+
+  String? _selectedType;
+  final TextEditingController _otherTypeController = TextEditingController();
 
   @override
   void initState() {
@@ -237,7 +252,7 @@ class _CreateReportState extends State<CreateReport> {
           centerTitle: true,
         ),
         body: Container(
-            margin: EdgeInsets.symmetric(horizontal: 15),
+            margin: const EdgeInsets.symmetric(horizontal: 15),
             child: Column(children: [
               Column(
                 children: [
@@ -266,14 +281,14 @@ class _CreateReportState extends State<CreateReport> {
                                 ),
                                 contentPadding:
                                     const EdgeInsets.only(left: 10, bottom: 8),
-                                border: OutlineInputBorder(
-                                  borderSide: const BorderSide(color: btnColor),
+                                border: const OutlineInputBorder(
+                                  borderSide: BorderSide(color: btnColor),
                                 ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderSide: const BorderSide(color: btnColor),
+                                focusedBorder: const OutlineInputBorder(
+                                  borderSide: BorderSide(color: btnColor),
                                 ),
-                                enabledBorder: OutlineInputBorder(
-                                  borderSide: const BorderSide(color: btnColor),
+                                enabledBorder: const OutlineInputBorder(
+                                  borderSide: BorderSide(color: btnColor),
                                 ),
                               )),
                         )),
@@ -295,7 +310,7 @@ class _CreateReportState extends State<CreateReport> {
                                     offset: Offset(1, 1),
                                   )
                                 ]),
-                            child: Center(
+                            child: const Center(
                               child: Icon(
                                 size: 20,
                                 Icons.search,
@@ -425,9 +440,69 @@ class _CreateReportState extends State<CreateReport> {
                         text:
                             'Help others stay safe by providing details about the incident and location.',
                       ),
-                      const SizedBox(height: 30),
-                      _buildRadiusSlider(),
                       const SizedBox(height: 20),
+                      _buildRadiusSlider(),
+                      const SizedBox(height: 10),
+                      const Align(
+                        alignment: Alignment.centerLeft,
+                        child: CategoryText(
+                          text: "Type of Report:",
+                          alignment: 'start',
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      DropdownButtonFormField<String>(
+                        value: _selectedType,
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            _selectedType = newValue;
+                          });
+                        },
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(5),
+                            borderSide: const BorderSide(color: btnColor),
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 12),
+                        ),
+                        items: _reportTypes.map((String type) {
+                          return DropdownMenuItem<String>(
+                            value: type,
+                            child: Text(
+                              type,
+                              style: GoogleFonts.poppins(fontSize: 13),
+                            ),
+                          );
+                        }).toList(),
+                        hint: Text(
+                          "Select report type",
+                          style: GoogleFonts.poppins(
+                              fontSize: 13, color: Colors.black54),
+                        ),
+                      ),
+                      if (_selectedType == 'Others') ...[
+                        const SizedBox(height: 10),
+                        TextFieldWidget.buildTextField(
+                          controller: _otherTypeController,
+                          label: "Specify Report Type",
+                          hint: "Enter custom report type",
+                        ),
+                      ],
+                      const SizedBox(height: 20),
+                      const Align(
+                        alignment: Alignment.centerLeft,
+                        child: CategoryText(
+                            text: "Safe Zone Title:", alignment: 'start'),
+                      ),
+                      const SizedBox(height: 15),
+                      TextFieldWidget.buildTextField(
+                        controller: _nameController,
+                        label: "Title",
+                        hint: "Enter safe zone title",
+                        maxLines: 5,
+                      ),
+                      const SizedBox(height: 5),
                       TextFieldWidget.buildTextField(
                         controller: _descriptionController,
                         label: "Description",
@@ -436,8 +511,8 @@ class _CreateReportState extends State<CreateReport> {
                         minLines: 5,
                       ),
                       Container(
-                        margin: EdgeInsets.only(top: 10, bottom: 20),
-                        child: CategoryText(
+                        margin: const EdgeInsets.only(top: 10, bottom: 20),
+                        child: const CategoryText(
                             text:
                                 "Upload images to provide more context about the incident (optional)"),
                       ),
@@ -450,7 +525,7 @@ class _CreateReportState extends State<CreateReport> {
                       ),
                       const SizedBox(height: 40),
                       Transform.translate(
-                          offset: Offset(0, -30),
+                          offset: const Offset(0, -30),
                           child: CustomButton(
                               widthSize: true,
                               text: "Continue",
@@ -495,7 +570,7 @@ class _CreateReportState extends State<CreateReport> {
                                 context.push('/review-report',
                                     extra: incidentReport);
                               })),
-                      SizedBox(height: 10)
+                      const SizedBox(height: 10)
                     ],
                   ),
                 ),

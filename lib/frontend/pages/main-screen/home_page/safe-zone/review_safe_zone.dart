@@ -171,9 +171,9 @@ class _ReviewSafezoneState extends State<ReviewSafezone> {
                 height: 215,
                 width: double.infinity,
                 decoration: BoxDecoration(
-                    color: const Color.fromARGB(54, 96, 125, 139),
-                    borderRadius: BorderRadius.circular(8),
-                    ),
+                  color: const Color.fromARGB(54, 96, 125, 139),
+                  borderRadius: BorderRadius.circular(8),
+                ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(8),
                   child: GoogleMap(
@@ -285,7 +285,7 @@ class _ReviewSafezoneState extends State<ReviewSafezone> {
                     border: Border.all(color: _appBarColor, width: 1),
                     borderRadius: BorderRadius.circular(10)),
                 child: _showTitle
-                    ? CategoryDescripTextE(
+                    ? const CategoryDescripTextE(
                         text:
                             "Location must be in Dagupan, Pangasinan, Philippines.",
                         color: Colors.red)
@@ -294,11 +294,11 @@ class _ReviewSafezoneState extends State<ReviewSafezone> {
               Container(
                   height: 130,
                   width: double.infinity,
-                  margin: EdgeInsets.only(top: 20),
+                  margin: const EdgeInsets.only(top: 20),
                   child: Row(children: [
                     Container(
                         width: 140,
-                        padding: EdgeInsets.all(20),
+                        padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(8),
@@ -315,15 +315,15 @@ class _ReviewSafezoneState extends State<ReviewSafezone> {
                           children: [
                             Text(
                               widget.safeZone.scale.toString(),
-                              style: TextStyle(
+                              style: const TextStyle(
                                   fontSize: 45, fontWeight: FontWeight.bold),
                             ),
-                            CategoryText(text: 'Rating'),
+                            const CategoryText(text: 'Rating'),
                           ],
                         )),
                     Expanded(
                         child: Container(
-                            margin: EdgeInsets.only(left: 10),
+                            margin: const EdgeInsets.only(left: 10),
                             decoration: BoxDecoration(
                                 color: Colors.white,
                                 borderRadius: BorderRadius.circular(8),
@@ -340,14 +340,14 @@ class _ReviewSafezoneState extends State<ReviewSafezone> {
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  CategoryText(text: 'Safe Time : '),
-                                  SizedBox(width: 5),
+                                  const CategoryText(text: 'Safe Time : '),
+                                  const SizedBox(width: 5),
                                   Row(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.center,
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
-                                      SizedBox(width: 5),
+                                      const SizedBox(width: 5),
                                       CategoryText(
                                           text: widget.safeZone.timeOfDay!,
                                           alignment: 'start')
@@ -356,8 +356,9 @@ class _ReviewSafezoneState extends State<ReviewSafezone> {
                                 ],
                               )),
                               Container(
-                                  margin: EdgeInsets.symmetric(horizontal: 20),
-                                  child: Divider(
+                                  margin: const EdgeInsets.symmetric(
+                                      horizontal: 20),
+                                  child: const Divider(
                                     height: 0.5,
                                     color: Colors.black26,
                                   )),
@@ -366,14 +367,14 @@ class _ReviewSafezoneState extends State<ReviewSafezone> {
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  CategoryText(text: 'Visit Frequency'),
-                                  SizedBox(width: 5),
+                                  const CategoryText(text: 'Visit Frequency'),
+                                  const SizedBox(width: 5),
                                   Row(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.center,
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
-                                      SizedBox(width: 5),
+                                      const SizedBox(width: 5),
                                       CategoryText(
                                           text: widget.safeZone.frequency!,
                                           alignment: 'start')
@@ -385,7 +386,7 @@ class _ReviewSafezoneState extends State<ReviewSafezone> {
                   ])),
               Container(
                   width: double.infinity,
-                  margin: EdgeInsets.symmetric(vertical: 20),
+                  margin: const EdgeInsets.symmetric(vertical: 20),
                   decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(8),
@@ -397,61 +398,92 @@ class _ReviewSafezoneState extends State<ReviewSafezone> {
                         )
                       ]),
                   child: Column(children: [
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     Container(
-                        padding: EdgeInsets.symmetric(horizontal: 20),
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            CategoryText(text: 'Location'),
-                            SizedBox(height: 5),
+                            const CategoryText(text: 'Location'),
+                            const SizedBox(height: 5),
                             Row(
                               crossAxisAlignment: CrossAxisAlignment.center,
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
-                                Icon(
+                                const Icon(
                                   size: 15,
                                   Icons.location_pin,
                                   color: widgetPricolor,
                                 ),
-                                SizedBox(width: 5),
+                                const SizedBox(width: 5),
                                 CategoryDescripTextE(
                                     text: locationName, alignment: 'start')
                               ],
                             ),
-                            SizedBox(height: 15),
-                            Divider(
+                            const SizedBox(height: 15),
+                            const Divider(
                               height: 0.5,
                               color: Colors.black26,
                             ),
                           ],
                         )),
                     Container(
-                        padding: EdgeInsets.symmetric(horizontal: 20),
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            SizedBox(height: 15),
-                            CategoryText(text: 'Description'),
-                            SizedBox(height: 5),
+                            const SizedBox(height: 15),
+                            const CategoryText(text: 'Safe Zone Title'),
+                            const SizedBox(height: 5),
                             Row(
                               crossAxisAlignment: CrossAxisAlignment.center,
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
-                                Icon(
+                                const Icon(
+                                  size: 15,
+                                  Icons.safety_check,
+                                  color: widgetPricolor,
+                                ),
+                                const SizedBox(width: 5),
+                                CategoryDescripTextE(
+                                    text: widget.safeZone.name!,
+                                    alignment: 'start')
+                              ],
+                            ),
+                            const SizedBox(height: 15),
+                            const Divider(
+                              height: 0.5,
+                              color: Colors.black26,
+                            ),
+                          ],
+                        )),
+                    Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const SizedBox(height: 15),
+                            const CategoryText(text: 'Description'),
+                            const SizedBox(height: 5),
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                const Icon(
                                   size: 15,
                                   Icons.description,
                                   color: widgetPricolor,
                                 ),
-                                SizedBox(width: 5),
+                                const SizedBox(width: 5),
                                 CategoryDescripTextE(
                                     text: widget.safeZone.description!,
                                     alignment: 'start')
                               ],
                             ),
-                            SizedBox(height: 15),
+                            const SizedBox(height: 15),
                           ],
                         )),
                     Container(
@@ -479,6 +511,7 @@ class _ReviewSafezoneState extends State<ReviewSafezone> {
                   );
                 },
               ),
+              const SizedBox(height: 20),
             ],
           ),
         ),
