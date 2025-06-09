@@ -1,0 +1,18 @@
+Advance Setting
+- Voice-Activated Emergency
+- SystemButton-Activated Emergency
+- Verified Incident Feeds
+- Travel Companion Finder
+- Safety Tips & Resources
+
+Privacy and Security :
+- End-to-End Encryption
+- Secure User Authentication
+- Two-Factor Authentication (2FA)
+
+- Permission Controls
+- Minimal Data Collection
+- Local Data Storage Options
+- Incident Reporting Privacy
+- Auto-Expire Shared Locations:
+- Data Deletion Option and Deactivate Account

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:safezone/backend/properties/properties.dart';
-import 'package:safezone/resource/schema/colors.dart';
+import '../../../../../backend/properties/import.dart';
 
 class Sidenav extends StatefulWidget {
   final IconData icon;
@@ -11,7 +10,6 @@ class Sidenav extends StatefulWidget {
   final List<Widget>? hoverTrailing;
   final List<DropdownItem>? dropdownItems;
 
-  // Set 'Zones' as default selected
   static final ValueNotifier<String?> selectedLabel = ValueNotifier("Zones");
 
   const Sidenav({
@@ -64,9 +62,11 @@ class _SidenavState extends State<Sidenav> {
 
   void _handleTap() {
     if (widget.withDrop == true) {
-      setState(() {
-        _showDropdown = !_showDropdown;
-      });
+      if (!sharedController.isSidebarCollapsed) {
+        setState(() {
+          _showDropdown = !_showDropdown;
+        });
+      }
     } else {
       Sidenav.selectedLabel.value = widget.label;
       widget.onTap?.call();
@@ -95,24 +95,48 @@ class _SidenavState extends State<Sidenav> {
           child: Material(
             color: backgroundColor,
             borderRadius: BorderRadius.circular(5),
-            child: InkWell(
-              borderRadius: BorderRadius.circular(5),
-              onTap: _handleTap,
-              onHover: (hovering) {
-                setState(() {
-                  _hovering = hovering;
-                });
-              },
-              child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Icon(widget.icon, color: iconColor, size: 15),
-                    if (!sharedController.isSidebarCollapsed)
-                      Row(
+            child: sharedController.isSidebarCollapsed
+                ? ShiftedTooltip(
+                    message: widget.label,
+                    horizontalOffset: 20,
+                    decoration: BoxDecoration(
+                      color: Colors.black,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    textStyle: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 8,
+                    ),
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(5),
+                      onTap: _handleTap,
+                      onHover: (hovering) {
+                        setState(() {
+                          _hovering = hovering;
+                        });
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 8, horizontal: 8),
+                        child: Icon(widget.icon, color: iconColor, size: 15),
+                      ),
+                    ),
+                  )
+                : InkWell(
+                    borderRadius: BorderRadius.circular(5),
+                    onTap: _handleTap,
+                    onHover: (hovering) {
+                      setState(() {
+                        _hovering = hovering;
+                      });
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 8, horizontal: 8),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
+                          Icon(widget.icon, color: iconColor, size: 15),
                           const SizedBox(width: 5),
                           Text(
                             widget.label,
@@ -122,46 +146,45 @@ class _SidenavState extends State<Sidenav> {
                               color: textColor,
                             ),
                           ),
+                          const Spacer(),
+                          if (_hovering && widget.hoverTrailing != null)
+                            Row(
+                              children: widget.hoverTrailing!.map((child) {
+                                if (child is Text) {
+                                  return Text(
+                                    child.data ?? '',
+                                    style: child.style?.copyWith(
+                                          color: Colors.black38,
+                                        ) ??
+                                        const TextStyle(
+                                            color: Colors.black38, fontSize: 10),
+                                  );
+                                } else if (child is Icon) {
+                                  return Icon(
+                                    child.icon,
+                                    color: Colors.black38,
+                                    size: child.size,
+                                  );
+                                } else {
+                                  return child;
+                                }
+                              }).toList(),
+                            ),
+                          if (isDropdown)
+                            Container(
+                              margin: EdgeInsets.only(left: 5),
+                              child: Icon(
+                                _showDropdown
+                                    ? Icons.keyboard_arrow_up
+                                    : Icons.keyboard_arrow_down,
+                                color: Colors.black,
+                                size: 12,
+                              ),
+                            )
                         ],
                       ),
-                    const Spacer(),
-                    if (!sharedController.isSidebarCollapsed && isDropdown)
-                      Icon(
-                        _showDropdown
-                            ? Icons.keyboard_arrow_up
-                            : Icons.keyboard_arrow_down,
-                        color: Colors.black,
-                        size: 12,
-                      ),
-                    if (!sharedController.isSidebarCollapsed &&
-                        _hovering &&
-                        widget.hoverTrailing != null)
-                      Row(
-                        children: widget.hoverTrailing!.map((child) {
-                          if (child is Text) {
-                            return Text(
-                              child.data ?? '',
-                              style: child.style?.copyWith(
-                                    color: Colors.black38,
-                                  ) ??
-                                  const TextStyle(
-                                      color: Colors.black38, fontSize: 10),
-                            );
-                          } else if (child is Icon) {
-                            return Icon(
-                              child.icon,
-                              color: Colors.black38,
-                              size: child.size,
-                            );
-                          } else {
-                            return child;
-                          }
-                        }).toList(),
-                      ),
-                  ],
-                ),
-              ),
-            ),
+                    ),
+                  ),
           ),
         ),
         if (_showDropdown && widget.dropdownItems != null)
@@ -203,6 +226,84 @@ class _SidenavState extends State<Sidenav> {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class ShiftedTooltip extends StatefulWidget {
+  final Widget child;
+  final String message;
+  final double horizontalOffset;
+  final Decoration? decoration;
+  final TextStyle? textStyle;
+
+  const ShiftedTooltip({
+    Key? key,
+    required this.child,
+    required this.message,
+    this.horizontalOffset = 20,
+    this.decoration,
+    this.textStyle,
+  }) : super(key: key);
+
+  @override
+  State<ShiftedTooltip> createState() => _ShiftedTooltipState();
+}
+
+class _ShiftedTooltipState extends State<ShiftedTooltip> {
+  OverlayEntry? _overlayEntry;
+
+  void _showTooltip() {
+    _overlayEntry = _createOverlayEntry();
+    Overlay.of(context)?.insert(_overlayEntry!);
+  }
+
+  void _hideTooltip() {
+    _overlayEntry?.remove();
+    _overlayEntry = null;
+  }
+
+  OverlayEntry _createOverlayEntry() {
+    RenderBox renderBox = context.findRenderObject() as RenderBox;
+    var size = renderBox.size;
+    var offset = renderBox.localToGlobal(Offset.zero);
+
+    return OverlayEntry(
+      builder: (context) => Positioned(
+        top: offset.dy + 5,
+        left: offset.dx + 40,
+        child: Material(
+          color: Colors.transparent,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: widget.decoration ??
+              BoxDecoration(
+                color: Colors.black,
+                borderRadius: BorderRadius.circular(4),
+              ),
+            child: Text(
+              widget.message,
+              style: widget.textStyle ??
+                const TextStyle(color: Colors.white, fontSize: 10),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) => _showTooltip(),
+      onExit: (_) => _hideTooltip(),
+      child: GestureDetector(
+        behavior: HitTestBehavior.translucent,
+        onTap: () {
+          _hideTooltip();
+        },
+        child: widget.child,
       ),
     );
   }

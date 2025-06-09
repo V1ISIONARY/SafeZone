@@ -128,20 +128,43 @@ class _NavigationDTState extends State<NavigationDT> {
                 ],
               ),
             ),
-            SizedBox(height: 30),
+            SizedBox(height: 5),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start, 
               children: [
+                sharedController.isSidebarCollapsed
+                  ? SizedBox.shrink()
+                  : Container(
+                    margin: EdgeInsets.symmetric(vertical: 10),
+                    height: 1,
+                    width: double.infinity,
+                    color: Colors.black12,
+                  ),
+                sharedController.isSidebarCollapsed
+                  ? SizedBox(height: 15)
+                  : Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Control Panel',
+                        style: TextStyle(
+                          color: Colors.black38,
+                          fontSize: 11,
+                        ),
+                      ),
+                      SizedBox(height: 10)
+                    ]
+                  ),
                 Sidenav(
                   icon: Icons.public,
                   label: 'Zones',
                   hoverTrailing: [
                     Text(
-                      'Ctrl',
+                      'Alt',
                       style: TextStyle(fontSize: 10, color: Colors.black38),
                     ),
                     Icon(Icons.arrow_upward_outlined, color: Colors.black38, size: 10),
-                    Text('W', style: TextStyle(fontSize: 10, color: Colors.black38)),
+                    Text('Q', style: TextStyle(fontSize: 10, color: Colors.black38)),
                   ],
                   onTap: () => print('Tapped Zones'),
                 ),
@@ -150,7 +173,7 @@ class _NavigationDTState extends State<NavigationDT> {
                   label: 'Dashboard',
                   hoverTrailing: [
                     Text(
-                      'Ctrl',
+                      'Alt',
                       style: TextStyle(fontSize: 10, color: Colors.black38),
                     ),
                     Icon(Icons.arrow_upward_outlined, color: Colors.black38, size: 10),
@@ -158,15 +181,91 @@ class _NavigationDTState extends State<NavigationDT> {
                   ],
                   onTap: () => print('Tapped Zones'),
                 ),
-                Container(
-                  margin: EdgeInsets.symmetric(vertical: 10),
-                  height: 1,
-                  width: double.infinity,
-                  color: Colors.black12,
+                sharedController.isSidebarCollapsed
+                  ? Container(
+                    margin: EdgeInsets.symmetric(vertical: 10),
+                    height: 1,
+                    width: double.infinity,
+                    color: Colors.black12,
+                  )
+                  : Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(height: 10),
+                      Text(
+                        'User Preference',
+                        style: TextStyle(
+                          color: Colors.black38,
+                          fontSize: 11,
+                        ),
+                      ),
+                      SizedBox(height: 10)
+                    ]
+                  ),
+                Sidenav(
+                  icon: Icons.private_connectivity_outlined,
+                  label: 'Privacy and Security',
+                  onTap: () => print('Tapped Zones'),
                 ),
+                Sidenav(
+                  icon: Icons.settings_outlined,
+                  label: 'Settings',
+                  withDrop: true,
+                  hoverTrailing: [
+                    Text(
+                      'Alt',
+                      style: TextStyle(fontSize: 10, color: Colors.black38),
+                    ),
+                    Icon(Icons.arrow_upward_outlined, color: Colors.black38, size: 10),
+                    Text('S', style: TextStyle(fontSize: 10, color: Colors.black38)),
+                  ],
+                  dropdownItems: [
+                    DropdownItem(
+                      label: 'Privacy and Security',
+                      onTap: () => print('Controls')
+                    ),
+                    DropdownItem(
+                      label: 'Permission Controls',
+                      onTap: () => print('Controls')
+                    ),
+                    DropdownItem(
+                      label: 'Local Data Storage Options', 
+                      onTap: () => print('Security')
+                    ),
+                  ],
+                ),
+                sharedController.isSidebarCollapsed
+                  ? Container(
+                    margin: EdgeInsets.symmetric(vertical: 10),
+                    height: 1,
+                    width: double.infinity,
+                    color: Colors.black12,
+                  )
+                  : Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(height: 10),
+                      Text(
+                        'Communication & Alerts',
+                        style: TextStyle(
+                          color: Colors.black38,
+                          fontSize: 11,
+                        ),
+                      ),
+                      SizedBox(height: 10)
+                    ]
+                  ),
                 Sidenav(
                   icon: Icons.notifications_outlined,
                   label: 'Notification',
+                  hoverTrailing: [
+                    Text(
+                      'Alt',
+                      style: TextStyle(fontSize: 10, color: Colors.black38),
+                    ),
+                    Icon(Icons.arrow_upward_outlined, color: Colors.black38, size: 10),
+                    Text('W', style: TextStyle(fontSize: 10, color: Colors.black38)),
+                  ],
                   onTap: () => print('Tapped Zones'),
                 ),
                 Sidenav(
@@ -174,28 +273,48 @@ class _NavigationDTState extends State<NavigationDT> {
                   label: 'Contact',
                   onTap: () => print('Tapped Zones'),
                 ),
-                Sidenav(
-                  icon: Icons.settings_outlined,
-                  label: 'Settings',
-                  withDrop: true,
-                  dropdownItems: [
-                    DropdownItem(
-                      label: 'Account',
-                      onTap: () => print('Account')
-                    ),
-                    DropdownItem(
-                      label: 'Security', 
-                      onTap: () => print('Security')
-                    ),
-                    DropdownItem(
-                      label: 'Notifications', 
-                      onTap: () => print('Notifications')
-                    ),
-                  ],
-                ),
+                sharedController.isSidebarCollapsed
+                  ? Container(
+                    margin: EdgeInsets.symmetric(vertical: 10),
+                    height: 1,
+                    width: double.infinity,
+                    color: Colors.black12,
+                  )
+                  : Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(height: 10),
+                      Text(
+                        'Help & Support Hub',
+                        style: TextStyle(
+                          color: Colors.black38,
+                          fontSize: 11,
+                        ),
+                      ),
+                      SizedBox(height: 10)
+                    ]
+                  ),
                 Sidenav(
                   icon: Icons.help_outline_outlined,
                   label: 'Help Center',
+                  hoverTrailing: [
+                    Text(
+                      'Shift',
+                      style: TextStyle(fontSize: 10, color: Colors.black38),
+                    ),
+                    Icon(Icons.arrow_upward_outlined, color: Colors.black38, size: 10),
+                    Text('H', style: TextStyle(fontSize: 10, color: Colors.black38)),
+                  ],
+                  onTap: () => print('Tapped Zones'),
+                ),
+                Sidenav(
+                  icon: Icons.support_agent,
+                  label: 'Chat Support',
+                  onTap: () => print('Tapped Zones'),
+                ),
+                Sidenav(
+                  icon: Icons.source_outlined,
+                  label: 'Safety Tips & Resources',
                   onTap: () => print('Tapped Zones'),
                 ),
               ]
@@ -213,7 +332,7 @@ class _NavigationDTState extends State<NavigationDT> {
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        color: const Color.fromARGB(255, 250, 250, 250),
+        color:  const Color.fromARGB(255, 250, 250, 250),
         padding: EdgeInsets.all(10),
         child: Row(
           children: [
@@ -227,6 +346,61 @@ class _NavigationDTState extends State<NavigationDT> {
                 ),
                 child: Stack(
                   children: [
+                    Positioned(
+                      left: 0,
+                      top: 0,
+                      child: AnimatedOpacity(
+                        duration: Duration(milliseconds: 300),
+                        opacity: sharedController.isSidebarCollapsed ? 1.0 : 0.0,
+                        child: sharedController.isSidebarCollapsed 
+                          ? Container(
+                              width: 50,
+                              height: 40,
+                              color: const Color.fromARGB(255, 250, 250, 250),
+                              child: Align(
+                                alignment: Alignment.topCenter,
+                                child: Transform.translate(
+                                  offset: Offset(-3, 2),
+                                  child: Tooltip(
+                                    message: 'Open sidebar',
+                                    preferBelow: false,
+                                    decoration: BoxDecoration(
+                                      color: Colors.black,
+                                      borderRadius: BorderRadius.circular(4),
+                                    ),
+                                    textStyle: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 8,
+                                    ),
+                                    child: Material(
+                                      color: Colors.transparent,
+                                      child: InkWell(
+                                        borderRadius: BorderRadius.circular(5),
+                                        hoverColor: Colors.grey.shade300,
+                                        onTap: () {
+                                          setState(() {
+                                            sharedController.isSidebarCollapsed =
+                                              !sharedController.isSidebarCollapsed;
+                                          });
+                                        },
+                                        child: Padding(
+                                          padding: EdgeInsets.all(5),
+                                          child: SvgPicture.asset(
+                                            'lib/resource/svg/open_sidebar.svg',
+                                            color: Colors.black45,
+                                            height: 18,
+                                            width: 19,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  )
+                                )
+                            )
+                          )
+                          : SizedBox.shrink()
+                      ),
+                    ),
                     Positioned(
                       top: 10,
                       right: 10,
