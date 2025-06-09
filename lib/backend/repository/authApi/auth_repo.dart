@@ -11,8 +11,8 @@ abstract class AuthenticationRepository {
       bool isGirl,
       bool isVerified,
       double latitude,
-      double longitude 
-      );
+      double longitude,
+      int age);
   Future<void> checkEmail(String email);
   Future<void> updateLocation(double latitude, double longitude);
   Future<void> changePassword(String password, String newpassword);

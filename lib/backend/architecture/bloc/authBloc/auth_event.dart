@@ -27,12 +27,13 @@ class ResetPasswordEvent extends AuthenticationEvent {
   final String password;
   final String newPassword;
 
-  ResetPasswordEvent({required this.email, required this.password, required this.newPassword});
+  ResetPasswordEvent(
+      {required this.email, required this.password, required this.newPassword});
 }
 
 class CheckEmailEvent extends AuthenticationEvent {
   final String email;
-  
+
   CheckEmailEvent({required this.email});
 }
 
@@ -48,6 +49,7 @@ class UserSignUpEvent extends AuthenticationEvent {
   final bool isVerified;
   final double longitude;
   final double latitude;
+  final int age;
 
   UserSignUpEvent({
     required this.username,
@@ -61,5 +63,6 @@ class UserSignUpEvent extends AuthenticationEvent {
     required this.isVerified,
     required this.longitude,
     required this.latitude,
+    required this.age,
   });
 }

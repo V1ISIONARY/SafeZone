@@ -14,7 +14,6 @@ import 'package:safezone/backend/architecture/bloc/authBloc/auth_state.dart';
 
 import '../../../../../backend/properties/import.dart';
 
-
 class RegisterMD extends StatefulWidget {
   const RegisterMD({super.key});
 
@@ -133,7 +132,6 @@ class _RegisterMDState extends State<RegisterMD> {
     } catch (e) {
       print('Error sending OTP: $e');
     }
-
   }
 
   @override
@@ -195,8 +193,8 @@ class _RegisterMDState extends State<RegisterMD> {
                       border: Border.all(width: 1, color: Colors.black),
                       shape: BoxShape.circle,
                     ),
-                    child:
-                        const Icon(Icons.arrow_back, color: Colors.black, size: 10),
+                    child: const Icon(Icons.arrow_back,
+                        color: Colors.black, size: 10),
                   ),
                 ),
               ),
@@ -284,8 +282,7 @@ class _RegisterMDState extends State<RegisterMD> {
                 if (state is EmailCheckSuccess) {
                   sendOTP(emailController.text);
                 } else if (state is EmailCheckError) {
-                  _checkIfShown(
-                      text: state.message, color: Colors.red);
+                  _checkIfShown(text: state.message, color: Colors.red);
                 }
               });
               sendOTP(emailController.text);
@@ -416,7 +413,7 @@ class _RegisterMDState extends State<RegisterMD> {
     );
   }
 
-  double strengthWidth = 10; 
+  double strengthWidth = 10;
   bool _isPasswordVisible = false;
   bool showConfirmPassword = false;
   Color strengthColor = Colors.black12;
@@ -429,11 +426,11 @@ class _RegisterMDState extends State<RegisterMD> {
 
     int strength = 0;
 
-    if (password.length >= 8) strength++; 
+    if (password.length >= 8) strength++;
     if (uppercase.hasMatch(password)) strength++;
-    if (lowercase.hasMatch(password)) strength++; 
-    if (digit.hasMatch(password)) strength++; 
-    if (specialChar.hasMatch(password)) strength++; 
+    if (lowercase.hasMatch(password)) strength++;
+    if (digit.hasMatch(password)) strength++;
+    if (specialChar.hasMatch(password)) strength++;
     if (password.contains(" ")) strength = 0;
 
     setState(() {
@@ -448,7 +445,7 @@ class _RegisterMDState extends State<RegisterMD> {
       } else if (strength < 5) {
         strengthColor = Colors.orange;
         strengthWidth = 200.0;
-        showConfirmPassword = true; 
+        showConfirmPassword = true;
       } else {
         strengthColor = Colors.green;
         strengthWidth = MediaQuery.of(context).size.width - 40;
@@ -578,49 +575,49 @@ class _RegisterMDState extends State<RegisterMD> {
             ),
             const SizedBox(height: 10),
             TextField(
-              controller: passwordController,
-              obscureText: !_isPasswordVisible,
-              onChanged: _checkPasswordStrength,
-              style: const TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w200,
-                color: textColor,
-              ),
-              decoration: InputDecoration(
-                hintText: "Enter Password",
-                hintStyle: const TextStyle(
+                controller: passwordController,
+                obscureText: !_isPasswordVisible,
+                onChanged: _checkPasswordStrength,
+                style: const TextStyle(
                   fontSize: 13,
-                  color: labelFormFieldColor,
                   fontWeight: FontWeight.w200,
+                  color: textColor,
                 ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  borderSide: const BorderSide(color: widgetPricolor, width: 2),
-                ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 15),
-                suffixIcon: Padding(
-                  padding: EdgeInsets.only(right: 15),
-                  child: GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _isPasswordVisible = !_isPasswordVisible; 
-                      });
-                    },
-                    child: Icon(
-                      _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
-                      color: Colors.grey,
+                decoration: InputDecoration(
+                    hintText: "Enter Password",
+                    hintStyle: const TextStyle(
+                      fontSize: 13,
+                      color: labelFormFieldColor,
+                      fontWeight: FontWeight.w200,
                     ),
-                  )
-                )
-              )
-            ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide:
+                          const BorderSide(color: widgetPricolor, width: 2),
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 15),
+                    suffixIcon: Padding(
+                        padding: EdgeInsets.only(right: 15),
+                        child: GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _isPasswordVisible = !_isPasswordVisible;
+                            });
+                          },
+                          child: Icon(
+                            _isPasswordVisible
+                                ? Icons.visibility
+                                : Icons.visibility_off,
+                            color: Colors.grey,
+                          ),
+                        )))),
             SizedBox(height: 20),
             AnimatedContainer(
-              duration: const Duration(milliseconds: 300), 
-              curve: Curves.easeInOut, 
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeInOut,
               width: strengthWidth,
               height: 8,
               decoration: BoxDecoration(
@@ -630,35 +627,37 @@ class _RegisterMDState extends State<RegisterMD> {
             ),
             SizedBox(height: 20),
             if (showConfirmPassword)
-            Column(
-              children: [
-                TextField(
-                  controller: confirmPasswordController,
-                  obscureText: !_isPasswordVisible,
-                  style: const TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w200,
-                    color: textColor,
-                  ),
-                  decoration: InputDecoration(
-                    hintText: "Confirm Password",
-                    hintStyle: const TextStyle(
-                        fontSize: 13,
-                        color: labelFormFieldColor,
-                        fontWeight: FontWeight.w200),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: const BorderSide(color: widgetPricolor, width: 2),
+              Column(
+                children: [
+                  TextField(
+                    controller: confirmPasswordController,
+                    obscureText: !_isPasswordVisible,
+                    style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w200,
+                      color: textColor,
                     ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
+                    decoration: InputDecoration(
+                      hintText: "Confirm Password",
+                      hintStyle: const TextStyle(
+                          fontSize: 13,
+                          color: labelFormFieldColor,
+                          fontWeight: FontWeight.w200),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide:
+                            const BorderSide(color: widgetPricolor, width: 2),
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      contentPadding:
+                          const EdgeInsets.symmetric(horizontal: 15),
                     ),
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 15),
                   ),
-                ),
-                const SizedBox(height: 20),
-              ],
-            ),
+                  const SizedBox(height: 20),
+                ],
+              ),
             GestureDetector(
               onTap: () async {
                 if (passwordController.text != confirmPasswordController.text) {
@@ -678,21 +677,25 @@ class _RegisterMDState extends State<RegisterMD> {
 
                   // Dispatch event to trigger sign-up
                   signupBloc.add(UserSignUpEvent(
-                    username: usernameController.text,
-                    email: emailController.text,
-                    password: passwordController.text,
-                    address: 'Some address',
-                    firstname: firstNameController.text,
-                    lastname: lastNameController.text,
-                    isAdmin: false,
-                    isGirl: selectedGender == 'Female',
-                    isVerified: true,
-                    latitude: position.latitude,
-                    longitude: position.longitude,
-                  ));
+                      username: usernameController.text,
+                      email: emailController.text,
+                      password: passwordController.text,
+                      address: 'Some address',
+                      firstname: firstNameController.text,
+                      lastname: lastNameController.text,
+                      isAdmin: false,
+                      isGirl: selectedGender == 'Female',
+                      isVerified: true,
+                      latitude: position.latitude,
+                      longitude: position.longitude,
+                      age:
+                          18 //temporary lang ito since wala pa sa sign up yung input age
+                      ));
                 } catch (e) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text("Failed to get location: ${e.toString()}")),
+                    SnackBar(
+                        content:
+                            Text("Failed to get location: ${e.toString()}")),
                   );
                 }
               },

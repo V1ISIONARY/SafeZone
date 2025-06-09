@@ -16,13 +16,14 @@ class SosSuccess extends StatefulWidget {
 }
 
 class _SosSuccessState extends State<SosSuccess> {
-
+  late SharedPreferences prefs;
   bool _showTitle = false;
   double _appBarHeight = 0;
   String _notificationText = "";
   Color _appBarColor = Colors.transparent;
 
-  Future<void> _checkIfShown({required String text, required Color color}) async {
+  Future<void> _checkIfShown(
+      {required String text, required Color color}) async {
     Future.delayed(Duration(milliseconds: 200), () {
       if (mounted) {
         setState(() {
@@ -44,7 +45,7 @@ class _SosSuccessState extends State<SosSuccess> {
       });
     });
   }
-  
+
   @override
   void initState() {
     super.initState();
@@ -67,11 +68,18 @@ class _SosSuccessState extends State<SosSuccess> {
     String fullName = "$formattedFirstName $formattedLastName".trim();
 
     if (userId != 0) {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? address = prefs.getString('currentAddress');
+      print(address);
+      print(address);
+      print(address);
+      print(address);
+      print(address);
       context.read<NotificationBloc>().add(
             BroadcastNotification(
                 userId, // Use the stored user ID
                 "Emergency Alert",
-                "$fullName has triggered an SOS alert!",
+                "$fullName has triggered an SOS alert! - Location: $address",
                 "SOS"),
           );
     } else {
@@ -84,15 +92,15 @@ class _SosSuccessState extends State<SosSuccess> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: BlocListener<NotificationBloc, NotificationState>(
-        listener: (context, state) {
-          if (state is NotificationBroadcasted) {
-            _checkIfShown(text: "SOS notification broadcasted!", color: Colors.green);
-          } else if (state is NotificationError) {
-            _checkIfShown(text: "Error: ${state.message}", color: Colors.red);
-          }
-        },
-        child: Column(
-          children: [
+          listener: (context, state) {
+            if (state is NotificationBroadcasted) {
+              _checkIfShown(
+                  text: "SOS notification broadcasted!", color: Colors.green);
+            } else if (state is NotificationError) {
+              _checkIfShown(text: "Error: ${state.message}", color: Colors.red);
+            }
+          },
+          child: Column(children: [
             AnimatedContainer(
               duration: const Duration(milliseconds: 300),
               height: _appBarHeight,
@@ -120,7 +128,7 @@ class _SosSuccessState extends State<SosSuccess> {
                   children: [
                     const SizedBox(height: 200),
                     Image.asset(
-                      "lib/resource/svg/sos-success.png",
+                      "lib/resources/svg/sos-success.png",
                       width: 150,
                       height: 150,
                     ),
@@ -149,13 +157,14 @@ class _SosSuccessState extends State<SosSuccess> {
                       isOutlined: true,
                       onPressed: () async {
                         final prefs = await SharedPreferences.getInstance();
-                        final userToken = prefs.getString('userToken'); 
+                        final userToken = prefs.getString('userToken');
                         if (userToken != null) {
                           context.go('/home', extra: userToken);
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                              content: Text("User token not found! Please log in again."),
+                              content: Text(
+                                  "User token not found! Please log in again."),
                               backgroundColor: Colors.red,
                             ),
                           );
@@ -167,9 +176,7 @@ class _SosSuccessState extends State<SosSuccess> {
                 ),
               ),
             )
-          ]
-        )
-      ),
+          ])),
     );
   }
 }

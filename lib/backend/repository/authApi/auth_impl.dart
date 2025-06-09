@@ -61,7 +61,8 @@ class AuthenticationImplementation extends AuthenticationRepository {
       bool isGirl,
       bool isVerified,
       double latitude,
-      double longitude) async {
+      double longitude,
+      int age) async {
     final response = await http.post(
       Uri.parse('$baseUrl/create_account'),
       headers: {
@@ -79,7 +80,8 @@ class AuthenticationImplementation extends AuthenticationRepository {
         'is_girl': isGirl,
         'is_verified': isVerified,
         'latitude': latitude,
-        'longitude': longitude
+        'longitude': longitude,
+        'age': age
       }),
     );
 
@@ -158,8 +160,8 @@ class AuthenticationImplementation extends AuthenticationRepository {
   }
 
   @override
-  Future<void> resetPassword(String? email, String password, String newpassword) async {
-
+  Future<void> resetPassword(
+      String? email, String password, String newpassword) async {
     if (email == null || email.isEmpty) {
       print("No Email");
       return;
@@ -209,7 +211,6 @@ class AuthenticationImplementation extends AuthenticationRepository {
       throw Exception(errorMessage);
     }
   }
-
 }
 
 void viewSharedPreferences() async {

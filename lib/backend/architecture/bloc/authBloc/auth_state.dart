@@ -16,6 +16,7 @@ class UserSignUp extends AuthenticationState {
   final bool isVerified;
   final double longitude;
   final double latitude;
+  final int age;
 
   UserSignUp({
     required this.username,
@@ -29,6 +30,7 @@ class UserSignUp extends AuthenticationState {
     required this.isVerified,
     required this.longitude,
     required this.latitude,
+    required this.age,
   });
 }
 
@@ -115,6 +117,6 @@ class EmailCheckSuccess extends AuthenticationState {}
 
 class EmailCheckError extends AuthenticationState {
   final String message;
-  
+
   EmailCheckError(this.message);
 }

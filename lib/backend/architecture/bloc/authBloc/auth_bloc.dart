@@ -35,7 +35,8 @@ class AuthenticationBloc
             event.isGirl,
             event.isVerified,
             event.longitude,
-            event.latitude);
+            event.latitude,
+            event.age);
 
         emit(SignUpSuccess());
       } catch (error) {
@@ -68,10 +69,13 @@ class AuthenticationBloc
     on<ResetPasswordEvent>((event, emit) async {
       emit(UpdateLocationLoading());
       try {
-        await _authrepo.resetPassword(event.email, event.password, event.newPassword);
-        emit(UpdateMyPasswordSuccess(event.email, event.password, event.newPassword));
+        await _authrepo.resetPassword(
+            event.email, event.password, event.newPassword);
+        emit(UpdateMyPasswordSuccess(
+            event.email, event.password, event.newPassword));
       } catch (e) {
-        emit(UpdateMyPasswordError('Failed to change password: ${e.toString()}'));
+        emit(UpdateMyPasswordError(
+            'Failed to change password: ${e.toString()}'));
       }
     });
 
@@ -85,5 +89,4 @@ class AuthenticationBloc
       }
     });
   }
-
 }

@@ -23,6 +23,7 @@ import 'package:safezone/backend/architecture/bloc/mapBloc/map_state.dart';
 import 'package:safezone/backend/architecture/bloc/notificationBloc/notification_bloc.dart';
 import 'package:safezone/backend/architecture/bloc/notificationBloc/notification_event.dart';
 import 'package:safezone/backend/architecture/bloc/notificationBloc/notification_state.dart';
+import 'package:safezone/backend/models/safezoneModel/safezone_model.dart';
 import 'package:safezone/backend/models/userModel/circle_model.dart';
 import 'package:safezone/backend/services/first_run_service.dart';
 import 'package:safezone/frontend/platforms/mobile/pages/authentication/account_details.dart';
@@ -52,6 +53,7 @@ class Maps extends StatefulWidget {
 
 class _MapsState extends State<Maps> with TickerProviderStateMixin {
   Map<String, BitmapDescriptor> memberMarkers = {};
+  List<SafeZoneModel> policeStations = [];
   List<Map<String, dynamic>> members = [];
   Set<Marker> markers = {};
   Set<Circle> circles = {};
@@ -62,7 +64,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
   final locs.Location location = locs.Location();
   static const LatLng sourceLocation = LatLng(16.0471, 120.3425);
   LatLng _initialPosition = const LatLng(37.7749, -122.4194); // Default: SF
-
+  final apiKey = dotenv.env['GOOGLE_API_KEY'];
   final GlobalKey _safeKey = GlobalKey();
   final GlobalKey _searchKey = GlobalKey();
   final GlobalKey _circleKey = GlobalKey();
@@ -132,7 +134,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
   double _appBarHeight = 0;
   Color _appBarColor = Colors.transparent;
 
-  List<CircleModel> _circles = []; 
+  List<CircleModel> _circles = [];
   int? _userId;
   int _currentHintIndex = 0;
   LatLng? _currentUserLocation;
@@ -335,7 +337,6 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
     });
   }
 
-  
   Future<void> _checkFirstRun() async {
     final prefs = await SharedPreferences.getInstance();
     int userId = prefs.getInt('id') ?? 0;
@@ -369,6 +370,16 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
         });
 
         await updateLocation(position.latitude, position.longitude);
+
+        String? currentAddress = await getAddressFromCoordinates(
+            position.latitude, position.longitude);
+        if (currentAddress != null) {
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          prefs.setDouble('latitude', position.latitude);
+          prefs.setDouble('longitude', position.longitude);
+          prefs.setString('currentAddress', currentAddress);
+          print('User address: $currentAddress');
+        }
       }
     } catch (e) {
       print('Error: $e');
@@ -427,6 +438,28 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
       print('$latitude');
       print('$longitude');
       print('Error updating location: $e');
+    }
+    findNearestSafezone();
+  }
+
+  Future<String?> getAddressFromCoordinates(
+      double latitude, double longitude) async {
+    final url =
+        'https://maps.googleapis.com/maps/api/geocode/json?latlng=$latitude,$longitude&key=$apiKey';
+
+    try {
+      final response = await http.get(Uri.parse(url));
+      final data = json.decode(response.body);
+
+      if (data['status'] == 'OK') {
+        return data['results'][0]['formatted_address'];
+      } else {
+        print('Failed to get address: ${data['status']}');
+        return null;
+      }
+    } catch (e) {
+      print('Error fetching address: $e');
+      return null;
     }
   }
 
@@ -709,7 +742,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
       _safeZones = state.safeZones
           .map((safeZone) => LatLng(safeZone.latitude!, safeZone.longitude!))
           .toList();
-
+      policeStations = state.safeZones;
       for (var safeZone in state.safeZones) {
         markers.add(
           Marker(
@@ -736,6 +769,40 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
     }
 
     return markers;
+  }
+
+  Future<SafeZoneModel?> getNearestStation(LatLng currentPosition) async {
+    double minDistance = double.infinity;
+    SafeZoneModel? nearest;
+
+    for (var station in policeStations) {
+      if (station.latitude == null || station.longitude == null) continue;
+      double distance = Geolocator.distanceBetween(
+        currentPosition.latitude,
+        currentPosition.longitude,
+        station.latitude!,
+        station.longitude!,
+      );
+
+      if (distance < minDistance) {
+        minDistance = distance;
+        nearest = station;
+      }
+    }
+
+    return nearest;
+  }
+
+  Future<void> findNearestSafezone() async {
+    SafeZoneModel? nearest = await getNearestStation(_currentUserLocation!);
+
+    if (nearest != null) {
+      print("Nearest Police Station: ${nearest.name}");
+      print("Latitude: ${nearest.latitude}");
+      print("Longitude: ${nearest.longitude}");
+    } else {
+      print("No valid stations found.");
+    }
   }
 
   bool _isInsideZone(LatLng userLocation, List<Circle> zones) {
@@ -867,7 +934,6 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
     );
   }
 
-  final String apiKey = dotenv.env['GOOGLE_API_KEY'] ?? '';
   Future<void> _getCurrentLocation() async {
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
@@ -912,20 +978,20 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
   void _searchLocation() async {
     if (_textEditingController.text.isNotEmpty) {
       String location = _textEditingController.text;
-      String url = "https://maps.googleapis.com/maps/api/geocode/json?address=$location&key=$apiKey";
+      String url =
+          "https://maps.googleapis.com/maps/api/geocode/json?address=$location&key=$apiKey";
 
       try {
         final response = await http.get(Uri.parse(url));
 
         if (response.statusCode == 200) {
           final data = json.decode(response.body);
-          
+
           if (data["status"] == "OK") {
             double lat = data["results"][0]["geometry"]["location"]["lat"];
             double lng = data["results"][0]["geometry"]["location"]["lng"];
 
             _updateMapPosition(LatLng(lat, lng));
-
           } else {
             // _showSnackBar("Location not found. Try another search.");
           }
@@ -1170,30 +1236,39 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                               padding:
                                                   const EdgeInsets.symmetric(
                                                       horizontal: 15),
-                                              child: Row(
-                                                children: [
+                                              child: Row(children: [
                                                 _circles.isEmpty
-                                                  ? Center(
-                                                    child: Container(
-                                                      width: 20,
-                                                      height: 20,
-                                                      child: CircularProgressIndicator(
-                                                        strokeWidth: 0.8,
-                                                        color: widgetPricolor,
+                                                    ? Center(
+                                                        child: Container(
+                                                          width: 20,
+                                                          height: 20,
+                                                          child:
+                                                              CircularProgressIndicator(
+                                                            strokeWidth: 0.8,
+                                                            color:
+                                                                widgetPricolor,
+                                                          ),
+                                                        ),
+                                                      )
+                                                    : Column(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .center,
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: _circles
+                                                            .where((circle) =>
+                                                                circle.isActive)
+                                                            .map((circle) =>
+                                                                CategoryDescripText(
+                                                                  text: circle
+                                                                      .name,
+                                                                  color: Colors
+                                                                      .black,
+                                                                ))
+                                                            .toList(),
                                                       ),
-                                                    ),
-                                                  )
-                                                  : Column(
-                                                    mainAxisAlignment: MainAxisAlignment.center,
-                                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                                    children: _circles
-                                                        .where((circle) => circle.isActive)
-                                                        .map((circle) => CategoryDescripText(
-                                                              text: circle.name,
-                                                              color: Colors.black,
-                                                            ))
-                                                        .toList(),
-                                                  ),
                                                 // SizedBox(width: 40),
                                                 // LimitedImageCircles(
                                                 //   imageUrls: [
@@ -1208,124 +1283,162 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                                 //     color: Colors.black38),
                                               ])))),
                                   SizedBox(width: 10),
-                                  for (var circle
-                                    in _circles.where((circle) => circle.isActive))
-                                  circle.code.isEmpty
-                                    ? Container()
-                                    : GestureDetector(
-                                      onTap: () {
-                                        bool hasActiveCircle = _circles.any((circle) => circle.isActive);
-                                        if (hasActiveCircle) {
-                                          showModalBottomSheet(
-                                            context: context,
-                                            isScrollControlled: true, 
-                                            shape: const RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
-                                            ),
-                                            builder: (BuildContext context) {
-                                              return FractionallySizedBox(
-                                                heightFactor: 0.3,
-                                                child: Container(
-                                                  width: double.infinity,
-                                                  decoration: BoxDecoration(
-                                                    borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
-                                                    color: Colors.white,
+                                  for (var circle in _circles
+                                      .where((circle) => circle.isActive))
+                                    circle.code.isEmpty
+                                        ? Container()
+                                        : GestureDetector(
+                                            onTap: () {
+                                              bool hasActiveCircle =
+                                                  _circles.any((circle) =>
+                                                      circle.isActive);
+                                              if (hasActiveCircle) {
+                                                showModalBottomSheet(
+                                                  context: context,
+                                                  isScrollControlled: true,
+                                                  shape:
+                                                      const RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.vertical(
+                                                            top:
+                                                                Radius.circular(
+                                                                    10)),
                                                   ),
-                                                  child: Column(
-                                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                                    children: [
-                                                      Container(
-                                                        width: double.infinity,
-                                                        height: 50,
-                                                        child: Row(
-                                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                                          mainAxisAlignment: MainAxisAlignment.center,
-                                                          children: [
-                                                            Expanded(child: SizedBox()),
-                                                            CategoryText(text: 'Invite Code'),
-                                                            Expanded(
-                                                              child: Align(
-                                                                alignment: Alignment.centerRight, 
-                                                                child: Container(
-                                                                  margin: EdgeInsets.only(right: 15),
-                                                                  child: GestureDetector(
-                                                                    onTap: (){
-                                                                      Navigator.pop(context);
-                                                                    },
-                                                                    child: CategoryDescripText(text: 'Done', color: widgetPricolor),
-                                                                  )
-                                                                )
+                                                  builder:
+                                                      (BuildContext context) {
+                                                    return FractionallySizedBox(
+                                                        heightFactor: 0.3,
+                                                        child: Container(
+                                                          width:
+                                                              double.infinity,
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            borderRadius:
+                                                                BorderRadius.vertical(
+                                                                    top: Radius
+                                                                        .circular(
+                                                                            10)),
+                                                            color: Colors.white,
+                                                          ),
+                                                          child: Column(
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .start,
+                                                            children: [
+                                                              Container(
+                                                                width: double
+                                                                    .infinity,
+                                                                height: 50,
+                                                                child: Row(
+                                                                  crossAxisAlignment:
+                                                                      CrossAxisAlignment
+                                                                          .center,
+                                                                  mainAxisAlignment:
+                                                                      MainAxisAlignment
+                                                                          .center,
+                                                                  children: [
+                                                                    Expanded(
+                                                                        child:
+                                                                            SizedBox()),
+                                                                    CategoryText(
+                                                                        text:
+                                                                            'Invite Code'),
+                                                                    Expanded(
+                                                                      child: Align(
+                                                                          alignment: Alignment.centerRight,
+                                                                          child: Container(
+                                                                              margin: EdgeInsets.only(right: 15),
+                                                                              child: GestureDetector(
+                                                                                onTap: () {
+                                                                                  Navigator.pop(context);
+                                                                                },
+                                                                                child: CategoryDescripText(text: 'Done', color: widgetPricolor),
+                                                                              ))),
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                                decoration:
+                                                                    BoxDecoration(
+                                                                  color: Colors
+                                                                      .white,
+                                                                  boxShadow: const [
+                                                                    BoxShadow(
+                                                                      color: Colors
+                                                                          .grey,
+                                                                      blurRadius:
+                                                                          2,
+                                                                      offset:
+                                                                          Offset(
+                                                                              1,
+                                                                              1),
+                                                                    ),
+                                                                  ],
+                                                                  borderRadius:
+                                                                      BorderRadius.vertical(
+                                                                          top: Radius.circular(
+                                                                              10)),
+                                                                ),
                                                               ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                        decoration: BoxDecoration(
-                                                          color: Colors.white,
-                                                          boxShadow: const [
-                                                            BoxShadow(
-                                                              color: Colors.grey,
-                                                              blurRadius: 2,
-                                                              offset: Offset(1, 1),
-                                                            ),
-                                                          ],
-                                                          borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
-                                                        ),
-                                                      ),
-                                                      Container(
-                                                        margin: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
-                                                        width: double.infinity,
-                                                        child: Column(
-                                                          mainAxisAlignment: MainAxisAlignment.center,
-                                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                                          children: [
-                                                            for (var circle
-                                                              in _circles.where((circle) => circle.isActive))
-                                                            Container(
-                                                              margin: EdgeInsets.symmetric(vertical: 30),
-                                                              child: Text(
-                                                                circle.code, style: TextStyle(
-                                                                  fontWeight: FontWeight.bold,
-                                                                  color: widgetPricolor,
-                                                                  fontSize: 30
-                                                                )
-                                                              )
-                                                            ),
-                                                            CategoryText(text: 'Share this invite code with the\n people you want in your Circle: ', alignment: 'center', color: Colors.black),
-                                                          ],
-                                                        )
-                                                      )
-                                                    ],
-                                                  ),
-                                                )
-                                              );
+                                                              Container(
+                                                                  margin: EdgeInsets.symmetric(
+                                                                      horizontal:
+                                                                          15,
+                                                                      vertical:
+                                                                          15),
+                                                                  width: double
+                                                                      .infinity,
+                                                                  child: Column(
+                                                                    mainAxisAlignment:
+                                                                        MainAxisAlignment
+                                                                            .center,
+                                                                    crossAxisAlignment:
+                                                                        CrossAxisAlignment
+                                                                            .center,
+                                                                    children: [
+                                                                      for (var circle in _circles.where((circle) =>
+                                                                          circle
+                                                                              .isActive))
+                                                                        Container(
+                                                                            margin:
+                                                                                EdgeInsets.symmetric(vertical: 30),
+                                                                            child: Text(circle.code, style: TextStyle(fontWeight: FontWeight.bold, color: widgetPricolor, fontSize: 30))),
+                                                                      CategoryText(
+                                                                          text:
+                                                                              'Share this invite code with the\n people you want in your Circle: ',
+                                                                          alignment:
+                                                                              'center',
+                                                                          color:
+                                                                              Colors.black),
+                                                                    ],
+                                                                  ))
+                                                            ],
+                                                          ),
+                                                        ));
+                                                  },
+                                                );
+                                              }
                                             },
-                                          );
-                                        } 
-                                      },
-                                      child: Container(
-                                        width: 40,
-                                        height: 40,
-                                        decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          borderRadius: BorderRadius.circular(10),
-                                          boxShadow: const [
-                                            BoxShadow(
-                                              color: Colors.grey,
-                                              blurRadius: 2,
-                                              offset: Offset(1, 1),
-                                            ),
-                                          ],
-                                        ),
-                                        child: Center(
-                                          child: Icon(
-                                            Icons.person_add,
-                                            size: 20,
-                                            color: widgetPricolor,
-                                          )
-                                        )
-                                      )
-                                    ) 
-                                    
+                                            child: Container(
+                                                width: 40,
+                                                height: 40,
+                                                decoration: BoxDecoration(
+                                                  color: Colors.white,
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
+                                                  boxShadow: const [
+                                                    BoxShadow(
+                                                      color: Colors.grey,
+                                                      blurRadius: 2,
+                                                      offset: Offset(1, 1),
+                                                    ),
+                                                  ],
+                                                ),
+                                                child: Center(
+                                                    child: Icon(
+                                                  Icons.person_add,
+                                                  size: 20,
+                                                  color: widgetPricolor,
+                                                ))))
                                 ],
                               )
                             ]))),
@@ -1488,7 +1601,8 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                                             const EdgeInsets
                                                                 .only(right: 4),
                                                         child: AnimatedBuilder(
-                                                          animation: _controllerFade,
+                                                          animation:
+                                                              _controllerFade,
                                                           builder:
                                                               (context, child) {
                                                             return Row(
@@ -1635,138 +1749,140 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                               ),
                               SizedBox(height: 10),
                               SingleChildScrollView(
-                                scrollDirection: Axis.horizontal,
-                                child: Row(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      GestureDetector(
-                                        onTap: () {
-                                          _findAllRoute();
-                                        },
-                                        child: Container(
-                                          margin:
-                                              const EdgeInsets.only(right: 10),
-                                          width: 60,
-                                          height: 40,
-                                          decoration: BoxDecoration(
-                                            color: _isAllZoneShown
-                                                ? Colors.grey[300]
-                                                : Colors.white,
-                                            borderRadius:
-                                                BorderRadius.circular(50),
-                                            boxShadow: const [
-                                              BoxShadow(
-                                                color: Colors.grey,
-                                                blurRadius: 2,
-                                                offset: Offset(1, 1),
-                                              ),
-                                            ],
-                                          ),
-                                          child: const Row(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.center,
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.start,
-                                            children: [
-                                              SizedBox(width: 5),
-                                              Icon(Icons.safety_check,
-                                                  color: Colors.blue),
-                                              SizedBox(width: 5),
-                                              Expanded(
-                                                child: CategoryDescripText(
-                                                  text: "All",
-                                                  color: Colors.black,
+                                  scrollDirection: Axis.horizontal,
+                                  child: Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        GestureDetector(
+                                          onTap: () {
+                                            _findAllRoute();
+                                          },
+                                          child: Container(
+                                            margin: const EdgeInsets.only(
+                                                right: 10),
+                                            width: 60,
+                                            height: 40,
+                                            decoration: BoxDecoration(
+                                              color: _isAllZoneShown
+                                                  ? Colors.grey[300]
+                                                  : Colors.white,
+                                              borderRadius:
+                                                  BorderRadius.circular(50),
+                                              boxShadow: const [
+                                                BoxShadow(
+                                                  color: Colors.grey,
+                                                  blurRadius: 2,
+                                                  offset: Offset(1, 1),
                                                 ),
-                                              ),
-                                            ],
+                                              ],
+                                            ),
+                                            child: const Row(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
+                                              children: [
+                                                SizedBox(width: 5),
+                                                Icon(Icons.safety_check,
+                                                    color: Colors.blue),
+                                                SizedBox(width: 5),
+                                                Expanded(
+                                                  child: CategoryDescripText(
+                                                    text: "All",
+                                                    color: Colors.black,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                      GestureDetector(
-                                        onTap: _findSafeRoute,
-                                        child: Container(
-                                          margin:
-                                              const EdgeInsets.only(right: 10),
-                                          width: 160,
-                                          height: 40,
-                                          decoration: BoxDecoration(
-                                            color: _isSafeZoneShown
-                                                ? Colors.grey[300]
-                                                : Colors.white,
-                                            borderRadius:
-                                                BorderRadius.circular(50),
-                                            boxShadow: const [
-                                              BoxShadow(
-                                                color: Colors.grey,
-                                                blurRadius: 2,
-                                                offset: Offset(1, 1),
-                                              ),
-                                            ],
-                                          ),
-                                          child: const Row(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.center,
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.start,
-                                            children: [
-                                              SizedBox(width: 5),
-                                              Icon(Icons.safety_check,
-                                                  color: Colors.green),
-                                              SizedBox(width: 5),
-                                              Expanded(
-                                                child: CategoryDescripText(
-                                                  text: "Show nearest safe zone",
-                                                  color: Colors.black,
+                                        GestureDetector(
+                                          onTap: _findSafeRoute,
+                                          child: Container(
+                                            margin: const EdgeInsets.only(
+                                                right: 10),
+                                            width: 160,
+                                            height: 40,
+                                            decoration: BoxDecoration(
+                                              color: _isSafeZoneShown
+                                                  ? Colors.grey[300]
+                                                  : Colors.white,
+                                              borderRadius:
+                                                  BorderRadius.circular(50),
+                                              boxShadow: const [
+                                                BoxShadow(
+                                                  color: Colors.grey,
+                                                  blurRadius: 2,
+                                                  offset: Offset(1, 1),
                                                 ),
-                                              ),
-                                            ],
+                                              ],
+                                            ),
+                                            child: const Row(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
+                                              children: [
+                                                SizedBox(width: 5),
+                                                Icon(Icons.safety_check,
+                                                    color: Colors.green),
+                                                SizedBox(width: 5),
+                                                Expanded(
+                                                  child: CategoryDescripText(
+                                                    text:
+                                                        "Show nearest safe zone",
+                                                    color: Colors.black,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                      GestureDetector(
-                                        onTap: () {
-                                          _findDangerRoute();
-                                        },
-                                        child: Container(
-                                          width: 170,
-                                          height: 40,
-                                          decoration: BoxDecoration(
-                                            color: _isDangerZoneShown
-                                                ? Colors.grey[300]
-                                                : Colors.white,
-                                            borderRadius:
-                                                BorderRadius.circular(50),
-                                            boxShadow: const [
-                                              BoxShadow(
-                                                color: Colors.grey,
-                                                blurRadius: 2,
-                                                offset: Offset(1, 1),
-                                              ),
-                                            ],
-                                          ),
-                                          child: const Row(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.center,
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.start,
-                                            children: [
-                                              SizedBox(width: 5),
-                                              Icon(Icons.safety_check,
-                                                  color: Colors.red),
-                                              SizedBox(width: 5),
-                                              Expanded(
-                                                child: CategoryDescripText(
-                                                  text:
-                                                      "Show nearest danger zone",
-                                                  color: Colors.black,
+                                        GestureDetector(
+                                          onTap: () {
+                                            _findDangerRoute();
+                                          },
+                                          child: Container(
+                                            width: 170,
+                                            height: 40,
+                                            decoration: BoxDecoration(
+                                              color: _isDangerZoneShown
+                                                  ? Colors.grey[300]
+                                                  : Colors.white,
+                                              borderRadius:
+                                                  BorderRadius.circular(50),
+                                              boxShadow: const [
+                                                BoxShadow(
+                                                  color: Colors.grey,
+                                                  blurRadius: 2,
+                                                  offset: Offset(1, 1),
                                                 ),
-                                              ),
-                                            ],
+                                              ],
+                                            ),
+                                            child: const Row(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
+                                              children: [
+                                                SizedBox(width: 5),
+                                                Icon(Icons.safety_check,
+                                                    color: Colors.red),
+                                                SizedBox(width: 5),
+                                                Expanded(
+                                                  child: CategoryDescripText(
+                                                    text:
+                                                        "Show nearest danger zone",
+                                                    color: Colors.black,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                    ])
-                    )]))
+                                      ]))
+                            ]))
                     : SingleChildScrollView(
                         scrollDirection: Axis.horizontal,
                         child: Row(
