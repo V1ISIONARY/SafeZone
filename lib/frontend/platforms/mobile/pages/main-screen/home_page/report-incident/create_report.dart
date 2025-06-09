@@ -16,11 +16,9 @@ import 'package:safezone/backend/models/dangerzoneModel/incident_report_request_
 import 'package:safezone/frontend/platforms/mobile/widgets/buttons/custom_button.dart';
 import 'package:safezone/frontend/platforms/mobile/widgets/report-danger-zone/multiple_images.dart';
 import 'package:safezone/frontend/platforms/mobile/widgets/text_field_widget.dart';
+import 'package:safezone/resource/schema/colors.dart';
+import 'package:safezone/resource/schema/texts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import '../../../../../../../resource/schema/colors.dart';
-import '../../../../../../../resource/schema/texts.dart';
-
 
 class CreateReport extends StatefulWidget {
   const CreateReport({super.key});
@@ -30,22 +28,39 @@ class CreateReport extends StatefulWidget {
 }
 
 class _CreateReportState extends State<CreateReport> {
-  
   List<File> selectedImages = [];
   int? userId;
   String reportTimestamp = "";
+  final TextEditingController _nameController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _searchController = TextEditingController();
-  LatLng _initialCameraPosition = LatLng(16.043859, 120.335182);
 
   final Completer<GoogleMapController> _mapController = Completer();
   LatLng? _pinnedLocation;
   final Set<Marker> _markers = {};
 
-  CameraPosition _majorCamera = CameraPosition(
+  double _radius = 50.0;
+  final Set<Circle> _circles = {};
+
+  final CameraPosition _majorCamera = const CameraPosition(
     target: LatLng(16.043859, 120.335182),
     zoom: 14.0,
   );
+
+  final List<String> _reportTypes = [
+    'Harassment',
+    'Assault',
+    'Theft',
+    'Suspicious Activity',
+    'Verbal Abuse',
+    'Stalking',
+    'Domestic Violence',
+    'Unsafe Environment',
+    'Others',
+  ];
+
+  String? _selectedType;
+  final TextEditingController _otherTypeController = TextEditingController();
 
   @override
   void initState() {
@@ -88,7 +103,8 @@ class _CreateReportState extends State<CreateReport> {
       return;
     }
 
-  Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+    Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
     _updateMapPosition(LatLng(position.latitude, position.longitude));
   }
 
@@ -98,7 +114,24 @@ class _CreateReportState extends State<CreateReport> {
   }
 
   void _showSnackBar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  void _updateCircle() {
+    if (_pinnedLocation != null) {
+      _circles.clear();
+      _circles.add(
+        Circle(
+          circleId: const CircleId("radius_circle"),
+          center: _pinnedLocation!,
+          radius: _radius,
+          strokeWidth: 1,
+          strokeColor: Colors.transparent,
+          fillColor: Colors.red.withOpacity(0.2),
+        ),
+      );
+    }
   }
 
   void _searchLocation() async {
@@ -108,7 +141,8 @@ class _CreateReportState extends State<CreateReport> {
     }
 
     String location = _searchController.text;
-    String url = "https://maps.googleapis.com/maps/api/geocode/json?address=$location&key=$apiKey";
+    String url =
+        "https://maps.googleapis.com/maps/api/geocode/json?address=$location&key=$apiKey";
 
     try {
       final response = await http.get(Uri.parse(url));
@@ -134,8 +168,8 @@ class _CreateReportState extends State<CreateReport> {
                 infoWindow: const InfoWindow(title: "Searched Location"),
               ),
             );
+            _updateCircle(); // Add this line
           });
-
         } else {
           // _showSnackBar("Location not found. Try another search.");
         }
@@ -147,129 +181,165 @@ class _CreateReportState extends State<CreateReport> {
     }
   }
 
+  Widget _buildRadiusSlider() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Incident Radius: ${_radius.round()} meters',
+            style: GoogleFonts.poppins(
+              fontSize: 13,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          SliderTheme(
+            data: SliderTheme.of(context).copyWith(
+              activeTrackColor: Colors.grey[600],
+              inactiveTrackColor: Colors.grey[300],
+              trackHeight: 4.0,
+              thumbColor: Colors.grey[700],
+              thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 8.0),
+              overlayColor: Colors.grey.withOpacity(0.2),
+              overlayShape: const RoundSliderOverlayShape(overlayRadius: 16.0),
+              valueIndicatorColor: Colors.grey[700],
+              valueIndicatorTextStyle: GoogleFonts.poppins(
+                color: Colors.white,
+                fontSize: 12,
+              ),
+            ),
+            child: Slider(
+              value: _radius,
+              min: 10,
+              max: 300,
+              divisions: 29,
+              label: _radius.round().toString(),
+              onChanged: (value) {
+                setState(() {
+                  _radius = value;
+                  _updateCircle();
+                });
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        title: const CategoryText(text: "Report an Incident"),
-        leading: GestureDetector(
-          onTap: () {
-            Navigator.pop(context);
-          },
-          child: Container(
-            margin: const EdgeInsets.all(15),
-            decoration: BoxDecoration(
-              border: Border.all(width: 1, color: Colors.black),
-              shape: BoxShape.circle,
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          title: const CategoryText(text: "Report an Incident"),
+          leading: GestureDetector(
+            onTap: () {
+              Navigator.pop(context);
+            },
+            child: Container(
+              margin: const EdgeInsets.all(15),
+              decoration: BoxDecoration(
+                border: Border.all(width: 1, color: Colors.black),
+                shape: BoxShape.circle,
+              ),
+              child:
+                  const Icon(Icons.arrow_back, color: Colors.black, size: 10),
             ),
-            child: const Icon(Icons.arrow_back, color: Colors.black, size: 10),
           ),
+          automaticallyImplyLeading: false,
+          centerTitle: true,
         ),
-        automaticallyImplyLeading: false,
-        centerTitle: true,
-      ),
-      body: Container(
-        margin: EdgeInsets.symmetric(horizontal: 15),
-        child: Column(
-          children: [
-            Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 0),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Container(
+        body: Container(
+            margin: const EdgeInsets.symmetric(horizontal: 15),
+            child: Column(children: [
+              Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 0),
+                    child: Row(
+                      children: [
+                        Expanded(
+                            child: Container(
                           height: 40,
                           child: TextField(
-                            controller: _searchController,
-                            style: GoogleFonts.poppins(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.black,
-                            ),
-                            decoration: InputDecoration(
-                              filled: true,
-                              fillColor: Colors.transparent,
-                              hintText: 'Search for location',
-                              hintStyle: GoogleFonts.poppins(
+                              controller: _searchController,
+                              style: GoogleFonts.poppins(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w500,
-                                color: Colors.black38,
+                                color: Colors.black,
                               ),
-                              contentPadding: const EdgeInsets.only(left: 10, bottom: 8), 
-                              border: OutlineInputBorder(
-                                borderSide: const BorderSide(color: btnColor),
+                              decoration: InputDecoration(
+                                filled: true,
+                                fillColor: Colors.transparent,
+                                hintText: 'Search for location',
+                                hintStyle: GoogleFonts.poppins(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.black38,
+                                ),
+                                contentPadding:
+                                    const EdgeInsets.only(left: 10, bottom: 8),
+                                border: const OutlineInputBorder(
+                                  borderSide: BorderSide(color: btnColor),
+                                ),
+                                focusedBorder: const OutlineInputBorder(
+                                  borderSide: BorderSide(color: btnColor),
+                                ),
+                                enabledBorder: const OutlineInputBorder(
+                                  borderSide: BorderSide(color: btnColor),
+                                ),
+                              )),
+                        )),
+                        const SizedBox(width: 10),
+                        GestureDetector(
+                          onTap: () {
+                            _searchLocation();
+                          },
+                          child: Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(5),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Colors.grey,
+                                    blurRadius: 2,
+                                    offset: Offset(1, 1),
+                                  )
+                                ]),
+                            child: const Center(
+                              child: Icon(
+                                size: 20,
+                                Icons.search,
+                                color: widgetPricolor,
                               ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(color: btnColor),
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(color: btnColor),
-                              ),
-                            )
-                          ), 
-                        )
-                      ),
-                      const SizedBox(width: 10),
-                      GestureDetector(
-                        onTap: (){
-                          _searchLocation();
-                        },
-                        child: Container(
-                          width: 40,
-                          height: 40,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(5),
-                            boxShadow: const [
-                              BoxShadow(
-                                color: Colors.grey,
-                                blurRadius: 2,
-                                offset: Offset(1, 1),
-                              )
-                            ]
-                          ),
-                          child: Center(
-                            child: Icon(
-                              size: 20,
-                              Icons.search,
-                              color: widgetPricolor,
                             ),
                           ),
-                        ),
-                      )
-                    ],
+                        )
+                      ],
+                    ),
                   ),
+                ],
+              ),
+              Container(
+                height: 215,
+                margin: const EdgeInsets.only(top: 15, bottom: 10),
+                decoration: BoxDecoration(
+                  color: const Color.fromARGB(54, 96, 125, 139),
+                  borderRadius: BorderRadius.circular(8),
                 ),
-              ],
-            ),
-            Container(
-              height: 215, 
-              margin: const EdgeInsets.only(
-                top: 15,
-                bottom: 10
-              ),
-              decoration: BoxDecoration(
-                color: const Color.fromARGB(54, 96, 125, 139),
-                borderRadius: BorderRadius.circular(8),
-                boxShadow: const [
-                  BoxShadow(
-                    color: Colors.grey,
-                    blurRadius: 2,
-                    offset: Offset(1, 1),
-                  )
-                ]
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: GoogleMap(
-                  initialCameraPosition: _majorCamera,
-                  markers: _markers,
-                  onMapCreated: (GoogleMapController controller) {
-                    _mapController.complete(controller);
-                    String style = '''
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: GoogleMap(
+                    initialCameraPosition: _majorCamera,
+                    markers: _markers,
+                    circles: _circles,
+                    onMapCreated: (GoogleMapController controller) {
+                      _mapController.complete(controller);
+                      String style = '''
                       [
                         {
                           "featureType": "administrative",
@@ -336,122 +406,175 @@ class _CreateReportState extends State<CreateReport> {
                         }
                       ]
                     ''';
-                    controller.setMapStyle(style);
-                  },
-                  onTap: (LatLng location) {
-                    setState(() {
-                      _pinnedLocation = location;
-                      _markers.clear();
-                      _markers.add(
-                        Marker(
-                          markerId: const MarkerId("pinned_location"),
-                          position: location,
-                          infoWindow: const InfoWindow(title: "Incident Location"),
-                        ),
-                      );
-                    });
-                  },
-                  zoomGesturesEnabled: true,
-                  scrollGesturesEnabled: true,
-                  rotateGesturesEnabled: true,
-                  tiltGesturesEnabled: true,
+                      controller.setMapStyle(style);
+                    },
+                    onTap: (LatLng location) {
+                      setState(() {
+                        _pinnedLocation = location;
+                        _markers.clear();
+                        _markers.add(
+                          Marker(
+                            markerId: const MarkerId("pinned_location"),
+                            position: location,
+                            infoWindow:
+                                const InfoWindow(title: "Incident Location"),
+                          ),
+                        );
+                        _updateCircle();
+                      });
+                    },
+                    zoomGesturesEnabled: true,
+                    scrollGesturesEnabled: true,
+                    rotateGesturesEnabled: true,
+                    tiltGesturesEnabled: true,
+                  ),
                 ),
               ),
-            ),
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(vertical: 20),
-                child: Column(
-                  children: [
-                    Container(
-                      margin: EdgeInsets.symmetric(horizontal: 10),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                            child: Image.asset(
-                              "lib/resource/svg/alert.png",
-                              width: 50,
-                              height: 50,
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          const Flexible(
-                            child: CategoryText(
-                              text: 'Help others stay safe by providing details about the incident and location.',
-                            ),
-                          ),
-                        ],
-                      )
-                    ),
-                    const SizedBox(height: 30),
-                    TextFieldWidget.buildTextField(
-                      controller: _descriptionController,
-                      label: "Description",
-                      hint: "Enter description",
-                      maxLines: 5,
-                      minLines: 5,
-                    ),
-                    Container(
-                      margin: EdgeInsets.only(top: 10, bottom: 20),
-                      child: CategoryText(
-                        text: "Upload images to provide more context about the incident (optional)"
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(vertical: 20),
+                  child: Column(
+                    children: [
+                      const CategoryText(
+                        color: textColor,
+                        text:
+                            'Help others stay safe by providing details about the incident and location.',
                       ),
-                    ),
-                    MultipleImages(
-                      onImagesSelected: (images) {
-                        setState(() {
-                          selectedImages = images;
-                        });
-                      },
-                    ),
-                    Transform.translate(
-                      offset: Offset(0, -30),
-                      child: CustomButton(
-                        widthSize: true,
-                        text: "Continue",
-                        buttonColor: widgetPricolor,
-                        onPressed: () {
-
-                          if (userId == null || _pinnedLocation == null || _descriptionController.text.trim().isEmpty) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: CategoryText(text: "Please select a location and enter a description.", color: Colors.white),
-                                backgroundColor: Colors.red,
-                              ),
-                            );
-                            return;
-                          }
-
-                          final incidentReport = IncidentReportRequestModel(
-                            userId: userId!,
-                            description: _descriptionController.text,
-                            reportDate: DateFormat("yyyy-MM-dd").format(DateTime.now()),
-                            reportTime: DateFormat("HH:mm:ss").format(DateTime.now()),
-                            images: selectedImages, // Pass the File objects directly
-                            reportTimestamp: reportTimestamp,
-                            latitude: _pinnedLocation!.latitude,
-                            longitude: _pinnedLocation!.longitude,
-                            radius: 50.0, // Default radius (adjust if needed)
-                            name:
-                                "Incident Report ${DateTime.now().millisecondsSinceEpoch}",
+                      const SizedBox(height: 20),
+                      _buildRadiusSlider(),
+                      const SizedBox(height: 10),
+                      const Align(
+                        alignment: Alignment.centerLeft,
+                        child: CategoryText(
+                          text: "Type of Report:",
+                          alignment: 'start',
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      DropdownButtonFormField<String>(
+                        value: _selectedType,
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            _selectedType = newValue;
+                          });
+                        },
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(5),
+                            borderSide: const BorderSide(color: btnColor),
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 12),
+                        ),
+                        items: _reportTypes.map((String type) {
+                          return DropdownMenuItem<String>(
+                            value: type,
+                            child: Text(
+                              type,
+                              style: GoogleFonts.poppins(fontSize: 13),
+                            ),
                           );
-                          print("🚨 Incident Report Created: $incidentReport");
-                          context.push('/review-report', extra: incidentReport);
+                        }).toList(),
+                        hint: Text(
+                          "Select report type",
+                          style: GoogleFonts.poppins(
+                              fontSize: 13, color: Colors.black54),
+                        ),
+                      ),
+                      if (_selectedType == 'Others') ...[
+                        const SizedBox(height: 10),
+                        TextFieldWidget.buildTextField(
+                          controller: _otherTypeController,
+                          label: "Specify Report Type",
+                          hint: "Enter custom report type",
+                        ),
+                      ],
+                      const SizedBox(height: 20),
+                      const Align(
+                        alignment: Alignment.centerLeft,
+                        child: CategoryText(
+                            text: "Safe Zone Title:", alignment: 'start'),
+                      ),
+                      const SizedBox(height: 15),
+                      TextFieldWidget.buildTextField(
+                        controller: _nameController,
+                        label: "Title",
+                        hint: "Enter safe zone title",
+                        maxLines: 5,
+                      ),
+                      const SizedBox(height: 5),
+                      TextFieldWidget.buildTextField(
+                        controller: _descriptionController,
+                        label: "Description",
+                        hint: "Enter description",
+                        maxLines: 5,
+                        minLines: 5,
+                      ),
+                      Container(
+                        margin: const EdgeInsets.only(top: 10, bottom: 20),
+                        child: const CategoryText(
+                            text:
+                                "Upload images to provide more context about the incident (optional)"),
+                      ),
+                      MultipleImages(
+                        onImagesSelected: (images) {
+                          setState(() {
+                            selectedImages = images;
+                          });
+                        },
+                      ),
+                      const SizedBox(height: 40),
+                      Transform.translate(
+                          offset: const Offset(0, -30),
+                          child: CustomButton(
+                              widthSize: true,
+                              text: "Continue",
+                              buttonColor: widgetPricolor,
+                              onPressed: () {
+                                if (userId == null ||
+                                    _pinnedLocation == null ||
+                                    _descriptionController.text
+                                        .trim()
+                                        .isEmpty) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: CategoryText(
+                                          text:
+                                              "Please select a location and enter a description.",
+                                          color: Colors.white),
+                                      backgroundColor: Colors.red,
+                                    ),
+                                  );
+                                  return;
+                                }
 
-                        }
-                      )
-                    ),
-                    SizedBox(height: 10)
-                  ],
+                                final incidentReport =
+                                    IncidentReportRequestModel(
+                                  userId: userId!,
+                                  description: _descriptionController.text,
+                                  reportDate: DateFormat("yyyy-MM-dd")
+                                      .format(DateTime.now()),
+                                  reportTime: DateFormat("HH:mm:ss")
+                                      .format(DateTime.now()),
+                                  images:
+                                      selectedImages, // Pass the File objects directly
+                                  reportTimestamp: reportTimestamp,
+                                  latitude: _pinnedLocation!.latitude,
+                                  longitude: _pinnedLocation!.longitude,
+                                  radius: _radius,
+                                  name:
+                                      "Incident Report ${DateTime.now().millisecondsSinceEpoch}",
+                                );
+                                print(
+                                    "🚨 Incident Report Created: $incidentReport");
+                                context.push('/review-report',
+                                    extra: incidentReport);
+                              })),
+                      const SizedBox(height: 10)
+                    ],
+                  ),
                 ),
-              ),
-            )
-          ]
-        )
-      )
-    );
+              )
+            ])));
   }
 }
