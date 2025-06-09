@@ -13,9 +13,7 @@ class MultipleImages extends StatefulWidget {
 
 class _MultipleImagesState extends State<MultipleImages> {
   final List<File> _images = [];
-
   final double imageSize = 150.0;
-  final double buttonSize = 100.0;
 
   void removeImage(int index) {
     setState(() {
@@ -32,71 +30,61 @@ class _MultipleImagesState extends State<MultipleImages> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                GestureDetector(
-                  onTap: () async {
-                    final files = await ImageHelper().pickImage(multiple: true);
-                    if (files.isNotEmpty) {
-                      setState(() {
-                        _images
-                            .addAll(files.map((e) => File(e!.path)).toList());
-                      });
-                      widget.onImagesSelected(_images);
-                    }
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.all(24.0),
-                    decoration: BoxDecoration(
-                      borderRadius:
-                          BorderRadius.circular(8), 
-                      border: Border.all(
-                        color: const Color(0xff707070), 
-                        width: 2.0, 
-                      ),
-                    ),
-                    child: Container(
-                      width: buttonSize,
-                      height: buttonSize,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8.0),
-                      ),
-                      child: const Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.add, size: 36.0, color: Colors.grey),
-                          SizedBox(height: 8.0),
-                          Text(
-                            "Upload Photos",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: Colors.grey,
-                              fontSize: 16.0,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+            // Full-width upload button
+            GestureDetector(
+              onTap: () async {
+                final files = await ImageHelper().pickImage(multiple: true);
+                if (files.isNotEmpty) {
+                  setState(() {
+                    _images.addAll(files.map((e) => File(e!.path)).toList());
+                  });
+                  widget.onImagesSelected(_images);
+                }
+              },
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(vertical: 40.0),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: const Color(0xff707070),
+                    width: 1.0,
                   ),
                 ),
-                const SizedBox(width: 10),
-                if (_images.isNotEmpty) buildImageWithRemoveButton(0),
-              ],
-            ),
-            const SizedBox(height: 10),
-            if (_images.length > 1)
-              Wrap(
-                spacing: 10,
-                runSpacing: 10,
-                children: _images
-                    .asMap()
-                    .entries
-                    .skip(1)
-                    .map((entry) => buildImageWithRemoveButton(entry.key))
-                    .toList(),
+                child: const Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.add, size: 36.0, color: Colors.grey),
+                    SizedBox(height: 8.0),
+                    Text(
+                      "Upload Photos",
+                      style: TextStyle(
+                        color: Colors.grey,
+                        fontSize: 13.0,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            const SizedBox(height: 60),
+            ),
+
+            const SizedBox(height: 16),
+
+            if (_images.isNotEmpty)
+              GridView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 10,
+                  mainAxisSpacing: 10,
+                  childAspectRatio: 1,
+                ),
+                itemCount: _images.length,
+                itemBuilder: (context, index) {
+                  return buildImageWithRemoveButton(index);
+                },
+              ),
           ],
         ),
       ),
@@ -106,24 +94,30 @@ class _MultipleImagesState extends State<MultipleImages> {
   Widget buildImageWithRemoveButton(int index) {
     return Stack(
       children: [
-        Image.file(
-          _images[index],
-          height: imageSize,
-          width: imageSize,
-          fit: BoxFit.cover,
+        ClipRRect(
+          borderRadius: BorderRadius.circular(8),
+          child: Image.file(
+            _images[index],
+            height: imageSize,
+            width: imageSize,
+            fit: BoxFit.cover,
+          ),
         ),
         Positioned(
           top: 5,
           right: 5,
           child: GestureDetector(
             onTap: () => removeImage(index),
-            child: const CircleAvatar(
-              radius: 10,
-              backgroundColor: Color.fromARGB(255, 238, 238, 238),
-              child: Icon(
+            child: Container(
+              padding: const EdgeInsets.all(2),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Icon(
                 Icons.close,
-                size: 18,
-                color: Color.fromARGB(255, 41, 41, 41),
+                size: 16,
+                color: Colors.black,
               ),
             ),
           ),

@@ -17,21 +17,15 @@ import 'package:safezone/resources/schema/texts.dart';
 import 'package:safezone/frontend/widgets/loadingstate.dart';
 
 class ReviewReport extends StatefulWidget {
-
-  const ReviewReport({
-    super.key, 
-    required this.reportInfo
-  });
+  const ReviewReport({super.key, required this.reportInfo});
 
   final IncidentReportRequestModel reportInfo;
 
   @override
   State<ReviewReport> createState() => _ReviewReportState();
-  
 }
 
 class _ReviewReportState extends State<ReviewReport> {
-  
   final Completer<GoogleMapController> _mapController = Completer();
   final String apiKey = dotenv.env['GOOGLE_API_KEY'] ?? '';
   String locationName = "Fetching location...";
@@ -42,27 +36,26 @@ class _ReviewReportState extends State<ReviewReport> {
 
   Future<void> _checkIfShown() async {
     Future.delayed(Duration(milliseconds: 200), () {
-        if (mounted) {
-          setState(() {
-            _appBarHeight = 40;
-            _appBarColor = Colors.red;
-            _showTitle = true;
-          });
-        }
-
-        Future.delayed(Duration(seconds: 5), () {
-          if (mounted) {
-            setState(() {
-              _appBarHeight = 0;
-              _appBarColor = Colors.transparent;
-              _showTitle = false;
-            });
-          }
+      if (mounted) {
+        setState(() {
+          _appBarHeight = 40;
+          _appBarColor = Colors.red;
+          _showTitle = true;
         });
       }
-    );
+
+      Future.delayed(Duration(seconds: 5), () {
+        if (mounted) {
+          setState(() {
+            _appBarHeight = 0;
+            _appBarColor = Colors.transparent;
+            _showTitle = false;
+          });
+        }
+      });
+    });
   }
-  
+
   @override
   void initState() {
     super.initState();
@@ -74,7 +67,9 @@ class _ReviewReportState extends State<ReviewReport> {
       double? latitude = widget.reportInfo.latitude;
       double? longitude = widget.reportInfo.longitude;
 
-      if (latitude == null || longitude == null || (latitude == 0.0 && longitude == 0.0)) {
+      if (latitude == null ||
+          longitude == null ||
+          (latitude == 0.0 && longitude == 0.0)) {
         setState(() {
           locationName = "Invalid coordinates";
         });
@@ -82,9 +77,8 @@ class _ReviewReportState extends State<ReviewReport> {
       }
 
       final url = Uri.parse(
-        'https://maps.googleapis.com/maps/api/geocode/json?latlng=$latitude,$longitude&key=$apiKey'
-      );
-      
+          'https://maps.googleapis.com/maps/api/geocode/json?latlng=$latitude,$longitude&key=$apiKey');
+
       final response = await http.get(url);
 
       if (response.statusCode == 200) {
@@ -93,7 +87,8 @@ class _ReviewReportState extends State<ReviewReport> {
 
         if (results.isNotEmpty) {
           setState(() {
-            locationName = results[0]['formatted_address'] ?? "Unknown Location";
+            locationName =
+                results[0]['formatted_address'] ?? "Unknown Location";
           });
         } else {
           setState(() {
@@ -149,7 +144,7 @@ class _ReviewReportState extends State<ReviewReport> {
           }
         },
         child: SingleChildScrollView(
-          padding: const EdgeInsets.only(bottom: 15.0, left: 15,  right: 15),
+          padding: const EdgeInsets.only(bottom: 15.0, left: 15, right: 15),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -179,13 +174,6 @@ class _ReviewReportState extends State<ReviewReport> {
                 decoration: BoxDecoration(
                   color: const Color.fromARGB(54, 96, 125, 139),
                   borderRadius: BorderRadius.circular(8),
-                  boxShadow: const [
-                    BoxShadow(
-                      color: Colors.grey,
-                      blurRadius: 2,
-                      offset: Offset(1, 1),
-                    )
-                  ]
                 ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(8),
@@ -268,10 +256,21 @@ class _ReviewReportState extends State<ReviewReport> {
                     },
                     markers: {
                       Marker(
-                        markerId: const MarkerId("pinned location"),
+                        markerId: const MarkerId("danger zone"),
                         position: LatLng(widget.reportInfo.latitude!,
                             widget.reportInfo.longitude!),
                         infoWindow: const InfoWindow(title: "Pinned Location"),
+                      ),
+                    },
+                    circles: {
+                      Circle(
+                        circleId: const CircleId("danger zone"),
+                        center: LatLng(widget.reportInfo.latitude!,
+                            widget.reportInfo.longitude!),
+                        radius: widget.reportInfo.radius!,
+                        strokeWidth: 1,
+                        strokeColor: Colors.transparent,
+                        fillColor: Colors.red.withOpacity(0.2),
                       ),
                     },
                   ),
@@ -284,127 +283,120 @@ class _ReviewReportState extends State<ReviewReport> {
                 alignment: Alignment.center,
                 margin: EdgeInsets.only(top: _showTitle ? 20 : 0),
                 decoration: BoxDecoration(
-                  color: Colors.transparent,
-                  border: Border.all(
-                    color: _appBarColor,
-                    width: 1
-                  ),
-                  borderRadius: BorderRadius.circular(10)
-                ),
+                    color: Colors.transparent,
+                    border: Border.all(color: _appBarColor, width: 1),
+                    borderRadius: BorderRadius.circular(10)),
                 child: _showTitle
-                  ? CategoryDescripTextE(
-                      text: "Location must be in Dagupan, Pangasinan, Philippines.", color: Colors.red
-                    )
-                  : null,
+                    ? CategoryDescripTextE(
+                        text:
+                            "Location must be in Dagupan, Pangasinan, Philippines.",
+                        color: Colors.red)
+                    : null,
               ),
               Container(
                 width: double.infinity,
                 margin: EdgeInsets.symmetric(vertical: 20),
                 decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                  boxShadow: const [
-                    BoxShadow(
-                      color: Colors.grey,
-                      blurRadius: 2,
-                      offset: Offset(1, 1),
-                    )
-                  ]
-                ),
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Colors.grey,
+                        blurRadius: 2,
+                        offset: Offset(1, 1),
+                      )
+                    ]),
                 child: Column(
                   children: [
                     SizedBox(height: 20),
                     Container(
-                      padding: EdgeInsets.symmetric(horizontal: 20),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          CategoryText(text: 'Location'),
-                          SizedBox(height: 5),
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Icon(
-                                size: 15,
-                                Icons.location_pin,
-                                color: widgetPricolor,
-                              ),
-                              SizedBox(width: 5),
-                              CategoryDescripTextE(text: locationName, alignment: 'start')
-                            ],
-                          ),
-                          SizedBox(height: 15),
-                          Divider(
-                            height: 0.5,
-                            color: Colors.black26,
-                          ),
-                        ],
-                      )
-                    ),
+                        padding: EdgeInsets.symmetric(horizontal: 20),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            CategoryText(text: 'Location'),
+                            SizedBox(height: 5),
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Icon(
+                                  size: 15,
+                                  Icons.location_pin,
+                                  color: widgetPricolor,
+                                ),
+                                SizedBox(width: 5),
+                                CategoryDescripTextE(
+                                    text: locationName, alignment: 'start')
+                              ],
+                            ),
+                            SizedBox(height: 15),
+                            Divider(
+                              height: 0.5,
+                              color: Colors.black26,
+                            ),
+                          ],
+                        )),
                     Container(
-                      padding: EdgeInsets.symmetric(horizontal: 20),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          SizedBox(height: 15),
-                          CategoryText(text: 'Time and Date'),
-                          SizedBox(height: 5),
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Icon(
-                                size: 15,
-                                Icons.schedule,
-                                color: widgetPricolor,
-                              ),
-                              SizedBox(width: 5),
-                              CategoryDescripTextE(
-                                text: "${DateFormat.yMMMMd().format(DateTime.now())} • ${DateFormat.jm().format(DateTime.now())}", 
-                                alignment: 'start'
-                              )
-                            ],
-                          ),
-                          SizedBox(height: 15),
-                          Divider(
-                            height: 0.5,
-                            color: Colors.black26,
-                          ),
-                        ],
-                      )
-                    ),
+                        padding: EdgeInsets.symmetric(horizontal: 20),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            SizedBox(height: 15),
+                            CategoryText(text: 'Time and Date'),
+                            SizedBox(height: 5),
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Icon(
+                                  size: 15,
+                                  Icons.schedule,
+                                  color: widgetPricolor,
+                                ),
+                                SizedBox(width: 5),
+                                CategoryDescripTextE(
+                                    text:
+                                        "${DateFormat.yMMMMd().format(DateTime.now())} • ${DateFormat.jm().format(DateTime.now())}",
+                                    alignment: 'start')
+                              ],
+                            ),
+                            SizedBox(height: 15),
+                            Divider(
+                              height: 0.5,
+                              color: Colors.black26,
+                            ),
+                          ],
+                        )),
                     Container(
-                      padding: EdgeInsets.symmetric(horizontal: 20),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          SizedBox(height: 15),
-                          CategoryText(text: 'Description'),
-                          SizedBox(height: 5),
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Icon(
-                                size: 15,
-                                Icons.description,
-                                color: widgetPricolor,
-                              ),
-                              SizedBox(width: 5),
-                              CategoryDescripTextE(
-                                text: widget.reportInfo.description!, 
-                                alignment: 'start'
-                              )
-                            ],
-                          ),
-                          SizedBox(height: 15),
-                        ],
-                      )
-                    ),
+                        padding: EdgeInsets.symmetric(horizontal: 20),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            SizedBox(height: 15),
+                            CategoryText(text: 'Description'),
+                            SizedBox(height: 5),
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Icon(
+                                  size: 15,
+                                  Icons.description,
+                                  color: widgetPricolor,
+                                ),
+                                SizedBox(width: 5),
+                                CategoryDescripTextE(
+                                    text: widget.reportInfo.description!,
+                                    alignment: 'start')
+                              ],
+                            ),
+                            SizedBox(height: 15),
+                          ],
+                        )),
                     Container(
                       height: 30,
                       width: double.infinity,
@@ -415,31 +407,29 @@ class _ReviewReportState extends State<ReviewReport> {
               ),
               const Align(
                 alignment: Alignment.centerLeft,
-                child: CategoryText(
-                  text: "Images:"
-                ),
+                child: CategoryText(text: "Images:"),
               ),
               const SizedBox(height: 10),
               widget.reportInfo.images!.isNotEmpty
-                ? SizedBox(
-                    height: 100,
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: widget.reportInfo.images!.length,
-                      itemBuilder: (context, index) {
-                        return Padding(
-                          padding: const EdgeInsets.only(right: 8.0),
-                          child: Image.file(
-                            widget.reportInfo.images![index],
-                            width: 100,
-                            height: 100,
-                            fit: BoxFit.cover,
-                          ),
-                        );
-                      },
-                    ),
-                  )
-                : const Text("No images uploaded"),
+                  ? SizedBox(
+                      height: 100,
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: widget.reportInfo.images!.length,
+                        itemBuilder: (context, index) {
+                          return Padding(
+                            padding: const EdgeInsets.only(right: 8.0),
+                            child: Image.file(
+                              widget.reportInfo.images![index],
+                              width: 100,
+                              height: 100,
+                              fit: BoxFit.cover,
+                            ),
+                          );
+                        },
+                      ),
+                    )
+                  : const Text("No images uploaded"),
               const SizedBox(height: 30),
               BlocBuilder<IncidentReportBloc, IncidentReportState>(
                 builder: (context, state) {
@@ -447,17 +437,16 @@ class _ReviewReportState extends State<ReviewReport> {
                     text: "Submit",
                     widthSize: true,
                     buttonColor: widgetPricolor,
-                    onPressed: state is IncidentReportLoading || 
-                        !(locationName.contains('Dagupan, Pangasinan, Philippines'))
+                    onPressed: state is IncidentReportLoading ||
+                            !(locationName.contains('Dagupan City'))
                         ? () {
-                          _checkIfShown();
-                        }
-                        : () { 
-                          context
-                          .read<IncidentReportBloc>()
-                          .add(CreateIncidentReport(widget.reportInfo)
-                        );
-                    },
+                            _checkIfShown();
+                          }
+                        : () {
+                            context
+                                .read<IncidentReportBloc>()
+                                .add(CreateIncidentReport(widget.reportInfo));
+                          },
                   );
                 },
               ),
