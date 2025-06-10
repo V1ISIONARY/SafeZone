@@ -776,17 +776,23 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
     SafeZoneModel? nearest;
 
     for (var station in policeStations) {
-      if (station.latitude == null || station.longitude == null) continue;
-      double distance = Geolocator.distanceBetween(
-        currentPosition.latitude,
-        currentPosition.longitude,
-        station.latitude!,
-        station.longitude!,
-      );
+      if (station.name!.contains("Barangay Hall") ||
+          station.name!.contains("Police Station")) {
+        if (station.latitude == null || station.longitude == null) continue;
 
-      if (distance < minDistance) {
-        minDistance = distance;
-        nearest = station;
+        double distance = Geolocator.distanceBetween(
+          currentPosition.latitude,
+          currentPosition.longitude,
+          station.latitude!,
+          station.longitude!,
+        );
+
+        if (distance < minDistance) {
+          minDistance = distance;
+          nearest = station;
+        }
+      } else {
+        print("Skipped: ${station.name}");
       }
     }
 
@@ -800,6 +806,12 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
       print("Nearest Police Station: ${nearest.name}");
       print("Latitude: ${nearest.latitude}");
       print("Longitude: ${nearest.longitude}");
+
+      // Save to SharedPreferences
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setString('nearest_station_name', nearest.name ?? '');
+
+      print("Nearest station saved to SharedPreferences.");
     } else {
       print("No valid stations found.");
     }

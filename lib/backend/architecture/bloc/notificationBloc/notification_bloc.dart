@@ -95,6 +95,23 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
         emit(NotificationError(e.toString()));
       }
     });
-
+    on<BroadcastNotificationPoliceStation>((event, emit) async {
+      try {
+        bool success =
+            await notificationRepository.broadcastNotificationpolicestation(
+                event.userId,
+                event.title,
+                event.policeStationName,
+                event.message,
+                event.type);
+        if (success) {
+          emit(NotificationBroadcasted());
+        } else {
+          emit(NotificationError("Failed to broadcast notification."));
+        }
+      } catch (e) {
+        emit(NotificationError(e.toString()));
+      }
+    });
   }
 }

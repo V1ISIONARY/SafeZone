@@ -9,7 +9,8 @@ class NotificationImplementation extends NotificationRepository {
 
   @override
   Future<List<NotificationModel>> getNotifications(int userId) async {
-    final String url = '$baseUrl/get_notif/$userId';  // Adjusted to match Flask API
+    final String url =
+        '$baseUrl/get_notif/$userId'; // Adjusted to match Flask API
 
     try {
       final response = await http.get(Uri.parse(url));
@@ -21,7 +22,8 @@ class NotificationImplementation extends NotificationRepository {
             .toList();
       } else {
         print(response.body);
-        throw Exception("Failed to load notifications. Status Code: ${response.statusCode}");
+        throw Exception(
+            "Failed to load notifications. Status Code: ${response.statusCode}");
       }
     } catch (e) {
       print('$baseUrl/get_notif/$userId');
@@ -32,7 +34,8 @@ class NotificationImplementation extends NotificationRepository {
 
   @override
   Future<bool> markAsRead(int notificationId) async {
-    final String url = '$baseUrl/mark_notif/$notificationId'; // Adjusted to match Flask API
+    final String url =
+        '$baseUrl/mark_notif/$notificationId'; // Adjusted to match Flask API
 
     try {
       final response = await http.patch(Uri.parse(url));
@@ -40,7 +43,8 @@ class NotificationImplementation extends NotificationRepository {
       if (response.statusCode == 200) {
         return true;
       } else {
-        throw Exception("Failed to mark notification as read. Status Code: ${response.statusCode}");
+        throw Exception(
+            "Failed to mark notification as read. Status Code: ${response.statusCode}");
       }
     } catch (e) {
       print("Error marking notification as read: $e");
@@ -50,7 +54,8 @@ class NotificationImplementation extends NotificationRepository {
 
   @override
   Future<bool> deleteNotification(int notificationId) async {
-    final String url = '$baseUrl/delete_notif/$notificationId'; // Adjusted to match Flask API
+    final String url =
+        '$baseUrl/delete_notif/$notificationId'; // Adjusted to match Flask API
 
     try {
       final response = await http.delete(Uri.parse(url));
@@ -58,7 +63,8 @@ class NotificationImplementation extends NotificationRepository {
       if (response.statusCode == 200) {
         return true;
       } else {
-        throw Exception("Failed to delete notification. Status Code: ${response.statusCode}");
+        throw Exception(
+            "Failed to delete notification. Status Code: ${response.statusCode}");
       }
     } catch (e) {
       print("Error deleting notification: $e");
@@ -67,7 +73,8 @@ class NotificationImplementation extends NotificationRepository {
   }
 
   @override
-  Future<bool> sendNotification(int userId, String title, String message, String type) async {
+  Future<bool> sendNotification(
+      int userId, String title, String message, String type) async {
     final String url = '$baseUrl/create_notif'; // Adjusted to match Flask API
 
     try {
@@ -85,7 +92,8 @@ class NotificationImplementation extends NotificationRepository {
       if (response.statusCode == 201) {
         return true;
       } else {
-        throw Exception("Failed to send notification. Status Code: ${response.statusCode}");
+        throw Exception(
+            "Failed to send notification. Status Code: ${response.statusCode}");
       }
     } catch (e) {
       print("Error sending notification: $e");
@@ -95,7 +103,8 @@ class NotificationImplementation extends NotificationRepository {
 
   @override
   Future<int> getUnreadNotificationsCount(int userId) async {
-    final String url = '$baseUrl/unread-count/$userId'; // Adjusted to match Flask API
+    final String url =
+        '$baseUrl/unread-count/$userId'; // Adjusted to match Flask API
 
     try {
       final response = await http.get(Uri.parse(url));
@@ -104,7 +113,8 @@ class NotificationImplementation extends NotificationRepository {
         final data = json.decode(response.body);
         return data['unread_count'];
       } else {
-        throw Exception("Failed to load unread notifications count. Status Code: ${response.statusCode}");
+        throw Exception(
+            "Failed to load unread notifications count. Status Code: ${response.statusCode}");
       }
     } catch (e) {
       print("Error fetching unread notifications count: $e");
@@ -113,8 +123,10 @@ class NotificationImplementation extends NotificationRepository {
   }
 
   @override
-  Future<Map<String, dynamic>> getNewUnreadNotifications(int userId, String lastChecked) async {
-    final String url = '$baseUrl/unread/$userId?last_checked=$lastChecked'; // Adjusted to match Flask API
+  Future<Map<String, dynamic>> getNewUnreadNotifications(
+      int userId, String lastChecked) async {
+    final String url =
+        '$baseUrl/unread/$userId?last_checked=$lastChecked'; // Adjusted to match Flask API
 
     try {
       final response = await http.get(Uri.parse(url));
@@ -129,7 +141,8 @@ class NotificationImplementation extends NotificationRepository {
           'last_checked': data['last_checked'],
         };
       } else {
-        throw Exception("Failed to load new unread notifications. Status Code: ${response.statusCode}");
+        throw Exception(
+            "Failed to load new unread notifications. Status Code: ${response.statusCode}");
       }
     } catch (e) {
       print("Error fetching new unread notifications: $e");
@@ -138,7 +151,8 @@ class NotificationImplementation extends NotificationRepository {
   }
 
   @override
-  Future<bool> broadcastNotification(int userId, String title, String message, String type) async {
+  Future<bool> broadcastNotification(
+      int userId, String title, String message, String type) async {
     final String url = '$baseUrl/broadcast'; // Adjusted to match Flask API
 
     try {
@@ -156,7 +170,38 @@ class NotificationImplementation extends NotificationRepository {
       if (response.statusCode == 201) {
         return true;
       } else {
-        throw Exception("Failed to broadcast notification. Status Code: ${response.statusCode}");
+        throw Exception(
+            "Failed to broadcast notification. Status Code: ${response.statusCode}");
+      }
+    } catch (e) {
+      print("Error broadcasting notification: $e");
+      return false;
+    }
+  }
+
+  @override
+  Future<bool> broadcastNotificationpolicestation(int userId, String title,
+      String policeStationName, String message, String type) async {
+    final String url = '$baseUrl/broadcast'; // Adjusted to match Flask API
+
+    try {
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {"Content-Type": "application/json"},
+        body: json.encode({
+          "user_id": userId,
+          "title": title,
+          "police_station_name": policeStationName,
+          "message": message,
+          "type": type,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        return true;
+      } else {
+        throw Exception(
+            "Failed to broadcast notification. Status Code: ${response.statusCode}");
       }
     } catch (e) {
       print("Error broadcasting notification: $e");

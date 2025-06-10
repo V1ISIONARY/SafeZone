@@ -9,5 +9,8 @@ abstract class NotificationRepository {
   Future<int> getUnreadNotificationsCount(int userId);
   Future<Map<String, dynamic>> getNewUnreadNotifications(
       int userId, String lastChecked);
-  Future<bool> broadcastNotification(int userId, String title, String message, String type);
+  Future<bool> broadcastNotification(
+      int userId, String title, String message, String type);
+  Future<bool> broadcastNotificationpolicestation(int userId, String title,
+      String policeStationName, String message, String type);
 }

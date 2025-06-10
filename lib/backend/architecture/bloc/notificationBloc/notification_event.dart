@@ -60,6 +60,7 @@ class FetchUnreadNotificationsCount extends NotificationEvent {
   @override
   List<Object?> get props => [userId];
 }
+
 class BroadcastNotification extends NotificationEvent {
   final int userId;
   final String title;
@@ -67,6 +68,20 @@ class BroadcastNotification extends NotificationEvent {
   final String type;
 
   BroadcastNotification(this.userId, this.title, this.message, this.type);
+
+  @override
+  List<Object?> get props => [userId, title, message, type];
+}
+
+class BroadcastNotificationPoliceStation extends NotificationEvent {
+  final int userId;
+  final String title;
+  final String message;
+  final String policeStationName;
+  final String type;
+
+  BroadcastNotificationPoliceStation(
+      this.userId, this.title, this.policeStationName, this.message, this.type);
 
   @override
   List<Object?> get props => [userId, title, message, type];

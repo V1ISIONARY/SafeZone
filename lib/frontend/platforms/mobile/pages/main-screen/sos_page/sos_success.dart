@@ -70,6 +70,7 @@ class _SosSuccessState extends State<SosSuccess> {
     if (userId != 0) {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? address = prefs.getString('currentAddress');
+      String policeStationName = prefs.getString('nearest_station_name') ?? "";
       print(address);
       print(address);
       print(address);
@@ -79,6 +80,14 @@ class _SosSuccessState extends State<SosSuccess> {
             BroadcastNotification(
                 userId, // Use the stored user ID
                 "Emergency Alert",
+                "$fullName has triggered an SOS alert! - Location: $address",
+                "SOS"),
+          );
+      context.read<NotificationBloc>().add(
+            BroadcastNotificationPoliceStation(
+                userId, // Use the stored user ID
+                "Emergency Alert",
+                policeStationName,
                 "$fullName has triggered an SOS alert! - Location: $address",
                 "SOS"),
           );
