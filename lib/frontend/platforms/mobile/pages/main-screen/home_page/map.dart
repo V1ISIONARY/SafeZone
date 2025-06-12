@@ -28,6 +28,8 @@ import 'package:safezone/backend/models/userModel/circle_model.dart';
 import 'package:safezone/backend/services/first_run_service.dart';
 import 'package:safezone/frontend/platforms/mobile/pages/authentication/account_details.dart';
 import 'package:safezone/frontend/platforms/mobile/widgets/Dialogs/dialogs.dart';
+import 'package:safezone/frontend/platforms/mobile/widgets/bottomsheet/dangerzoneBottomSheet.dart';
+import 'package:safezone/frontend/platforms/mobile/widgets/bottomsheet/safezoneBottomSheet.dart';
 import 'package:safezone/frontend/platforms/mobile/widgets/loadingstate.dart';
 import 'package:safezone/frontend/utils/marker_utils.dart';
 import 'package:safezone/frontend/utils/safezone_navigator.dart';
@@ -725,6 +727,9 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
             infoWindow: InfoWindow(
               title: dangerZone.name,
             ),
+            onTap: () {
+              showDangerZoneBottomSheet(dangerZone, context);
+            },
           ),
         );
         circles.add(
@@ -751,8 +756,10 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
             position: LatLng(safeZone.latitude!, safeZone.longitude!),
             infoWindow: InfoWindow(
               title: safeZone.name,
-              snippet: safeZone.description,
             ),
+            onTap: () {
+              showSafeZoneBottomSheet(safeZone, context);
+            },
           ),
         );
         circles.add(
@@ -770,6 +777,8 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
 
     return markers;
   }
+
+  
 
   Future<SafeZoneModel?> getNearestStation(LatLng currentPosition) async {
     double minDistance = double.infinity;

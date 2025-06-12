@@ -24,12 +24,16 @@ void showCreateReportDialog(BuildContext context) {
               const SizedBox(height: 10),
               CategoryText(text: "Report an Incident"),
               const SizedBox(height: 5),
-              CategoryDescripText(text: "Report any incidents or unsafe situations to help keep you\nand others safe", alignment: 'center'),
+              CategoryDescripText(
+                  text:
+                      "Report any incidents or unsafe situations to help keep you\nand others safe",
+                  alignment: 'center'),
               const SizedBox(height: 20),
               CustomButton(
                 text: "Create Report",
                 onPressed: () {
                   context.push('/create-report');
+                  Navigator.pop(context);
                 },
                 width: 150,
                 height: 40,
@@ -67,12 +71,17 @@ void showMarkSafeDialog(BuildContext context) {
               const SizedBox(height: 10),
               CategoryText(text: "Mark this place safe"),
               const SizedBox(height: 5),
-              CategoryDescripText(text: "Are you sure this location is safe? Marking it as safe\nwill help others.", alignment: "center",),
+              CategoryDescripText(
+                text:
+                    "Are you sure this location is safe? Marking it as safe\nwill help others.",
+                alignment: "center",
+              ),
               const SizedBox(height: 20),
               CustomButton(
                 text: "Create safe zone",
                 onPressed: () {
                   context.push('/mark-safe-zone');
+                  Navigator.pop(context);
                 },
                 width: 150,
                 height: 40,
