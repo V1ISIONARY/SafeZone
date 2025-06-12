@@ -298,23 +298,30 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     int? userId = prefs.getInt('id');
     int? circleId = prefs.getInt('circle');
-    profilePictureUrl = prefs.getString('profile_picture_url') ??
-        'https://storage.googleapis.com/safezone-11724.firebasestorage.app/profile_pictures/2.jpg';
+
+    final loadedUrl = prefs.getString('profile_picture_url');
+    print('Loaded profile URL: $loadedUrl');
+
+    profilePictureUrl = loadedUrl?.isNotEmpty == true
+        ? loadedUrl!
+        : 'https://storage.googleapis.com/safezone-11724.firebasestorage.app/profile_pictures/2.jpg';
 
     if (userId != null) {
       setState(() {
         _userId = userId;
       });
+
       context.read<CircleBloc>().add(FetchCirclesEvent(userId: userId));
       if (circleId != null) {
         context.read<CircleBloc>().add(FetchMembersEvent(circleId: circleId));
       }
     }
 
+    await _createCustomMarker();
+
     context.read<CircleBloc>().stream.listen((state) {
       if (state is CircleMembersLoadedState) {
         context.read<MapBloc>().add(FetchMapData());
-
         context
             .read<MapBloc>()
             .add(ListenForMemberLocations(state.members, _userId!));
@@ -577,8 +584,8 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
 
   Future<void> _createCustomMarker() async {
     try {
-      customMarker =
-          await MarkerUtils.createCustomMarker(context, widgetPricolor, profilePictureUrl);
+      customMarker = await MarkerUtils.createCustomMarker(
+          context, widgetPricolor, profilePictureUrl);
       customDangerZoneMarker = await MarkerUtils.resizeMarker(
         'lib/resource/image/png/dangerzonee.png',
         48,

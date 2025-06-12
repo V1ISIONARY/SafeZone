@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -21,73 +22,90 @@ class MarkerUtils {
   }
 
   static Future<BitmapDescriptor> createCustomMarker(
-      BuildContext context, Color widgetColor, String profilePictureUrl) async {
-    final ui.PictureRecorder pictureRecorder = ui.PictureRecorder();
-    final Canvas canvas = Canvas(pictureRecorder);
+    BuildContext context,
+    Color widgetColor,
+    String profilePictureUrl,
+  ) async {
+    try {
+      final ui.PictureRecorder pictureRecorder = ui.PictureRecorder();
+      final Canvas canvas = Canvas(pictureRecorder);
 
-    const double pinWidth = 100;
-    const double pinHeight = 160;
-    const double circleRadius = 40; // Radius of the circle
-    const double textSize = 30;
+      const double pinWidth = 100;
+      const double pinHeight = 160;
+      const double circleRadius = 40;
+      const Offset circleCenter = Offset(pinWidth / 2, pinHeight / 3);
 
-    // Draw the pin shape
-    final Paint pinPaint = Paint()..color = widgetColor;
-    final Path pinPath = Path()
-      ..moveTo(pinWidth / 2, pinHeight)
-      ..quadraticBezierTo(0, pinHeight * 0.75, 0, pinHeight / 3)
-      ..arcToPoint(
-        const Offset(pinWidth, pinHeight / 3),
-        radius: const Radius.circular(pinWidth / 4),
-        clockwise: true,
-      )
-      ..quadraticBezierTo(pinWidth, pinHeight * 0.75, pinWidth / 2, pinHeight)
-      ..close();
+      final Paint pinPaint = Paint()..color = widgetColor;
+      final Path pinPath = Path()
+        ..moveTo(pinWidth / 2, pinHeight)
+        ..quadraticBezierTo(0, pinHeight * 0.75, 0, pinHeight / 3)
+        ..arcToPoint(
+          const Offset(pinWidth, pinHeight / 3),
+          radius: const Radius.circular(pinWidth / 4),
+          clockwise: true,
+        )
+        ..quadraticBezierTo(pinWidth, pinHeight * 0.75, pinWidth / 2, pinHeight)
+        ..close();
+      canvas.drawPath(pinPath, pinPaint);
 
-    canvas.drawPath(pinPath, pinPaint);
+      final Paint circlePaint = Paint()..color = const Color(0xFFF0EEEE);
+      canvas.drawCircle(circleCenter, circleRadius, circlePaint);
 
-    // Draw the light pink circle
-    final Paint circlePaint = Paint()
-      ..color = const ui.Color.fromARGB(255, 240, 238, 238); // Light pink color
-    const Offset circleCenter =
-        Offset(pinWidth / 2, pinHeight / 3); // Center of the circle
-    canvas.drawCircle(circleCenter, circleRadius, circlePaint);
+      ui.Image profileImage;
 
-    // Draw the text "you"
-    final TextPainter textPainter = TextPainter(
-      text: const TextSpan(
-        text: "You",
-        style: TextStyle(
-          color: ui.Color.fromARGB(255, 71, 71, 71),
-          fontSize: textSize,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-      textDirection: TextDirection.ltr,
-    );
+      try {
+        final Completer<ui.Image> completer = Completer();
+        final ImageStream stream =
+            NetworkImage(profilePictureUrl).resolve(const ImageConfiguration());
 
-    // Layout the text
-    textPainter.layout();
+        final listener = ImageStreamListener((info, _) {
+          completer.complete(info.image);
+        }, onError: (error, stackTrace) {
+          completer.completeError(error);
+        });
 
-    // Calculate the position to center the text within the circle
-    final double textX = circleCenter.dx - (textPainter.width / 2);
-    final double textY = circleCenter.dy - (textPainter.height / 2);
-
-    // Draw the text on the canvas
-    textPainter.paint(canvas, Offset(textX, textY));
-
-    // Convert the canvas to an image
-    final ui.Image markerImage = await pictureRecorder.endRecording().toImage(
-          pinWidth.toInt(),
-          pinHeight.toInt(),
+        stream.addListener(listener);
+        profileImage = await completer.future.timeout(
+          const Duration(seconds: 5),
+          onTimeout: () => throw Exception("Network image timeout"),
         );
+        stream.removeListener(listener);
+      } catch (e) {
+        print('dis should show the url $profilePictureUrl');
+        print('⚠️ Failed to load network image, using local asset. $e');
+        final ByteData bytes =
+            await rootBundle.load('lib/resource/image/jpg/profile.jpg');
+        final codec =
+            await ui.instantiateImageCodec(bytes.buffer.asUint8List());
+        final frame = await codec.getNextFrame();
+        profileImage = frame.image;
+      }
 
-    // Convert the image to bytes
-    final ByteData? byteData = await markerImage.toByteData(
-      format: ui.ImageByteFormat.png,
-    );
-    final Uint8List imageData = byteData!.buffer.asUint8List();
+      final Path clipPath = Path()
+        ..addOval(Rect.fromCircle(center: circleCenter, radius: circleRadius));
 
-    // Return the custom marker as a BitmapDescriptor
-    return BitmapDescriptor.fromBytes(imageData);
+      canvas.save();
+      canvas.clipPath(clipPath);
+
+      paintImage(
+        canvas: canvas,
+        image: profileImage,
+        rect: Rect.fromCircle(center: circleCenter, radius: circleRadius),
+        fit: BoxFit.cover,
+      );
+
+      canvas.restore(); 
+
+      final ui.Image finalImage = await pictureRecorder
+          .endRecording()
+          .toImage(pinWidth.toInt(), pinHeight.toInt());
+      final ByteData? byteData =
+          await finalImage.toByteData(format: ui.ImageByteFormat.png);
+
+      return BitmapDescriptor.fromBytes(byteData!.buffer.asUint8List());
+    } catch (e) {
+      print('❌ Error creating marker: $e');
+      return BitmapDescriptor.defaultMarker; 
+    }
   }
 }
