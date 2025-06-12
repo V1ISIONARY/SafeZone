@@ -2,6 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:safezone/backend/architecture/bloc/authBloc/auth_event.dart';
+import 'package:safezone/frontend/platforms/mobile/widgets/bottomsheet/uploadProfilePicture.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../../backend/architecture/bloc/authBloc/auth_bloc.dart';
@@ -16,7 +17,9 @@ class AccountDetails extends StatefulWidget {
 
 class _AccountDetailsState extends State<AccountDetails> {
   String username = '';
+  int user_id = 0; 
   String email = '';
+  String profilePictureUrl = '';
   String firstName = '';
   String lastName = '';
   String phone = '';
@@ -30,9 +33,12 @@ class _AccountDetailsState extends State<AccountDetails> {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
       username = prefs.getString('username') ?? 'User';
+      user_id = prefs.getInt('id') ?? 0;
       password = prefs.getString('password') ?? '*****';
       phone = prefs.getString('phone') ?? 'Phone Number not set';
       email = prefs.getString('email') ?? 'user@example.com';
+      profilePictureUrl = prefs.getString('profile_picture_url') ??
+          'https://storage.googleapis.com/safezone-11724.firebasestorage.app/profile_pictures/2.jpg';
       firstName = prefs.getString('first_name') ?? 'First Name';
       lastName = prefs.getString('last_name') ?? 'Last Name';
       address = prefs.getString('address') ?? 'Address not set';
@@ -40,6 +46,8 @@ class _AccountDetailsState extends State<AccountDetails> {
       isGirl = prefs.getBool('is_girl') ?? false;
       isVerified = prefs.getBool('is_verified') ?? false;
     });
+
+    print('profile piccccccc $profilePictureUrl');
   }
 
   @override
@@ -68,27 +76,27 @@ class _AccountDetailsState extends State<AccountDetails> {
                 children: [
                   TextField(
                     controller: currentPasswordController,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       labelText: 'Current Password',
                       border: OutlineInputBorder(),
                       suffixIcon: Icon(Icons.lock),
                     ),
                     obscureText: true,
                   ),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
                   TextField(
                     controller: newPasswordController,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       labelText: 'New Password',
                       border: OutlineInputBorder(),
                       suffixIcon: Icon(Icons.lock_outline),
                     ),
                     obscureText: true,
                   ),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
                   TextField(
                     controller: confirmNewPasswordController,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       labelText: 'Confirm New Password',
                       border: OutlineInputBorder(),
                       suffixIcon: Icon(Icons.lock_outline),
@@ -96,10 +104,10 @@ class _AccountDetailsState extends State<AccountDetails> {
                     obscureText: true,
                   ),
                   if (errorMessage != null) ...[
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
                     Text(
                       errorMessage!,
-                      style: TextStyle(color: Colors.red),
+                      style: const TextStyle(color: Colors.red),
                     ),
                   ],
                 ],
@@ -173,17 +181,17 @@ class _AccountDetailsState extends State<AccountDetails> {
             child: const Icon(Icons.arrow_back, color: Colors.black, size: 10),
           ),
         ),
-        title: CategoryText(text: "Account Details"),
+        title: const CategoryText(text: "Account Details"),
       ),
       body: Container(
-        margin: EdgeInsets.symmetric(horizontal: 15),
+        margin: const EdgeInsets.symmetric(horizontal: 15),
         child: ListView(
           children: [
             Container(
               width: double.infinity,
               height: 250,
               decoration: BoxDecoration(
-                color: Color.fromARGB(255, 240, 240, 240),
+                color: const Color.fromARGB(255, 240, 240, 240),
                 borderRadius: BorderRadius.circular(5),
               ),
               child: Center(
@@ -191,22 +199,57 @@ class _AccountDetailsState extends State<AccountDetails> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Container(
-                      height: 100,
-                      width: 100,
-                      decoration: BoxDecoration(
-                        color: Colors.black38,
-                        shape: BoxShape.circle,
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(50),
-                        child: Image.asset(
-                          'lib/resource/image/png/profile.jpg',
-                          fit: BoxFit.cover,
+                    Stack(
+                      children: [
+                        Container(
+                          height: 100,
+                          width: 100,
+                          decoration: const BoxDecoration(
+                            color: Colors.black38,
+                            shape: BoxShape.circle,
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(50),
+                            child: profilePictureUrl.isNotEmpty
+                                ? Image.network(
+                                    profilePictureUrl,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return Image.asset(
+                                        'lib/resource/image/jpg/profile.jpg',
+                                        fit: BoxFit.cover,
+                                      );
+                                    },
+                                  )
+                                : Image.asset(
+                                    'lib/resource/image/jpg/profile.jpg',
+                                    fit: BoxFit.cover,
+                                  ),
+                          ),
                         ),
-                      ),
+                        Positioned(
+                          bottom: 0,
+                          right: 0,
+                          child: GestureDetector(
+                            onTap: () =>
+                                showUploadPictureBottomSheet(context, user_id),
+                            child: Container(
+                              decoration: const BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.white,
+                              ),
+                              padding: const EdgeInsets.all(5),
+                              child: const Icon(
+                                Icons.camera_alt,
+                                size: 20,
+                                color: Colors.black,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
                     CategoryText(text: "$firstName $lastName"),
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -220,8 +263,8 @@ class _AccountDetailsState extends State<AccountDetails> {
                             color: widgetPricolor,
                           ),
                         ),
-                        SizedBox(width: 5),
-                        CategoryDescripText(text: "Verified at Safezone"),
+                        const SizedBox(width: 5),
+                        const CategoryDescripText(text: "Verified at Safezone"),
                       ],
                     ),
                   ],
@@ -231,12 +274,12 @@ class _AccountDetailsState extends State<AccountDetails> {
 
             // Credentials Section
             Padding(
-              padding: EdgeInsets.symmetric(vertical: 15),
+              padding: const EdgeInsets.symmetric(vertical: 15),
               child: SizedBox(
                 width: double.infinity,
                 child: Stack(
                   children: [
-                    CategoryText(text: 'Credentials'),
+                    const CategoryText(text: 'Credentials'),
                     Positioned(
                       right: 0,
                       top: 0,
@@ -261,11 +304,11 @@ class _AccountDetailsState extends State<AccountDetails> {
             Container(
               width: double.infinity,
               decoration: BoxDecoration(
-                color: Color.fromARGB(255, 245, 245, 245),
+                color: const Color.fromARGB(255, 245, 245, 245),
                 borderRadius: BorderRadius.circular(5),
               ),
               child: Container(
-                margin: EdgeInsets.only(left: 10, right: 10),
+                margin: const EdgeInsets.only(left: 10, right: 10),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -274,7 +317,7 @@ class _AccountDetailsState extends State<AccountDetails> {
                       svgIcon: "lib/resource/svg/password.svg",
                       data: password,
                     ),
-                    Divider(height: 0.5, color: Colors.white),
+                    const Divider(height: 0.5, color: Colors.white),
                     // AccountDisplay(
                     //   title: "Phone",
                     //   svgIcon: "lib/resource/svg/phone.svg",
@@ -286,7 +329,7 @@ class _AccountDetailsState extends State<AccountDetails> {
                       svgIcon: "lib/resource/svg/mail.svg",
                       data: email,
                     ),
-                    Divider(height: 0.5, color: Colors.white),
+                    const Divider(height: 0.5, color: Colors.white),
                     AccountDisplay(
                       title: "Location",
                       svgIcon: "lib/resource/svg/location.svg",

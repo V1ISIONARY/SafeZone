@@ -138,6 +138,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
 
   List<CircleModel> _circles = [];
   int? _userId;
+  String profilePictureUrl = '';
   int _currentHintIndex = 0;
   LatLng? _currentUserLocation;
   StreamSubscription? _locationSubscription;
@@ -297,6 +298,8 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     int? userId = prefs.getInt('id');
     int? circleId = prefs.getInt('circle');
+    profilePictureUrl = prefs.getString('profile_picture_url') ??
+        'https://storage.googleapis.com/safezone-11724.firebasestorage.app/profile_pictures/2.jpg';
 
     if (userId != null) {
       setState(() {
@@ -575,7 +578,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
   Future<void> _createCustomMarker() async {
     try {
       customMarker =
-          await MarkerUtils.createCustomMarker(context, widgetPricolor);
+          await MarkerUtils.createCustomMarker(context, widgetPricolor, profilePictureUrl);
       customDangerZoneMarker = await MarkerUtils.resizeMarker(
         'lib/resource/image/png/dangerzonee.png',
         48,
@@ -777,8 +780,6 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
 
     return markers;
   }
-
-  
 
   Future<SafeZoneModel?> getNearestStation(LatLng currentPosition) async {
     double minDistance = double.infinity;
@@ -1230,12 +1231,28 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                             ],
                                           ),
                                           child: Center(
-                                              child: ClipRRect(
-                                                  borderRadius:
-                                                      BorderRadius.circular(10),
-                                                  child: Image.asset(
-                                                    'lib/resource/image/jpg/profile.jpg',
-                                                  ))))),
+                                            child: ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                              child: profilePictureUrl
+                                                      .isNotEmpty
+                                                  ? Image.network(
+                                                      profilePictureUrl,
+                                                      fit: BoxFit.cover,
+                                                      errorBuilder: (context,
+                                                          error, stackTrace) {
+                                                        return Image.asset(
+                                                          'lib/resource/image/jpg/profile.jpg',
+                                                          fit: BoxFit.cover,
+                                                        );
+                                                      },
+                                                    )
+                                                  : Image.asset(
+                                                      'lib/resource/image/jpg/profile.jpg',
+                                                      fit: BoxFit.cover,
+                                                    ),
+                                            ),
+                                          ))),
                                   SizedBox(width: 10),
                                   Expanded(
                                       child: GestureDetector(

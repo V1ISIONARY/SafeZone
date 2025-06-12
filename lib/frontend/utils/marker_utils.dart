@@ -21,7 +21,7 @@ class MarkerUtils {
   }
 
   static Future<BitmapDescriptor> createCustomMarker(
-      BuildContext context, Color widgetColor) async {
+      BuildContext context, Color widgetColor, String profilePictureUrl) async {
     final ui.PictureRecorder pictureRecorder = ui.PictureRecorder();
     final Canvas canvas = Canvas(pictureRecorder);
 

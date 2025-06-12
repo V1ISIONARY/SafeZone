@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:safezone/backend/models/userModel/profile_model.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:safezone/backend/repository/profileApi/profile_repo.dart';
+import 'package:mime/mime.dart';
 
 class ProfileImplementation extends ProfileRepository {
   static String baseUrl = '${dotenv.env['API_URL']}/profile';
@@ -57,29 +58,38 @@ class ProfileImplementation extends ProfileRepository {
     final String url = '$baseUrl/upload-profile-picture';
 
     try {
+      final stream = http.ByteStream(imageFile.openRead());
+      final length = await imageFile.length();
+
+      final fileName = imageFile.path.split('/').last;
+
       var request = http.MultipartRequest("POST", Uri.parse(url));
       request.fields["user_id"] = userId.toString();
 
-      // Attach the image file
-      request.files.add(
-        await http.MultipartFile.fromPath(
-          "file",
-          imageFile.path,
-          contentType: MediaType('image', 'jpeg'), // Adjust if necessary
-        ),
+      var multipartFile = http.MultipartFile(
+        'file',
+        stream,
+        length,
+        filename: fileName,
       );
+
+      request.files.add(multipartFile);
 
       var response = await request.send();
       var responseData = await http.Response.fromStream(response);
+
+      print("Profile Upload Response Code: ${response.statusCode}");
+      print("Profile Upload Body: ${responseData.body} for user $userId");
 
       if (response.statusCode == 200) {
         final jsonData = json.decode(responseData.body);
         return jsonData["profile_picture_url"];
       } else {
-        throw Exception("Failed to upload profile picture.");
+        throw Exception(
+            "Failed to upload profile picture. ${response.statusCode}");
       }
     } catch (e) {
-      print("Error uploading profile picture: $e");
+      print("Error uploading profile picture eyyy: $e");
       return null;
     }
   }

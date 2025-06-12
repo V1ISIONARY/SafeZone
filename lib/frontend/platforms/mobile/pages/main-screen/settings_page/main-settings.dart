@@ -20,6 +20,7 @@ class _SettingsState extends State<Settings> {
   bool isToggled = false;
   int selectedItem = 0;
   bool? isAdmin;
+  String profilePictureUrl = '';
 
   Future<String> _getUserName() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -35,6 +36,15 @@ class _SettingsState extends State<Settings> {
         : '';
 
     return '$formattedFirstName $formattedLastName'.trim();
+  }
+
+  Future<void> loadUserProfile() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      profilePictureUrl = prefs.getString('profile_picture_url') ??
+          'https://storage.googleapis.com/safezone-11724.firebasestorage.app/profile_pictures/2.jpg';
+    });
+    print('profile piccccccc $profilePictureUrl');
   }
 
   Future<void> _saveMapType(int index) async {
@@ -75,6 +85,7 @@ class _SettingsState extends State<Settings> {
   @override
   void initState() {
     super.initState();
+    loadUserProfile();
     _loadAdminStatus();
     _loadSelectedMapType();
   }
@@ -121,18 +132,32 @@ class _SettingsState extends State<Settings> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Container(
-                                  width: 130,
-                                  height: 130,
-                                  color: Colors.white,
-                                  child: ClipRRect(
-                                      borderRadius: const BorderRadius.only(
-                                        bottomLeft: Radius.circular(10),
-                                        topLeft: Radius.circular(10),
-                                      ),
-                                      child: Image.asset(
-                                        'lib/resource/images/profile.jpg',
-                                        fit: BoxFit.cover,
-                                      ))),
+                                width: 130,
+                                height: 130,
+                                color: Colors.white,
+                                child: ClipRRect(
+                                  borderRadius: const BorderRadius.only(
+                                    bottomLeft: Radius.circular(10),
+                                    topLeft: Radius.circular(10),
+                                  ),
+                                  child: profilePictureUrl.isNotEmpty
+                                      ? Image.network(
+                                          profilePictureUrl,
+                                          fit: BoxFit.cover,
+                                          errorBuilder:
+                                              (context, error, stackTrace) {
+                                            return Image.asset(
+                                              'lib/resource/image/jpg/profile.jpg',
+                                              fit: BoxFit.cover,
+                                            );
+                                          },
+                                        )
+                                      : Image.asset(
+                                          'lib/resource/image/jpg/profile.jpg',
+                                          fit: BoxFit.cover,
+                                        ),
+                                ),
+                              ),
                               Container(
                                 width: 150,
                                 height: 130,
@@ -305,8 +330,7 @@ class _SettingsState extends State<Settings> {
                         child: Container(
                           width: 130,
                           height: 130,
-                          child:
-                              SvgPicture.asset('lib/resource/svg/lines.svg'),
+                          child: SvgPicture.asset('lib/resource/svg/lines.svg'),
                         ))
                   ]),
                 ),
@@ -359,11 +383,11 @@ class _SettingsState extends State<Settings> {
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: [
                               _buildItem(0, 'Default',
-                                  'lib/resource/images/terrain.png'),
+                                  'lib/resource/image/png/terrain.png'),
                               _buildItem(1, 'Satellite',
-                                  'lib/resource/images/satellite.png'),
+                                  'lib/resource/image/png/satellite.png'),
                               _buildItem(2, 'Terrain',
-                                  'lib/resource/images/terrain.png'),
+                                  'lib/resource/image/png/terrain.png'),
                             ],
                           ),
                         ),
@@ -420,7 +444,8 @@ class _SettingsState extends State<Settings> {
                         replace: true,
                         onTap: () async {
                           NotificationPollingService().stopPolling();
-                          final SharedPreferences prefs = await SharedPreferences.getInstance();
+                          final SharedPreferences prefs =
+                              await SharedPreferences.getInstance();
                           Map<String, bool> firstRunFlags = {};
                           for (String key in prefs.getKeys()) {
                             if (key.startsWith('isFirstRunFlag_')) {

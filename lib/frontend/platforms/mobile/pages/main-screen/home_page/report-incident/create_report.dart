@@ -493,13 +493,13 @@ class _CreateReportState extends State<CreateReport> {
                       const Align(
                         alignment: Alignment.centerLeft,
                         child: CategoryText(
-                            text: "Safe Zone Title:", alignment: 'start'),
+                            text: "Incident Report Title:", alignment: 'start'),
                       ),
                       const SizedBox(height: 15),
                       TextFieldWidget.buildTextField(
                         controller: _nameController,
                         label: "Title",
-                        hint: "Enter safe zone title",
+                        hint: "Enter incident report title",
                         maxLines: 5,
                       ),
                       const SizedBox(height: 5),
