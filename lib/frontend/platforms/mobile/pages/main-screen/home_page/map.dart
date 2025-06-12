@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:io';
 import 'dart:ui' as ui;
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_places_flutter/model/prediction.dart';
@@ -608,14 +610,14 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
   Future<void> _preloadMemberMarkers(List<Map<String, dynamic>> members) async {
     for (var member in members) {
       String userId = member['user_id'].toString();
-      String name = member['first_name'];
-      String firstLetter = name.isNotEmpty ? name[0] : '';
+      String? profileUrl = member['profile_picture'];
 
       if (userId == _userId.toString()) {
         continue;
       }
 
-      BitmapDescriptor marker = await _loadCustomMemberMarker(firstLetter);
+      BitmapDescriptor marker =
+          await MarkerUtils.loadMemberProfileMarker(profileUrl);
       memberMarkers[userId] = marker;
     }
   }
@@ -638,51 +640,6 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
         ),
       );
     });
-  }
-
-  Future<BitmapDescriptor> _loadCustomMemberMarker(String letter) async {
-    ByteData data =
-        await rootBundle.load('lib/resource/image/png/marker_member.png');
-    ui.Codec codec = await ui.instantiateImageCodec(
-      data.buffer.asUint8List(),
-      targetWidth: 100,
-      targetHeight: 110,
-    );
-    ui.FrameInfo frameInfo = await codec.getNextFrame();
-    ui.Image originalImage = frameInfo.image;
-
-    final ui.PictureRecorder pictureRecorder = ui.PictureRecorder();
-    final Canvas canvas = Canvas(pictureRecorder);
-    final Paint paint = Paint();
-
-    canvas.drawImage(originalImage, const Offset(0, 0), paint);
-
-    final TextPainter textPainter = TextPainter(
-      text: TextSpan(
-        text: letter,
-        style: const TextStyle(
-          color: ui.Color.fromARGB(255, 71, 71, 71),
-          fontSize: 100 * 0.35,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-      textDirection: TextDirection.ltr,
-    );
-    textPainter.layout();
-
-    double dx = (100 - textPainter.width) / 2;
-    double dy = (110 - textPainter.height) / 2 - (110 * 0.1);
-
-    textPainter.paint(canvas, Offset(dx, dy));
-
-    final ui.Image finalImage =
-        await pictureRecorder.endRecording().toImage(100, 110);
-
-    ByteData? byteData =
-        await finalImage.toByteData(format: ui.ImageByteFormat.png);
-    Uint8List resizedData = byteData!.buffer.asUint8List();
-
-    return BitmapDescriptor.fromBytes(resizedData);
   }
 
   Set<Marker> _createMarkers(MapState state) {
@@ -1082,7 +1039,10 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                       ),
                     );
                   } else if (state is MapDataLoaded) {
-                    _preloadMemberMarkers(state.members);
+                    () async {
+                      await _preloadMemberMarkers(state.members);
+                      setState(() {}); // or update the markers on the map
+                    }();
                   } else if (state is MapError) {
                     return Center(child: Text(state.message));
                   }
@@ -1243,16 +1203,20 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                                   BorderRadius.circular(10),
                                               child: profilePictureUrl
                                                       .isNotEmpty
-                                                  ? Image.network(
-                                                      profilePictureUrl,
-                                                      fit: BoxFit.cover,
-                                                      errorBuilder: (context,
-                                                          error, stackTrace) {
-                                                        return Image.asset(
-                                                          'lib/resource/image/jpg/profile.jpg',
-                                                          fit: BoxFit.cover,
-                                                        );
-                                                      },
+                                                  ? Container(
+                                                      width: 35,
+                                                      height: 35,
+                                                      child: Image.network(
+                                                        profilePictureUrl,
+                                                        fit: BoxFit.cover,
+                                                        errorBuilder: (context,
+                                                            error, stackTrace) {
+                                                          return Image.asset(
+                                                            'lib/resource/image/jpg/profile.jpg',
+                                                            fit: BoxFit.cover,
+                                                          );
+                                                        },
+                                                      ),
                                                     )
                                                   : Image.asset(
                                                       'lib/resource/image/jpg/profile.jpg',

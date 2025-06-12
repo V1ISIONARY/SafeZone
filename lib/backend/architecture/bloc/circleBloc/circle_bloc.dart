@@ -43,7 +43,8 @@ class CircleBloc extends Bloc<CircleEvent, CircleState> {
         );
         emit(CircleUpdatedState(message: 'Joining Group successfully'));
       } catch (e) {
-        emit(CircleAddMemberErrorState(message: 'Error Joining Group: ${e.toString()}'));
+        emit(CircleAddMemberErrorState(
+            message: 'Error Joining Group: ${e.toString()}'));
       }
     });
 
@@ -73,23 +74,25 @@ class CircleBloc extends Bloc<CircleEvent, CircleState> {
     });
 
     // Fetch members of a circle
-on<FetchMembersEvent>((event, emit) async {
-  if (state is CircleLoadingState) {
-    print("FetchMembersEvent already in progress, skipping duplicate call.");
-    return;
-  }
+    on<FetchMembersEvent>((event, emit) async {
+      if (state is CircleLoadingState) {
+        print(
+            "FetchMembersEvent already in progress, skipping duplicate call.");
+        return;
+      }
 
-  emit(CircleLoadingState());
-  try {
-    final members = await _circleImplementation.viewMembers(event.circleId);
-    print("Fetched Members for Circle ID: ${event.circleId}");
-    print("Raw API Response: $event.circleId $event.circleId$event.circleId$event.circleId$event.circleId$event.circleId$event.circleId$event.circleId$event.circleId$event.circleId$event.circleId  $members");
-
-    emit(CircleMembersLoadedState(members: members));
-  } catch (e) {
-    emit(CircleErrorState(message: 'Error fetching members: ${e.toString()}'));
-  }
-});
+      emit(CircleLoadingState());
+      try {
+        final members = await _circleImplementation.viewMembers(event.circleId);
+        print("Fetched Members for Circle ID: ${event.circleId}");
+        print(
+            "Raw API Response: $event.circleId $event.circleId$event.circleId$event.circleId$event.circleId$event.circleId$event.circleId$event.circleId$event.circleId$event.circleId$event.circleId  $members");
+        emit(CircleMembersLoadedState(members: members));
+      } catch (e) {
+        emit(CircleErrorState(
+            message: 'Error fetching members: ${e.toString()}'));
+      }
+    });
 
 // Generate a circle code
     on<GenerateCodeEvent>((event, emit) async {
@@ -123,8 +126,8 @@ on<FetchMembersEvent>((event, emit) async {
           circleId: event.circleId, isActive: event.isActive));
 
       try {
-        await _circleImplementation.activeCircle(event.userId,
-            event.circleId, event.isActive);
+        await _circleImplementation.activeCircle(
+            event.userId, event.circleId, event.isActive);
         emit(CircleActiveChangedState(
             circleId: event.circleId, isActive: event.isActive));
       } catch (e) {

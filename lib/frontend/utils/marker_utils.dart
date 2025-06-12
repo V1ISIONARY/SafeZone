@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:io';
 import 'dart:ui' as ui;
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -94,7 +96,7 @@ class MarkerUtils {
         fit: BoxFit.cover,
       );
 
-      canvas.restore(); 
+      canvas.restore();
 
       final ui.Image finalImage = await pictureRecorder
           .endRecording()
@@ -105,7 +107,81 @@ class MarkerUtils {
       return BitmapDescriptor.fromBytes(byteData!.buffer.asUint8List());
     } catch (e) {
       print('❌ Error creating marker: $e');
-      return BitmapDescriptor.defaultMarker; 
+      return BitmapDescriptor.defaultMarker;
     }
+  }
+
+  static Future<BitmapDescriptor> loadMemberProfileMarker(
+      String? imageUrl) async {
+    // Load marker background
+    ByteData baseData =
+        await rootBundle.load('lib/resource/image/png/marker_member.png');
+    ui.Codec baseCodec = await ui.instantiateImageCodec(
+      baseData.buffer.asUint8List(),
+      targetWidth: 100,
+      targetHeight: 114,
+    );
+    ui.FrameInfo baseFrame = await baseCodec.getNextFrame();
+    ui.Image baseImage = baseFrame.image;
+
+    // Load profile picture
+    ui.Image profileImage;
+    try {
+      final Uri? uri = Uri.tryParse(imageUrl ?? '');
+      if (uri != null && uri.hasAbsolutePath) {
+        final httpClient = HttpClient();
+        final request = await httpClient.getUrl(uri);
+        final response = await request.close();
+
+        if (response.statusCode == 200) {
+          final bytes = await consolidateHttpClientResponseBytes(response);
+          final codec = await ui.instantiateImageCodec(bytes,
+              targetWidth: 95, targetHeight: 95);
+          final frame = await codec.getNextFrame();
+          profileImage = frame.image;
+        } else {
+          throw Exception('Image load failed');
+        }
+      } else {
+        throw Exception('Invalid URL');
+      }
+    } catch (_) {
+      ByteData fallback =
+          await rootBundle.load('lib/resource/image/jpg/profile.jpg');
+      final codec = await ui.instantiateImageCodec(
+          fallback.buffer.asUint8List(),
+          targetWidth: 95,
+          targetHeight: 95);
+      final frame = await codec.getNextFrame();
+      profileImage = frame.image;
+    }
+
+    // Draw marker with profile image
+    final recorder = ui.PictureRecorder();
+    final canvas = Canvas(recorder);
+    final paint = Paint();
+
+    // Draw the marker background
+    canvas.drawImage(baseImage, Offset.zero, paint);
+
+    const Rect imageRect = Rect.fromLTWH(10, 10, 80, 70); // position and size
+    final RRect roundedRect =
+        RRect.fromRectAndRadius(imageRect, const Radius.circular(10));
+
+    canvas.save();
+    canvas.clipRRect(roundedRect);
+
+    paintImage(
+      canvas: canvas,
+      image: profileImage,
+      rect: imageRect,
+      fit: BoxFit.cover,
+    );
+    canvas.restore();
+
+    final image = await recorder.endRecording().toImage(100, 110);
+    final bytes = await image.toByteData(format: ui.ImageByteFormat.png);
+
+    return BitmapDescriptor.fromBytes(bytes!.buffer.asUint8List());
   }
 }

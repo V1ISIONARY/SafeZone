@@ -24,8 +24,8 @@ class ListOfMembers extends StatefulWidget {
 class _ListOfMembersState extends State<ListOfMembers> {
   List<Map<String, dynamic>> members = [];
   bool isLoading = true;
-  int? _userId; 
-  CircleModel? _updatedCircleInfo; 
+  int? _userId;
+  CircleModel? _updatedCircleInfo;
 
   bool _showTitle = false;
   double _appBarHeight = 0;
@@ -60,8 +60,7 @@ class _ListOfMembersState extends State<ListOfMembers> {
         .read<CircleBloc>()
         .add(FetchMembersEvent(circleId: widget.circleId));
     _loadUserId();
-    _updatedCircleInfo =
-        widget.circleInfo; 
+    _updatedCircleInfo = widget.circleInfo;
   }
 
   // Load userId from shared preferences
@@ -125,64 +124,62 @@ class _ListOfMembersState extends State<ListOfMembers> {
         }
       },
       child: Scaffold(
-        body: Column(
-          children: [
-            AppBar(
-              toolbarHeight: 0,
-              automaticallyImplyLeading: false,
-            ),
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 300),
-              height: _appBarHeight,
-              color: _appBarColor,
-              width: double.infinity,
-              alignment: Alignment.center,
-              child: _showTitle
-                  ? CategoryDescripText(
-                      text: "New code generated successfully!",
-                      color: Colors.white,
-                    )
-                  : null,
-            ),
-            AppBar(
-              backgroundColor: Colors.white,
-              automaticallyImplyLeading: false,
-              centerTitle: true,
-              leading: GestureDetector(
-                onTap: () {
-                  Navigator.pop(context);
-                },
-                child: Container(
-                  margin: const EdgeInsets.all(15),
-                  decoration: BoxDecoration(
-                    border: Border.all(width: 1, color: Colors.black),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(Icons.arrow_back, color: Colors.black, size: 10),
-                ),
+          body: Column(children: [
+        AppBar(
+          toolbarHeight: 0,
+          automaticallyImplyLeading: false,
+        ),
+        AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
+          height: _appBarHeight,
+          color: _appBarColor,
+          width: double.infinity,
+          alignment: Alignment.center,
+          child: _showTitle
+              ? const CategoryDescripText(
+                  text: "New code generated successfully!",
+                  color: Colors.white,
+                )
+              : null,
+        ),
+        AppBar(
+          backgroundColor: Colors.white,
+          automaticallyImplyLeading: false,
+          centerTitle: true,
+          leading: GestureDetector(
+            onTap: () {
+              Navigator.pop(context);
+            },
+            child: Container(
+              margin: const EdgeInsets.all(15),
+              decoration: BoxDecoration(
+                border: Border.all(width: 1, color: Colors.black),
+                shape: BoxShape.circle,
               ),
-              actions: <Widget>[
-                IconButton(
-                  icon: const Icon(Icons.exit_to_app),
-                  onPressed: _leaveGroup,
-                ),
-                SizedBox(width: 5),
-              ],
-              title: CategoryText(text: "Members"),
+              child:
+                  const Icon(Icons.arrow_back, color: Colors.black, size: 10),
             ),
-            isLoading
-                ? Expanded(
-                    child: Center(
-                      child: Transform.translate(
-                          offset: const Offset(-40, -40),
-                          child: const LoadingState()),
-                    ),
-                  )
-                : members.isEmpty
-                  ? Expanded(
-                    child: Center(child: Text("No members found"))
-                  )
-                  : Expanded(
+          ),
+          actions: <Widget>[
+            IconButton(
+              icon: const Icon(Icons.exit_to_app),
+              onPressed: _leaveGroup,
+            ),
+            const SizedBox(width: 5),
+          ],
+          title: const CategoryText(text: "Members"),
+        ),
+        isLoading
+            ? Expanded(
+                child: Center(
+                  child: Transform.translate(
+                      offset: const Offset(-40, -40),
+                      child: const LoadingState()),
+                ),
+              )
+            : members.isEmpty
+                ? const Expanded(child: Center(child: Text("No members found")))
+                : Expanded(
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Column(
@@ -201,8 +198,8 @@ class _ListOfMembersState extends State<ListOfMembers> {
                                 children: [
                                   Center(
                                     child: Container(
-                                      width:
-                                          MediaQuery.of(context).size.width * 0.9,
+                                      width: MediaQuery.of(context).size.width *
+                                          0.9,
                                       padding: const EdgeInsets.all(12),
                                       decoration: BoxDecoration(
                                         color: const Color.fromARGB(
@@ -232,19 +229,26 @@ class _ListOfMembersState extends State<ListOfMembers> {
                                           ),
                                           const SizedBox(height: 20),
                                           Text(
-                                            (_updatedCircleInfo != null && _updatedCircleInfo!.code.isNotEmpty)
+                                            (_updatedCircleInfo != null &&
+                                                    _updatedCircleInfo!
+                                                        .code.isNotEmpty)
                                                 ? _updatedCircleInfo!.code
                                                 : 'No Generated Code',
                                             textAlign: TextAlign.center,
                                             style: TextStyle(
-                                              fontSize: (_updatedCircleInfo != null && _updatedCircleInfo!.code.isNotEmpty)
-                                                ? 30 
-                                                : 25,
+                                              fontSize:
+                                                  (_updatedCircleInfo != null &&
+                                                          _updatedCircleInfo!
+                                                              .code.isNotEmpty)
+                                                      ? 30
+                                                      : 25,
                                               fontWeight: FontWeight.bold,
-                                              color: (_updatedCircleInfo != null && _updatedCircleInfo!.code.isNotEmpty)
-                                                ? widgetPricolor 
-                                                : Colors.black26
-                                              ,
+                                              color:
+                                                  (_updatedCircleInfo != null &&
+                                                          _updatedCircleInfo!
+                                                              .code.isNotEmpty)
+                                                      ? widgetPricolor
+                                                      : Colors.black26,
                                             ),
                                           ),
                                           const SizedBox(height: 20),
@@ -293,7 +297,7 @@ class _ListOfMembersState extends State<ListOfMembers> {
                                                     );
                                               },
                                               style: ElevatedButton.styleFrom(
-                                                backgroundColor:widgetPricolor,
+                                                backgroundColor: widgetPricolor,
                                                 foregroundColor: Colors.white,
                                                 padding:
                                                     const EdgeInsets.symmetric(
@@ -336,41 +340,60 @@ class _ListOfMembersState extends State<ListOfMembers> {
                                     '${member['first_name']} ${member['last_name']}';
                                 final status = member['status'];
                                 return Container(
-                                  margin: EdgeInsets.only(bottom: 15),
-                                  child: Row(
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      Padding(
-                                        padding: const EdgeInsets.only(left: 15.0),
-                                        child: Container(
-                                          width: 35,
-                                          height: 35,
-                                          decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            color: const Color.fromARGB(255, 48, 72, 92).withOpacity(0.2),
-                                          ),
-                                          child: const Icon(
-                                            Icons.person,
-                                            color: textColor,
-                                            size: 20,
+                                    margin: const EdgeInsets.only(bottom: 15),
+                                    child: Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: [
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(left: 15.0),
+                                          child: Container(
+                                            width: 35,
+                                            height: 35,
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              color: Colors.grey[300],
+                                            ),
+                                            clipBehavior: Clip.antiAlias,
+                                            child: member['profile_picture'] !=
+                                                        null &&
+                                                    member['profile_picture']
+                                                        .toString()
+                                                        .isNotEmpty
+                                                ? Image.network(
+                                                    member['profile_picture'],
+                                                    fit: BoxFit.cover,
+                                                    errorBuilder: (context,
+                                                        error, stackTrace) {
+                                                      return const Icon(
+                                                          Icons.person,
+                                                          color: textColor,
+                                                          size: 20);
+                                                    },
+                                                  )
+                                                : Icon(Icons.person,
+                                                    color: textColor, size: 20),
                                           ),
                                         ),
-                                      ),
-                                      const SizedBox(width: 10),
-                                      Expanded( 
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start, 
-                                          children: [
-                                            CategoryText(text: fullName),
-                                            const SizedBox(height: 2),
-                                            CategoryDescripText(text: 'Status: $status', alignment: 'start'),
-                                          ],
+                                        const SizedBox(width: 10),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              CategoryText(text: fullName),
+                                              const SizedBox(height: 2),
+                                              CategoryDescripText(
+                                                  text: 'Status: $status',
+                                                  alignment: 'start'),
+                                            ],
+                                          ),
                                         ),
-                                      ),
-                                    ],
-                                  )
-                                );
+                                      ],
+                                    ));
                               },
                             ),
                           ),
@@ -378,9 +401,7 @@ class _ListOfMembersState extends State<ListOfMembers> {
                       ),
                     ),
                   )
-          ]
-        )
-      ),
+      ])),
     );
   }
 }
