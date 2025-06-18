@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:geocoding/geocoding.dart';
+import 'package:safezone/backend/properties/import.dart';
 import 'package:safezone/resource/schema/colors.dart';
 
 Future<String> getAddressFromCoordinates(
@@ -115,7 +116,7 @@ void showMemberBottomSheet(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const Icon(Icons.location_on,
-                              color: Colors.red, size: 20),
+                              color: widgetPricolor, size: 20),
                           const SizedBox(width: 4),
                           Expanded(
                             child: Text(
@@ -148,6 +149,24 @@ void showMemberBottomSheet(
                     return const Center(
                         child: Text('No street view available'));
                   },
+                ),
+              ),
+              const SizedBox(height: 10.0),
+              ElevatedButton.icon(
+                onPressed: () {
+                  final googleMapsUrl =
+                      'https://www.google.com/maps/search/?api=1&query=$latitude,$longitude';
+                  launchUrl(Uri.parse(googleMapsUrl),
+                      mode: LaunchMode.externalApplication);
+                },
+                icon: const Icon(
+                  Icons.map,
+                  color: widgetPricolor,
+                ),
+                label: const Text('Open in Maps'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  foregroundColor: textColor,
                 ),
               ),
               const SizedBox(height: 25.0),

@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:safezone/backend/models/dangerzoneModel/incident_report_model.dart';
 import 'package:safezone/resource/schema/colors.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:geocoding/geocoding.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:url_launcher/url_launcher.dart';
 
 Future<bool> hasStreetViewImagery(double lat, double lng, String apiKey) async {
   final url = Uri.parse(
@@ -34,11 +36,21 @@ void showDangerZoneBottomSheet(
   final hasImage = await hasStreetViewImagery(lat, lng, apiKey);
   final imageUrl = hasImage ? getStreetViewImageUrl(lat, lng, apiKey) : null;
 
+  String readableAddress = 'Location unavailable';
+  try {
+    List<Placemark> placemarks = await placemarkFromCoordinates(lat, lng);
+    if (placemarks.isNotEmpty) {
+      final place = placemarks[0];
+      readableAddress =
+          '${place.street}, ${place.locality}, ${place.administrativeArea}, ${place.country}';
+    }
+  } catch (_) {}
+
   if (!context.mounted) return;
 
   showModalBottomSheet(
     context: context,
-    isScrollControlled: true, // important!
+    isScrollControlled: true,
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
     ),
@@ -62,14 +74,6 @@ void showDangerZoneBottomSheet(
                 ),
               ),
               const SizedBox(height: 20.0),
-              Text(dangerZone.name ?? 'Danger Zone Name',
-                  style: const TextStyle(
-                      fontSize: 18,
-                      color: textColor,
-                      fontWeight: FontWeight.w600)),
-              const SizedBox(height: 10.0),
-
-              // Street View Image or fallback
               if (imageUrl != null)
                 ClipRRect(
                   borderRadius: BorderRadius.circular(8),
@@ -84,7 +88,8 @@ void showDangerZoneBottomSheet(
                     },
                     errorBuilder: (context, error, stackTrace) {
                       return const Center(
-                          child: Text('No street view available'));
+                        child: Text('No street view available'),
+                      );
                     },
                   ),
                 )
@@ -98,7 +103,47 @@ void showDangerZoneBottomSheet(
                     ),
                   ),
                 ),
-
+              const SizedBox(height: 20.0),
+              Text(
+                dangerZone.name ?? 'Danger Zone Name',
+                style: const TextStyle(
+                  fontSize: 18,
+                  color: textColor,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 10.0),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Icon(Icons.location_on, color: widgetPricolor, size: 20),
+                  const SizedBox(width: 4),
+                  Expanded(
+                    child: Text(
+                      readableAddress,
+                      style: const TextStyle(fontSize: 13, color: textColor),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10.0),
+              ElevatedButton.icon(
+                onPressed: () {
+                  final googleMapsUrl =
+                      'https://www.google.com/maps/search/?api=1&query=$lat,$lng';
+                  launchUrl(Uri.parse(googleMapsUrl),
+                      mode: LaunchMode.externalApplication);
+                },
+                icon: const Icon(
+                  Icons.map,
+                  color: widgetPricolor,
+                ),
+                label: const Text('Open in Maps'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  foregroundColor: textColor,
+                ),
+              ),
               const SizedBox(height: 25.0),
             ],
           ),
