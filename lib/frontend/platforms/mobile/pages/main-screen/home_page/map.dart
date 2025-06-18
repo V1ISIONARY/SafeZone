@@ -30,8 +30,9 @@ import 'package:safezone/backend/models/userModel/circle_model.dart';
 import 'package:safezone/backend/services/first_run_service.dart';
 import 'package:safezone/frontend/platforms/mobile/pages/authentication/account_details.dart';
 import 'package:safezone/frontend/platforms/mobile/widgets/Dialogs/dialogs.dart';
-import 'package:safezone/frontend/platforms/mobile/widgets/bottomsheet/dangerzoneBottomSheet.dart';
-import 'package:safezone/frontend/platforms/mobile/widgets/bottomsheet/safezoneBottomSheet.dart';
+import 'package:safezone/frontend/platforms/mobile/widgets/bottomsheet/map/dangerzone_bottom_sheet.dart';
+import 'package:safezone/frontend/platforms/mobile/widgets/bottomsheet/map/member_bottom_sheet.dart';
+import 'package:safezone/frontend/platforms/mobile/widgets/bottomsheet/map/safezone_bottom_sheet.dart';
 import 'package:safezone/frontend/platforms/mobile/widgets/loadingstate.dart';
 import 'package:safezone/frontend/utils/marker_utils.dart';
 import 'package:safezone/frontend/utils/safezone_navigator.dart';
@@ -663,6 +664,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
         String lastName = member['last_name'];
         double latitude = member['latitude'];
         double longitude = member['longitude'];
+        String profile = member['profile_picture'];
 
         BitmapDescriptor? memberMarker = memberMarkers[userId];
 
@@ -676,6 +678,10 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
             position: LatLng(latitude, longitude),
             icon: memberMarker ?? BitmapDescriptor.defaultMarker,
             infoWindow: InfoWindow(title: '$firstName $lastName'),
+            onTap: () {
+              showMemberBottomSheet(
+                  userId, firstName, lastName, longitude, latitude, profile, context);
+            },
           ),
         );
       }

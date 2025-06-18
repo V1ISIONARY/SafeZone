@@ -563,7 +563,7 @@ class _CreateReportState extends State<CreateReport> {
                                   longitude: _pinnedLocation!.longitude,
                                   radius: _radius,
                                   name:
-                                      "Incident Report ${DateTime.now().millisecondsSinceEpoch}",
+                                      _nameController.text,
                                 );
                                 print(
                                     "🚨 Incident Report Created: $incidentReport");
