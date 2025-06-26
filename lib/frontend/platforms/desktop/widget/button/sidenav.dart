@@ -62,7 +62,7 @@ class _SidenavState extends State<Sidenav> {
 
   void _handleTap() {
     if (widget.withDrop == true) {
-      if (!sharedController.isSidebarCollapsed) {
+      if (!sharedController.isSidebarCollapsed.value) {
         setState(() {
           _showDropdown = !_showDropdown;
         });
@@ -95,7 +95,7 @@ class _SidenavState extends State<Sidenav> {
           child: Material(
             color: backgroundColor,
             borderRadius: BorderRadius.circular(5),
-            child: sharedController.isSidebarCollapsed
+            child: sharedController.isSidebarCollapsed.value
                 ? ShiftedTooltip(
                     message: widget.label,
                     horizontalOffset: 20,

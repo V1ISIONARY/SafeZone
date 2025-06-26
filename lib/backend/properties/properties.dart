@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class SharedProperties {
 
@@ -17,10 +20,21 @@ class SharedProperties {
   final TextEditingController descriptionController = TextEditingController();
   final TextEditingController confirmPassController = TextEditingController();
 
+  //Map Variables
+  final TextEditingController mapSearchTE = TextEditingController();
+  MapType currentMapType = MapType.normal;
+  bool showMarkers = true;
+  Set<Circle> circles = {};
+  Set<Polyline> polylines = {};
+  GoogleMapController? googleMapController;
+  final Completer<GoogleMapController> mapController = Completer();
+
+  //no info
   bool rememberMe = false;
   bool passwordVisible = false;
-  bool isSidebarCollapsed = false;
-
+  ValueNotifier<bool> isSidebarCollapsed = ValueNotifier(false);
+  
   ValueNotifier<bool> authenticationPage = ValueNotifier(true);
   ValueNotifier<bool> inSlide = ValueNotifier(false);
+
 }
