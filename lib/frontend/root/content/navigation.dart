@@ -21,7 +21,7 @@ class _NavigationRTState extends State<NavigationRT> {
       backgroundColor: Colors.transparent,
       body: ResponsiveWidget(
         mobile: BottomNavigationWidget(userToken: widget.userToken),
-        desktop: NavigationDT(),
+        desktop: NavigationDT(userToken: widget.userToken),
       ),
     );
   }

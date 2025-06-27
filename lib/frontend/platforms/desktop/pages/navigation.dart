@@ -1,12 +1,20 @@
 import 'package:safezone/backend/properties/import.dart';
 import 'package:safezone/backend/properties/properties.dart';
 import 'package:safezone/frontend/platforms/desktop/pages/content/contact.dart';
+import 'package:safezone/frontend/platforms/desktop/pages/content/map/circles/createreport.dart';
+import 'package:safezone/frontend/platforms/desktop/pages/content/map/circles/listofgroup.dart';
+import 'package:safezone/frontend/platforms/desktop/pages/content/map/circles/marksafezone.dart';
 import 'package:safezone/frontend/platforms/desktop/pages/content/map/map.dart';
 import 'package:safezone/frontend/platforms/desktop/pages/content/map/mapheader.dart';
+import 'package:safezone/frontend/platforms/desktop/pages/content/notification.dart';
 import 'package:safezone/frontend/platforms/desktop/widget/button/sidenav.dart';
 
 class NavigationDT extends StatefulWidget {
-  const NavigationDT({super.key});
+  final String userToken;
+  const NavigationDT({
+    super.key,
+    required this.userToken
+  });
 
   @override
   State<NavigationDT> createState() => _NavigationDTState();
@@ -15,8 +23,12 @@ class NavigationDT extends StatefulWidget {
 class _NavigationDTState extends State<NavigationDT> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
+  int selectedDropdownIndex = 0;
   int _selectedPageIndex = 0;
+  int selectedComs = 0;
+
   bool showit = false;
+  bool dropdown = false;
   final sharedController = SharedProperties();
 
   Widget _getSelectedPage() {
@@ -24,7 +36,7 @@ class _NavigationDTState extends State<NavigationDT> {
 
     switch (_selectedPageIndex) {
       case 0:
-        pageContent = MapDT();
+        pageContent = MapDT(UserToken: widget.userToken);
         break;
       case 1:
         pageContent = Container(
@@ -49,6 +61,30 @@ class _NavigationDTState extends State<NavigationDT> {
         pageContent = const Center(child: Text('Default Page'));
     }
 
+    Widget _getComsPage() {
+      switch (selectedComs) {
+        case 0:
+          return NotificationDT(UserToken: widget.userToken, initialPage: 0);
+        case 1:
+          return ContactDT(UserToken: widget.userToken);
+        default:
+          return const Center(child: Text('No Dropdown Content'));
+      }
+    }
+
+    Widget _getSelectedDropPage() {
+      switch (selectedDropdownIndex) {
+        case 0:
+          return ListOfGroupsDT();
+        case 1:
+          return CreateReportDT();
+        case 2:
+          return MarkSafeZoneDT();
+        default:
+          return const Center(child: Text('No Dropdown Content'));
+      }
+    }
+
     return Column(
       children: [
         if (_selectedPageIndex == 0) const MapHeader(),
@@ -60,14 +96,26 @@ class _NavigationDTState extends State<NavigationDT> {
                   alignment: Alignment.centerLeft,
                   child: Container(
                     width: 350,
-                    padding: const EdgeInsets.all(15),
                     color: Colors.white,
-                    child: const ContactDT(),
+                    child: _getComsPage(),
                   ),
                 ),
               Expanded(
                 child: pageContent,
-              )
+              ),
+              if (dropdown == true)
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Container(
+                    width: 400,
+                    padding: const EdgeInsets.only(
+                      right: 15,
+                      left: 15,
+                    ),
+                    color: Colors.white,
+                    child: _getSelectedDropPage(),
+                  ),
+                ),
             ],
           ),
         ),
@@ -288,6 +336,7 @@ class _NavigationDTState extends State<NavigationDT> {
                     Sidenav(
                       icon: Icons.public,
                       label: 'Zones',
+                      withDrop: true,
                       hoverTrailing: [
                         Text(
                           'Alt',
@@ -296,8 +345,44 @@ class _NavigationDTState extends State<NavigationDT> {
                         Icon(Icons.arrow_upward_outlined, color: Colors.black38, size: 10),
                         Text('Q', style: TextStyle(fontSize: 10, color: Colors.black38)),
                       ],
+                      dropdownItems: [
+                        DropdownItem(
+                          label: 'Group List',
+                          id: 'gl', 
+                          onTap: (){
+                            setState(() {
+                              dropdown = true;
+                              _selectedPageIndex = 0;
+                              selectedDropdownIndex = 0;
+                            });
+                          }
+                        ),
+                        DropdownItem(
+                          label: 'Report an Incident',
+                          id: 'ri', 
+                          onTap: (){
+                            setState(() {
+                              dropdown = true;
+                              _selectedPageIndex = 0;
+                              selectedDropdownIndex = 1;
+                            });
+                          }
+                        ),
+                        DropdownItem(
+                          label: 'Mark an Safe Place', 
+                          id: 'msp', 
+                          onTap: (){
+                            setState(() {
+                              dropdown = true;
+                              _selectedPageIndex = 0;
+                              selectedDropdownIndex = 2;
+                            });
+                          }
+                        ),
+                      ],
                       onTap: (){
                         setState(() {
+                          dropdown = false;
                           _selectedPageIndex = 0;
                         });
                       },
@@ -315,6 +400,7 @@ class _NavigationDTState extends State<NavigationDT> {
                       ],
                       onTap: (){
                         setState(() {
+                          dropdown = false;
                           _selectedPageIndex = 1;
                         });
                       },
@@ -364,14 +450,17 @@ class _NavigationDTState extends State<NavigationDT> {
                       dropdownItems: [
                         DropdownItem(
                           label: 'Privacy and Security',
+                          id: 'privacy_security', 
                           onTap: () => print('Controls')
                         ),
                         DropdownItem(
                           label: 'Permission Controls',
+                          id: 'permission_controls',
                           onTap: () => print('Controls')
                         ),
                         DropdownItem(
                           label: 'Local Data Storage Options', 
+                          id: 'ldso', 
                           onTap: () => print('Security')
                         ),
                       ],
@@ -406,20 +495,35 @@ class _NavigationDTState extends State<NavigationDT> {
                           style: TextStyle(fontSize: 10, color: Colors.black38),
                         ),
                         Icon(Icons.arrow_upward_outlined, color: Colors.black38, size: 10),
-                        Text('W', style: TextStyle(fontSize: 10, color: Colors.black38)),
+                        Text(
+                          'W',
+                          style: TextStyle(fontSize: 10, color: Colors.black38),
+                        ),
                       ],
-                      onTap: (){
+                      onTap: () {
                         setState(() {
-                          _selectedPageIndex = 4; // this is now correct
+                          dropdown = false;
+                          if (selectedComs == 0) {
+                            showit = !showit; 
+                          } else {
+                            showit = true;
+                          }
+                          selectedComs = 0;
                         });
                       },
                     ),
                     Sidenav(
                       icon: Icons.phone_outlined,
                       label: 'Contact',
-                      onTap: (){
+                      onTap: () {
                         setState(() {
-                          showit = !showit;
+                          dropdown = false;
+                          if (selectedComs == 1) {
+                            showit = !showit;
+                          } else {
+                            showit = true;
+                          }
+                          selectedComs = 1;
                         });
                       },
                     ),
@@ -456,21 +560,30 @@ class _NavigationDTState extends State<NavigationDT> {
                         Text('H', style: TextStyle(fontSize: 10, color: Colors.black38)),
                       ],
                       onTap: (){
-                        _selectedPageIndex = 6;
+                        setState(() {
+                          dropdown = false;
+                          _selectedPageIndex = 6;
+                        });
                       },
                     ),
                     Sidenav(
                       icon: Icons.support_agent,
                       label: 'Chat Support',
                       onTap: (){
-                        _selectedPageIndex = 7;
+                        setState(() {
+                          dropdown = false;
+                          _selectedPageIndex = 7;
+                        });
                       },
                     ),
                     Sidenav(
                       icon: Icons.source_outlined,
                       label: 'Safety Tips & Resources',
                       onTap: (){
-                        _selectedPageIndex = 8;
+                        setState(() {
+                          dropdown = false;
+                          _selectedPageIndex = 8;
+                        });
                       },
                     ),
                   ]

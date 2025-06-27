@@ -1,34 +1,224 @@
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:lottie/lottie.dart';
+import 'package:safezone/backend/architecture/bloc/contactBloc/contact_bloc.dart';
+import 'package:safezone/backend/architecture/bloc/contactBloc/contact_event.dart';
+import 'package:safezone/backend/architecture/bloc/contactBloc/contact_state.dart';
+import 'package:safezone/backend/models/userModel/contacts_model.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../../../../backend/properties/import.dart';
+import '../../../../../../backend/properties/import.dart';
 
-class ContactDT extends StatelessWidget {
-  const ContactDT({super.key});
+class ContactDT extends StatefulWidget {
+
+  final String UserToken;
+
+  const ContactDT({
+    super.key,
+    required this.UserToken
+  });
+
+  @override
+  State<ContactDT> createState() => _ContactDTState();
+}
+
+class _ContactDTState extends State<ContactDT> with SingleTickerProviderStateMixin {
+
+  int userId = 0;
+  List<ContactsModel> localContacts = [];
+  late AnimationController _controller;
+  late Animation<double> _animation;
+
+  Future<void> loadUserId() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final loadedUserId = prefs.getInt('id') ?? 0;
+
+    setState(() {
+      userId = loadedUserId;
+    });
+
+    context.read<ContactBloc>().add(ViewContacts(userId));
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    widget.UserToken == 'guest'
+      ? const SizedBox()
+      : loadUserId();
+
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    )..addStatusListener((status) {
+        if (status == AnimationStatus.completed) {
+          _controller.reset();
+        }
+      });
+
+    _animation = TweenSequence([
+      TweenSequenceItem(tween: Tween(begin: 0.0, end: 10.0), weight: 1),
+      TweenSequenceItem(tween: Tween(begin: 10.0, end: -10.0), weight: 1),
+      TweenSequenceItem(tween: Tween(begin: -10.0, end: 10.0), weight: 1),
+      TweenSequenceItem(tween: Tween(begin: 10.0, end: 0.0), weight: 1),
+    ]).animate(_controller);
+
+  }
+
+  void _startShake() {
+    _controller.forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      children: [
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Text(
-              "Contact",
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 15,
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 15),
+      child: Stack(
+        children:[
+          Scaffold(
+            backgroundColor: Colors.white,
+            appBar: AppBar(
+              backgroundColor: Colors.white,
+              automaticallyImplyLeading: false,
+              centerTitle: false,
+              title: Transform.translate(
+                offset: const Offset(-15, 0),
+                child: CategoryText(text: "Contact")
               ),
+              actions: [
+                GestureDetector(
+                  child: Icon(
+                    Icons.cancel_outlined,
+                    size: 20,
+                    color: Colors.black38,
+                  )
+                ),
+              ],
             ),
-            Spacer(),
-            Icon(
-              Icons.cancel_outlined,
-              size: 20,
-              color: Colors.black38,
+            body: Container(
+              child: Stack(
+                children:[
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      BlocBuilder<ContactBloc, ContactState>(
+                        builder: (context, state) {
+                          if (state is ContactLoading) {
+                            return Expanded(
+                              child: Center(
+                                child: Transform.translate(
+                                  offset: const Offset(-40, -60), 
+                                  child: Lottie.asset(
+                                    'lib/resource/lottie/loading.json',
+                                    width: 80,
+                                    height: 80,
+                                    fit: BoxFit.cover,
+                                  ),
+                                )
+                              )
+                            );
+                          } else if (state is ContactLoaded) {
+                            localContacts = state.contacts;
+                            return Expanded(
+                              child: ListView.builder(
+                                itemCount: localContacts.length,
+                                itemBuilder: (context, index) {
+                                  final contact = localContacts[index];
+                                  return Contactinfo(
+                                    name: contact.name,
+                                    phone: contact.phoneNumber,
+                                  );
+                                },
+                              ),
+                            );
+                          } else if (state is ContactError) {
+                            return const Center(
+                              // child: Text(
+                              //   state.error,
+                              //   style: const TextStyle(color: Colors.red),
+                              // ),
+                            );
+                          } else {
+                            return Expanded(
+                              child: widget.UserToken == 'guest'
+                              ? const SizedBox()
+                              : const Center(
+                                  child: Text("No contacts found."),
+                                )
+                            );
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                ]
+              ),
             )
-          ],
-        )
-      ],
+          ),
+          widget.UserToken == 'guest'
+            ? GestureDetector(
+                onTap: _startShake,
+                child: Container(
+                  width: double.infinity,
+                  height: double.infinity,
+                  color: Colors.black38,
+                  child: Center(
+                    child: Container(
+                      width: 200,
+                      color: Colors.transparent,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          AnimatedBuilder(
+                            animation: _animation,
+                            builder: (context, child) {
+                              return Transform.translate(
+                                offset: Offset(_animation.value, 0),
+                                child: SizedBox(
+                                  width: 130,
+                                  height: 110,
+                                  child: Image.asset(
+                                    'lib/resource/image/png/lock.png',
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                          const Text(
+                            'Lock',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 15,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          const Text(
+                            'You need to sign in to your account to access all features.',
+                            style: TextStyle(
+                              color: Colors.white60,
+                              fontSize: 9,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              )
+            : const SizedBox(),
+        ]
+      )
     );
   }
 }

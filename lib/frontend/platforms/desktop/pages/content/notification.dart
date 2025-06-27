@@ -1,16 +1,250 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:safezone/backend/architecture/cubic/notification.dart';
+import 'package:safezone/frontend/platforms/mobile/pages/main-screen/notifications_page/all.dart';
+import 'package:safezone/frontend/platforms/mobile/pages/main-screen/notifications_page/read.dart';
+import 'package:safezone/frontend/platforms/mobile/pages/main-screen/notifications_page/unread.dart';
+import 'package:safezone/frontend/platforms/mobile/widgets/buttons/notification_btn.dart';
+import 'package:safezone/resource/schema/colors.dart';
+import 'package:safezone/resource/schema/texts.dart';
 
-class Notification extends StatefulWidget {
-  const Notification({super.key});
+class NotificationDT extends StatefulWidget {
+  final String UserToken;
+  final int initialPage;
+
+  const NotificationDT({
+    super.key,
+    required this.UserToken,
+    required this.initialPage,
+  });
 
   @override
-  State<Notification> createState() => _NotificationState();
+  State<NotificationDT> createState() => _NotificationDTState();
 }
 
-class _NotificationState extends State<Notification> {
+class _NotificationDTState extends State<NotificationDT> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _animation;
+  late PageController pageController;
+  late List<Widget> topLevelPages;
+
+  @override
+  void initState() {
+    super.initState();
+
+    pageController = PageController(initialPage: widget.initialPage);
+    topLevelPages = [All(userToken: widget.UserToken), Read(userToken: widget.UserToken), Unread(userToken: widget.UserToken)];
+
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    )..addStatusListener((status) {
+        if (status == AnimationStatus.completed) {
+          _controller.reset();
+        }
+      });
+
+    _animation = TweenSequence([
+      TweenSequenceItem(tween: Tween(begin: 0.0, end: 10.0), weight: 1),
+      TweenSequenceItem(tween: Tween(begin: 10.0, end: -10.0), weight: 1),
+      TweenSequenceItem(tween: Tween(begin: -10.0, end: 10.0), weight: 1),
+      TweenSequenceItem(tween: Tween(begin: 10.0, end: 0.0), weight: 1),
+    ]).animate(_controller);
+  }
+
+  void onPageChanged(int page) {
+    BlocProvider.of<NotificationCubit>(context).changeSelectedIndex(page);
+  }
+
+  Widget _mainWrapperBody() {
+    return PageView(
+      controller: pageController,
+      onPageChanged: onPageChanged,
+      children: topLevelPages,
+    );
+  }
+
+  void _startShake() {
+    _controller.forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    pageController.dispose();
+    super.dispose();
+  }
+
+  Widget _bodyNavigator(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      height: 40,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          _bottomAppBarItem("All", 0),
+          _bottomAppBarItem("Read", 1),
+          _bottomAppBarItem("Unread", 2),
+        ],
+      ),
+    );
+  }
+
+  Widget _bottomAppBarItem(String indicator, int page) {
+    return Expanded(
+      child: GestureDetector(
+        onTap: () {
+          pageController.jumpToPage(page);
+          onPageChanged(page);
+        },
+        child: Padding(
+          padding: const EdgeInsets.only(top: 10),
+          child: BlocBuilder<NotificationCubit, int>(
+            builder: (context, selectedIndex) {
+              final isSelected = selectedIndex == page;
+              return Column(
+                children: [
+                  Text(
+                    indicator,
+                    style: TextStyle(
+                      fontSize: 10,
+                      color: isSelected ? Colors.black : Colors.black38,
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 10), 
+                    child:Container(
+                      height: 4,
+                      width: double.infinity,
+                      child: Center(
+                        child: Container(
+                          width: double.infinity,
+                          height: 0.5,
+                          color: Colors.black38,
+                          child: isSelected
+                            ? Container(
+                              width: double.infinity, 
+                              height: 5.0,
+                              color: widgetPricolor, 
+                            )
+                          : const SizedBox(), 
+                        ),
+                      ),
+                    )
+                  )
+                ],
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return Stack(
+      children: [
+        Scaffold(
+          appBar: AppBar(
+            backgroundColor: Colors.white,
+            automaticallyImplyLeading: false,
+            centerTitle: false,
+            title: CategoryText(text: "Contact"),
+            actions: [
+              GestureDetector(
+                child: Icon(
+                  Icons.cancel_outlined,
+                  size: 20,
+                  color: Colors.black38,
+                )
+              ),
+              SizedBox(width: 15)
+            ],
+          ),
+          body: Column(
+            children: [
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 8.0),
+                child: NotificationBtn(
+                  title: "My Incident Reports",
+                  svgIcon: "lib/resource/svg/report_notif.svg",
+                  navigateTo: "Reports",
+                  description:
+                      "Check the status and details of your submitted reports",
+                ),
+              ),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 8.0),
+                child: NotificationBtn(
+                  title: "My Safe Zones",
+                  svgIcon: "lib/resource/svg/safe.png",
+                  navigateTo: "Safezone",
+                  description:
+                      "Check the status and details of your submitted safe zones",
+                ),
+              ),
+              _bodyNavigator(context),
+              Expanded(child: _mainWrapperBody()),
+              
+            ],
+          ),
+        ),
+        widget.UserToken == 'guest'
+            ? GestureDetector(
+                onTap: _startShake,
+                child: Container(
+                  width: double.infinity,
+                  height: double.infinity,
+                  color: Colors.black38,
+                  child: Center(
+                    child: Container(
+                      width: 200,
+                      color: Colors.transparent,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          AnimatedBuilder(
+                            animation: _animation,
+                            builder: (context, child) {
+                              return Transform.translate(
+                                offset: Offset(_animation.value, 0),
+                                child: SizedBox(
+                                  width: 130,
+                                  height: 110,
+                                  child: Image.asset(
+                                    'lib/resource/image/png/lock.png',
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                          const Text(
+                            'Lock',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 15,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          const Text(
+                            'You need to sign in to your account to access all features.',
+                            style: TextStyle(
+                              color: Colors.white60,
+                              fontSize: 9,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              )
+            : const SizedBox(),
+      ],
     );
   }
 }

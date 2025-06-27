@@ -146,36 +146,36 @@ class _ReadState extends State<Read> {
 
   Widget _buildPlaceholder() {
     return widget.userToken == 'guest'
-        ? Container()
-        : Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Image.asset(
-                  'lib/resources/image/png/notif1.png',
-                  width: 150,
-                  height: 150,
+      ? Container()
+      : Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Image.asset(
+                'lib/resource/image/png/notif1.png',
+                width: 150,
+                height: 150,
+              ),
+              const SizedBox(height: 10),
+              const Text(
+                'No Read Notifications',
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 15,
                 ),
-                const SizedBox(height: 10),
-                const Text(
-                  'No Read Notifications',
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 15,
-                  ),
-                  textAlign: TextAlign.center,
+                textAlign: TextAlign.center,
+              ),
+              const Text(
+                'You have not read any notifications yet.',
+                style: TextStyle(
+                  color: Colors.black54,
+                  fontSize: 9,
                 ),
-                const Text(
-                  'You have not read any notifications yet.',
-                  style: TextStyle(
-                    color: Colors.black54,
-                    fontSize: 9,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ],
-            ),
-          );
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        );
   }
 
   Widget _buildError(String message) {
