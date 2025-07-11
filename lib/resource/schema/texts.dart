@@ -63,6 +63,7 @@ class CategoryDescripText extends StatelessWidget {
         fontWeight: FontWeight.w500,
         color: color ?? Colors.black45,
       ),
+      overflow: TextOverflow.ellipsis,
       textAlign: _getTextAlignment(),
     );
   }

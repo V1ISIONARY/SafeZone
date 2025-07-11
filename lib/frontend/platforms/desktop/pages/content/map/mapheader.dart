@@ -87,65 +87,76 @@ class _MapHeaderState extends State<MapHeader> {
                 ],
               ),
               Expanded(
-                child: Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 150),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Expanded(
-                        child: Container(
-                          height: 35,
-                          margin: const EdgeInsets.only(right: 10),
-                          child: TextField(
-                            controller: searchController,
-                            cursorColor: labelFormFieldColor,
-                            style: const TextStyle(
-                              fontSize: 10,
-                              color: Colors.black,
-                              fontWeight: FontWeight.w100,
-                            ),
-                            decoration: InputDecoration(
-                              hintText: "Search | Dagupan City > Pantal East > Sagur",
-                              hintStyle: TextStyle(
-                                fontSize: 10,
-                                color: labelFormFieldColor,
-                                fontWeight: FontWeight.w100,
-                              ),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(20),
-                                borderSide: const BorderSide(color: Colors.black12),
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(20),
-                                borderSide: const BorderSide(color: Colors.black12, width: 2),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(20),
-                                borderSide: BorderSide(color: widgetPricolor, width: 2),
-                              ),
-                              filled: true,
-                              fillColor: Colors.transparent,
-                              contentPadding: const EdgeInsets.only(left: 15, top: 12, bottom: 12),
-                              suffixIcon: Padding(
-                                padding: const EdgeInsets.all(3),
-                                child: GestureDetector(
-                                  onTap: () {
-                                    print("Search tapped");
-                                  },
-                                  child: Container(
-                                    width: 70,
-                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                                    decoration: BoxDecoration(
-                                      color: btnColor,
-                                      borderRadius: BorderRadius.circular(15),
-                                    ),
-                                    alignment: Alignment.center,
-                                    child: const Text(
-                                      'Search',
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 10,
-                                        fontWeight: FontWeight.w500,
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    double maxMargin = 150;
+                    double minMargin = 0;
+                    double screenWidth = constraints.maxWidth;
+
+                    // You can adjust the formula below to control how quickly margin shrinks
+                    double margin = (screenWidth / 10).clamp(minMargin, maxMargin);
+
+                    return Container(
+                      margin: EdgeInsets.symmetric(horizontal: margin),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Expanded(
+                            child: Container(
+                              height: 35,
+                              margin: const EdgeInsets.only(right: 10),
+                              child: TextField(
+                                controller: searchController,
+                                cursorColor: labelFormFieldColor,
+                                style: const TextStyle(
+                                  fontSize: 10,
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.w100,
+                                ),
+                                decoration: InputDecoration(
+                                  hintText: "Search | Dagupan City > Pantal East > Sagur",
+                                  hintStyle: TextStyle(
+                                    fontSize: 10,
+                                    color: labelFormFieldColor,
+                                    fontWeight: FontWeight.w100,
+                                  ),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                    borderSide: const BorderSide(color: Colors.black12),
+                                  ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                    borderSide: const BorderSide(color: Colors.black12, width: 2),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                    borderSide: BorderSide(color: widgetPricolor, width: 2),
+                                  ),
+                                  filled: true,
+                                  fillColor: Colors.transparent,
+                                  contentPadding: const EdgeInsets.only(left: 15, top: 12, bottom: 12),
+                                  suffixIcon: Padding(
+                                    padding: const EdgeInsets.all(3),
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        print("Search tapped");
+                                      },
+                                      child: Container(
+                                        width: 70,
+                                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                        decoration: BoxDecoration(
+                                          color: btnColor,
+                                          borderRadius: BorderRadius.circular(15),
+                                        ),
+                                        alignment: Alignment.center,
+                                        child: const Text(
+                                          'Search',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -153,25 +164,25 @@ class _MapHeaderState extends State<MapHeader> {
                               ),
                             ),
                           ),
-                        ),
-                      ),
-                      GestureDetector(
-                        child: Container(
-                          height: 33,
-                          width: 33,
-                          decoration: BoxDecoration(
-                            color: btnColor,
-                            shape: BoxShape.circle,
+                          GestureDetector(
+                            child: Container(
+                              height: 33,
+                              width: 33,
+                              decoration: BoxDecoration(
+                                color: btnColor,
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(
+                                Icons.mic,
+                                size: 17,
+                                color: Colors.white,
+                              ),
+                            ),
                           ),
-                          child: const Icon(
-                            Icons.mic,
-                            size: 17,
-                            color: Colors.white,
-                          ),
-                        ),
+                        ],
                       ),
-                    ],
-                  ),
+                    );
+                  },
                 ),
               ),
               Container(

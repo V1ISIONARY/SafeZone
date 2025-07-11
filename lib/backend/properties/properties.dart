@@ -19,6 +19,7 @@ class SharedProperties {
   final TextEditingController groupCodeController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
   final TextEditingController confirmPassController = TextEditingController();
+  ValueNotifier<bool> isSidebarAutoLocked = ValueNotifier<bool>(false);
 
   //Map Variables
   final TextEditingController mapSearchTE = TextEditingController();

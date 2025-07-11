@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:safezone/backend/properties/responsive.dart';
+import 'package:safezone/backend/properties/responsive/auth.dart';
 import 'package:safezone/frontend/platforms/mobile/pages/authentication/login.dart';
 import '../../platforms/desktop/pages/authentication/authentication.dart';
 
@@ -15,7 +15,7 @@ class _LoginRTState extends State<LoginRT> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.transparent,
-      body: ResponsiveWidget(
+      body: AuthResWidget(
         mobile: LoginMD(),
         desktop: AuthenticationDesktop(),
       ),

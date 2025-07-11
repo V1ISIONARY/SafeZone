@@ -20,7 +20,11 @@ import 'package:safezone/resource/schema/texts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class MarkSafeZoneDT extends StatefulWidget {
-  const MarkSafeZoneDT({super.key});
+  final VoidCallback? onClose;
+  const MarkSafeZoneDT({
+    super.key,
+    this.onClose
+  });
 
   @override
   State<MarkSafeZoneDT> createState() => _MarkSafeZoneDTState();
@@ -244,6 +248,11 @@ class _MarkSafeZoneDTState extends State<MarkSafeZoneDT> {
         ),
         actions: [
           GestureDetector(
+            onTap: (){
+              if (widget.onClose != null) {
+                widget.onClose!();
+              }
+            },
             child: Icon(
               Icons.cancel_outlined,
               size: 20,
@@ -252,8 +261,9 @@ class _MarkSafeZoneDTState extends State<MarkSafeZoneDT> {
           ),
         ],
       ),
-      body: Container(
-        child: Column(
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          return Column(
           children: [
             Column(
               children: [
@@ -328,113 +338,124 @@ class _MarkSafeZoneDTState extends State<MarkSafeZoneDT> {
                 ),
               ],
             ),
-            Container(
-              height: 215,
-              margin: const EdgeInsets.only(top: 15, bottom: 20),
-              decoration: BoxDecoration(
-                color: const Color.fromARGB(54, 96, 125, 139),
-                borderRadius: BorderRadius.circular(8),
+            ConstrainedBox(
+              constraints: BoxConstraints(
+                maxHeight: constraints.maxHeight - 80, 
+                minHeight: 0,
               ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: GoogleMap(
-                  initialCameraPosition: const CameraPosition(
-                    target: LatLng(16.043859, 120.335182),
-                    zoom: 14.0,
-                  ),
-                  markers: _markers,
-                  circles: _circles,
-                  onMapCreated: (GoogleMapController controller) {
-                    _mapController.complete(controller);
-                    String style = '''
-                  [
-                    {
-                      "featureType": "administrative",
-                      "elementType": "labels.text",
-                      "stylers": [
-                        { "visibility": "off" }
-                      ]
-                    },
-                    {
-                      "featureType": "administrative.locality",
-                      "elementType": "labels.text",
-                      "stylers": [
-                        { "visibility": "on" }
-                      ]
-                    },
-                    {
-                      "featureType": "administrative.neighborhood",
-                      "elementType": "labels.text",
-                      "stylers": [
-                        { "visibility": "on" }
-                      ]
-                    },
-                    {
-                      "featureType": "poi",
-                      "elementType": "labels.text",
-                      "stylers": [
-                        { "visibility": "off" }
-                      ]
-                    },
-                    {
-                      "featureType": "poi.business",
-                      "elementType": "labels",
-                      "stylers": [
-                        { "visibility": "off" }
-                      ]
-                    },
-                    {
-                      "featureType": "poi.government",
-                      "elementType": "labels",
-                      "stylers": [
-                        { "visibility": "on" }
-                      ]
-                    },
-                    {
-                      "featureType": "poi.medical",
-                      "elementType": "labels",
-                      "stylers": [
-                        { "visibility": "on" }
-                      ]
-                    },
-                    {
-                      "featureType": "transit.station.bus",
-                      "elementType": "labels",
-                      "stylers": [
-                        { "visibility": "off" }
-                      ]
-                    },
-                    {
-                      "featureType": "road",
-                      "elementType": "labels",
-                      "stylers": [
-                        { "visibility": "off" }
-                      ]
-                    }
-                  ]
-                ''';
-                    controller.setMapStyle(style);
-                  },
-                  onTap: (LatLng location) {
-                    setState(() {
-                      _pinnedLocation = location;
-                      _markers.clear();
-                      _markers.add(
-                        Marker(
-                          markerId: const MarkerId("pinned_location"),
-                          position: location,
-                          infoWindow: const InfoWindow(title: "Safe Zone"),
+              child: ClipRect(
+                child: SizedBox(
+                  height: 215,
+                  child: Container(
+                    height: 215,
+                    margin: const EdgeInsets.only(top: 15, bottom: 20),
+                    decoration: BoxDecoration(
+                      color: const Color.fromARGB(54, 96, 125, 139),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: GoogleMap(
+                        initialCameraPosition: const CameraPosition(
+                          target: LatLng(16.043859, 120.335182),
+                          zoom: 14.0,
                         ),
-                      );
-                      _updateCircle();
-                    });
-                  },
-                  zoomGesturesEnabled: true,
-                  scrollGesturesEnabled: true,
-                  rotateGesturesEnabled: true,
-                  tiltGesturesEnabled: true,
-                ),
-              ),
+                        markers: _markers,
+                        circles: _circles,
+                        onMapCreated: (GoogleMapController controller) {
+                          _mapController.complete(controller);
+                          String style = '''
+                        [
+                          {
+                            "featureType": "administrative",
+                            "elementType": "labels.text",
+                            "stylers": [
+                              { "visibility": "off" }
+                            ]
+                          },
+                          {
+                            "featureType": "administrative.locality",
+                            "elementType": "labels.text",
+                            "stylers": [
+                              { "visibility": "on" }
+                            ]
+                          },
+                          {
+                            "featureType": "administrative.neighborhood",
+                            "elementType": "labels.text",
+                            "stylers": [
+                              { "visibility": "on" }
+                            ]
+                          },
+                          {
+                            "featureType": "poi",
+                            "elementType": "labels.text",
+                            "stylers": [
+                              { "visibility": "off" }
+                            ]
+                          },
+                          {
+                            "featureType": "poi.business",
+                            "elementType": "labels",
+                            "stylers": [
+                              { "visibility": "off" }
+                            ]
+                          },
+                          {
+                            "featureType": "poi.government",
+                            "elementType": "labels",
+                            "stylers": [
+                              { "visibility": "on" }
+                            ]
+                          },
+                          {
+                            "featureType": "poi.medical",
+                            "elementType": "labels",
+                            "stylers": [
+                              { "visibility": "on" }
+                            ]
+                          },
+                          {
+                            "featureType": "transit.station.bus",
+                            "elementType": "labels",
+                            "stylers": [
+                              { "visibility": "off" }
+                            ]
+                          },
+                          {
+                            "featureType": "road",
+                            "elementType": "labels",
+                            "stylers": [
+                              { "visibility": "off" }
+                            ]
+                          }
+                        ]
+                      ''';
+                          controller.setMapStyle(style);
+                        },
+                        onTap: (LatLng location) {
+                          setState(() {
+                            _pinnedLocation = location;
+                            _markers.clear();
+                            _markers.add(
+                              Marker(
+                                markerId: const MarkerId("pinned_location"),
+                                position: location,
+                                infoWindow: const InfoWindow(title: "Safe Zone"),
+                              ),
+                            );
+                            _updateCircle();
+                          });
+                        },
+                        zoomGesturesEnabled: true,
+                        scrollGesturesEnabled: true,
+                        rotateGesturesEnabled: true,
+                        tiltGesturesEnabled: true,
+                      ),
+                    ),
+                  ),
+                )
+              )
             ),
             Expanded(
               child: SingleChildScrollView(
@@ -653,7 +674,8 @@ class _MarkSafeZoneDTState extends State<MarkSafeZoneDT> {
               ),
             ),
           ],
-        )
+        );
+        }
       )
     );
   }

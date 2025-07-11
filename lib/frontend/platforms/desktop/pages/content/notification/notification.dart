@@ -1,19 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:safezone/backend/architecture/cubic/notification.dart';
+import 'package:safezone/frontend/platforms/desktop/pages/content/notification/reports/reports_history.dart';
+import 'package:safezone/frontend/platforms/desktop/pages/content/notification/safezone/safe_zone_history.dart';
+import 'package:safezone/frontend/platforms/desktop/widget/button/horizontalBtn.dart';
 import 'package:safezone/frontend/platforms/mobile/pages/main-screen/notifications_page/all.dart';
 import 'package:safezone/frontend/platforms/mobile/pages/main-screen/notifications_page/read.dart';
 import 'package:safezone/frontend/platforms/mobile/pages/main-screen/notifications_page/unread.dart';
-import 'package:safezone/frontend/platforms/mobile/widgets/buttons/notification_btn.dart';
+import 'package:safezone/backend/properties/import.dart';
 import 'package:safezone/resource/schema/colors.dart';
 import 'package:safezone/resource/schema/texts.dart';
 
 class NotificationDT extends StatefulWidget {
+  final VoidCallback? onClose;
   final String UserToken;
   final int initialPage;
 
   const NotificationDT({
     super.key,
+    this.onClose,
     required this.UserToken,
     required this.initialPage,
   });
@@ -28,12 +33,18 @@ class _NotificationDTState extends State<NotificationDT> with SingleTickerProvid
   late PageController pageController;
   late List<Widget> topLevelPages;
 
+  String? selectedInternalPage;
+
   @override
   void initState() {
     super.initState();
 
     pageController = PageController(initialPage: widget.initialPage);
-    topLevelPages = [All(userToken: widget.UserToken), Read(userToken: widget.UserToken), Unread(userToken: widget.UserToken)];
+    topLevelPages = [
+      All(userToken: widget.UserToken),
+      Read(userToken: widget.UserToken),
+      Unread(userToken: widget.UserToken),
+    ];
 
     _controller = AnimationController(
       vsync: this,
@@ -56,27 +67,12 @@ class _NotificationDTState extends State<NotificationDT> with SingleTickerProvid
     BlocProvider.of<NotificationCubit>(context).changeSelectedIndex(page);
   }
 
-  Widget _mainWrapperBody() {
-    return PageView(
-      controller: pageController,
-      onPageChanged: onPageChanged,
-      children: topLevelPages,
-    );
-  }
-
   void _startShake() {
     _controller.forward();
   }
 
-  @override
-  void dispose() {
-    _controller.dispose();
-    pageController.dispose();
-    super.dispose();
-  }
-
   Widget _bodyNavigator(BuildContext context) {
-    return Container(
+    return SizedBox(
       width: double.infinity,
       height: 40,
       child: Row(
@@ -112,8 +108,8 @@ class _NotificationDTState extends State<NotificationDT> with SingleTickerProvid
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.only(top: 10), 
-                    child:Container(
+                    padding: const EdgeInsets.only(top: 10),
+                    child: Container(
                       height: 4,
                       width: double.infinity,
                       child: Center(
@@ -122,16 +118,16 @@ class _NotificationDTState extends State<NotificationDT> with SingleTickerProvid
                           height: 0.5,
                           color: Colors.black38,
                           child: isSelected
-                            ? Container(
-                              width: double.infinity, 
-                              height: 5.0,
-                              color: widgetPricolor, 
-                            )
-                          : const SizedBox(), 
+                              ? Container(
+                                  width: double.infinity,
+                                  height: 5.0,
+                                  color: widgetPricolor,
+                                )
+                              : const SizedBox(),
                         ),
                       ),
-                    )
-                  )
+                    ),
+                  ),
                 ],
               );
             },
@@ -141,55 +137,105 @@ class _NotificationDTState extends State<NotificationDT> with SingleTickerProvid
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Scaffold(
+  Widget _getPageForNavigation(String? page) {
+    switch (page) {
+      case "Reports":
+        return ReportsHistoryDT(
+          onBack: () {
+            setState(() {
+              selectedInternalPage = null;
+            });
+          },
+        );
+      case "Safezone":
+        return SafezoneHistoryDT(
+          onBack: () {
+            setState(() {
+              selectedInternalPage = null;
+            });
+          },
+        );
+      default:
+        return Scaffold(
           appBar: AppBar(
             backgroundColor: Colors.white,
             automaticallyImplyLeading: false,
             centerTitle: false,
-            title: CategoryText(text: "Contact"),
+            title: CategoryText(text: "Notification"),
             actions: [
               GestureDetector(
-                child: Icon(
+               onTap: () {
+                  if (widget.onClose != null) {
+                    widget.onClose!();
+                  }
+                },
+                child: const Icon(
                   Icons.cancel_outlined,
                   size: 20,
                   color: Colors.black38,
-                )
+                ),
               ),
-              SizedBox(width: 15)
+              const SizedBox(width: 15)
             ],
           ),
           body: Column(
             children: [
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 8.0),
-                child: NotificationBtn(
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 0.0),
+                child: HorizontalBtn(
                   title: "My Incident Reports",
                   svgIcon: "lib/resource/svg/report_notif.svg",
                   navigateTo: "Reports",
-                  description:
-                      "Check the status and details of your submitted reports",
+                  description: "Check the status and details of your submitted reports",
+                  onTap: (page) {
+                    setState(() {
+                      selectedInternalPage = page;
+                    });
+                  },
                 ),
               ),
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 8.0),
-                child: NotificationBtn(
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 0.0),
+                child: HorizontalBtn(
                   title: "My Safe Zones",
                   svgIcon: "lib/resource/svg/safe.png",
                   navigateTo: "Safezone",
-                  description:
-                      "Check the status and details of your submitted safe zones",
+                  description: "Check the status and details of your submitted safe zones",
+                  onTap: (page) {
+                    setState(() {
+                      selectedInternalPage = page;
+                    });
+                  },
                 ),
               ),
               _bodyNavigator(context),
               Expanded(child: _mainWrapperBody()),
-              
             ],
-          ),
-        ),
+          )
+        );
+    }
+  }
+
+  Widget _mainWrapperBody() {
+    return PageView(
+      controller: pageController,
+      onPageChanged: onPageChanged,
+      children: topLevelPages,
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    pageController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        _getPageForNavigation(selectedInternalPage),
         widget.UserToken == 'guest'
             ? GestureDetector(
                 onTap: _startShake,

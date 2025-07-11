@@ -11,7 +11,11 @@ import '../../../../../../../backend/architecture/bloc/circleBloc/circle_bloc.da
 import '../../../../../../../backend/properties/import.dart';
 
 class ListOfGroupsDT extends StatefulWidget {
-  const ListOfGroupsDT({super.key});
+  final VoidCallback? onClose;
+  const ListOfGroupsDT({
+    super.key,
+    this.onClose
+  });
 
   @override
   State<ListOfGroupsDT> createState() => _ListOfGroupsDTState();
@@ -338,6 +342,11 @@ class _ListOfGroupsDTState extends State<ListOfGroupsDT> {
               ],
             ),
             GestureDetector(
+              onTap: (){
+                if (widget.onClose != null) {
+                  widget.onClose!();
+                }
+              },
               child: Icon(
                 Icons.cancel_outlined,
                 size: 20,
@@ -430,8 +439,6 @@ class _ListOfGroupsDTState extends State<ListOfGroupsDT> {
                                 child: Container(
                                   width: double.infinity,
                                   height: 70,
-                                  margin: const EdgeInsets.symmetric(
-                                      horizontal: 10, vertical: 5),
                                   decoration: BoxDecoration(
                                     color: const Color.fromARGB(10, 0, 0, 0),
                                     borderRadius: BorderRadius.circular(5),
@@ -569,7 +576,7 @@ class _ListOfGroupsDTState extends State<ListOfGroupsDT> {
                                 width: 150,
                                 height: 150,
                                 child: Image.asset(
-                                  'lib/resources/image/png/empty-state/no_group.png',
+                                  'lib/resource/image/empty-state/no_group.png',
                                   width: 150,
                                   height: 150,
                                 ),

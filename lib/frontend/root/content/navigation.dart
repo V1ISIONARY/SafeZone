@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:safezone/backend/properties/responsive.dart';
-import 'package:safezone/frontend/platforms/mobile/pages/authentication/login.dart';
-import '../../platforms/desktop/pages/authentication/authentication.dart';
+import 'package:safezone/backend/properties/responsive/navigation.dart';
 import '../../platforms/desktop/pages/navigation.dart';
 import '../../platforms/mobile/widgets/bottom_navigation.dart';
 
@@ -19,7 +17,7 @@ class _NavigationRTState extends State<NavigationRT> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.transparent,
-      body: ResponsiveWidget(
+      body: NavResWidget(
         mobile: BottomNavigationWidget(userToken: widget.userToken),
         desktop: NavigationDT(userToken: widget.userToken),
       ),

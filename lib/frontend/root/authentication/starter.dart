@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:safezone/frontend/platforms/mobile/pages/introduction/starter.dart';
-import '../../../../backend/properties/responsive.dart';
+import '../../../backend/properties/responsive/auth.dart';
 import '../../platforms/desktop/pages/authentication/authentication.dart';
 
 class Starter extends StatelessWidget {
@@ -10,7 +10,7 @@ class Starter extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.transparent,
-      body: ResponsiveWidget(
+      body: AuthResWidget(
         mobile: StarterMD(),
         desktop: AuthenticationDesktop(),
       ),

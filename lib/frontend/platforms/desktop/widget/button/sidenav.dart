@@ -12,6 +12,7 @@ class Sidenav extends StatefulWidget {
 
   static final ValueNotifier<String?> selectedLabel = ValueNotifier("Zones");
   static final ValueNotifier<String?> selectedDropdownId = ValueNotifier(null);
+  static final ValueNotifier<int?> selectedComsNotifier = ValueNotifier(null);
 
   const Sidenav({
     Key? key,
@@ -63,24 +64,36 @@ class _SidenavState extends State<Sidenav> {
   }
 
   void _handleTap() {
-    Sidenav.selectedLabel.value = widget.label;
-    
-    if (!(widget.withDrop ?? false)) {
-      Sidenav.selectedDropdownId.value = null;
-    }
+    if (widget.label != 'Notification' && widget.label != 'Contact') {
+      Sidenav.selectedLabel.value = widget.label;
 
+      if (!(widget.withDrop ?? false)) {
+        Sidenav.selectedDropdownId.value = null;
+      }
+    }
     widget.onTap?.call();
-    
   }
+
 
   @override
   Widget build(BuildContext context) {
-    final bool isSelected = Sidenav.selectedLabel.value == widget.label;
+
     final bool isDropdown = widget.withDrop == true;
 
-    final Color backgroundColor = isSelected
-      ? Colors.grey.shade300
-      : (_hovering ? Colors.grey.shade50 : Colors.transparent);
+    final bool isMainSelected = Sidenav.selectedLabel.value == widget.label;
+    final bool isComsSelected =
+        (widget.label == 'Notification' && Sidenav.selectedComsNotifier.value == 0) ||
+        (widget.label == 'Contact' && Sidenav.selectedComsNotifier.value == 1);
+    final bool isSelected = isMainSelected || isComsSelected;
+
+
+    final Color backgroundColor = 
+      (widget.label == 'Notification' && Sidenav.selectedComsNotifier.value == 0) ||
+      (widget.label == 'Contact' && Sidenav.selectedComsNotifier.value == 1)
+          ? btnColor.withOpacity(0.3)
+          : (Sidenav.selectedLabel.value == widget.label
+              ? Colors.grey.shade300
+              : (_hovering ? Colors.grey.shade50 : Colors.transparent));
 
     final Color iconColor = Colors.black54;
     final Color textColor = Colors.black54;

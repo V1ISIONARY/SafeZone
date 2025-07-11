@@ -13,9 +13,11 @@ import '../../../../../../backend/properties/import.dart';
 class ContactDT extends StatefulWidget {
 
   final String UserToken;
+  final VoidCallback? onClose;
 
   const ContactDT({
     super.key,
+    this.onClose,
     required this.UserToken
   });
 
@@ -95,6 +97,11 @@ class _ContactDTState extends State<ContactDT> with SingleTickerProviderStateMix
               ),
               actions: [
                 GestureDetector(
+                  onTap: (){
+                    if (widget.onClose != null) {
+                      widget.onClose!();
+                    }
+                  },
                   child: Icon(
                     Icons.cancel_outlined,
                     size: 20,

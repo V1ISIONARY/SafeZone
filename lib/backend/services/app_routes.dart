@@ -40,6 +40,7 @@ import 'package:safezone/frontend/platforms/mobile/pages/main-screen/sos_page/so
 import 'package:safezone/frontend/platforms/mobile/pages/main-screen/sos_page/sos_success.dart';
 import 'package:safezone/frontend/platforms/mobile/widgets/bottom_navigation.dart';
 import 'package:safezone/frontend/root/authentication/starter.dart';
+import 'package:safezone/frontend/root/experiement.dart';
 
 import '../../frontend/root/content/navigation.dart';
 
@@ -63,6 +64,10 @@ GoRouter appRouter(bool isFirstRun, String? userToken) => GoRouter(
     //   path: '/',
     //   builder: (context, state) => const NavigationDT(),
     // ),
+    GoRoute(
+      path: '/experiement',
+      builder: (context, state) => const Experiement(),
+    ),
     GoRoute(
       path: '/register',
       builder: (context, state) => const RegisterMD(),
