@@ -13,14 +13,23 @@ class NavigationRT extends StatefulWidget {
 }
 
 class _NavigationRTState extends State<NavigationRT> {
+
+  @override
+  void initState() {
+    super.initState();
+    print('This is the usertokensdads : ${widget.userToken}');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.transparent,
-      body: NavResWidget(
-        mobile: BottomNavigationWidget(userToken: widget.userToken),
-        desktop: NavigationDT(userToken: widget.userToken),
-      ),
+      body: widget.userToken != 'guest'
+        ? NavResWidget(
+            mobile: BottomNavigationWidget(userToken: widget.userToken),
+            desktop: NavigationDT(userToken: widget.userToken),
+          )
+        : BottomNavigationWidget(userToken: widget.userToken)
     );
   }
 }

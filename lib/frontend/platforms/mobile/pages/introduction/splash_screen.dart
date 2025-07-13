@@ -4,6 +4,7 @@ import 'package:page_transition/page_transition.dart';
 
 import '../../../../../resource/schema/colors.dart';
 import '../../../../root/authentication/starter.dart';
+import '../../../../root/content/navigation.dart';
 import '../../widgets/bottom_navigation.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -33,9 +34,9 @@ class _SplashScreenState extends State<SplashScreen> {
           PageTransition(
             child: isFirstRun
                 ? const Starter()
-                : const BottomNavigationWidget(
-                    userToken: 'guest',
-                  ),
+                : const NavigationRT(
+                  userToken: 'guest',
+                ),
             type: PageTransitionType.fade,
             duration: const Duration(milliseconds: 300),
           ),

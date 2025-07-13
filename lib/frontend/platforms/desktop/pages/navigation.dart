@@ -291,72 +291,49 @@ class _NavigationDTState extends State<NavigationDT> {
                                                 opacity: animation,
                                                 child: child,
                                               ),
-                                              child: isVisible
-                                                ? Tooltip(
-                                                    message: 'Close tab',
-                                                    preferBelow: false,
-                                                    decoration: BoxDecoration(
-                                                      color: Colors.black,
-                                                      borderRadius: BorderRadius.circular(4),
-                                                    ),
-                                                    textStyle: TextStyle(
-                                                      color: Colors.white,
-                                                      fontSize: 8,
-                                                    ),
-                                                    child: Material(
-                                                      color: Colors.transparent,
-                                                      child: InkWell(
-                                                        borderRadius: BorderRadius.circular(5),
-                                                        hoverColor: Colors.grey.shade300,
-                                                        onTap: () {
-                                                          setState(() {
-                                                            sharedController.isSidebarTabUi.value = !sharedController.isSidebarTabUi.value;
-                                                          });
-                                                        },
-                                                        child: Padding(
-                                                          padding: EdgeInsets.all(5),
-                                                          child: Icon(
-                                                            Icons.cancel_outlined,
-                                                            color: Colors.black45,
-                                                            size: 18,
-                                                          )
-                                                        ),
-                                                      ),
-                                                    )
-                                                  )
-                                                : Tooltip(
-                                                  message: 'Close sidebar',
-                                                  preferBelow: false,
-                                                  decoration: BoxDecoration(
-                                                    color: Colors.black,
-                                                    borderRadius: BorderRadius.circular(4),
-                                                  ),
-                                                  textStyle: TextStyle(
-                                                    color: Colors.white,
-                                                    fontSize: 8,
-                                                  ),
-                                                  child: Material(
-                                                    color: Colors.transparent,
-                                                    child: InkWell(
-                                                      borderRadius: BorderRadius.circular(5),
-                                                      hoverColor: Colors.grey.shade300,
-                                                      onTap: () {
-                                                        setState(() {
+                                              child: Tooltip(
+                                                message: sharedController.isSidebarTabUi.value ? 'Close tab' : 'Close sidebar',
+                                                preferBelow: false,
+                                                decoration: BoxDecoration(
+                                                  color: Colors.black,
+                                                  borderRadius: BorderRadius.circular(4),
+                                                ),
+                                                textStyle: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 8,
+                                                ),
+                                                child: Material(
+                                                  color: Colors.transparent,
+                                                  child: InkWell(
+                                                    borderRadius: BorderRadius.circular(5),
+                                                    hoverColor: Colors.grey.shade300,
+                                                    onTap: () {
+                                                      setState(() {
+                                                        if (sharedController.isSidebarTabUi.value) {
+                                                          sharedController.isSidebarTabUi.value = false;
+                                                        } else {
                                                           sharedController.isSidebarCollapsed.value = !sharedController.isSidebarCollapsed.value;
-                                                        });
-                                                      },
-                                                      child: Padding(
-                                                        padding: EdgeInsets.all(5),
-                                                        child: SvgPicture.asset(
-                                                          'lib/resource/svg/close_sidebar.svg',
-                                                          color: Colors.black45,
-                                                          height: 18,
-                                                          width: 18,
-                                                        ),
-                                                      ),
+                                                        }
+                                                      });
+                                                    },
+                                                    child: Padding(
+                                                      padding: EdgeInsets.all(5),
+                                                      child: sharedController.isSidebarTabUi.value
+                                                          ? Icon(
+                                                              Icons.cancel_outlined,
+                                                              color: Colors.black45,
+                                                              size: 18,
+                                                            )
+                                                          : SvgPicture.asset(
+                                                              'lib/resource/svg/close_sidebar.svg',
+                                                              color: Colors.black45,
+                                                              height: 18,
+                                                              width: 18,
+                                                            ),
                                                     ),
                                                   ),
-                                                )
+                                                ),
+                                              )
                                             );
                                           }
                                         )
