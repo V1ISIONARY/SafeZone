@@ -19,7 +19,6 @@ class SharedProperties {
   final TextEditingController groupCodeController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
   final TextEditingController confirmPassController = TextEditingController();
-  ValueNotifier<bool> isSidebarAutoLocked = ValueNotifier<bool>(false);
 
   //Map Variables
   final TextEditingController mapSearchTE = TextEditingController();
@@ -34,6 +33,8 @@ class SharedProperties {
   bool rememberMe = false;
   bool passwordVisible = false;
   ValueNotifier<bool> isSidebarCollapsed = ValueNotifier(false);
+  ValueNotifier<bool> isSidebarTab = ValueNotifier(false);
+  ValueNotifier<bool> isSidebarTabUi = ValueNotifier(false);
   
   ValueNotifier<bool> authenticationPage = ValueNotifier(true);
   ValueNotifier<bool> inSlide = ValueNotifier(false);

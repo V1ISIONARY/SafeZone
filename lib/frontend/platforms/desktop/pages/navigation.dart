@@ -30,6 +30,7 @@ class _NavigationDTState extends State<NavigationDT> {
 
   bool showit = false;
   bool dropdown = false;
+  bool? _wasSmallScreen;
   final sharedController = SharedProperties();
 
   Widget _getSelectedPage() {
@@ -132,21 +133,6 @@ class _NavigationDTState extends State<NavigationDT> {
             builder: (context, constraints) {
               final double pageContentWidth = constraints.maxWidth;
               final bool isInSplitMode = showit && dropdown && pageContentWidth <= 1220;
-
-              if (pageContentWidth <= 900) {
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  if (!sharedController.isSidebarCollapsed.value) {
-                    sharedController.isSidebarCollapsed.value = true;
-                  }
-                });
-              } else if (pageContentWidth >= 1120) {
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  if (sharedController.isSidebarCollapsed.value) {
-                    sharedController.isSidebarCollapsed.value = false;
-                  }
-                });
-              }
-
               return Row(
                 children: [
                   if (showit && isInSplitMode)
@@ -210,6 +196,7 @@ class _NavigationDTState extends State<NavigationDT> {
                     ),
                 ],
               );
+
             },
           ),
         ),
@@ -220,7 +207,6 @@ class _NavigationDTState extends State<NavigationDT> {
   }
 
   Widget _buildDrawer() {
-
     return ValueListenableBuilder<bool>(
       valueListenable: sharedController.isSidebarCollapsed,
       builder: (context, isCollapsed, child) {
@@ -296,40 +282,84 @@ class _NavigationDTState extends State<NavigationDT> {
                                           ],
                                         ),
                                         Spacer(),
-                                        Tooltip(
-                                          message: 'Close sidebar',
-                                          preferBelow: false,
-                                          decoration: BoxDecoration(
-                                            color: Colors.black,
-                                            borderRadius: BorderRadius.circular(4),
-                                          ),
-                                          textStyle: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 8,
-                                          ),
-                                          child: Material(
-                                            color: Colors.transparent,
-                                            child: InkWell(
-                                              borderRadius: BorderRadius.circular(5),
-                                              hoverColor: Colors.grey.shade300,
-                                              onTap: () {
-                                                setState(() {
-                                                  sharedController.isSidebarCollapsed.value =
-                                                      !sharedController.isSidebarCollapsed.value;
-                                                });
-                                              },
-                                              child: Padding(
-                                                padding: EdgeInsets.all(5),
-                                                child: SvgPicture.asset(
-                                                  'lib/resource/svg/close_sidebar.svg',
-                                                  color: Colors.black45,
-                                                  height: 18,
-                                                  width: 18,
-                                                ),
+                                        ValueListenableBuilder(
+                                          valueListenable: sharedController.isSidebarTabUi,
+                                          builder: (context, isVisible, _) {
+                                            return AnimatedSwitcher(
+                                              duration: Duration(milliseconds: 300),
+                                              transitionBuilder: (child, animation) => FadeTransition(
+                                                opacity: animation,
+                                                child: child,
                                               ),
-                                            ),
-                                          ),
-                                        ),
+                                              child: isVisible
+                                                ? Tooltip(
+                                                    message: 'Close tab',
+                                                    preferBelow: false,
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.black,
+                                                      borderRadius: BorderRadius.circular(4),
+                                                    ),
+                                                    textStyle: TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: 8,
+                                                    ),
+                                                    child: Material(
+                                                      color: Colors.transparent,
+                                                      child: InkWell(
+                                                        borderRadius: BorderRadius.circular(5),
+                                                        hoverColor: Colors.grey.shade300,
+                                                        onTap: () {
+                                                          setState(() {
+                                                            sharedController.isSidebarTabUi.value = !sharedController.isSidebarTabUi.value;
+                                                          });
+                                                        },
+                                                        child: Padding(
+                                                          padding: EdgeInsets.all(5),
+                                                          child: Icon(
+                                                            Icons.cancel_outlined,
+                                                            color: Colors.black45,
+                                                            size: 18,
+                                                          )
+                                                        ),
+                                                      ),
+                                                    )
+                                                  )
+                                                : Tooltip(
+                                                  message: 'Close sidebar',
+                                                  preferBelow: false,
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.black,
+                                                    borderRadius: BorderRadius.circular(4),
+                                                  ),
+                                                  textStyle: TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: 8,
+                                                  ),
+                                                  child: Material(
+                                                    color: Colors.transparent,
+                                                    child: InkWell(
+                                                      borderRadius: BorderRadius.circular(5),
+                                                      hoverColor: Colors.grey.shade300,
+                                                      onTap: () {
+                                                        setState(() {
+                                                          sharedController.isSidebarCollapsed.value = !sharedController.isSidebarCollapsed.value;
+                                                        });
+                                                      },
+                                                      child: Padding(
+                                                        padding: EdgeInsets.all(5),
+                                                        child: SvgPicture.asset(
+                                                          'lib/resource/svg/close_sidebar.svg',
+                                                          color: Colors.black45,
+                                                          height: 18,
+                                                          width: 18,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                )
+                                            );
+                                          }
+                                        )
                                       ],
                                     ),
                                   ),
@@ -407,7 +437,9 @@ class _NavigationDTState extends State<NavigationDT> {
                                   ),
                                 ),
                                 onChanged: (text) {
-                                  setState(() {});
+                                  setState(() {
+
+                                  });
                                 },
                               ),
                             ),
@@ -741,31 +773,83 @@ class _NavigationDTState extends State<NavigationDT> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      key: _scaffoldKey,
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        color:  const Color.fromARGB(255, 250, 250, 250),
-        padding: EdgeInsets.only(
-          left: 10
-        ),
-        child: Row(
-          children: [
-            _buildDrawer(),
-            Expanded(
-              flex: 6,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: _getSelectedPage()
-              )
-            )
-          ],
-        ),
-      ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final double pageContentWidth = constraints.maxWidth;
+        final bool isSmallScreen = pageContentWidth <= 900;
+
+        if (_wasSmallScreen != isSmallScreen) {
+          _wasSmallScreen = isSmallScreen;
+
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (isSmallScreen) {
+              if (!sharedController.isSidebarTab.value) {
+                sharedController.isSidebarTab.value = true;
+                if (sharedController.isSidebarCollapsed.value) {
+                  sharedController.isSidebarCollapsed.value = false;
+                }
+              }
+            } else {
+              if (sharedController.isSidebarTab.value) {
+                sharedController.isSidebarTabUi.value = false;
+                sharedController.isSidebarTab.value = false;
+              }
+            }
+          });
+        }
+
+        return Scaffold(
+          key: _scaffoldKey,
+          body: Container(
+            width: double.infinity,
+            height: double.infinity,
+            color: const Color.fromARGB(255, 250, 250, 250),
+            padding: EdgeInsets.only(
+              left: !isSmallScreen ? 10 : 0,
+            ),
+            child: Row(
+              children: [
+                if (pageContentWidth > 900) _buildDrawer(),
+                Expanded(
+                  flex: 6,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: ValueListenableBuilder(
+                      valueListenable: sharedController.isSidebarTabUi,
+                      builder: (context, isVisible, _) {
+                        return Stack(
+                          children: [
+                            _getSelectedPage(),
+                            if (isSmallScreen)
+                              AnimatedPositioned(
+                                duration: const Duration(milliseconds: 300),
+                                curve: Curves.easeInOut,
+                                left: isVisible ? 0 : -247,
+                                top: 0,
+                                bottom: 0,
+                                child: Container(
+                                  width: 247,
+                                  height: double.infinity,
+                                  padding: const EdgeInsets.only(left: 10),
+                                  color: const Color.fromARGB(250, 250, 250, 250),
+                                  child: _buildDrawer(),
+                                ),
+                              ),
+                          ],
+                        );
+                      },
+                    ),
+                  ),
+                )
+              ],
+            ),
+          ),
+        );
+      },
     );
+
   }
 }
