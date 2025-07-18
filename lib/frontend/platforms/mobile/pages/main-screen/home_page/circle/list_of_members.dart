@@ -77,16 +77,41 @@ class _ListOfMembersState extends State<ListOfMembers> {
     }
   }
 
-  void _leaveGroup() {
-    context
-        .read<CircleBloc>()
-        .add(RemoveMemberEvent(circleId: widget.circleId, userId: _userId!));
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('You have left the group')),
+  void _leaveGroup() async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text("Leave Circle"),
+          content: const Text("Are you sure you want to leave this circle?"),
+          actions: [
+            TextButton(
+              child: const Text("Cancel"),
+              onPressed: () => Navigator.of(context).pop(false),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+              ),
+              child: const Text("Leave"),
+              onPressed: () => Navigator.of(context).pop(true),
+            ),
+          ],
+        );
+      },
     );
 
-    Navigator.of(context).pop();
+    if (confirm == true) {
+      context
+          .read<CircleBloc>()
+          .add(RemoveMemberEvent(circleId: widget.circleId, userId: _userId!));
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('You have left the group')),
+      );
+
+      Navigator.of(context).pop(true);
+    }
   }
 
   @override

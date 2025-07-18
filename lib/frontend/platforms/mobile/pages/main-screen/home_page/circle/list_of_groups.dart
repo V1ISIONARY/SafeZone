@@ -48,8 +48,7 @@ class _ListOfGroupsState extends State<ListOfGroups> {
 
     return showDialog<void>(
       context: context,
-      barrierDismissible:
-          true,
+      barrierDismissible: true,
       builder: (BuildContext context) {
         return AlertDialog(
           backgroundColor: Colors.white,
@@ -66,33 +65,26 @@ class _ListOfGroupsState extends State<ListOfGroups> {
             style: const TextStyle(fontSize: 11),
             decoration: InputDecoration(
               labelText: 'Group Name',
-              labelStyle: const TextStyle(
-                  fontSize: 11, color: Colors.grey), 
+              labelStyle: const TextStyle(fontSize: 11, color: Colors.grey),
               hintText: 'Enter group name',
-              hintStyle: const TextStyle(
-                  fontSize: 11, color: Colors.grey),
-              contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 12, vertical: 8),
+              hintStyle: const TextStyle(fontSize: 11, color: Colors.grey),
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               border: OutlineInputBorder(
-                borderRadius:
-                    BorderRadius.circular(8),
-                borderSide: const BorderSide(
-                    color: Colors.grey, width: 1),
+                borderRadius: BorderRadius.circular(8),
+                borderSide: const BorderSide(color: Colors.grey, width: 1),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
-                borderSide: const BorderSide(
-                    color: Colors.blue, width: 2), 
+                borderSide: const BorderSide(color: Colors.blue, width: 2),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
-                borderSide: const BorderSide(
-                    color: Colors.grey,
-                    width: 1), 
+                borderSide: const BorderSide(color: Colors.grey, width: 1),
               ),
             ),
             inputFormatters: [
-              LengthLimitingTextInputFormatter(15), 
+              LengthLimitingTextInputFormatter(15),
             ],
           ),
           actions: [
@@ -119,7 +111,8 @@ class _ListOfGroupsState extends State<ListOfGroups> {
               onPressed: () {
                 final groupName = nameController.text.trim();
 
-                bool nameExists = _circles.any((circle) => circle.name == groupName);
+                bool nameExists =
+                    _circles.any((circle) => circle.name == groupName);
 
                 if (groupName.isEmpty) {
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -270,26 +263,25 @@ class _ListOfGroupsState extends State<ListOfGroups> {
           centerTitle: true,
           title: Transform.translate(
             offset: const Offset(-15, 0),
-            child: Row(
-              children: [
-                GestureDetector(
-                  onTap: () async {
-                    Navigator.pop(context);
-                  },
-                  child: Container(
-                    margin: const EdgeInsets.all(15),
-                    height: 25,
-                    width: 25,
-                    decoration: BoxDecoration(
-                      border: Border.all(width: 1, color: Colors.black),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(Icons.arrow_back, color: Colors.black, size: 10),
+            child: Row(children: [
+              GestureDetector(
+                onTap: () async {
+                  Navigator.pop(context);
+                },
+                child: Container(
+                  margin: const EdgeInsets.all(15),
+                  height: 25,
+                  width: 25,
+                  decoration: BoxDecoration(
+                    border: Border.all(width: 1, color: Colors.black),
+                    shape: BoxShape.circle,
                   ),
+                  child: const Icon(Icons.arrow_back,
+                      color: Colors.black, size: 10),
                 ),
-                const CategoryText(text: "My Groups")
-              ]
-            ),
+              ),
+              const CategoryText(text: "My Groups")
+            ]),
           ),
           actions: [
             Row(
@@ -366,7 +358,8 @@ class _ListOfGroupsState extends State<ListOfGroups> {
                   if (state is CircleCreatedState) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                          content: Text('New group "${state.circle.name}" created!')),
+                          content: Text(
+                              'New group "${state.circle.name}" created!')),
                     );
                   } else if (state is CircleUpdatedState) {
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -377,7 +370,6 @@ class _ListOfGroupsState extends State<ListOfGroups> {
                       SnackBar(content: Text(state.message)),
                     );
                   } else if (state is CircleErrorState) {
-                    
                   } else if (state is CircleAddMemberErrorState) {
                     showDialog(
                       context: context,
@@ -424,20 +416,29 @@ class _ListOfGroupsState extends State<ListOfGroups> {
                           padding: const EdgeInsets.symmetric(vertical: 8.0),
                           child: ListView.builder(
                             itemCount: _circles.length,
-                              itemBuilder: (context, index) {
-                                
-                                final sortedCircles = _circles..sort((a, b) {
-                                  if (a.isActive && !b.isActive) return -1; 
+                            itemBuilder: (context, index) {
+                              final sortedCircles = _circles
+                                ..sort((a, b) {
+                                  if (a.isActive && !b.isActive) return -1;
                                   if (!a.isActive && b.isActive) return 1;
-                                  return b.id.compareTo(a.id); 
+                                  return b.id.compareTo(a.id);
                                 });
 
-                                final group = sortedCircles[index];
+                              final group = sortedCircles[index];
 
-                                return GestureDetector(
-                                onTap: () {
-                                  context.push('/members/${group.id}',
-                                      extra: group);
+                              return GestureDetector(
+                                onTap: () async {
+                                  final result = await context.push<bool>(
+                                    '/members/${group.id}',
+                                    extra: group,
+                                  );
+
+                                  if (result == true) {
+                                    Future.delayed(const Duration(seconds: 2),
+                                        () {
+                                      _loadUserId(); // Reload userId or do whatever is needed
+                                    });
+                                  }
                                 },
                                 child: Container(
                                   width: double.infinity,

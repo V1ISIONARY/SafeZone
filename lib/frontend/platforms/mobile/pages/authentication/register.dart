@@ -36,7 +36,7 @@ class _RegisterMDState extends State<RegisterMD> {
   EmailOTP myauth = EmailOTP();
   String generatedOTP = "";
   String? selectedGender;
-
+  bool _isSendingOTP = false;
   bool _showTitle = false;
   double _appBarHeight = 0;
   String _notificationText = "";
@@ -86,11 +86,19 @@ class _RegisterMDState extends State<RegisterMD> {
   }
 
   Future<void> sendOTP(String recipientEmail) async {
+    setState(() {
+      _isSendingOTP = true;
+    });
+
     const String senderEmail = 'safezone.SY2425@gmail.com';
     final String senderPassword = dotenv.env['GMAIL_PASSWORD'] ?? '';
 
     if (senderPassword.isEmpty) {
       print('Error: GMAIL_PASSWORD is not set in .env file');
+      _checkIfShown(text: "Email sender error", color: Colors.red);
+      setState(() {
+        _isSendingOTP = false;
+      });
       return;
     }
 
@@ -101,23 +109,13 @@ class _RegisterMDState extends State<RegisterMD> {
     final String htmlContent = '''
     <html>
       <body>
-        <table align="center" width="100%" cellpadding="0" cellspacing="0" role="presentation">
-          <tr>
-            <td align="center">
-              <img src="https://firebasestorage.googleapis.com/v0/b/safezone-11724.firebasestorage.app/o/Group%2031.png?alt=media&token=393c849f-c3e6-4c19-a231-62350ec23667" alt="SafeZone Logo" style="width:150px;height:auto;">
-            </td>
-          </tr>
-        </table>
-        <p>Dear user,</p>
-        <p>Welcome to SafeZone app!</p>
-        <p>To proceed with your verification request, here's your one-time PIN:</p>
+        <p>Welcome to SafeZone!</p>
+        <p>Your OTP is:</p>
         <h2>$generatedOTP</h2>
-        <p>One Time PIN is only valid for 10 minutes.</p>
-        <p>Did you request for this? If not, please ignore this email or report this activity to our customer service by sending an email to <a href="mailto:safezone.SY2425@gmail.com">safezone.SY2425@gmail.com</a>.</p>
-        <p>Thank you.</p>
+        <p>Valid for 10 minutes.</p>
       </body>
     </html>
-    ''';
+  ''';
 
     final message = Message()
       ..from = const Address(senderEmail, 'SafeZone App')
@@ -131,7 +129,12 @@ class _RegisterMDState extends State<RegisterMD> {
       print('OTP sent successfully: $generatedOTP');
     } catch (e) {
       print('Error sending OTP: $e');
+      _checkIfShown(text: "Failed to send OTP", color: Colors.red);
     }
+
+    setState(() {
+      _isSendingOTP = false;
+    });
   }
 
   @override
@@ -260,9 +263,10 @@ class _RegisterMDState extends State<RegisterMD> {
             decoration: InputDecoration(
               hintText: "Email Address",
               hintStyle: const TextStyle(
-                  fontSize: 13,
-                  color: labelFormFieldColor,
-                  fontWeight: FontWeight.w200),
+                fontSize: 13,
+                color: labelFormFieldColor,
+                fontWeight: FontWeight.w200,
+              ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
                 borderSide: const BorderSide(color: widgetPricolor, width: 2),
@@ -275,18 +279,21 @@ class _RegisterMDState extends State<RegisterMD> {
           ),
           const Spacer(),
           GestureDetector(
-            onTap: () {
-              final bloc = context.read<AuthenticationBloc>();
-              bloc.add(CheckEmailEvent(email: emailController.text));
-              bloc.stream.listen((state) {
-                if (state is EmailCheckSuccess) {
-                  sendOTP(emailController.text);
-                } else if (state is EmailCheckError) {
-                  _checkIfShown(text: state.message, color: Colors.red);
-                }
-              });
-              sendOTP(emailController.text);
-            },
+            onTap: _isSendingOTP
+                ? null
+                : () {
+                    final bloc = context.read<AuthenticationBloc>();
+                    bloc.add(CheckEmailEvent(email: emailController.text));
+
+                    // Wait for result then trigger OTP
+                    bloc.stream.listen((state) {
+                      if (state is EmailCheckSuccess) {
+                        sendOTP(emailController.text);
+                      } else if (state is EmailCheckError) {
+                        _checkIfShown(text: state.message, color: Colors.red);
+                      }
+                    });
+                  },
             child: Container(
               height: 50,
               width: double.infinity,
@@ -295,14 +302,23 @@ class _RegisterMDState extends State<RegisterMD> {
                 color: widgetPricolor,
                 borderRadius: BorderRadius.circular(50),
               ),
-              child: const Center(
-                child: Text(
-                  'Send Code',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.white,
-                  ),
-                ),
+              child: Center(
+                child: _isSendingOTP
+                    ? const SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(
+                          color: Colors.white,
+                          strokeWidth: 2,
+                        ),
+                      )
+                    : const Text(
+                        'Send Code',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.white,
+                        ),
+                      ),
               ),
             ),
           )
