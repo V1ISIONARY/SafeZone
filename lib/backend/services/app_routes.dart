@@ -14,6 +14,7 @@ import 'package:safezone/frontend/platforms/mobile/pages/authentication/account_
 import 'package:safezone/frontend/platforms/mobile/pages/authentication/register.dart';
 import 'package:safezone/backend/models/dangerzoneModel/incident_report_model.dart';
 import 'package:safezone/frontend/platforms/mobile/pages/authentication/login.dart';
+import 'package:safezone/frontend/platforms/mobile/pages/introduction/splash_screen.dart';
 import 'package:safezone/frontend/platforms/mobile/pages/main-screen/home_page/circle/create_new_group.dart';
 import 'package:safezone/frontend/platforms/mobile/pages/main-screen/home_page/circle/generate_new_code.dart';
 import 'package:safezone/frontend/platforms/mobile/pages/main-screen/home_page/circle/join_group.dart';
@@ -50,8 +51,8 @@ GoRouter appRouter(bool isFirstRun, String? userToken) => GoRouter(
     GoRoute(
       path: '/',
       builder: (context, state) => isFirstRun
-        ? const Starter()
-        : BottomNavigationWidget(userToken: userToken ?? 'guest'),
+        ? const SplashScreen()
+        : NavigationRT(userToken: userToken ?? 'guest'),
     ),
     GoRoute(
       path: '/home',
@@ -60,10 +61,6 @@ GoRouter appRouter(bool isFirstRun, String? userToken) => GoRouter(
         return NavigationRT(userToken: token);
       },
     ),
-    // GoRoute(
-    //   path: '/',
-    //   builder: (context, state) => const NavigationDT(),
-    // ),
     GoRoute(
       path: '/experiement',
       builder: (context, state) => const Experiement(),

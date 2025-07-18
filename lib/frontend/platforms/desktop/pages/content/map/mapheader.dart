@@ -72,7 +72,49 @@ class _MapHeaderState extends State<MapHeader> {
                           ),
                         ),
                       )
-                    : const SizedBox(width: 10);
+                    : ValueListenableBuilder(
+                        valueListenable: sharedController.isSidebarTab,
+                        builder: (context, tabvalue, child) {
+                          return tabvalue 
+                            ? Container(
+                              margin: const EdgeInsets.only(left: 10, right: 15),
+                              child: Tooltip(
+                                message: 'Open tab',
+                                preferBelow: false,
+                                decoration: BoxDecoration(
+                                  color: Colors.black,
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                textStyle: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 8,
+                                ),
+                                child: Material(
+                                  color: Colors.transparent,
+                                  child: InkWell(
+                                    borderRadius: BorderRadius.circular(5),
+                                    hoverColor: Colors.grey.shade300,
+                                    onTap: () {
+                                      sharedController.isSidebarTabUi.value = !sharedController.isSidebarTabUi.value;
+                                    },
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(5),
+                                      child: SvgPicture.asset(
+                                        'lib/resource/svg/navigation_tab.svg',
+                                        color: Colors.black45,
+                                        height: 18,
+                                        width: 19,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            )
+                            : Container(
+                              margin: const EdgeInsets.only(left: 10),
+                            );
+                        }
+                      );
                 }
               ),
               Row(
@@ -93,7 +135,6 @@ class _MapHeaderState extends State<MapHeader> {
                     double minMargin = 0;
                     double screenWidth = constraints.maxWidth;
 
-                    // You can adjust the formula below to control how quickly margin shrinks
                     double margin = (screenWidth / 10).clamp(minMargin, maxMargin);
 
                     return Container(
