@@ -11,14 +11,9 @@ import 'package:safezone/resource/schema/texts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ReportsHistoryDT extends StatefulWidget {
-
-  final bool ?fromSuccess;
+  final bool? fromSuccess;
   final VoidCallback? onBack;
-  const ReportsHistoryDT({
-    super.key,
-    this.onBack,
-    this.fromSuccess
-  });
+  const ReportsHistoryDT({super.key, this.onBack, this.fromSuccess});
 
   @override
   State<ReportsHistoryDT> createState() => _ReportsHistoryDTState();
@@ -84,7 +79,7 @@ class _ReportsHistoryDTState extends State<ReportsHistoryDT>
         if (widget.onBack != null) {
           widget.onBack!();
         }
-        return false; 
+        return false;
       },
       child: Scaffold(
         appBar: AppBar(
@@ -93,24 +88,23 @@ class _ReportsHistoryDTState extends State<ReportsHistoryDT>
           centerTitle: false,
           title: Transform.translate(
             offset: const Offset(-15, 0),
-            child: Row(
-              children: [
-                GestureDetector(
-                  onTap: widget.onBack ?? () => Navigator.pop(context),
-                  child: Container(
-                    margin: const EdgeInsets.all(10),
-                    height: 20,
-                    width: 20,
-                    decoration: BoxDecoration(
-                      border: Border.all(width: 1, color: Colors.black),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(Icons.arrow_back, color: Colors.black, size: 10),
+            child: Row(children: [
+              GestureDetector(
+                onTap: widget.onBack ?? () => Navigator.pop(context),
+                child: Container(
+                  margin: const EdgeInsets.all(10),
+                  height: 20,
+                  width: 20,
+                  decoration: BoxDecoration(
+                    border: Border.all(width: 1, color: Colors.black),
+                    shape: BoxShape.circle,
                   ),
+                  child: const Icon(Icons.arrow_back,
+                      color: Colors.black, size: 10),
                 ),
-                const CategoryText(text: "My Incident Reports")
-              ]
-            ),
+              ),
+              const CategoryText(text: "My Incident Reports")
+            ]),
           ),
           actions: [
             Padding(
@@ -129,8 +123,8 @@ class _ReportsHistoryDTState extends State<ReportsHistoryDT>
                     children: [
                       Icon(
                         _isAscending
-                          ? Icons.arrow_upward
-                          : Icons.arrow_downward,
+                            ? Icons.arrow_upward
+                            : Icons.arrow_downward,
                         size: 15,
                         color: Colors.black,
                       ),
@@ -150,12 +144,14 @@ class _ReportsHistoryDTState extends State<ReportsHistoryDT>
         body: Column(
           children: [
             Container(
-              margin: const EdgeInsets.only(top: 10, left: 16, bottom: 16, right: 16),
+              margin: const EdgeInsets.only(
+                  top: 10, left: 16, bottom: 16, right: 16),
               child: Row(
                 children: [
                   const Flexible(
                     child: CategoryDescripText(
-                      text: 'View and track the status of all your past reports.',
+                      text:
+                          'View and track the status of all your past reports.',
                     ),
                   ),
                   const SizedBox(width: 8),
@@ -182,8 +178,8 @@ class _ReportsHistoryDTState extends State<ReportsHistoryDT>
               child: TabBarView(
                 controller: _tabController,
                 children: _categories
-                  .map((category) => _buildCategoryPage(category))
-                  .toList(),
+                    .map((category) => _buildCategoryPage(category))
+                    .toList(),
               ),
             ),
           ],
@@ -197,13 +193,9 @@ class _ReportsHistoryDTState extends State<ReportsHistoryDT>
       builder: (context, state) {
         if (state is IncidentReportLoading) {
           return Expanded(
-            child: Center(
-              child: Transform.translate(
-                offset: const Offset(-30, -60), 
-                child: LoadingState()
-              )
-            )
-          );
+              child: Center(
+                  child: Transform.translate(
+                      offset: const Offset(-30, -60), child: LoadingState())));
         } else if (state is IncidentReportLoaded) {
           var filteredReports = status == 'All'
               ? state.incidentReports
@@ -228,7 +220,7 @@ class _ReportsHistoryDTState extends State<ReportsHistoryDT>
                     width: 150,
                     height: 150,
                     child: Image.asset(
-                      'lib/resource/image/png/empty-state/search.png',
+                      'lib/resource/image/empty-state/search.png',
                       width: 150,
                       height: 150,
                     ),

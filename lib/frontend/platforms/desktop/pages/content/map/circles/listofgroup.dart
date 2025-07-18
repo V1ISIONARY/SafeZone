@@ -12,10 +12,7 @@ import '../../../../../../../backend/properties/import.dart';
 
 class ListOfGroupsDT extends StatefulWidget {
   final VoidCallback? onClose;
-  const ListOfGroupsDT({
-    super.key,
-    this.onClose
-  });
+  const ListOfGroupsDT({super.key, this.onClose});
 
   @override
   State<ListOfGroupsDT> createState() => _ListOfGroupsDTState();
@@ -52,8 +49,7 @@ class _ListOfGroupsDTState extends State<ListOfGroupsDT> {
 
     return showDialog<void>(
       context: context,
-      barrierDismissible:
-          true,
+      barrierDismissible: true,
       builder: (BuildContext context) {
         return AlertDialog(
           backgroundColor: Colors.white,
@@ -70,33 +66,26 @@ class _ListOfGroupsDTState extends State<ListOfGroupsDT> {
             style: const TextStyle(fontSize: 11),
             decoration: InputDecoration(
               labelText: 'Group Name',
-              labelStyle: const TextStyle(
-                  fontSize: 11, color: Colors.grey), 
+              labelStyle: const TextStyle(fontSize: 11, color: Colors.grey),
               hintText: 'Enter group name',
-              hintStyle: const TextStyle(
-                  fontSize: 11, color: Colors.grey),
-              contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 12, vertical: 8),
+              hintStyle: const TextStyle(fontSize: 11, color: Colors.grey),
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               border: OutlineInputBorder(
-                borderRadius:
-                    BorderRadius.circular(8),
-                borderSide: const BorderSide(
-                    color: Colors.grey, width: 1),
+                borderRadius: BorderRadius.circular(8),
+                borderSide: const BorderSide(color: Colors.grey, width: 1),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
-                borderSide: const BorderSide(
-                    color: Colors.blue, width: 2), 
+                borderSide: const BorderSide(color: Colors.blue, width: 2),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
-                borderSide: const BorderSide(
-                    color: Colors.grey,
-                    width: 1), 
+                borderSide: const BorderSide(color: Colors.grey, width: 1),
               ),
             ),
             inputFormatters: [
-              LengthLimitingTextInputFormatter(15), 
+              LengthLimitingTextInputFormatter(15),
             ],
           ),
           actions: [
@@ -123,7 +112,8 @@ class _ListOfGroupsDTState extends State<ListOfGroupsDT> {
               onPressed: () {
                 final groupName = nameController.text.trim();
 
-                bool nameExists = _circles.any((circle) => circle.name == groupName);
+                bool nameExists =
+                    _circles.any((circle) => circle.name == groupName);
 
                 if (groupName.isEmpty) {
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -273,9 +263,8 @@ class _ListOfGroupsDTState extends State<ListOfGroupsDT> {
           automaticallyImplyLeading: false,
           centerTitle: false,
           title: Transform.translate(
-            offset: const Offset(-15, 0),
-            child: CategoryText(text: "My Groups")
-          ),
+              offset: const Offset(-15, 0),
+              child: CategoryText(text: "My Groups")),
           actions: [
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
@@ -342,17 +331,16 @@ class _ListOfGroupsDTState extends State<ListOfGroupsDT> {
               ],
             ),
             GestureDetector(
-              onTap: (){
-                if (widget.onClose != null) {
-                  widget.onClose!();
-                }
-              },
-              child: Icon(
-                Icons.cancel_outlined,
-                size: 20,
-                color: Colors.black38,
-              )
-            ),
+                onTap: () {
+                  if (widget.onClose != null) {
+                    widget.onClose!();
+                  }
+                },
+                child: Icon(
+                  Icons.cancel_outlined,
+                  size: 20,
+                  color: Colors.black38,
+                )),
           ],
         ),
         body: Container(
@@ -363,7 +351,8 @@ class _ListOfGroupsDTState extends State<ListOfGroupsDT> {
                   if (state is CircleCreatedState) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                          content: Text('New group "${state.circle.name}" created!')),
+                          content: Text(
+                              'New group "${state.circle.name}" created!')),
                     );
                   } else if (state is CircleUpdatedState) {
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -374,7 +363,6 @@ class _ListOfGroupsDTState extends State<ListOfGroupsDT> {
                       SnackBar(content: Text(state.message)),
                     );
                   } else if (state is CircleErrorState) {
-                    
                   } else if (state is CircleAddMemberErrorState) {
                     showDialog(
                       context: context,
@@ -421,17 +409,17 @@ class _ListOfGroupsDTState extends State<ListOfGroupsDT> {
                           padding: const EdgeInsets.symmetric(vertical: 8.0),
                           child: ListView.builder(
                             itemCount: _circles.length,
-                              itemBuilder: (context, index) {
-                                
-                                final sortedCircles = _circles..sort((a, b) {
-                                  if (a.isActive && !b.isActive) return -1; 
+                            itemBuilder: (context, index) {
+                              final sortedCircles = _circles
+                                ..sort((a, b) {
+                                  if (a.isActive && !b.isActive) return -1;
                                   if (!a.isActive && b.isActive) return 1;
-                                  return b.id.compareTo(a.id); 
+                                  return b.id.compareTo(a.id);
                                 });
 
-                                final group = sortedCircles[index];
+                              final group = sortedCircles[index];
 
-                                return GestureDetector(
+                              return GestureDetector(
                                 onTap: () {
                                   context.push('/members/${group.id}',
                                       extra: group);
@@ -576,7 +564,7 @@ class _ListOfGroupsDTState extends State<ListOfGroupsDT> {
                                 width: 150,
                                 height: 150,
                                 child: Image.asset(
-                                  'lib/resource/image/empty-state/no_group.png',
+                                  'lib/resource/image/empty-state/no-group.png',
                                   width: 150,
                                   height: 150,
                                 ),

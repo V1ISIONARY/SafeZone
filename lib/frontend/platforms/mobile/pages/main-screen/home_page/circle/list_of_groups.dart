@@ -582,7 +582,7 @@ class _ListOfGroupsState extends State<ListOfGroups> {
                                 width: 150,
                                 height: 150,
                                 child: Image.asset(
-                                  'lib/resources/image/png/empty-state/no_group.png',
+                                  'lib/resource/image/empty-state/no-group.png',
                                   width: 150,
                                   height: 150,
                                 ),

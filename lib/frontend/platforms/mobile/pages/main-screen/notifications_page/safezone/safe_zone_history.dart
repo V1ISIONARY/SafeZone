@@ -11,12 +11,8 @@ import 'package:safezone/resource/schema/texts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SafezoneHistory extends StatefulWidget {
-
-  final bool ?fromSuccess;
-  const SafezoneHistory({
-    super.key,
-    this.fromSuccess
-  });
+  final bool? fromSuccess;
+  const SafezoneHistory({super.key, this.fromSuccess});
 
   @override
   State<SafezoneHistory> createState() => _SafezoneHistoryState();
@@ -88,42 +84,43 @@ class _SafezoneHistoryState extends State<SafezoneHistory>
           centerTitle: true,
           title: Transform.translate(
             offset: const Offset(-15, 0),
-            child: Row(
-              children: [
-                GestureDetector(
-                  onTap: () async {
-                    if (widget.fromSuccess == true) {
-                      final prefs = await SharedPreferences.getInstance();
-                      final userToken = prefs.getString('userToken'); // Fetch token from SharedPreferences
+            child: Row(children: [
+              GestureDetector(
+                onTap: () async {
+                  if (widget.fromSuccess == true) {
+                    final prefs = await SharedPreferences.getInstance();
+                    final userToken = prefs.getString(
+                        'userToken'); // Fetch token from SharedPreferences
 
-                      if (userToken != null) {
-                        context.go('/home', extra: userToken);
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text("User token not found! Please log in again."),
-                            backgroundColor: Colors.red,
-                          ),
-                        );
-                      }
+                    if (userToken != null) {
+                      context.go('/home', extra: userToken);
                     } else {
-                      Navigator.pop(context);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text(
+                              "User token not found! Please log in again."),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
                     }
-                  },
-                  child: Container(
-                    margin: const EdgeInsets.all(15),
-                    height: 25,
-                    width: 25,
-                    decoration: BoxDecoration(
-                      border: Border.all(width: 1, color: Colors.black),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(Icons.arrow_back, color: Colors.black, size: 10),
+                  } else {
+                    Navigator.pop(context);
+                  }
+                },
+                child: Container(
+                  margin: const EdgeInsets.all(15),
+                  height: 25,
+                  width: 25,
+                  decoration: BoxDecoration(
+                    border: Border.all(width: 1, color: Colors.black),
+                    shape: BoxShape.circle,
                   ),
+                  child: const Icon(Icons.arrow_back,
+                      color: Colors.black, size: 10),
                 ),
-                const CategoryText(text: "Safe Zones History")
-              ]
-            ),
+              ),
+              const CategoryText(text: "Safe Zones History")
+            ]),
           ),
           actions: [
             Padding(
@@ -159,27 +156,27 @@ class _SafezoneHistoryState extends State<SafezoneHistory>
         ),
         body: Column(
           children: [
-            Container(
-              margin: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
-              child: Row(
-                children: [
-                  const Flexible(
-                    child: CategoryDescripText(
-                      text: 'View and track the status of all your past safe zones.',
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                    child: Image.asset(
-                      "lib/resource/svg/check.png",
-                      width: 25,
-                      height: 25,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            // Container(
+            //   margin: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
+            //   child: Row(
+            //     children: [
+            //       const Flexible(
+            //         child: CategoryDescripText(
+            //           text: 'View and track the status of all your past safe zones.',
+            //         ),
+            //       ),
+            //       const SizedBox(width: 8),
+            //       Padding(
+            //         padding: const EdgeInsets.symmetric(horizontal: 10.0),
+            //         child: Image.asset(
+            //           "lib/resource/svg/check.png",
+            //           width: 25,
+            //           height: 25,
+            //         ),
+            //       ),
+            //     ],
+            //   ),
+            // ),
             TabBar(
               controller: _tabController,
               indicatorColor: btnColor,
@@ -207,13 +204,9 @@ class _SafezoneHistoryState extends State<SafezoneHistory>
       builder: (context, state) {
         if (state is SafeZoneLoading) {
           return Expanded(
-            child: Center(
-              child: Transform.translate(
-                offset: const Offset(-30, -60), 
-                child: LoadingState()
-              )
-            )
-          );
+              child: Center(
+                  child: Transform.translate(
+                      offset: const Offset(-30, -60), child: LoadingState())));
         } else if (state is SafeZonesLoaded) {
           final filteredZones = status == 'All'
               ? state.safeZones
@@ -238,7 +231,7 @@ class _SafezoneHistoryState extends State<SafezoneHistory>
                     width: 150,
                     height: 150,
                     child: Image.asset(
-                      'lib/resource/images/empty-state/search.png',
+                      'lib/resource/image/empty-state/search.png',
                       width: 150,
                       height: 150,
                     ),

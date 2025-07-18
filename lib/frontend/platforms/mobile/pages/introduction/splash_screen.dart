@@ -35,8 +35,8 @@ class _SplashScreenState extends State<SplashScreen> {
             child: isFirstRun
                 ? const Starter()
                 : const NavigationRT(
-                  userToken: 'guest',
-                ),
+                    userToken: 'guest',
+                  ),
             type: PageTransitionType.fade,
             duration: const Duration(milliseconds: 300),
           ),
@@ -69,7 +69,7 @@ class _SplashScreenState extends State<SplashScreen> {
                 height: 120,
                 color: Colors.transparent,
                 child: Image.asset(
-                  'lib/resource/image/png/email.png',
+                  'lib/resource/image/logo/safezone.png',
                 ),
               ),
             ),
