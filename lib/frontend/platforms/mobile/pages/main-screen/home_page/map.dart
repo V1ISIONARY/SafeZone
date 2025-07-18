@@ -29,6 +29,9 @@ import 'package:safezone/backend/properties/properties.dart';
 import 'package:safezone/backend/services/first_run_service.dart';
 import 'package:safezone/frontend/platforms/mobile/pages/authentication/account_details.dart';
 import 'package:safezone/frontend/platforms/mobile/widgets/Dialogs/dialogs.dart';
+import 'package:safezone/frontend/platforms/mobile/widgets/bottomsheet/map/dangerzone_bottom_sheet.dart';
+import 'package:safezone/frontend/platforms/mobile/widgets/bottomsheet/map/member_bottom_sheet.dart';
+import 'package:safezone/frontend/platforms/mobile/widgets/bottomsheet/map/safezone_bottom_sheet.dart';
 import 'package:safezone/frontend/platforms/mobile/widgets/loadingstate.dart';
 import 'package:safezone/frontend/utils/marker_utils.dart';
 import 'package:safezone/frontend/utils/safezone_navigator.dart';
@@ -53,15 +56,14 @@ class Maps extends StatefulWidget {
 }
 
 class _MapsState extends State<Maps> with TickerProviderStateMixin {
-
   final sharedController = SharedProperties();
-  
+
   Map<String, BitmapDescriptor> memberMarkers = {};
   List<SafeZoneModel> policeStations = [];
   List<Map<String, dynamic>> members = [];
   Set<Marker> markers = {};
   Set<Marker> membersMarkers = {};
-  
+
   List<LatLng> _safeZones = [];
   List<LatLng> _dangerZones = [];
   final locs.Location location = locs.Location();
@@ -72,7 +74,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
   final GlobalKey _searchKey = GlobalKey();
   final GlobalKey _circleKey = GlobalKey();
   final GlobalKey _reportKey = GlobalKey();
-  
+
   bool _isAllZoneShown = false;
   bool _isSafeZoneShown = false;
   bool _isDangerZoneShown = false;
@@ -133,6 +135,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
 
   List<CircleModel> _circles = [];
   int? _userId;
+  String profilePictureUrl = '';
   int _currentHintIndex = 0;
   LatLng? _currentUserLocation;
   StreamSubscription? _locationSubscription;
@@ -204,7 +207,8 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
     _changeHintText();
 
     _focusNodeText.addListener(() {
-      if (_focusNodeText.hasFocus && sharedController.mapSearchTE.text.isEmpty) {
+      if (_focusNodeText.hasFocus &&
+          sharedController.mapSearchTE.text.isEmpty) {
         _controllerFade.forward();
         _controller.forward();
       } else if (!_focusNodeText.hasFocus &&
@@ -291,6 +295,8 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     int? userId = prefs.getInt('id');
     int? circleId = prefs.getInt('circle');
+    profilePictureUrl = prefs.getString('profile_picture_url') ??
+        'https://storage.googleapis.com/safezone-11724.firebasestorage.app/profile_pictures/2.jpg';
 
     if (userId != null) {
       setState(() {
@@ -318,7 +324,8 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
 
   void _changeHintText() {
     Future.delayed(const Duration(seconds: 2), () {
-      if (!_focusNodeText.hasFocus && sharedController.mapSearchTE.text.isEmpty) {
+      if (!_focusNodeText.hasFocus &&
+          sharedController.mapSearchTE.text.isEmpty) {
         _controller.forward().then((_) {
           setState(() {
             _currentHintIndex = (_currentHintIndex + 1) % hints.length;
@@ -347,7 +354,8 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
     try {
       Position position = await getCurrentLocation();
       if (sharedController.googleMapController != null) {
-        sharedController.googleMapController!.animateCamera(CameraUpdate.newCameraPosition(
+        sharedController.googleMapController!
+            .animateCamera(CameraUpdate.newCameraPosition(
           CameraPosition(
             target: LatLng(position.latitude, position.longitude),
             zoom: 14.0,
@@ -469,7 +477,8 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
       LatLng userLocation = LatLng(position.latitude, position.longitude);
 
       if (sharedController.googleMapController != null) {
-        sharedController.googleMapController!.animateCamera(CameraUpdate.newCameraPosition(
+        sharedController.googleMapController!
+            .animateCamera(CameraUpdate.newCameraPosition(
           CameraPosition(
             target: userLocation,
             zoom: 14.0,
@@ -568,14 +577,8 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
 
   Future<void> _createCustomMarker() async {
     try {
-      const String defaultProfileUrl = 'https://example.com/default.jpg'; // Replace with a real URL
-
-      customMarker = await MarkerUtils.createCustomMarker(
-        context,
-        widgetPricolor,
-        defaultProfileUrl,
-      );
-
+      await MarkerUtils.createCustomMarker(
+          context, widgetPricolor, profilePictureUrl);
       customDangerZoneMarker = await MarkerUtils.resizeMarker(
         'lib/resource/image/png/dangerzonee.png',
         48,
@@ -601,12 +604,14 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
       String userId = member['user_id'].toString();
       String name = member['first_name'];
       String firstLetter = name.isNotEmpty ? name[0] : '';
+      String? profileUrl = member['profile_picture'];
 
       if (userId == _userId.toString()) {
         continue;
       }
 
-      BitmapDescriptor marker = await _loadCustomMemberMarker(firstLetter);
+      BitmapDescriptor marker =
+          await MarkerUtils.loadMemberProfileMarker(profileUrl);
       memberMarkers[userId] = marker;
     }
   }
@@ -631,51 +636,6 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
     });
   }
 
-  Future<BitmapDescriptor> _loadCustomMemberMarker(String letter) async {
-    ByteData data =
-        await rootBundle.load('lib/resource/image/png/marker_member.png');
-    ui.Codec codec = await ui.instantiateImageCodec(
-      data.buffer.asUint8List(),
-      targetWidth: 100,
-      targetHeight: 110,
-    );
-    ui.FrameInfo frameInfo = await codec.getNextFrame();
-    ui.Image originalImage = frameInfo.image;
-
-    final ui.PictureRecorder pictureRecorder = ui.PictureRecorder();
-    final Canvas canvas = Canvas(pictureRecorder);
-    final Paint paint = Paint();
-
-    canvas.drawImage(originalImage, const Offset(0, 0), paint);
-
-    final TextPainter textPainter = TextPainter(
-      text: TextSpan(
-        text: letter,
-        style: const TextStyle(
-          color: ui.Color.fromARGB(255, 71, 71, 71),
-          fontSize: 100 * 0.35,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-      textDirection: TextDirection.ltr,
-    );
-    textPainter.layout();
-
-    double dx = (100 - textPainter.width) / 2;
-    double dy = (110 - textPainter.height) / 2 - (110 * 0.1);
-
-    textPainter.paint(canvas, Offset(dx, dy));
-
-    final ui.Image finalImage =
-        await pictureRecorder.endRecording().toImage(100, 110);
-
-    ByteData? byteData =
-        await finalImage.toByteData(format: ui.ImageByteFormat.png);
-    Uint8List resizedData = byteData!.buffer.asUint8List();
-
-    return BitmapDescriptor.fromBytes(resizedData);
-  }
-
   Set<Marker> _createMarkers(MapState state) {
     Set<Marker> markers = {};
 
@@ -697,6 +657,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
         String lastName = member['last_name'];
         double latitude = member['latitude'];
         double longitude = member['longitude'];
+        String profile = member['profile_picture'];
 
         BitmapDescriptor? memberMarker = memberMarkers[userId];
 
@@ -710,6 +671,10 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
             position: LatLng(latitude, longitude),
             icon: memberMarker ?? BitmapDescriptor.defaultMarker,
             infoWindow: InfoWindow(title: '$firstName $lastName'),
+            onTap: () {
+              showMemberBottomSheet(userId, firstName, lastName, longitude,
+                  latitude, profile, context);
+            },
           ),
         );
       }
@@ -728,6 +693,9 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
             infoWindow: InfoWindow(
               title: dangerZone.name,
             ),
+            onTap: () {
+              showDangerZoneBottomSheet(dangerZone, context);
+            },
           ),
         );
         sharedController.circles.add(
@@ -754,8 +722,11 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
             position: LatLng(safeZone.latitude!, safeZone.longitude!),
             infoWindow: InfoWindow(
               title: safeZone.name,
-              snippet: safeZone.description,
             ),
+            onTap: () {
+              showSafeZoneBottomSheet(safeZone, context);
+            },
+            
           ),
         );
         sharedController.circles.add(
@@ -968,7 +939,8 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
       _initialPosition = newPosition;
     });
 
-    final GoogleMapController controller = await sharedController.mapController.future;
+    final GoogleMapController controller =
+        await sharedController.mapController.future;
     controller
         .animateCamera(CameraUpdate.newLatLngZoom(_initialPosition, 14.0));
   }
@@ -1051,12 +1023,15 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                     return Expanded(
                       child: Center(
                         child: Transform.translate(
-                          offset: const Offset(-40, 0),
-                          child: const LoadingState()),
+                            offset: const Offset(-40, 0),
+                            child: const LoadingState()),
                       ),
                     );
                   } else if (state is MapDataLoaded) {
-                    _preloadMemberMarkers(state.members);
+                    () async {
+                      await _preloadMemberMarkers(state.members);
+                      setState(() {}); // or update the markers on the map
+                    }();
                   } else if (state is MapError) {
                     return Center(child: Text(state.message));
                   }
@@ -1066,7 +1041,9 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                       zoom: 16.0,
                     ),
                     mapType: sharedController.currentMapType,
-                    markers: sharedController.showMarkers ? _createMarkers(state) : {},
+                    markers: sharedController.showMarkers
+                        ? _createMarkers(state)
+                        : {},
                     circles: sharedController.circles,
                     polylines: sharedController.polylines,
                     onMapCreated: (GoogleMapController controller) async {
@@ -1211,12 +1188,32 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                             ],
                                           ),
                                           child: Center(
-                                              child: ClipRRect(
-                                                  borderRadius:
-                                                      BorderRadius.circular(10),
-                                                  child: Image.asset(
-                                                    'lib/resource/image/jpg/profile.jpg',
-                                                  ))))),
+                                            child: ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                              child: profilePictureUrl
+                                                      .isNotEmpty
+                                                  ? Container(
+                                                      width: 35,
+                                                      height: 35,
+                                                      child: Image.network(
+                                                        profilePictureUrl,
+                                                        fit: BoxFit.cover,
+                                                        errorBuilder: (context,
+                                                            error, stackTrace) {
+                                                          return Image.asset(
+                                                            'lib/resource/image/jpg/profile.jpg',
+                                                            fit: BoxFit.cover,
+                                                          );
+                                                        },
+                                                      ),
+                                                    )
+                                                  : Image.asset(
+                                                      'lib/resource/image/jpg/profile.jpg',
+                                                      fit: BoxFit.cover,
+                                                    ),
+                                            ),
+                                          ))),
                                   SizedBox(width: 10),
                                   Expanded(
                                       child: GestureDetector(
@@ -1513,8 +1510,8 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                               children: [
                                                 Positioned.fill(
                                                   child: TextField(
-                                                    controller:
-                                                        sharedController.mapSearchTE,
+                                                    controller: sharedController
+                                                        .mapSearchTE,
                                                     focusNode: _focusNodeText,
                                                     style: GoogleFonts.poppins(
                                                       fontSize: 9,
@@ -1677,7 +1674,8 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                                           _speech.listen(
                                                             onResult: (result) {
                                                               setState(() {
-                                                                sharedController.mapSearchTE
+                                                                sharedController
+                                                                        .mapSearchTE
                                                                         .text =
                                                                     result
                                                                         .recognizedWords;
@@ -1942,7 +1940,8 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                                         Positioned.fill(
                                                           child: TextField(
                                                             controller:
-                                                                sharedController.mapSearchTE,
+                                                                sharedController
+                                                                    .mapSearchTE,
                                                             focusNode:
                                                                 _focusNodeText,
                                                             style: GoogleFonts
@@ -2106,8 +2105,9 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                                                         (result) {
                                                                       setState(
                                                                           () {
-                                                                        sharedController.mapSearchTE.text =
-                                                                            result.recognizedWords;
+                                                                        sharedController
+                                                                            .mapSearchTE
+                                                                            .text = result.recognizedWords;
                                                                       });
                                                                     },
                                                                     listenFor: Duration(
@@ -2147,13 +2147,15 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                                   GestureDetector(
                                                       onTap: () {
                                                         setState(() {
-                                                          if (sharedController.mapSearchTE
+                                                          if (sharedController
+                                                              .mapSearchTE
                                                               .text
                                                               .isNotEmpty) {
                                                             _searchLocation();
                                                           } else {
                                                             _isExpanded = false;
-                                                            sharedController.mapSearchTE
+                                                            sharedController
+                                                                .mapSearchTE
                                                                 .clear();
                                                             _focusNodeText
                                                                 .unfocus();
@@ -2181,7 +2183,8 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                                               child: ValueListenableBuilder<
                                                                   TextEditingValue>(
                                                             valueListenable:
-                                                                sharedController.mapSearchTE,
+                                                                sharedController
+                                                                    .mapSearchTE,
                                                             builder: (context,
                                                                 value, child) {
                                                               return Transform
@@ -2331,7 +2334,8 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                           child: GestureDetector(
                             onTap: () {
                               setState(() {
-                                sharedController.showMarkers = !sharedController.showMarkers;
+                                sharedController.showMarkers =
+                                    !sharedController.showMarkers;
                               });
                             },
                             child: _buildButton(sharedController.showMarkers
@@ -2354,7 +2358,8 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                               GestureDetector(
                                 onTap: () {
                                   setState(() {
-                                    sharedController.showMarkers = !sharedController.showMarkers;
+                                    sharedController.showMarkers =
+                                        !sharedController.showMarkers;
                                   });
                                 },
                                 child: _buildButton(sharedController.showMarkers
