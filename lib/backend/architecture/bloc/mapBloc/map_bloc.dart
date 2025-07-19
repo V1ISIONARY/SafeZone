@@ -83,10 +83,7 @@ class MapBloc extends Bloc<MapPageEvent, MapState> {
             if (data.containsKey('latitude') && data.containsKey('longitude')) {
               double latitude = double.parse(data['latitude'].toString());
               double longitude = double.parse(data['longitude'].toString());
-
-              print(
-                  "Updated location for user $userId -> Latitude: $latitude, Longitude: $longitude");
-
+              print("Updated location for user $userId -> Latitude: $latitude, Longitude: $longitude");
               emit(MemberLocationUpdated(userId, latitude, longitude));
             } else {
               print("Missing latitude or longitude data for user $userId");

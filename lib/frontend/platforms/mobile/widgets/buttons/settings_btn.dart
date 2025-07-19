@@ -37,7 +37,9 @@ class Settingsbtn extends StatelessWidget {
         width: double.infinity,
         color: Colors.white,
         margin: const EdgeInsets.symmetric(vertical: 15),
-        child: Stack(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Row(
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -62,19 +64,15 @@ class Settingsbtn extends StatelessWidget {
                 ),
               ],
             ),
-            Positioned(
-              right: -10,
-              top: 5,
-              bottom: 5,
-              child: Container(
-                height: 20,
-                width: 20,
-                margin: const EdgeInsets.only(right: 17),
-                child: SvgPicture.asset(
-                  'lib/resource/svg/proceed.svg',
-                  color: const Color.fromARGB(179, 0, 0, 0),
-                ),
-              ),
+            Spacer(),
+            Container(
+              height: 15,
+              width: 15,
+              margin: const EdgeInsets.only(right: 17),
+              child: Icon(
+                Icons.chevron_right_outlined,
+                color: Colors.grey[500],
+              )
             ),
           ],
         ),

@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
+import '../../frontend/platforms/mobile/pages/main-screen/home_page/map.dart';
+
 class SharedProperties {
 
   static final SharedProperties _instance = SharedProperties._internal();

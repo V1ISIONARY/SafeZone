@@ -19,7 +19,7 @@ class CategoryText extends StatelessWidget {
     return (
       Text(
         text,
-        style: GoogleFonts.poppins(
+        style: GoogleFonts.inter(
           fontSize: 13, fontWeight: FontWeight.w500, color: color ?? Colors.black
         ),
         textAlign: _getTextAlignment(),
@@ -58,7 +58,7 @@ class CategoryDescripText extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       text, 
-      style: GoogleFonts.poppins(
+      style: GoogleFonts.inter(
         fontSize: 9,
         fontWeight: FontWeight.w500,
         color: color ?? Colors.black45,
@@ -100,7 +100,7 @@ class CategoryDescripTextE extends StatelessWidget {
     return Flexible(
       child: Text(
         text,
-        style: GoogleFonts.poppins(
+        style: GoogleFonts.inter(
           fontSize: 9,
           fontWeight: FontWeight.w500,
           color: color ?? Colors.black45,
@@ -145,7 +145,7 @@ class CategoryDescripTextEllipsis extends StatelessWidget {
       padding: const EdgeInsets.only(right: 8.0),
       child: Text(
         text,
-        style: GoogleFonts.poppins(
+        style: GoogleFonts.inter(
           fontSize: 9,
           fontWeight: FontWeight.w500,
           color: Colors.black45,
@@ -181,7 +181,7 @@ class PrimaryText extends StatelessWidget {
   Widget build(BuildContext context) {
     return (Text(
       text,
-      style: GoogleFonts.poppins(
+      style: GoogleFonts.inter(
           fontWeight: FontWeight.w500, color: primaryTextColor, fontSize: 11),
     ));
   }
@@ -196,7 +196,7 @@ class DescriptionText extends StatelessWidget {
   Widget build(BuildContext context) {
     return (Text(
       text,
-      style: GoogleFonts.poppins(
+      style: GoogleFonts.inter(
           fontWeight: FontWeight.w500,
           color: descriptionTextColor,
           fontSize: 8),

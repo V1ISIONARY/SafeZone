@@ -11,7 +11,7 @@ class BottomNavigationWidget extends StatefulWidget {
   _BottomNavigationWidgetState createState() => _BottomNavigationWidgetState();
 }
 
-class _BottomNavigationWidgetState extends State<BottomNavigationWidget> with SingleTickerProviderStateMixin {
+class _BottomNavigationWidgetState extends State<BottomNavigationWidget>with TickerProviderStateMixin {
   
   int _selectedIndex = 0;
   late List<Widget> _pages;
@@ -141,7 +141,7 @@ class _BottomNavigationWidgetState extends State<BottomNavigationWidget> with Si
             ),
           ),
         
-    floatingActionButtonLocation: FloatingActionButtonLocation.miniCenterDocked,
+      floatingActionButtonLocation: FloatingActionButtonLocation.miniCenterDocked,
 
     );
   }
@@ -181,8 +181,8 @@ class _BottomNavigationWidgetState extends State<BottomNavigationWidget> with Si
                       style: TextStyle(
                         fontSize: 9,
                         fontWeight:
-                            isSelected ? FontWeight.bold : FontWeight.w400,
-                        color: isSelected ? widgetPricolor : Colors.black45,
+                          isSelected ? FontWeight.bold : FontWeight.w400,
+                          color: isSelected ? widgetPricolor : Colors.black45,
                       ),
                     ),
                   ),

@@ -17,7 +17,6 @@ class _NavigationRTState extends State<NavigationRT> {
   @override
   void initState() {
     super.initState();
-    print('This is the usertokensdads : ${widget.userToken}');
   }
 
   @override
@@ -26,9 +25,9 @@ class _NavigationRTState extends State<NavigationRT> {
       backgroundColor: Colors.transparent,
       body: widget.userToken != 'guest'
         ? NavResWidget(
-            mobile: BottomNavigationWidget(userToken: widget.userToken),
-            desktop: NavigationDT(userToken: widget.userToken),
-          )
+          mobile: BottomNavigationWidget(userToken: widget.userToken),
+          desktop: NavigationDT(userToken: widget.userToken),
+        )
         : BottomNavigationWidget(userToken: widget.userToken)
     );
   }

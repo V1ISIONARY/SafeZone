@@ -158,8 +158,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
     _getCurrentLocation();
 
     _initSharedPreferences();
-    context.read<MapBloc>().add(FetchMapData());
-    context.read<DangerZoneBloc>().add(FetchDangerZones());
+    _runInitLogicOnce();
 
     _createCustomMarker().then((_) {
       _fetchLocation();
@@ -219,6 +218,21 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
     });
 
     _startLocationUpdates();
+  }
+
+  void _runInitLogicOnce() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    bool hasRunBefore = prefs.getBool('mapsHasInitialized') ?? false;
+
+    if (!hasRunBefore) {
+      context.read<MapBloc>().add(FetchMapData());
+      context.read<DangerZoneBloc>().add(FetchDangerZones());
+      await prefs.setBool('mapsHasInitialized', true);
+      print("✅ Maps init logic executed");
+    } else {
+      print("⏭️ Maps init logic already executed, skipping...");
+    }
   }
 
   Future<void> _checkIfShown() async {

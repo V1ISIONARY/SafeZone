@@ -155,7 +155,7 @@ class StarterMD extends StatelessWidget {
                   context,
                   PageTransition(
                     type: PageTransitionType.rightToLeft,
-                    duration: const Duration(milliseconds: 300), child: const BottomNavigationWidget(userToken: 'guest',),
+                    duration: const Duration(milliseconds: 300), child: const BottomNavigationWidget(userToken: 'guest'),
                   ),
                 );
               },
