@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../../backend/architecture/bloc/dangerzoneBloc/dangerzone_bloc.dart';
 import '../../../../../backend/architecture/bloc/dangerzoneBloc/dangerzone_event.dart';
 import '../../../../../backend/architecture/bloc/dangerzoneBloc/dangerzone_state.dart';
-import '../../widgets/buttons/identified_zone.dart';
+import '../../widgets/cards/identified_zone.dart';
 
 class AdminDangerzones extends StatefulWidget {
   const AdminDangerzones({super.key});

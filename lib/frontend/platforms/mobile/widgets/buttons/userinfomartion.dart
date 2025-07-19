@@ -33,7 +33,16 @@ class Userinfomartion extends StatelessWidget {
               height: 40,
               margin: const EdgeInsets.only(left: 15),
               decoration: const BoxDecoration(
-                  shape: BoxShape.circle, color: Colors.white),
+                shape: BoxShape.circle,
+              ),
+              child: ClipOval(
+                child: Image.network(
+                  profileImage,
+                  fit: BoxFit.cover,
+                  width: 40,
+                  height: 40,
+                ),
+              ),
             ),
             Padding(
                 padding: const EdgeInsets.only(left: 15),

@@ -139,13 +139,14 @@ class _AdminReportsUsersState extends State<AdminReportsUsers> {
                   // Display filtered user information
                   ..._filteredUsers.map((user) {
                     final username = user['username'] ?? 'Unknown';
+                    final profileImage = user['profile_picture_url'] ?? '';
                     final safeZonesCount = (user['safe_zones'] as List).length;
                     final incidentsCount =
                         (user['incident_reports'] as List).length;
 
                     return Userinfomartion(
                       username: username,
-                      profileImage: '', // Add profile image URL if available
+                      profileImage: profileImage,
                       safeZone: safeZonesCount,
                       incidents: incidentsCount,
                     );
@@ -156,7 +157,7 @@ class _AdminReportsUsersState extends State<AdminReportsUsers> {
           } else if (state is AdminError) {
             return Center(child: Text('Error: ${state.message}'));
           } else {
-            return const Center(child: Text('Press a button to fetch data'));
+            return const Center(child: Text('No data available..'));
           }
         },
       ),

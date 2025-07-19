@@ -45,7 +45,7 @@ export 'package:awesome_notifications/awesome_notifications.dart';
 export 'package:safezone/frontend/platforms/mobile/widgets/buttons/percentage_average.dart';
 export 'package:safezone/frontend/platforms/mobile/widgets/loadingstate.dart';
 
-export 'package:safezone/frontend/platforms/mobile/widgets/buttons/identified_zone.dart';
+export 'package:safezone/frontend/platforms/mobile/widgets/cards/identified_zone.dart';
 export 'package:safezone/frontend/platforms/mobile/widgets/texts/history_information.dart';
 export 'package:safezone/frontend/platforms/mobile/widgets/buttons/custom_radio_button.dart';
 export 'package:safezone/frontend/platforms/mobile/widgets/cards/admin_safezones_card.dart';
