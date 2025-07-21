@@ -151,93 +151,101 @@ class _NotifState extends State<Notif> with SingleTickerProviderStateMixin {
             title: const Text(
               "Notification",
               style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black),
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
+                color: Colors.black),
             ),
           ),
-          body: Column(
-            children: [
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 8.0),
-                child: NotificationBtn(
-                  title: "My Incident Reports",
-                  svgIcon: "lib/resource/svg/report_notif.svg",
-                  navigateTo: "Reports",
-                  description:
-                      "Check the status and details of your submitted reports",
-                ),
+          body: ScrollConfiguration(
+              behavior: ScrollConfiguration.of(context).copyWith(
+                scrollbars: false,
               ),
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 8.0),
-                child: NotificationBtn(
-                  title: "My Safe Zones",
-                  svgIcon: "lib/resource/svg/safe.png",
-                  navigateTo: "Safezone",
-                  description:
-                      "Check the status and details of your submitted safe zones",
+              child: Column(
+              children: [
+                Transform.translate(
+                  offset: Offset(0, -10),
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 15),
+                    child: Column(
+                      children: [
+                        NotificationBtn(
+                          title: "My Incident Reports",
+                          svgIcon: "lib/resource/svg/report_notif.svg",
+                          navigateTo: "Reports",
+                          description:
+                              "Check the status and details of your submitted reports",
+                        ),
+                        NotificationBtn(
+                          title: "My Safe Zones",
+                          svgIcon: "lib/resource/svg/safe.png",
+                          navigateTo: "Safezone",
+                          description:
+                              "Check the status and details of your submitted safe zones",
+                        ),
+                      ]
+                    )
+                  ),
                 ),
-              ),
-              _bodyNavigator(context),
-              Expanded(child: _mainWrapperBody()),
-              
-            ],
+                _bodyNavigator(context),
+                Expanded(child: _mainWrapperBody()),
+              ],
+            ),
           ),
         ),
         widget.UserToken == 'guest'
-            ? GestureDetector(
-                onTap: _startShake,
-                child: Container(
-                  width: double.infinity,
-                  height: double.infinity,
-                  color: Colors.black38,
-                  child: Center(
-                    child: Container(
-                      width: 200,
-                      color: Colors.transparent,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          AnimatedBuilder(
-                            animation: _animation,
-                            builder: (context, child) {
-                              return Transform.translate(
-                                offset: Offset(_animation.value, 0),
-                                child: SizedBox(
-                                  width: 130,
-                                  height: 110,
-                                  child: Image.asset(
-                                    'lib/resource/image/png/lock.png',
-                                    fit: BoxFit.cover,
-                                  ),
+          ? GestureDetector(
+              onTap: _startShake,
+              child: Container(
+                width: double.infinity,
+                height: double.infinity,
+                color: Colors.black38,
+                child: Center(
+                  child: Container(
+                    width: 200,
+                    color: Colors.transparent,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        AnimatedBuilder(
+                          animation: _animation,
+                          builder: (context, child) {
+                            return Transform.translate(
+                              offset: Offset(_animation.value, 0),
+                              child: SizedBox(
+                                width: 130,
+                                height: 110,
+                                child: Image.asset(
+                                  'lib/resource/image/png/lock.png',
+                                  fit: BoxFit.cover,
                                 ),
-                              );
-                            },
+                              ),
+                            );
+                          },
+                        ),
+                        const Text(
+                          'Lock',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 15,
                           ),
-                          const Text(
-                            'Lock',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 15,
-                            ),
-                            textAlign: TextAlign.center,
+                          textAlign: TextAlign.center,
+                        ),
+                        const Text(
+                          'You need to sign in to your account to access all features.',
+                          style: TextStyle(
+                            color: Colors.white60,
+                            fontSize: 9,
                           ),
-                          const Text(
-                            'You need to sign in to your account to access all features.',
-                            style: TextStyle(
-                              color: Colors.white60,
-                              fontSize: 9,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
-                      ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
                     ),
                   ),
                 ),
-              )
-            : const SizedBox(),
+              ),
+            )
+          : const SizedBox(),
       ],
     );
   }

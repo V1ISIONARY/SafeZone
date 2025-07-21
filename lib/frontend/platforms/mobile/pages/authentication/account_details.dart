@@ -163,9 +163,9 @@ class _AccountDetailsState extends State<AccountDetails> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Color.fromARGB(255, 240, 240, 240),
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: Color.fromARGB(255, 240, 240, 240),
         automaticallyImplyLeading: false,
         centerTitle: true,
         leading: GestureDetector(
@@ -191,7 +191,7 @@ class _AccountDetailsState extends State<AccountDetails> {
               width: double.infinity,
               height: 250,
               decoration: BoxDecoration(
-                color: const Color.fromARGB(255, 240, 240, 240),
+                color: Colors.white,
                 borderRadius: BorderRadius.circular(5),
               ),
               child: Center(

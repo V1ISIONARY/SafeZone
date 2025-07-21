@@ -31,30 +31,29 @@ class NotificationBtn extends StatelessWidget {
           ),
         );
       },
-      child: Container(
+      child:Container(
         width: double.infinity,
-        margin: const EdgeInsets.only(bottom: 15),
-        padding: const EdgeInsets.symmetric(
-            horizontal: 16, vertical: 10),
+        margin: const EdgeInsets.symmetric(vertical: 15),
         decoration: const BoxDecoration(
           color: Colors.white,
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Container(
               height: 25,
               width: 25,
               margin: const EdgeInsets.only(right: 17),
               child: svgIcon.endsWith('.svg')
-                  ? SvgPicture.asset(
-                      svgIcon,
-                      color: const Color.fromARGB(179, 0, 0, 0),
-                    )
-                  : Image.asset(
-                      svgIcon,
-                      fit: BoxFit.contain,
-                    ),
+                ? SvgPicture.asset(
+                    svgIcon,
+                    color: const Color.fromARGB(179, 0, 0, 0),
+                  )
+                : Image.asset(
+                    svgIcon,
+                    fit: BoxFit.contain,
+                  ),
             ),
             Expanded(
               child: Column(
@@ -65,13 +64,15 @@ class NotificationBtn extends StatelessWidget {
                 ],
               ),
             ),
+            Spacer(),
             Container(
-              height: 20,
-              width: 20,
-              child: SvgPicture.asset(
-                'lib/resource/svg/proceed.svg',
-                color: const Color.fromARGB(179, 0, 0, 0),
-              ),
+              height: 15,
+              width: 15,
+              margin: const EdgeInsets.only(right: 17),
+              child: Icon(
+                Icons.chevron_right_outlined,
+                color: Colors.grey[500],
+              )
             ),
           ],
         ),

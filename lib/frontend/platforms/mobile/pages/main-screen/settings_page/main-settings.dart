@@ -358,7 +358,7 @@ class _SettingsState extends State<Settings> {
                   : Settingsbtn(
                       title: 'Privacy',
                       svgIcon: 'lib/resource/svg/lock.svg',
-                      navigateTo: '',
+                      navigateTo: 'privacy',
                       description:
                           'Manage your data sharing and personal information settings.',
                       onTap: () {},
@@ -534,7 +534,7 @@ class _SettingsState extends State<Settings> {
                 Settingsbtn(
                   title: 'Free up space',
                   svgIcon: 'lib/resource/svg/recycling.svg',
-                  navigateTo: '',
+                  navigateTo: 'freespace',
                   description:
                       'Manage unused data to maintain your personal storage.',
                   onTap: () {},

@@ -34,18 +34,11 @@ class TermsPolicyBtn extends StatelessWidget {
         );
       },
       child: Container(
-        margin: const EdgeInsets.only(bottom: 15),
+        margin: const EdgeInsets.only(bottom: 10),
         width: double.infinity,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
           color: Colors.white,
-          boxShadow: const [
-            BoxShadow(
-              color: Colors.grey,
-              blurRadius: 2,
-              offset: Offset(1, 1),
-            ),
-          ],
         ),
         child: Container(
           margin: const EdgeInsets.symmetric(horizontal: 15),

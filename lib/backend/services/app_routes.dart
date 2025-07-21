@@ -32,7 +32,9 @@ import 'package:safezone/frontend/platforms/mobile/pages/main-screen/home_page/s
 import 'package:safezone/frontend/platforms/mobile/pages/main-screen/home_page/safe-zone/review_safe_zone.dart';
 import 'package:safezone/frontend/platforms/mobile/pages/main-screen/notifications_page/safezone/safe_zone_status_history.dart';
 import 'package:safezone/frontend/platforms/mobile/pages/main-screen/settings_page/about.dart';
+import 'package:safezone/frontend/platforms/mobile/pages/main-screen/settings_page/freespace.dart';
 import 'package:safezone/frontend/platforms/mobile/pages/main-screen/settings_page/help-center.dart';
+import 'package:safezone/frontend/platforms/mobile/pages/main-screen/settings_page/privacy.dart';
 import 'package:safezone/frontend/platforms/mobile/pages/main-screen/settings_page/privacy_security.dart';
 import 'package:safezone/frontend/platforms/mobile/pages/main-screen/settings_page/term-policy/main_terms_policy.dart';
 import 'package:safezone/frontend/platforms/mobile/pages/main-screen/settings_page/user_guide.dart';
@@ -214,12 +216,20 @@ GoRouter appRouter(bool isFirstRun, String? userToken) => GoRouter(
       builder: (context, state) => const PrivacySecurity(),
     ),
     GoRoute(
+      path: '/privacy',
+      builder: (context, state) => const Privacy(),
+    ),
+    GoRoute(
       path: '/termsPolicy',
       builder: (context, state) => const TermsPolicy(),
     ),
     GoRoute(
       path: '/help-center',
       builder: (context, state) => const HelpCenter(),
+    ),
+    GoRoute(
+      path: '/freespace',
+      builder: (context, state) => const Freespace(),
     ),
     GoRoute(
       path: '/userGuide',
