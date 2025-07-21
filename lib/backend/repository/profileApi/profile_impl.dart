@@ -54,6 +54,29 @@ class ProfileImplementation extends ProfileRepository {
   }
 
   @override
+  Future<bool> updateAcivityStatus(int userId, String status) async {
+    final String url = '$baseUrl/update-activity-status';
+
+    try {
+      final response = await http.patch(
+        Uri.parse(url),
+        headers: {"Content-Type": "application/json"},
+        body: json.encode({"user_id": userId, "status": status}),
+      );
+
+      if (response.statusCode == 200) {
+        return true;
+      } else {
+        throw Exception(
+            "Failed to update status. Status Code: ${response.statusCode}");
+      }
+    } catch (e) {
+      print("Error updating status: $e");
+      return false;
+    }
+  }
+
+  @override
   Future<String?> uploadProfilePicture(int userId, File imageFile) async {
     final String url = '$baseUrl/upload-profile-picture';
 

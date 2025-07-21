@@ -37,6 +37,8 @@ class AuthenticationImplementation extends AuthenticationRepository {
       await prefs.setBool('is_admin', data['profile']['is_admin']);
       await prefs.setBool('is_girl', data['profile']['is_girl']);
       await prefs.setBool('is_verified', data['profile']['is_verified']);
+      await prefs.setBool(
+          'activity_status', data['profile']['activity_status']);
       await prefs.setInt('circle', data['profile']['active_circle'] ?? 0);
       await prefs.setBool('wasInsideSafeZone', false);
       await prefs.setBool('wasInsideDangerZone', false);
@@ -81,6 +83,7 @@ class AuthenticationImplementation extends AuthenticationRepository {
         'is_admin': isAdmin,
         'is_girl': isGirl,
         'is_verified': isVerified,
+        'acitivty_status': true,
         'latitude': latitude,
         'longitude': longitude,
         'age': age

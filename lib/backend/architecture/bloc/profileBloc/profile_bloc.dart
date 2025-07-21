@@ -38,6 +38,21 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
       }
     });
 
+    on<UpdateStatusEvent>((event, emit) async {
+      emit(UpdateStatusLoading());
+      try {
+        final success = await profileRepository.updateAcivityStatus(
+            event.userId, event.status);
+        if (success) {
+          emit(UpdateStatusSuccess(event.status));
+        } else {
+          emit(const UpdateStatusError("Failed to update status"));
+        }
+      } catch (e) {
+        emit(UpdateStatusError("Error updating status: $e"));
+      }
+    });
+
     // Upload Profile Picture Event
     on<UploadProfilePictureEvent>((event, emit) async {
       emit(ProfileLoading());

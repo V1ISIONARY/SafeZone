@@ -5,6 +5,7 @@ class ProfileModel {
   final bool isAdmin;
   final bool isGirl;
   final bool isVerified;
+  final bool activityStatus;
   final String status;
   final int? circleId;
   final String profilePicture;
@@ -18,6 +19,7 @@ class ProfileModel {
       required this.isAdmin,
       required this.isGirl,
       required this.isVerified,
+      required this.activityStatus,
       required this.status,
       required this.circleId,
       required this.profilePicture,
@@ -32,6 +34,7 @@ class ProfileModel {
         isAdmin: json['is_admin'] ?? false,
         isGirl: json['is_girl'] ?? false,
         isVerified: json['is_verified'] ?? false,
+        activityStatus: json['activity_status'] ?? false,
         status: json['status'] ?? "Safe",
         circleId: json['active_circle'] ?? 0,
         profilePicture: json['profile_picture'] ?? "Safe",
@@ -47,6 +50,7 @@ class ProfileModel {
       'is_admin': isAdmin,
       'is_girl': isGirl,
       'is_verified': isVerified,
+      'activity_status': activityStatus,
       'status': status,
       'active_circle': circleId,
       'profile_picture': profilePicture,

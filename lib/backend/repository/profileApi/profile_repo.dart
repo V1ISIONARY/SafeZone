@@ -6,4 +6,5 @@ abstract class ProfileRepository {
   Future<bool> updateStatus(int userId, String status);
   Future<String?> uploadProfilePicture(int userId, File imageFile);
   Future<String?> getProfilePicture(int userId);
+  Future<bool> updateAcivityStatus(int userId, String status);
 }
