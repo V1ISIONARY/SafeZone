@@ -30,7 +30,7 @@ class AuthenticationImplementation extends AuthenticationRepository {
       await prefs.setString('username', data['user']['username']);
       await prefs.setString('email', data['user']['email']);
       await prefs.setString(
-          'profile_picture_url', data['profile']['profile_picture'] ?? '');
+          'profile_picture_url', data['profile']['profile_picture'] ?? 'Safe');
       await prefs.setString('address', data['profile']['address']);
       await prefs.setString('first_name', data['profile']['first_name']);
       await prefs.setString('last_name', data['profile']['last_name']);

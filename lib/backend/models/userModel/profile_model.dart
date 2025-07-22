@@ -8,7 +8,7 @@ class ProfileModel {
   final bool activityStatus;
   final String status;
   final int? circleId;
-  final String profilePicture;
+  final String? profilePicture;
   final String phoneNumber;
   final int age;
 
@@ -28,18 +28,19 @@ class ProfileModel {
 
   factory ProfileModel.fromJson(Map<String, dynamic> json) {
     return ProfileModel(
-        id: json['id'] ?? 0,
-        userId: json['user_id'] ?? 0,
-        address: json['address'] ?? 'Unknown',
-        isAdmin: json['is_admin'] ?? false,
-        isGirl: json['is_girl'] ?? false,
-        isVerified: json['is_verified'] ?? false,
-        activityStatus: json['activity_status'] ?? false,
-        status: json['status'] ?? "Safe",
-        circleId: json['active_circle'] ?? 0,
-        profilePicture: json['profile_picture'] ?? "Safe",
-        phoneNumber: json['phone_number'] ?? "Safe",
-        age: json['age'] ?? 0);
+      id: json['id'] ?? 0,
+      userId: json['user_id'] ?? 0,
+      address: json['address'] ?? 'Unknown',
+      isAdmin: json['is_admin'] ?? false,
+      isGirl: json['is_girl'] ?? false,
+      isVerified: json['is_verified'] ?? false,
+      activityStatus: json['activity_status'] ?? false,
+      status: json['status'] ?? "Safe",
+      circleId: json['active_circle'] ?? 0,
+      profilePicture: (json['profile_picture'] as String?) ?? "Safe",
+      phoneNumber: (json['phone_number'] as String?) ?? "Safe",
+      age: json['age'] ?? 0,
+    );
   }
 
   Map<String, dynamic> toJson() {
