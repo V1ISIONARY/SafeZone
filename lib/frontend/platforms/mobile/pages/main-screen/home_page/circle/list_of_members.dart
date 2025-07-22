@@ -9,6 +9,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../../../../backend/properties/import.dart';
 import '../../../../widgets/loadingstate.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ListOfMembers extends StatefulWidget {
   final int circleId;
@@ -30,6 +32,9 @@ class _ListOfMembersState extends State<ListOfMembers> {
   bool _showTitle = false;
   double _appBarHeight = 0;
   Color _appBarColor = Colors.transparent;
+
+  bool? _isSharingLocation;
+  bool _isToggling = false;
 
   Future<void> _checkIfShown() async {
     Future.delayed(Duration(milliseconds: 200), () {
@@ -67,7 +72,7 @@ class _ListOfMembersState extends State<ListOfMembers> {
   Future<void> _loadUserId() async {
     final prefs = await SharedPreferences.getInstance();
     final userId = prefs.getInt('id');
-
+    checkSharing();
     if (userId != null) {
       setState(() {
         _userId = userId;
@@ -114,6 +119,86 @@ class _ListOfMembersState extends State<ListOfMembers> {
     }
   }
 
+  Future<bool?> getCircleSharingStatus(String userId, String circleId) async {
+    try {
+      final doc = await FirebaseFirestore.instance
+          .collection('locations')
+          .doc(userId)
+          .get();
+      final data = doc.data();
+
+      print("Raw data from Firestore for user $userId: $data");
+
+      if (data == null) return null;
+
+      final circleSharing = data['circleSharing'] as Map<String, dynamic>?;
+
+      if (circleSharing == null) {
+        print("circleSharing is null");
+        return null;
+      }
+
+      print("circleSharing map: $circleSharing");
+      print(
+          "circleId $circleId exists: ${circleSharing.containsKey(circleId)}");
+
+      return circleSharing[circleId] == true;
+    } catch (e) {
+      print('Error fetching circle sharing status: $e');
+      return null;
+    }
+  }
+
+  void checkSharing() async {
+    final prefs = await SharedPreferences.getInstance();
+    final userId = prefs.getInt('id');
+    if (userId == null) return;
+
+    bool? isSharing = await getCircleSharingStatus(
+        userId.toString(), widget.circleId.toString());
+
+    setState(() {
+      _isSharingLocation = isSharing;
+    });
+
+    if (isSharing == true) {
+      print("User is sharing location with this circle");
+    } else if (isSharing == false) {
+      print("User is NOT sharing location with this circle");
+    } else {
+      print("No sharing data found");
+    }
+  }
+
+  Future<void> _toggleSharing(bool value) async {
+    setState(() {
+      _isToggling = true;
+    });
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final userId = prefs.getInt('id');
+      if (userId == null) return;
+
+      await FirebaseFirestore.instance
+          .collection('locations')
+          .doc(userId.toString())
+          .set({
+        'circleSharing': {widget.circleId.toString(): value}
+      }, SetOptions(merge: true));
+
+      setState(() {
+        _isSharingLocation = value;
+      });
+    } catch (e) {
+      print('Error toggling location sharing: $e');
+    } finally {
+      setState(() {
+        _isToggling = false;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocListener<CircleBloc, CircleState>(
@@ -154,6 +239,27 @@ class _ListOfMembersState extends State<ListOfMembers> {
           toolbarHeight: 0,
           automaticallyImplyLeading: false,
         ),
+        if (_isSharingLocation != null)
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  "Share my location with this circle",
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                ),
+                Switch(
+                  value: _isSharingLocation!,
+                  onChanged: _isToggling
+                      ? null
+                      : (value) {
+                          _toggleSharing(value);
+                        },
+                ),
+              ],
+            ),
+          ),
         AnimatedContainer(
           duration: const Duration(milliseconds: 300),
           height: _appBarHeight,

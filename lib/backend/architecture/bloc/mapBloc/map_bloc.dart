@@ -14,7 +14,8 @@ class MapBloc extends Bloc<MapPageEvent, MapState> {
   final DangerZoneRepository dangerZoneRepository;
   final CircleRepository circleRepository;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final Map<String, StreamSubscription<DocumentSnapshot>> _locationListeners = {};
+  final Map<String, StreamSubscription<DocumentSnapshot>> _locationListeners =
+      {};
 
   MapBloc({
     required this.safeZoneRepository,
@@ -34,7 +35,6 @@ class MapBloc extends Bloc<MapPageEvent, MapState> {
       final int userId = prefs.getInt('circle') ?? 0;
 
       final dangerZones = await dangerZoneRepository.getVerifiedDangerZones();
-
       final members = await circleRepository.viewMembers(userId);
 
       if (members.isNotEmpty) {
@@ -75,16 +75,34 @@ class MapBloc extends Bloc<MapPageEvent, MapState> {
             .collection('locations')
             .doc(userId)
             .snapshots()
-            .listen((documentSnapshot) {
+            .listen((documentSnapshot) async {
           if (documentSnapshot.exists) {
             var data = documentSnapshot.data() as Map<String, dynamic>;
             print("Received Firestore document data for user $userId: $data");
 
             if (data.containsKey('latitude') && data.containsKey('longitude')) {
-              double latitude = double.parse(data['latitude'].toString());
-              double longitude = double.parse(data['longitude'].toString());
-              print("Updated location for user $userId -> Latitude: $latitude, Longitude: $longitude");
-              emit(MemberLocationUpdated(userId, latitude, longitude));
+              final circleSharing =
+                  data['circleSharing'] as Map<String, dynamic>?;
+
+              if (circleSharing != null) {
+                final SharedPreferences prefs =
+                    await SharedPreferences.getInstance();
+                final currentCircleId =
+                    prefs.getInt('circle')?.toString(); // your circle
+
+                if (currentCircleId != null &&
+                    circleSharing[currentCircleId] == true) {
+                  double latitude = double.parse(data['latitude'].toString());
+                  double longitude = double.parse(data['longitude'].toString());
+                  print("Location shared for circle $currentCircleId");
+                  emit(MemberLocationUpdated(userId, latitude, longitude));
+                } else {
+                  print(
+                      "User $userId is NOT sharing location with circle $currentCircleId");
+                }
+              } else {
+                print("No circleSharing field found for user $userId");
+              }
             } else {
               print("Missing latitude or longitude data for user $userId");
             }
