@@ -35,6 +35,8 @@ class ProfilePictureLoaded extends ProfileState {
   List<Object?> get props => [profilePictureUrl];
 }
 
+class ProfilePictureUploading extends ProfileState {}
+
 // Success States
 class UpdateStatusSuccess extends ProfileState {
   final String status;

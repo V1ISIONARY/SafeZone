@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:safezone/backend/architecture/bloc/notificationBloc/notification_polling.dart';
+import 'package:safezone/backend/architecture/bloc/profileBloc/profile_bloc.dart';
+import 'package:safezone/backend/architecture/bloc/profileBloc/profile_state.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../../../backend/properties/import.dart';
@@ -23,7 +25,7 @@ class _SettingsState extends State<Settings> {
   bool? isAdmin;
   String profilePictureUrl = '';
   Future<String>? _userNameFuture;
-  
+
   Future<String> _getUserName() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final firstName = prefs.getString('first_name') ?? '';
@@ -42,9 +44,12 @@ class _SettingsState extends State<Settings> {
 
   Future<void> loadUserProfile() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {
-      profilePictureUrl = prefs.getString('profile_picture_url') ?? 'https://storage.googleapis.com/safezone-11724.firebasestorage.app/profile_pictures/2.jpg';
-    });
+    if (mounted) {
+      setState(() {
+        profilePictureUrl = prefs.getString('profile_picture_url') ??
+            'https://storage.googleapis.com/safezone-11724.firebasestorage.app/profile_pictures/2.jpg';
+      });
+    }
   }
 
   Future<void> _saveMapType(int index) async {
@@ -92,538 +97,597 @@ class _SettingsState extends State<Settings> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      child: Scaffold(
-        backgroundColor: Colors.white,
-        appBar: AppBar(
-          automaticallyImplyLeading: false,
-          backgroundColor: Colors.white,
-          centerTitle: false,
-          title: const Text(
-            "My Account",
-            style: TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.bold,
-                color: Colors.black),
-          ),
-        ),
-        body: Container(
-          margin: const EdgeInsets.symmetric(horizontal: 15),
-          child: ScrollConfiguration(
-            behavior: ScrollConfiguration.of(context).copyWith(
-              scrollbars: false,
+    return BlocListener<ProfileBloc, ProfileState>(
+      listener: (context, state) {
+        if (state is ProfilePictureUploaded) {
+          loadUserProfile();
+        }
+      },
+      child: WillPopScope(
+          child: Scaffold(
+            backgroundColor: Colors.white,
+            appBar: AppBar(
+              automaticallyImplyLeading: false,
+              backgroundColor: Colors.white,
+              centerTitle: false,
+              title: const Text(
+                "My Account",
+                style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black),
+              ),
             ),
-            child: ListView(
-              children: [
-                Container(
-                  width: double.infinity,
-                  height: 130,
-                  decoration: BoxDecoration(
-                    color: widgetPricolor,
-                    borderRadius: BorderRadius.circular(10),
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Colors.grey,
-                        blurRadius: 2,
-                        offset: Offset(1, 1),
+            body: Container(
+              margin: const EdgeInsets.symmetric(horizontal: 15),
+              child: ScrollConfiguration(
+                behavior: ScrollConfiguration.of(context).copyWith(
+                  scrollbars: false,
+                ),
+                child: ListView(
+                  children: [
+                    Container(
+                      width: double.infinity,
+                      height: 130,
+                      decoration: BoxDecoration(
+                        color: widgetPricolor,
+                        borderRadius: BorderRadius.circular(10),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Colors.grey,
+                            blurRadius: 2,
+                            offset: Offset(1, 1),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                  child: Stack(children: [
-                    Positioned(
-                        left: 0,
-                        child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Container(
-                                width: 130,
-                                height: 130,
-                                color: Colors.white,
-                                child: ClipRRect(
-                                  borderRadius: const BorderRadius.only(
-                                    bottomLeft: Radius.circular(10),
-                                    topLeft: Radius.circular(10),
-                                  ),
-                                  child: profilePictureUrl.isNotEmpty
-                                      ? Image.network(
-                                          profilePictureUrl,
-                                          fit: BoxFit.cover,
-                                          errorBuilder:
-                                              (context, error, stackTrace) {
-                                            return Image.asset(
+                      child: Stack(children: [
+                        Positioned(
+                            left: 0,
+                            child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    width: 130,
+                                    height: 130,
+                                    color: Colors.white,
+                                    child: ClipRRect(
+                                      borderRadius: const BorderRadius.only(
+                                        bottomLeft: Radius.circular(10),
+                                        topLeft: Radius.circular(10),
+                                      ),
+                                      child: profilePictureUrl.isNotEmpty
+                                          ? Image.network(
+                                              profilePictureUrl,
+                                              fit: BoxFit.cover,
+                                              errorBuilder:
+                                                  (context, error, stackTrace) {
+                                                return Image.asset(
+                                                  'lib/resource/image/jpg/profile.jpg',
+                                                  fit: BoxFit.cover,
+                                                );
+                                              },
+                                            )
+                                          : Image.asset(
                                               'lib/resource/image/jpg/profile.jpg',
                                               fit: BoxFit.cover,
-                                            );
-                                          },
-                                        )
-                                      : Image.asset(
-                                          'lib/resource/image/jpg/profile.jpg',
-                                          fit: BoxFit.cover,
-                                        ),
-                                ),
-                              ),
-                              Container(
-                                width: 150,
-                                height: 130,
-                                child: Stack(
-                                  children: [
-                                    Positioned(
-                                        top: 15,
-                                        left: 10,
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            widget.UserToken == 'guest'
-                                              ? Column(
-                                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                                  children: [
-                                                    Text(
-                                                      'Guest',
-                                                      style: GoogleFonts.poppins(
-                                                        fontSize: 15,
-                                                        fontWeight: FontWeight.w500,
-                                                        color: Colors.white,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                )
-                                              : FutureBuilder<String>(
-                                                  future: _userNameFuture,
-                                                  builder: (context, snapshot) {
-                                                    if (snapshot.connectionState == ConnectionState.waiting) {
-                                                      return Text(
-                                                        'Loading...',
-                                                        style: GoogleFonts.poppins(
-                                                          fontSize: 15,
-                                                          fontWeight: FontWeight.w500,
-                                                          color: Colors.white,
-                                                        ),
-                                                      );
-                                                    } else if (snapshot.hasError) {
-                                                      return Text(
-                                                        'Error loading name',
-                                                        style: GoogleFonts.poppins(
-                                                          fontSize: 15,
-                                                          fontWeight: FontWeight.w500,
-                                                          color: Colors.white,
-                                                        ),
-                                                      );
-                                                    } else {
-                                                      return Column(
-                                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                            ),
+                                    ),
+                                  ),
+                                  Container(
+                                    width: 150,
+                                    height: 130,
+                                    child: Stack(
+                                      children: [
+                                        Positioned(
+                                            top: 15,
+                                            left: 10,
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                widget.UserToken == 'guest'
+                                                    ? Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
                                                         children: [
                                                           Text(
-                                                            snapshot.data ?? 'Unknown User',
-                                                            style: GoogleFonts.poppins(
+                                                            'Guest',
+                                                            style: GoogleFonts
+                                                                .poppins(
                                                               fontSize: 15,
-                                                              fontWeight: FontWeight.w500,
-                                                              color: Colors.white,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w500,
+                                                              color:
+                                                                  Colors.white,
                                                             ),
                                                           ),
                                                         ],
-                                                      );
-                                                    }
-                                                  },
-                                                )
-                                          ],
-                                        )),
-                                    Positioned(
-                                        bottom: 15,
-                                        left: 10,
-                                        child: widget.UserToken == 'guest'
-                                            ? Row(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.center,
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                children: [
-                                                  Container(
-                                                    width: 13,
-                                                    height: 13,
-                                                    child: SvgPicture.asset(
-                                                      'lib/resource/svg/verified.svg',
-                                                      color: Colors.white,
-                                                    ),
-                                                  ),
-                                                  const SizedBox(width: 5),
-                                                  Text(
-                                                    'Not Verified',
-                                                    style: GoogleFonts.poppins(
-                                                        fontSize: 10,
-                                                        fontWeight:
-                                                            FontWeight.w400,
-                                                        color: Colors.white70),
+                                                      )
+                                                    : FutureBuilder<String>(
+                                                        future: _userNameFuture,
+                                                        builder: (context,
+                                                            snapshot) {
+                                                          if (snapshot
+                                                                  .connectionState ==
+                                                              ConnectionState
+                                                                  .waiting) {
+                                                            return Text(
+                                                              'Loading...',
+                                                              style: GoogleFonts
+                                                                  .poppins(
+                                                                fontSize: 15,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w500,
+                                                                color: Colors
+                                                                    .white,
+                                                              ),
+                                                            );
+                                                          } else if (snapshot
+                                                              .hasError) {
+                                                            return Text(
+                                                              'Error loading name',
+                                                              style: GoogleFonts
+                                                                  .poppins(
+                                                                fontSize: 15,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w500,
+                                                                color: Colors
+                                                                    .white,
+                                                              ),
+                                                            );
+                                                          } else {
+                                                            return Column(
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .start,
+                                                              children: [
+                                                                Text(
+                                                                  snapshot.data ??
+                                                                      'Unknown User',
+                                                                  style: GoogleFonts
+                                                                      .poppins(
+                                                                    fontSize:
+                                                                        15,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w500,
+                                                                    color: Colors
+                                                                        .white,
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            );
+                                                          }
+                                                        },
+                                                      )
+                                              ],
+                                            )),
+                                        Positioned(
+                                            bottom: 15,
+                                            left: 10,
+                                            child: widget.UserToken == 'guest'
+                                                ? Row(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .center,
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .center,
+                                                    children: [
+                                                      Container(
+                                                        width: 13,
+                                                        height: 13,
+                                                        child: SvgPicture.asset(
+                                                          'lib/resource/svg/verified.svg',
+                                                          color: Colors.white,
+                                                        ),
+                                                      ),
+                                                      const SizedBox(width: 5),
+                                                      Text(
+                                                        'Not Verified',
+                                                        style:
+                                                            GoogleFonts.poppins(
+                                                                fontSize: 10,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w400,
+                                                                color: Colors
+                                                                    .white70),
+                                                      )
+                                                    ],
                                                   )
-                                                ],
-                                              )
-                                            : Row(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.center,
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                children: [
-                                                  Container(
-                                                    width: 13,
-                                                    height: 13,
-                                                    child: SvgPicture.asset(
-                                                      'lib/resource/svg/verified.svg',
-                                                      color: Colors.white,
-                                                    ),
-                                                  ),
-                                                  const SizedBox(width: 5),
-                                                  Text(
-                                                    'Verified at Safezone',
-                                                    style: GoogleFonts.poppins(
-                                                        fontSize: 10,
-                                                        fontWeight:
-                                                            FontWeight.w400,
-                                                        color: Colors.white70),
-                                                  )
-                                                ],
-                                              ))
-                                  ],
-                                ),
-                              )
-                            ])),
-                    Positioned(
-                        right: 0,
-                        child: Container(
-                          width: 130,
-                          height: 130,
-                          child: SvgPicture.asset('lib/resource/svg/lines.svg'),
-                        ))
-                  ]),
-                ),
-                widget.UserToken == 'guest'
-                    ? const SizedBox()
-                    : Column(children: [
-                        Padding(
-                          padding: const EdgeInsets.only(top: 10),
-                          child: Settingsbtn(
-                            title: 'Account Details',
-                            svgIcon: 'lib/resource/svg/account.svg',
-                            navigateTo: 'accountDetails',
-                            description:
-                                'Protecting personal data and ensuring safety from threats.',
-                            onTap: () {},
-                          ),
-                        ),
-                        isAdmin == false
-                            ? Container()
-                            : Settingsbtn(
-                                title: 'Report Analytics',
-                                svgIcon: 'lib/resource/svg/monitor.svg',
-                                navigateTo: 'analytics',
-                                description:
-                                    'Report Analytics delivers data insights with reports and dashboards.',
-                                onTap: () {},
-                              )
+                                                : Row(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .center,
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .center,
+                                                    children: [
+                                                      Container(
+                                                        width: 13,
+                                                        height: 13,
+                                                        child: SvgPicture.asset(
+                                                          'lib/resource/svg/verified.svg',
+                                                          color: Colors.white,
+                                                        ),
+                                                      ),
+                                                      const SizedBox(width: 5),
+                                                      Text(
+                                                        'Verified at Safezone',
+                                                        style:
+                                                            GoogleFonts.poppins(
+                                                                fontSize: 10,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w400,
+                                                                color: Colors
+                                                                    .white70),
+                                                      )
+                                                    ],
+                                                  ))
+                                      ],
+                                    ),
+                                  )
+                                ])),
+                        Positioned(
+                            right: 0,
+                            child: Container(
+                              width: 130,
+                              height: 130,
+                              child: SvgPicture.asset(
+                                  'lib/resource/svg/lines.svg'),
+                            ))
                       ]),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Padding(
-                      padding: EdgeInsets.only(top: 10),
-                      child: CategoryText(text: "Map Preference"),
                     ),
-                    const CategoryDescripText(text:"Select the appropriate map design for your application."),
-                    Container(
-                      margin: const EdgeInsets.symmetric(vertical: 20),
-                      width: double.infinity,
-                      height: 90,
-                      color: Colors.transparent,
-                      child: Center(
-                        child: Container(
-                          height: 80,
-                          width: double.infinity,
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: [
-                              _buildItem(0, 'Default',
-                                  'lib/resource/image/png/terrain.png'),
-                              _buildItem(1, 'Satellite',
-                                  'lib/resource/image/png/satellite.png'),
-                              _buildItem(2, 'Terrain',
-                                  'lib/resource/image/png/terrain.png'),
-                            ],
-                          ),
-                        ),
-                      ),
-                    )
-                  ],
-                ),
-                widget.UserToken == 'gueguestss'
-                  ? const SizedBox()
-                  : Settingsbtn(
-                      title: 'Privacy',
-                      svgIcon: 'lib/resource/svg/lock.svg',
-                      navigateTo: 'privacy',
-                      description:
-                          'Manage your data sharing and personal information settings.',
-                      onTap: () {},
-                    ),
-                widget.UserToken == 'guest'
-                  ? const SizedBox()
-                  : Container(
-                      width: double.infinity,
-                      margin: const EdgeInsets.only(top: 10, bottom: 10),
-                      child: Stack(
-                        children: [
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Container(
-                                  height: 25,
-                                  width: 25,
-                                  margin: const EdgeInsets.only(right: 17),
-                                  child: SvgPicture.asset(
-                                    'lib/resource/svg/notification-outline.svg',
-                                    color: const Color.fromARGB(179, 0, 0, 0),
-                                  )),
-                              const Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  PrimaryText(text: 'Notification'),
-                                  DescriptionText(
-                                    text: "Control your notification",
-                                  )
-                                ],
-                              )
-                            ],
-                          ),
-                          Positioned(
-                            right: 0,
-                            top: 5,
-                            bottom: 5,
-                            child: GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  isNotification = !isNotification; 
-                                });
-                              },
-                              child: Container(
-                                height: 15,
-                                width: 35, 
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal:
-                                        2), // Padding for inner circle
-                                decoration: BoxDecoration(
-                                  color: isNotification
-                                      ? widgetPricolor
-                                      : widgetSeccolor, // Toggle background color
-                                  borderRadius: BorderRadius.circular(
-                                      10), // Rounded edges for toggle
-                                ),
-                                child: AnimatedAlign(
-                                  duration: const Duration(
-                                      milliseconds:
-                                          200), // Smooth animation for toggle
-                                  alignment: isNotification
-                                      ? Alignment.centerRight
-                                      : Alignment.centerLeft,
-                                  child: Container(
-                                    height: 16,
-                                    width: 16,
-                                    decoration: const BoxDecoration(
-                                      color: Colors.white, // Circle color
-                                      shape: BoxShape
-                                          .circle, // Makes the inner container a circle
-                                    ),
-                                  ),
-                                ),
+                    widget.UserToken == 'guest'
+                        ? const SizedBox()
+                        : Column(children: [
+                            Padding(
+                              padding: const EdgeInsets.only(top: 10),
+                              child: Settingsbtn(
+                                title: 'Account Details',
+                                svgIcon: 'lib/resource/svg/account.svg',
+                                navigateTo: 'accountDetails',
+                                description:
+                                    'Protecting personal data and ensuring safety from threats.',
+                                onTap: () {},
                               ),
                             ),
-                          )
-                        ],
-                      )),
-                widget.UserToken == 'guest'
-                  ? const SizedBox()
-                  : Container(
-                      width: double.infinity,
-                      margin: const EdgeInsets.only(top: 10, bottom: 10),
-                      child: Stack(
-                        children: [
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Container(
-                                  height: 25,
-                                  width: 25,
-                                  margin: const EdgeInsets.only(right: 17),
-                                  child: SvgPicture.asset(
-                                    'lib/resource/svg/color-blind.svg',
-                                    color: const Color.fromARGB(179, 0, 0, 0),
-                                  )),
-                              const Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  PrimaryText(text: 'Color Blind'),
-                                  DescriptionText(
-                                    text: "Enhances visuals for colorblind accessibility.",
+                            isAdmin == false
+                                ? Container()
+                                : Settingsbtn(
+                                    title: 'Report Analytics',
+                                    svgIcon: 'lib/resource/svg/monitor.svg',
+                                    navigateTo: 'analytics',
+                                    description:
+                                        'Report Analytics delivers data insights with reports and dashboards.',
+                                    onTap: () {},
                                   )
-                                ],
-                              )
-                            ],
-                          ),
-                          Positioned(
-                            right: 0,
-                            top: 5,
-                            bottom: 5,
-                            child: GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  isColorBlind = !isColorBlind; 
-                                });
-                              },
-                              child: Container(
-                                height: 15,
-                                width: 35, 
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal:
-                                        2), // Padding for inner circle
-                                decoration: BoxDecoration(
-                                  color: isColorBlind
-                                      ? Colors.green.shade300
-                                      : widgetSeccolor, // Toggle background color
-                                  borderRadius: BorderRadius.circular(
-                                      10), // Rounded edges for toggle
-                                ),
-                                child: AnimatedAlign(
-                                  duration: const Duration(
-                                      milliseconds:
-                                          200), // Smooth animation for toggle
-                                  alignment: isColorBlind
-                                      ? Alignment.centerRight
-                                      : Alignment.centerLeft,
-                                  child: Container(
-                                    height: 16,
-                                    width: 16,
-                                    decoration: const BoxDecoration(
-                                      color: Colors.white, // Circle color
-                                      shape: BoxShape
-                                          .circle, // Makes the inner container a circle
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          )
-                        ],
-                      )),
-                widget.UserToken == 'gueguestss'
-                  ? const SizedBox()
-                  : Settingsbtn(
-                      title: 'Security & permission',
-                      svgIcon: 'lib/resource/svg/privacy_security.svg',
-                      navigateTo: '',
-                      description:
-                          'Control access, app permissions, and secure your account.',
-                      onTap: () {},
-                    ),
-                SizedBox(height: 10),
-                const CategoryText(text: "Cache & Cellular"),
-                SizedBox(height: 10),
-                Settingsbtn(
-                  title: 'Offline Map & Zones',
-                  svgIcon: 'lib/resource/svg/cloud-download.svg',
-                  navigateTo: '',
-                  description: 'Download maps and access zones without internet.',
-                  onTap: () {},
-                ),
-                Settingsbtn(
-                  title: 'Free up space',
-                  svgIcon: 'lib/resource/svg/recycling.svg',
-                  navigateTo: 'freespace',
-                  description:
-                      'Manage unused data to maintain your personal storage.',
-                  onTap: () {},
-                ),
-                SizedBox(height: 10),
-                const CategoryText(text: "Help & Support Hub"),
-                SizedBox(height: 10),
-                Settingsbtn(
-                  title: 'Help Center',
-                  svgIcon: 'lib/resource/svg/about.svg',
-                  navigateTo: 'help-center',
-                  description: 'Find answers to common questions and issues.',
-                  onTap: () {},
-                ),
-                Settingsbtn(
-                  title: 'Terms and Policy',
-                  svgIcon: 'lib/resource/svg/law.svg',
-                  navigateTo: 'termsPolicy',
-                  description: 'Outlines rules and user responsibilities.',
-                  onTap: () {},
-                ),
-                Settingsbtn(
-                  title: 'Report a problem',
-                  svgIcon: 'lib/resource/svg/bug.svg',
-                  navigateTo: '',
-                  description: 'your concern is our priority.',
-                  onTap: () {},
-                ),
-                widget.UserToken == 'guest'
-                    ? Settingsbtn(
-                        title: 'Sign In',
-                        svgIcon: 'lib/resource/svg/logout.svg',
-                        navigateTo: 'starter',
-                        description: 'Start your journey now!',
-                        replace: false,
-                        onTap: () {},
-                      )
-                    : Settingsbtn(
-                        title: 'Logout',
-                        svgIcon: 'lib/resource/svg/logout.svg',
-                        navigateTo: 'login',
-                        replace: true,
-                        onTap: () async {
-                          NotificationPollingService().stopPolling();
-                          final SharedPreferences prefs =
-                              await SharedPreferences.getInstance();
-                          Map<String, bool> firstRunFlags = {};
-                          for (String key in prefs.getKeys()) {
-                            if (key.startsWith('isFirstRunFlag_')) {
-                              firstRunFlags[key] = prefs.getBool(key) ?? true;
-                            }
-                          }
-
-                          await prefs.clear();
-
-                          for (var entry in firstRunFlags.entries) {
-                            await prefs.setBool(entry.key, entry.value);
-                          }
-                        },
-                      ),
-                Container(
-                  width: double.infinity,
-                  margin: const EdgeInsets.symmetric(vertical: 60),
-                  child: Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
+                          ]),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        SvgPicture.asset(
-                          'lib/resource/svg/visionary.svg',
-                          height: 50,
-                          width: 50,
+                        const Padding(
+                          padding: EdgeInsets.only(top: 10),
+                          child: CategoryText(text: "Map Preference"),
                         ),
-                        const CategoryText(text: "Safezone"),
                         const CategoryDescripText(
-                            text: 'Developed by Visionary Org')
+                            text:
+                                "Select the appropriate map design for your application."),
+                        Container(
+                          margin: const EdgeInsets.symmetric(vertical: 20),
+                          width: double.infinity,
+                          height: 90,
+                          color: Colors.transparent,
+                          child: Center(
+                            child: Container(
+                              height: 80,
+                              width: double.infinity,
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
+                                children: [
+                                  _buildItem(0, 'Default',
+                                      'lib/resource/image/png/terrain.png'),
+                                  _buildItem(1, 'Satellite',
+                                      'lib/resource/image/png/satellite.png'),
+                                  _buildItem(2, 'Terrain',
+                                      'lib/resource/image/png/terrain.png'),
+                                ],
+                              ),
+                            ),
+                          ),
+                        )
                       ],
                     ),
-                  ),
+                    widget.UserToken == 'gueguestss'
+                        ? const SizedBox()
+                        : Settingsbtn(
+                            title: 'Privacy',
+                            svgIcon: 'lib/resource/svg/lock.svg',
+                            navigateTo: 'privacy',
+                            description:
+                                'Manage your data sharing and personal information settings.',
+                            onTap: () {},
+                          ),
+                    widget.UserToken == 'guest'
+                        ? const SizedBox()
+                        : Container(
+                            width: double.infinity,
+                            margin: const EdgeInsets.only(top: 10, bottom: 10),
+                            child: Stack(
+                              children: [
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Container(
+                                        height: 25,
+                                        width: 25,
+                                        margin:
+                                            const EdgeInsets.only(right: 17),
+                                        child: SvgPicture.asset(
+                                          'lib/resource/svg/notification-outline.svg',
+                                          color: const Color.fromARGB(
+                                              179, 0, 0, 0),
+                                        )),
+                                    const Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        PrimaryText(text: 'Notification'),
+                                        DescriptionText(
+                                          text: "Control your notification",
+                                        )
+                                      ],
+                                    )
+                                  ],
+                                ),
+                                Positioned(
+                                  right: 0,
+                                  top: 5,
+                                  bottom: 5,
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        isNotification = !isNotification;
+                                      });
+                                    },
+                                    child: Container(
+                                      height: 15,
+                                      width: 35,
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal:
+                                              2), // Padding for inner circle
+                                      decoration: BoxDecoration(
+                                        color: isNotification
+                                            ? widgetPricolor
+                                            : widgetSeccolor, // Toggle background color
+                                        borderRadius: BorderRadius.circular(
+                                            10), // Rounded edges for toggle
+                                      ),
+                                      child: AnimatedAlign(
+                                        duration: const Duration(
+                                            milliseconds:
+                                                200), // Smooth animation for toggle
+                                        alignment: isNotification
+                                            ? Alignment.centerRight
+                                            : Alignment.centerLeft,
+                                        child: Container(
+                                          height: 16,
+                                          width: 16,
+                                          decoration: const BoxDecoration(
+                                            color: Colors.white, // Circle color
+                                            shape: BoxShape
+                                                .circle, // Makes the inner container a circle
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                )
+                              ],
+                            )),
+                    widget.UserToken == 'guest'
+                        ? const SizedBox()
+                        : Container(
+                            width: double.infinity,
+                            margin: const EdgeInsets.only(top: 10, bottom: 10),
+                            child: Stack(
+                              children: [
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Container(
+                                        height: 25,
+                                        width: 25,
+                                        margin:
+                                            const EdgeInsets.only(right: 17),
+                                        child: SvgPicture.asset(
+                                          'lib/resource/svg/color-blind.svg',
+                                          color: const Color.fromARGB(
+                                              179, 0, 0, 0),
+                                        )),
+                                    const Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        PrimaryText(text: 'Color Blind'),
+                                        DescriptionText(
+                                          text:
+                                              "Enhances visuals for colorblind accessibility.",
+                                        )
+                                      ],
+                                    )
+                                  ],
+                                ),
+                                Positioned(
+                                  right: 0,
+                                  top: 5,
+                                  bottom: 5,
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        isColorBlind = !isColorBlind;
+                                      });
+                                    },
+                                    child: Container(
+                                      height: 15,
+                                      width: 35,
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal:
+                                              2), // Padding for inner circle
+                                      decoration: BoxDecoration(
+                                        color: isColorBlind
+                                            ? Colors.green.shade300
+                                            : widgetSeccolor, // Toggle background color
+                                        borderRadius: BorderRadius.circular(
+                                            10), // Rounded edges for toggle
+                                      ),
+                                      child: AnimatedAlign(
+                                        duration: const Duration(
+                                            milliseconds:
+                                                200), // Smooth animation for toggle
+                                        alignment: isColorBlind
+                                            ? Alignment.centerRight
+                                            : Alignment.centerLeft,
+                                        child: Container(
+                                          height: 16,
+                                          width: 16,
+                                          decoration: const BoxDecoration(
+                                            color: Colors.white, // Circle color
+                                            shape: BoxShape
+                                                .circle, // Makes the inner container a circle
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                )
+                              ],
+                            )),
+                    widget.UserToken == 'gueguestss'
+                        ? const SizedBox()
+                        : Settingsbtn(
+                            title: 'Security & permission',
+                            svgIcon: 'lib/resource/svg/privacy_security.svg',
+                            navigateTo: '',
+                            description:
+                                'Control access, app permissions, and secure your account.',
+                            onTap: () {},
+                          ),
+                    SizedBox(height: 10),
+                    const CategoryText(text: "Cache & Cellular"),
+                    SizedBox(height: 10),
+                    Settingsbtn(
+                      title: 'Offline Map & Zones',
+                      svgIcon: 'lib/resource/svg/cloud-download.svg',
+                      navigateTo: '',
+                      description:
+                          'Download maps and access zones without internet.',
+                      onTap: () {},
+                    ),
+                    Settingsbtn(
+                      title: 'Free up space',
+                      svgIcon: 'lib/resource/svg/recycling.svg',
+                      navigateTo: 'freespace',
+                      description:
+                          'Manage unused data to maintain your personal storage.',
+                      onTap: () {},
+                    ),
+                    SizedBox(height: 10),
+                    const CategoryText(text: "Help & Support Hub"),
+                    SizedBox(height: 10),
+                    Settingsbtn(
+                      title: 'Help Center',
+                      svgIcon: 'lib/resource/svg/about.svg',
+                      navigateTo: 'help-center',
+                      description:
+                          'Find answers to common questions and issues.',
+                      onTap: () {},
+                    ),
+                    Settingsbtn(
+                      title: 'Terms and Policy',
+                      svgIcon: 'lib/resource/svg/law.svg',
+                      navigateTo: 'termsPolicy',
+                      description: 'Outlines rules and user responsibilities.',
+                      onTap: () {},
+                    ),
+                    Settingsbtn(
+                      title: 'Report a problem',
+                      svgIcon: 'lib/resource/svg/bug.svg',
+                      navigateTo: '',
+                      description: 'your concern is our priority.',
+                      onTap: () {},
+                    ),
+                    widget.UserToken == 'guest'
+                        ? Settingsbtn(
+                            title: 'Sign In',
+                            svgIcon: 'lib/resource/svg/logout.svg',
+                            navigateTo: 'starter',
+                            description: 'Start your journey now!',
+                            replace: false,
+                            onTap: () {},
+                          )
+                        : Settingsbtn(
+                            title: 'Logout',
+                            svgIcon: 'lib/resource/svg/logout.svg',
+                            navigateTo: 'login',
+                            replace: true,
+                            onTap: () async {
+                              NotificationPollingService().stopPolling();
+                              final SharedPreferences prefs =
+                                  await SharedPreferences.getInstance();
+                              Map<String, bool> firstRunFlags = {};
+                              for (String key in prefs.getKeys()) {
+                                if (key.startsWith('isFirstRunFlag_')) {
+                                  firstRunFlags[key] =
+                                      prefs.getBool(key) ?? true;
+                                }
+                              }
+
+                              await prefs.clear();
+
+                              for (var entry in firstRunFlags.entries) {
+                                await prefs.setBool(entry.key, entry.value);
+                              }
+                            },
+                          ),
+                    Container(
+                      width: double.infinity,
+                      margin: const EdgeInsets.symmetric(vertical: 60),
+                      child: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            SvgPicture.asset(
+                              'lib/resource/svg/visionary.svg',
+                              height: 50,
+                              width: 50,
+                            ),
+                            const CategoryText(text: "Safezone"),
+                            const CategoryDescripText(
+                                text: 'Developed by Visionary Org')
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 100)
+                  ],
                 ),
-                const SizedBox(height: 100)
-              ],
+              ),
             ),
           ),
-        ),
-      ),
-      onWillPop: () async {
-        return false;
-      });
+          onWillPop: () async {
+            return false;
+          }),
+    );
   }
 
   Widget _buildItem(int index, String label, String imgStyle) {

@@ -26,16 +26,21 @@ class IdentifiedZone extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            // Container(
-            //   width: 40,
-            //   height: 40,
-            //   margin: const EdgeInsets.only(left: 15),
-            //   decoration: const BoxDecoration(
-            //     shape: BoxShape.circle,
-            //     color: Colors.white,
-            //   ),
-            // ),
-            const SizedBox(width: 15),
+            Container(
+              width: 40,
+              height: 40,
+              margin: const EdgeInsets.only(left: 15),
+              decoration: const BoxDecoration(
+                shape: BoxShape.circle,
+                color: dangerStatusColor,
+              ),
+              child: const Icon(
+                Icons.warning,
+                color: Colors.white,
+                size: 24,
+              ),
+            ),
+            const SizedBox(width: 10),
             Padding(
                 padding: const EdgeInsets.only(left: 15),
                 child: Column(
@@ -43,8 +48,7 @@ class IdentifiedZone extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     CategoryText(text: name),
-                    CategoryDescripText(
-                        text: location)
+                    CategoryDescripText(text: location)
                   ],
                 )),
           ],

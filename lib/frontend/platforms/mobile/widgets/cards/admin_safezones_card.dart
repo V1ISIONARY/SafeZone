@@ -47,16 +47,21 @@ class AdminSafeZonesCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            // Container(
-            //   width: 40,
-            //   height: 40,
-            //   margin: const EdgeInsets.only(left: 15),
-            //   decoration: const BoxDecoration(
-            //     shape: BoxShape.circle,
-            //     color: Colors.white,
-            //   ),
-            // ),
-            const SizedBox(width: 15),
+            Container(
+              width: 40,
+              height: 40,
+              margin: const EdgeInsets.only(left: 15),
+              decoration: const BoxDecoration(
+                shape: BoxShape.circle,
+                color: Color.fromARGB(136, 101, 180, 137), 
+              ),
+              child: const Icon(
+                Icons.shield_outlined, 
+                color: Colors.white, 
+                size: 24,
+              ),
+            ),
+            const SizedBox(width: 10),
             Expanded(
               // Prevents overflow
               child: Column(

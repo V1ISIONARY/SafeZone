@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:safezone/backend/properties/import.dart';
 import 'package:safezone/backend/repository/profileApi/profile_repo.dart';
 import 'profile_event.dart';
 import 'profile_state.dart';
@@ -23,22 +24,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     });
 
     // Update Status Event
-    on<UpdateStatusEvent>((event, emit) async {
-      emit(UpdateStatusLoading());
-      try {
-        final success =
-            await profileRepository.updateStatus(event.userId, event.status);
-        if (success) {
-          emit(UpdateStatusSuccess(event.status));
-        } else {
-          emit(const UpdateStatusError("Failed to update status"));
-        }
-      } catch (e) {
-        emit(UpdateStatusError("Error updating status: $e"));
-      }
-    });
-
-    on<UpdateStatusEvent>((event, emit) async {
+      on<UpdateStatusEvent>((event, emit) async {
       emit(UpdateStatusLoading());
       try {
         final success = await profileRepository.updateAcivityStatus(
@@ -54,12 +40,16 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     });
 
     // Upload Profile Picture Event
-    on<UploadProfilePictureEvent>((event, emit) async {
+       on<UploadProfilePictureEvent>((event, emit) async {
       emit(ProfileLoading());
       try {
+        emit(ProfilePictureUploading());
         final profilePictureUrl = await profileRepository.uploadProfilePicture(
             event.userId, event.imageFile);
         if (profilePictureUrl != null) {
+          final SharedPreferences prefs = await SharedPreferences.getInstance();
+          await prefs.setString('profile_picture_url', profilePictureUrl);
+
           emit(ProfilePictureUploaded(profilePictureUrl));
         } else {
           emit(const ProfileError("Failed to upload profile picture"));
