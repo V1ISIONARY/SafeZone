@@ -18,8 +18,8 @@ class ListOfGroups extends StatefulWidget {
 }
 
 class _ListOfGroupsState extends State<ListOfGroups> {
-  List<CircleModel> _circles = []; // Local list to store circles
-  int? _userId; // Store userId locally
+  List<CircleModel> _circles = []; 
+  int? _userId; 
 
   @override
   void initState() {
@@ -27,7 +27,6 @@ class _ListOfGroupsState extends State<ListOfGroups> {
     _loadUserId();
   }
 
-  // Load userId from shared preferences and fetch circles
   Future<void> _loadUserId() async {
     final prefs = await SharedPreferences.getInstance();
     final userId = prefs.getInt('id');
@@ -42,7 +41,6 @@ class _ListOfGroupsState extends State<ListOfGroups> {
     }
   }
 
-  // Show dialog to create a new group
   Future<void> _showCreateGroupDialog() async {
     final TextEditingController nameController = TextEditingController();
 
@@ -257,8 +255,9 @@ class _ListOfGroupsState extends State<ListOfGroups> {
         return true;
       },
       child: Scaffold(
+        backgroundColor: Color.fromARGB(255, 240, 240, 240),
         appBar: AppBar(
-          backgroundColor: Colors.white,
+          backgroundColor: Color.fromARGB(255, 240, 240, 240),
           automaticallyImplyLeading: false,
           centerTitle: true,
           title: Transform.translate(
@@ -436,98 +435,92 @@ class _ListOfGroupsState extends State<ListOfGroups> {
                                   if (result == true) {
                                     Future.delayed(const Duration(seconds: 2),
                                         () {
-                                      _loadUserId(); // Reload userId or do whatever is needed
+                                      _loadUserId(); 
                                     });
                                   }
                                 },
                                 child: Container(
                                   width: double.infinity,
-                                  height: 70,
                                   margin: const EdgeInsets.symmetric(
-                                      horizontal: 10, vertical: 5),
+                                    horizontal: 10, 
+                                    vertical: 5
+                                  ),
+                                  padding: EdgeInsets.symmetric(
+                                    vertical: 10
+                                  ),
                                   decoration: BoxDecoration(
-                                    color: const Color.fromARGB(10, 0, 0, 0),
+                                    color: Colors.white,
                                     borderRadius: BorderRadius.circular(5),
                                   ),
                                   child: Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
+                                    crossAxisAlignment:CrossAxisAlignment.center,
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
                                       Container(
                                         width: 40,
                                         height: 40,
                                         margin: const EdgeInsets.symmetric(
-                                            horizontal: 15),
+                                          horizontal: 15
+                                        ),
                                         decoration: const BoxDecoration(
                                           shape: BoxShape.circle,
-                                          color: Colors.white,
+                                          color: Color.fromARGB(255, 240, 240, 240),
                                         ),
                                         child: const Icon(Icons.group),
                                       ),
-                                      const SizedBox(width: 10),
+                                      const SizedBox(width: 5),
                                       Expanded(
                                         child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          mainAxisAlignment: MainAxisAlignment.center,
                                           children: [
                                             CategoryText(text: group.name),
+                                            Text(
+                                              "3 active · 5 members",
+                                              style: TextStyle(
+                                                fontSize: 10,
+                                                color: Colors.black38
+                                              ),
+                                            )
                                           ],
                                         ),
                                       ),
                                       StatefulBuilder(
                                         builder: (context, setState) {
-                                          return TextButton(
-                                            onPressed: group.isActive
+                                          final isChecked = group.isActive;
+                                          return GestureDetector(
+                                            onTap: isChecked
                                                 ? null
                                                 : () async {
-                                                    for (var otherGroup
-                                                        in _circles) {
-                                                      if (otherGroup.isActive &&
-                                                          otherGroup != group) {
-                                                        context
-                                                            .read<CircleBloc>()
-                                                            .add(
+                                                    for (var otherGroup in _circles) {
+                                                      if (otherGroup.isActive && otherGroup != group) {
+                                                        context.read<CircleBloc>().add(
                                                               ChangeActiveEvent(
-                                                                circleId:
-                                                                    otherGroup
-                                                                        .id,
+                                                                circleId: otherGroup.id,
                                                                 isActive: false,
-                                                                userId:
-                                                                    _userId!,
+                                                                userId: _userId!,
                                                               ),
                                                             );
                                                         setState(() {
-                                                          otherGroup.isActive =
-                                                              false;
+                                                          otherGroup.isActive = false;
                                                         });
                                                       }
                                                     }
 
-                                                    final newState =
-                                                        !group.isActive;
+                                                    final newState = !isChecked;
 
-                                                    context
-                                                        .read<CircleBloc>()
-                                                        .add(
-                                                          ChangeActiveEvent(
-                                                            circleId: group.id,
-                                                            isActive: newState,
-                                                            userId: _userId!,
-                                                          ),
-                                                        );
+                                                    context.read<CircleBloc>().add(
+                                                      ChangeActiveEvent(
+                                                        circleId: group.id,
+                                                        isActive: newState,
+                                                        userId: _userId!,
+                                                      ),
+                                                    );
 
-                                                    final prefs =
-                                                        await SharedPreferences
-                                                            .getInstance();
-                                                    await prefs.setInt(
-                                                        'circle', group.id);
+                                                    final prefs = await SharedPreferences.getInstance();
+                                                    await prefs.setInt('circle', group.id);
 
-                                                    Future.delayed(
-                                                        const Duration(
-                                                            seconds: 1), () {
+                                                    Future.delayed(const Duration(seconds: 1), () {
                                                       _loadUserId();
                                                     });
 
@@ -535,27 +528,24 @@ class _ListOfGroupsState extends State<ListOfGroups> {
                                                       group.isActive = newState;
                                                     });
                                                   },
-                                            style: TextButton.styleFrom(
-                                              backgroundColor: group.isActive
-                                                  ? widgetPricolor
-                                                  : const Color.fromARGB(
-                                                      255, 155, 155, 155),
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
+                                            child: Container(
+                                              width: 20,
+                                              height: 20,
+                                              decoration: BoxDecoration(
+                                                color: isChecked ? widgetPricolor : Colors.transparent,
+                                                border: Border.all(
+                                                  color: isChecked ? widgetPricolor : Colors.grey,
+                                                  width: 2,
+                                                ),
+                                                borderRadius: BorderRadius.circular(4), 
                                               ),
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 16,
-                                                      vertical: 10),
-                                            ),
-                                            child: Text(
-                                              group.isActive
-                                                  ? 'Activated'
-                                                  : 'Activate',
-                                              style: const TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize: 14),
+                                              child: isChecked
+                                                ? const Icon(
+                                                    Icons.check,
+                                                    size: 14,
+                                                    color: Colors.white,
+                                                  )
+                                                : null,
                                             ),
                                           );
                                         },
@@ -572,7 +562,6 @@ class _ListOfGroupsState extends State<ListOfGroups> {
                     } else if (state is CircleErrorState) {
                       return Center();
                     } else if (_circles.isEmpty) {
-                      // Handle the case where there are no circles
                       return Expanded(
                         child: Center(
                           child: Column(
@@ -611,7 +600,6 @@ class _ListOfGroupsState extends State<ListOfGroups> {
                         ),
                       );
                     } else {
-                      // Handle the case where there are no circles
                       return Container();
                     }
                   },

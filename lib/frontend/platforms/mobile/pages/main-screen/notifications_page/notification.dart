@@ -21,17 +21,47 @@ class Notif extends StatefulWidget {
   State<Notif> createState() => _NotifState();
 }
 
-class _NotifState extends State<Notif> with SingleTickerProviderStateMixin {
+class _NotifState extends State<Notif> with TickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _animation;
   late PageController pageController;
   late List<Widget> topLevelPages;
+
+  
+  late TabController _tabController;
+  final List<String> _categories = [
+    'All',
+    'Read',
+    'Unread',
+  ].map((category) => category[0].toUpperCase() + category.substring(1))
+  .toList();
+
+  Widget _mainWrapperBody(String category) {
+    return PageView(
+      controller: pageController,
+      onPageChanged: onPageChanged,
+      children: getTopLevelPagesForCategory(category),
+    );
+  }
+
+  List<Widget> getTopLevelPagesForCategory(String category) {
+    switch (category) {
+      case 'Read':
+        return [Read(userToken: widget.UserToken)];
+      case 'Unread':
+        return [Unread(userToken: widget.UserToken)];
+      case 'All':
+      default:
+        return [All(userToken: widget.UserToken)];
+    }
+  }
 
   @override
   void initState() {
     super.initState();
 
     pageController = PageController(initialPage: widget.initialPage);
+    _tabController = TabController(length: _categories.length, vsync: this);
     topLevelPages = [All(userToken: widget.UserToken), Read(userToken: widget.UserToken), Unread(userToken: widget.UserToken)];
 
     _controller = AnimationController(
@@ -55,14 +85,6 @@ class _NotifState extends State<Notif> with SingleTickerProviderStateMixin {
     BlocProvider.of<NotificationCubit>(context).changeSelectedIndex(page);
   }
 
-  Widget _mainWrapperBody() {
-    return PageView(
-      controller: pageController,
-      onPageChanged: onPageChanged,
-      children: topLevelPages,
-    );
-  }
-
   void _startShake() {
     _controller.forward();
   }
@@ -70,74 +92,9 @@ class _NotifState extends State<Notif> with SingleTickerProviderStateMixin {
   @override
   void dispose() {
     _controller.dispose();
+    _tabController.dispose();
     pageController.dispose();
     super.dispose();
-  }
-
-  Widget _bodyNavigator(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      height: 40,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          _bottomAppBarItem("All", 0),
-          _bottomAppBarItem("Read", 1),
-          _bottomAppBarItem("Unread", 2),
-        ],
-      ),
-    );
-  }
-
-  Widget _bottomAppBarItem(String indicator, int page) {
-    return Expanded(
-      child: GestureDetector(
-        onTap: () {
-          pageController.jumpToPage(page);
-          onPageChanged(page);
-        },
-        child: Padding(
-          padding: const EdgeInsets.only(top: 10),
-          child: BlocBuilder<NotificationCubit, int>(
-            builder: (context, selectedIndex) {
-              final isSelected = selectedIndex == page;
-              return Column(
-                children: [
-                  Text(
-                    indicator,
-                    style: TextStyle(
-                      fontSize: 10,
-                      color: isSelected ? Colors.black : Colors.black38,
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 10), 
-                    child:Container(
-                      height: 4,
-                      width: double.infinity,
-                      child: Center(
-                        child: Container(
-                          width: double.infinity,
-                          height: 0.5,
-                          color: Colors.black38,
-                          child: isSelected
-                            ? Container(
-                              width: double.infinity, 
-                              height: 5.0,
-                              color: widgetPricolor, 
-                            )
-                          : const SizedBox(), 
-                        ),
-                      ),
-                    )
-                  )
-                ],
-              );
-            },
-          ),
-        ),
-      ),
-    );
   }
 
   @override
@@ -157,10 +114,10 @@ class _NotifState extends State<Notif> with SingleTickerProviderStateMixin {
             ),
           ),
           body: ScrollConfiguration(
-              behavior: ScrollConfiguration.of(context).copyWith(
-                scrollbars: false,
-              ),
-              child: Column(
+            behavior: ScrollConfiguration.of(context).copyWith(
+              scrollbars: false,
+            ),
+            child: Column(
               children: [
                 Transform.translate(
                   offset: Offset(0, -10),
@@ -186,8 +143,27 @@ class _NotifState extends State<Notif> with SingleTickerProviderStateMixin {
                     )
                   ),
                 ),
-                _bodyNavigator(context),
-                Expanded(child: _mainWrapperBody()),
+                TabBar(
+                  controller: _tabController,
+                  indicatorColor: widgetPricolor,
+                  labelColor: Colors.black,
+                  labelStyle: TextStyle(fontSize: 10),
+                  overlayColor: MaterialStateProperty.all(Colors.transparent),
+                  tabs: _categories.map((category) => SizedBox(
+                    height: 35,
+                    child: Tab(text: category),
+                  )).toList(),
+                  dividerColor: Colors.black12,
+                ),
+                const SizedBox(height: 20),
+                Expanded(
+                  child: TabBarView(
+                    controller: _tabController,
+                    children: _categories
+                      .map((category) => _mainWrapperBody(category))
+                      .toList(),
+                  ),
+                ),
               ],
             ),
           ),

@@ -149,7 +149,7 @@ class _FreespaceState extends State<Freespace> {
                 width: double.infinity,
                 padding: EdgeInsets.symmetric(
                   vertical: 20,
-                  horizontal: 10
+                  horizontal: 20
                 ),
                 margin: EdgeInsets.symmetric(
                   vertical: 20

@@ -27,9 +27,9 @@ class _SafezoneHistoryState extends State<SafezoneHistory>
     'Pending',
     'Rejected',
     'Under review'
-  ]
-      .map((category) => category[0].toUpperCase() + category.substring(1))
-      .toList();
+  ].map((category) => category[0].toUpperCase() + category.substring(1))
+  .toList();
+
   late final SafeZoneBloc _safeZoneBloc;
   bool _isAscending = false;
 
@@ -78,8 +78,9 @@ class _SafezoneHistoryState extends State<SafezoneHistory>
         return false;
       },
       child: Scaffold(
+        backgroundColor: Color.fromARGB(255, 240, 240, 240),
         appBar: AppBar(
-          backgroundColor: Colors.white,
+          backgroundColor: Color.fromARGB(255, 240, 240, 240),
           automaticallyImplyLeading: false,
           centerTitle: true,
           title: Transform.translate(
@@ -89,9 +90,7 @@ class _SafezoneHistoryState extends State<SafezoneHistory>
                 onTap: () async {
                   if (widget.fromSuccess == true) {
                     final prefs = await SharedPreferences.getInstance();
-                    final userToken = prefs.getString(
-                        'userToken'); // Fetch token from SharedPreferences
-
+                    final userToken = prefs.getString('userToken');
                     if (userToken != null) {
                       context.go('/home', extra: userToken);
                     } else {
@@ -115,8 +114,11 @@ class _SafezoneHistoryState extends State<SafezoneHistory>
                     border: Border.all(width: 1, color: Colors.black),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.arrow_back,
-                      color: Colors.black, size: 10),
+                  child: const Icon(
+                    Icons.arrow_back,
+                    color: Colors.black, 
+                    size: 10
+                  ),
                 ),
               ),
               const CategoryText(text: "Safe Zones History")
@@ -179,10 +181,17 @@ class _SafezoneHistoryState extends State<SafezoneHistory>
             // ),
             TabBar(
               controller: _tabController,
-              indicatorColor: btnColor,
+              indicatorColor: widgetPricolor,
               labelColor: Colors.black,
-              unselectedLabelColor: Colors.black38,
-              tabs: _categories.map((category) => Tab(text: category)).toList(),
+              labelStyle: TextStyle(
+                fontSize: 10
+              ),
+              overlayColor: MaterialStateProperty.all(Colors.transparent),
+              tabs: _categories.map((category) => SizedBox(
+                height: 35,
+                child: Tab(text: category),
+              )).toList(),
+              dividerColor: Colors.black12,
             ),
             const SizedBox(height: 20),
             Expanded(
@@ -204,16 +213,20 @@ class _SafezoneHistoryState extends State<SafezoneHistory>
       builder: (context, state) {
         if (state is SafeZoneLoading) {
           return Expanded(
-              child: Center(
-                  child: Transform.translate(
-                      offset: const Offset(-30, -60), child: LoadingState())));
+            child: Center(
+              child: Transform.translate(
+                offset: const Offset(-30, -60), 
+                child: LoadingState()
+              )
+            )
+          );
         } else if (state is SafeZonesLoaded) {
           final filteredZones = status == 'All'
-              ? state.safeZones
-              : state.safeZones
-                  .where((zone) =>
-                      zone.status?.toLowerCase() == status.toLowerCase())
-                  .toList();
+            ? state.safeZones
+            : state.safeZones
+                .where((zone) =>
+                    zone.status?.toLowerCase() == status.toLowerCase())
+                .toList();
 
           filteredZones.sort((a, b) => _isAscending
               ? DateTime.parse(a.reportTimestamp!)

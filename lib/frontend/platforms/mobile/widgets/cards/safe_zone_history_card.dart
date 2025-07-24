@@ -43,15 +43,8 @@ class SafezoneHistoryCard extends StatelessWidget {
         margin: const EdgeInsets.symmetric(vertical: 5),
         padding: const EdgeInsets.all(20),
         decoration: const BoxDecoration(
-          color: Color(0xffFDFDFD),
+          color: Colors.white,
           borderRadius: BorderRadius.all(Radius.circular(10)),
-          boxShadow: [
-            BoxShadow(
-              color: Color.fromARGB(30, 0, 0, 0),
-              blurRadius: 9.4,
-              offset: Offset(0, 1),
-            ),
-          ],
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -59,12 +52,14 @@ class SafezoneHistoryCard extends StatelessWidget {
           children: [
             Container(
               decoration: const BoxDecoration(
-                color: Color.fromARGB(255, 243, 243, 243),
+                color: Colors.white,
                 borderRadius: BorderRadius.all(Radius.circular(10)),
               ),
               child: Padding(
                 padding: const EdgeInsets.only(
-                    top: 3.0, bottom: 3.0, right: 8, left: 8),
+                  top: 3.0, 
+                  right: 8
+                ),
                 child: Text(
                   statusText,
                   style: TextStyle(fontSize: 15, color: statusColor),
@@ -72,18 +67,18 @@ class SafezoneHistoryCard extends StatelessWidget {
               ),
             ),
             const SizedBox(
-              height: 10,
+              height: 3,
             ),
             Text(
               safeZone.name!,
-              style: const TextStyle(fontSize: 11, color: textColor),
+              style: const TextStyle(fontSize: 11, color: Colors.black45),
             ),
             const SizedBox(
               height: 5,
             ),
             Text(
               safeZone.reportTimestamp!,
-              style: const TextStyle(fontSize: 11, color: textColor),
+              style: const TextStyle(fontSize: 11, color: Colors.black45),
             ),
           ],
         ),

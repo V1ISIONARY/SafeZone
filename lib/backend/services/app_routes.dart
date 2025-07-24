@@ -34,6 +34,7 @@ import 'package:safezone/frontend/platforms/mobile/pages/main-screen/notificatio
 import 'package:safezone/frontend/platforms/mobile/pages/main-screen/settings_page/about.dart';
 import 'package:safezone/frontend/platforms/mobile/pages/main-screen/settings_page/freespace.dart';
 import 'package:safezone/frontend/platforms/mobile/pages/main-screen/settings_page/help-center.dart';
+import 'package:safezone/frontend/platforms/mobile/pages/main-screen/settings_page/locationservice.dart';
 import 'package:safezone/frontend/platforms/mobile/pages/main-screen/settings_page/privacy.dart';
 import 'package:safezone/frontend/platforms/mobile/pages/main-screen/settings_page/privacy_security.dart';
 import 'package:safezone/frontend/platforms/mobile/pages/main-screen/settings_page/term-policy/main_terms_policy.dart';
@@ -191,22 +192,18 @@ GoRouter appRouter(bool isFirstRun, String? userToken) => GoRouter(
         );
       },
     ),
-
     GoRoute(
       path: '/generate-group-code',
       builder: (context, state) => const GenerateNewCode(),
     ),
-
     GoRoute(
       path: '/create-new-group',
       builder: (context, state) => const CreateNewGroup(),
     ),
-
     GoRoute(
       path: '/join-group',
       builder: (context, state) => const JoinGroup(),
     ),
-
     GoRoute(
       path: '/accountDetails',
       builder: (context, state) => const AccountDetails(),
@@ -214,6 +211,10 @@ GoRouter appRouter(bool isFirstRun, String? userToken) => GoRouter(
     GoRoute(
       path: '/privacySecurity',
       builder: (context, state) => const PrivacySecurity(),
+    ),
+    GoRoute(
+      path: '/location-service',
+      builder: (context, state) => const Locationservice(),
     ),
     GoRoute(
       path: '/privacy',
@@ -251,7 +252,6 @@ GoRouter appRouter(bool isFirstRun, String? userToken) => GoRouter(
       path: '/login',
       builder: (context, state) => const LoginMD(),
     ),
-
     GoRoute(
       path: '/admin-initial-screen',
       builder: (context, state) => const AdminInitialScreen(),
