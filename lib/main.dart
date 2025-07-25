@@ -30,6 +30,7 @@ import 'package:safezone/backend/repository/profileApi/profile_impl.dart';
 import 'package:safezone/backend/repository/safezoneApi/safezone_impl.dart';
 import 'package:safezone/backend/services/app_routes.dart';
 import 'package:safezone/backend/services/firebase_options.dart';
+import 'package:safezone/backend/services/shake_detector_service.dart';
 import 'package:safezone/resource/schema/app_theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -78,11 +79,34 @@ void main() async {
   runApp(MyApp(isFirstRun: isFirstRun, userToken: userToken));
 }
 
-class MyApp extends StatelessWidget {
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
+class MyApp extends StatefulWidget {
   final bool isFirstRun;
   final String userToken;
 
   const MyApp({super.key, required this.isFirstRun, required this.userToken});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  late ShakeDetectorService shakeDetector;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      shakeDetector = ShakeDetectorService(context);
+    });
+  }
+
+  @override
+  void dispose() {
+    shakeDetector.stopListening();
+    super.dispose();
+  }
 
   Future<void> _initializeApp() async {
     await Firebase.initializeApp();
@@ -169,7 +193,7 @@ class MyApp extends StatelessWidget {
             ],
             child: MaterialApp.router(
               debugShowCheckedModeBanner: false,
-              routerConfig: appRouter(isFirstRun, userToken),
+              routerConfig: appRouter(widget.isFirstRun, widget.userToken),
               theme: AppTheme.lightTheme,
               title: "SafeZone",
             ),

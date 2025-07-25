@@ -17,6 +17,19 @@ class _SosPageState extends State<SosPage> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         centerTitle: true,
+        leading: GestureDetector(
+          onTap: () {
+            Navigator.pop(context);
+          },
+          child: Container(
+            margin: const EdgeInsets.all(15),
+            decoration: BoxDecoration(
+              border: Border.all(width: 1, color: Colors.black),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(Icons.arrow_back, color: Colors.black, size: 10),
+          ),
+        ),
         title: const CategoryText(text: "SOS"),
       ),
       body: Center(
