@@ -6,26 +6,22 @@ import 'package:safezone/backend/architecture/bloc/contactBloc/contact_bloc.dart
 import 'package:safezone/backend/architecture/bloc/contactBloc/contact_event.dart';
 import 'package:safezone/backend/architecture/bloc/contactBloc/contact_state.dart';
 import 'package:safezone/backend/models/userModel/contacts_model.dart';
+import 'package:safezone/frontend/platforms/mobile/widgets/loading/shimmer_loading.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../../../backend/properties/import.dart';
 import '../../../widgets/dialogs/common_dialog.dart';
 
 class Contact extends StatefulWidget {
-
   final String UserToken;
 
-  const Contact({
-    super.key,
-    required this.UserToken
-  });
+  const Contact({super.key, required this.UserToken});
 
   @override
   State<Contact> createState() => _ContactState();
 }
 
 class _ContactState extends State<Contact> with SingleTickerProviderStateMixin {
-
   int userId = 0;
   List<ContactsModel> localContacts = [];
   late AnimationController _controller;
@@ -46,9 +42,7 @@ class _ContactState extends State<Contact> with SingleTickerProviderStateMixin {
   void initState() {
     super.initState();
 
-    widget.UserToken == 'guest'
-      ? const SizedBox()
-      : loadUserId();
+    widget.UserToken == 'guest' ? const SizedBox() : loadUserId();
 
     _controller = AnimationController(
       vsync: this,
@@ -65,7 +59,6 @@ class _ContactState extends State<Contact> with SingleTickerProviderStateMixin {
       TweenSequenceItem(tween: Tween(begin: -10.0, end: 10.0), weight: 1),
       TweenSequenceItem(tween: Tween(begin: 10.0, end: 0.0), weight: 1),
     ]).animate(_controller);
-
   }
 
   void _startShake() {
@@ -80,9 +73,8 @@ class _ContactState extends State<Contact> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children:[
-        Scaffold(
+    return Stack(children: [
+      Scaffold(
           backgroundColor: Colors.white,
           appBar: AppBar(
             automaticallyImplyLeading: false,
@@ -115,66 +107,50 @@ class _ContactState extends State<Contact> with SingleTickerProviderStateMixin {
           ),
           body: Container(
             margin: const EdgeInsets.symmetric(horizontal: 15),
-            child: Stack(
-              children:[
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    BlocBuilder<ContactBloc, ContactState>(
-                      builder: (context, state) {
-                        if (state is ContactLoading) {
-                          return Expanded(
-                            child: Center(
-                              child: Transform.translate(
-                                offset: const Offset(-40, -60), 
-                                child: Lottie.asset(
-                                  'lib/resource/lottie/loading.json',
-                                  width: 80,
-                                  height: 80,
-                                  fit: BoxFit.cover,
-                                ),
-                              )
-                            )
-                          );
-                        } else if (state is ContactLoaded) {
-                          localContacts = state.contacts;
-                          return Expanded(
-                            child: ListView.builder(
-                              itemCount: localContacts.length,
-                              itemBuilder: (context, index) {
-                                final contact = localContacts[index];
-                                return Contactinfo(
-                                  name: contact.name,
-                                  phone: contact.phoneNumber,
-                                );
-                              },
-                            ),
-                          );
-                        } else if (state is ContactError) {
-                          return const Center(
+            child: Stack(children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  BlocBuilder<ContactBloc, ContactState>(
+                    builder: (context, state) {
+                      if (state is ContactLoading) {
+                        return const Expanded(child: ShimmerContactsLoading());
+                      } else if (state is ContactLoaded) {
+                        localContacts = state.contacts;
+                        return Expanded(
+                          child: ListView.builder(
+                            itemCount: localContacts.length,
+                            itemBuilder: (context, index) {
+                              final contact = localContacts[index];
+                              return Contactinfo(
+                                name: contact.name,
+                                phone: contact.phoneNumber,
+                              );
+                            },
+                          ),
+                        );
+                      } else if (state is ContactError) {
+                        return const Center(
                             // child: Text(
                             //   state.error,
                             //   style: const TextStyle(color: Colors.red),
                             // ),
-                          );
-                        } else {
-                          return Expanded(
+                            );
+                      } else {
+                        return Expanded(
                             child: widget.UserToken == 'guest'
-                            ? const SizedBox()
-                            : const Center(
-                                child: Text("No contacts found."),
-                              )
-                          );
-                        }
-                      },
-                    ),
-                  ],
-                ),
-              ]
-            ),
-          )
-        ),
-        widget.UserToken == 'guest'
+                                ? const SizedBox()
+                                : const Center(
+                                    child: Text("No contacts found."),
+                                  ));
+                      }
+                    },
+                  ),
+                ],
+              ),
+            ]),
+          )),
+      widget.UserToken == 'guest'
           ? GestureDetector(
               onTap: _startShake,
               child: Container(
@@ -228,7 +204,6 @@ class _ContactState extends State<Contact> with SingleTickerProviderStateMixin {
               ),
             )
           : const SizedBox(),
-      ]
-    );
+    ]);
   }
 }

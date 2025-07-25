@@ -120,8 +120,8 @@ class _NotifState extends State<Notif> with TickerProviderStateMixin {
             child: Column(
               children: [
                 Transform.translate(
-                  offset: Offset(0, -10),
-                  child: Padding(
+                  offset: const Offset(0, -10),
+                  child: const Padding(
                     padding: EdgeInsets.symmetric(horizontal: 15),
                     child: Column(
                       children: [
@@ -147,7 +147,7 @@ class _NotifState extends State<Notif> with TickerProviderStateMixin {
                   controller: _tabController,
                   indicatorColor: widgetPricolor,
                   labelColor: Colors.black,
-                  labelStyle: TextStyle(fontSize: 10),
+                  labelStyle: const TextStyle(fontSize: 10),
                   overlayColor: MaterialStateProperty.all(Colors.transparent),
                   tabs: _categories.map((category) => SizedBox(
                     height: 35,

@@ -32,7 +32,7 @@ import 'package:safezone/frontend/platforms/mobile/widgets/Dialogs/dialogs.dart'
 import 'package:safezone/frontend/platforms/mobile/widgets/bottomsheet/map/dangerzone_bottom_sheet.dart';
 import 'package:safezone/frontend/platforms/mobile/widgets/bottomsheet/map/member_bottom_sheet.dart';
 import 'package:safezone/frontend/platforms/mobile/widgets/bottomsheet/map/safezone_bottom_sheet.dart';
-import 'package:safezone/frontend/platforms/mobile/widgets/loadingstate.dart';
+import 'package:safezone/frontend/platforms/mobile/widgets/loading/loadingstate.dart';
 import 'package:safezone/frontend/utils/marker_utils.dart';
 import 'package:safezone/frontend/utils/safezone_navigator.dart';
 import 'package:safezone/resource/schema/colors.dart';

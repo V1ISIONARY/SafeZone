@@ -28,7 +28,7 @@ import 'package:safezone/backend/models/userModel/circle_model.dart';
 import 'package:safezone/backend/properties/properties.dart';
 import 'package:safezone/frontend/platforms/mobile/pages/authentication/account_details.dart';
 import 'package:safezone/frontend/platforms/mobile/widgets/Dialogs/dialogs.dart';
-import 'package:safezone/frontend/platforms/mobile/widgets/loadingstate.dart';
+import 'package:safezone/frontend/platforms/mobile/widgets/loading/loadingstate.dart';
 import 'package:safezone/frontend/utils/marker_utils.dart';
 import 'package:safezone/frontend/utils/safezone_navigator.dart';
 import 'package:safezone/resource/schema/colors.dart';

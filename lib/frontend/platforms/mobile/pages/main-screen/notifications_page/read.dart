@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -7,6 +6,7 @@ import 'package:safezone/backend/architecture/bloc/notificationBloc/notification
 import 'package:safezone/backend/architecture/bloc/notificationBloc/notification_event.dart';
 import 'package:safezone/backend/architecture/bloc/notificationBloc/notification_state.dart';
 import 'package:safezone/backend/models/userModel/notifications_model.dart';
+import 'package:safezone/frontend/platforms/mobile/widgets/loading/shimmer_loading.dart';
 import 'package:safezone/resource/schema/colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -45,18 +45,9 @@ class _ReadState extends State<Read> {
       body: BlocBuilder<NotificationBloc, NotificationState>(
         builder: (context, state) {
           if (state is NotificationLoading) {
-            return Expanded(
-              child: Center(
-                child: Transform.translate(
-                  offset: const Offset(-40, -30), 
-                  child: Lottie.asset(
-                    'lib/resource/lottie/loading.json',
-                    width: 80,
-                    height: 80,
-                    fit: BoxFit.cover,
-                  ),
-                )
-              )
+            return ListView.builder(
+              itemCount: 4,
+              itemBuilder: (context, index) => const ShimmerNotificationCard(),
             );
           } else if (state is NotificationError) {
             return _buildError(state.message);
@@ -77,105 +68,105 @@ class _ReadState extends State<Read> {
 
   Widget _buildNotificationList() {
     return Container(
-      margin: const EdgeInsets.only(bottom: 30.0),
-      child: ListView.builder(
-        itemCount: readNotifications.length,
-        itemBuilder: (context, index) {
-          final notification = readNotifications[index];
-          return Container(
-            width: double.infinity,
-            margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-            decoration: BoxDecoration(
-              color: const Color.fromARGB(10, 0, 0, 0),
-              borderRadius: BorderRadius.circular(5),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: Row(
-                children: [
-                  Container(
-                    width: 40,
-                    height: 40,
-                    decoration: const BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.white,
-                    ),
-                    child: const Icon(
-                      Icons.notifications,
-                      color: Colors.grey,
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          notification.title,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: textColor,
-                            fontSize: 15,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          notification.message,
-                          style: const TextStyle(
-                            color: labelFormFieldColor,
-                            fontSize: 13,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          notification.createdAt,
-                          style:
-                              const TextStyle(color: Colors.grey, fontSize: 11),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+        margin: const EdgeInsets.only(bottom: 30.0),
+        child: ListView.builder(
+          itemCount: readNotifications.length,
+          itemBuilder: (context, index) {
+            final notification = readNotifications[index];
+            return Container(
+              width: double.infinity,
+              margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              decoration: BoxDecoration(
+                color: const Color.fromARGB(10, 0, 0, 0),
+                borderRadius: BorderRadius.circular(5),
               ),
-            ),
-          );
-        },
-      )
-    );
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 40,
+                      height: 40,
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white,
+                      ),
+                      child: const Icon(
+                        Icons.notifications,
+                        color: Colors.grey,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            notification.title,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: textColor,
+                              fontSize: 15,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            notification.message,
+                            style: const TextStyle(
+                              color: labelFormFieldColor,
+                              fontSize: 13,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            notification.createdAt,
+                            style: const TextStyle(
+                                color: Colors.grey, fontSize: 11),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        ));
   }
 
   Widget _buildPlaceholder() {
     return widget.userToken == 'guest'
-      ? Container()
-      : Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Image.asset(
-                'lib/resource/image/png/notif1.png',
-                width: 150,
-                height: 150,
-              ),
-              const SizedBox(height: 10),
-              const Text(
-                'No Read Notifications',
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 15,
+        ? Container()
+        : Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Image.asset(
+                  'lib/resource/image/png/notif1.png',
+                  width: 150,
+                  height: 150,
                 ),
-                textAlign: TextAlign.center,
-              ),
-              const Text(
-                'You have not read any notifications yet.',
-                style: TextStyle(
-                  color: Colors.black54,
-                  fontSize: 9,
+                const SizedBox(height: 10),
+                const Text(
+                  'No Read Notifications',
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 15,
+                  ),
+                  textAlign: TextAlign.center,
                 ),
-                textAlign: TextAlign.center,
-              ),
-            ],
-          ),
-        );
+                const Text(
+                  'You have not read any notifications yet.',
+                  style: TextStyle(
+                    color: Colors.black54,
+                    fontSize: 9,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          );
   }
 
   Widget _buildError(String message) {

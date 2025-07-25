@@ -11,7 +11,7 @@ import '../../../../../backend/architecture/bloc/safezoneBloc/safezone_bloc.dart
 import '../../../../../backend/architecture/bloc/safezoneBloc/safezone_event.dart' show FetchAllSafeZones;
 import '../../../../../backend/properties/import.dart';
 import '../../widgets/cards/admin_safezones_card.dart';
-import '../../widgets/loadingstate.dart';
+import '../../widgets/loading/loadingstate.dart';
 
 class AdminSafezones extends StatefulWidget {
   const AdminSafezones({super.key});

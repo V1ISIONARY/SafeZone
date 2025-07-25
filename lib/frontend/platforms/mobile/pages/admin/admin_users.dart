@@ -7,7 +7,7 @@ import '../../../../../backend/architecture/bloc/adminBloc/analytics/analytics_a
 import '../../../../../backend/models/dangerzoneModel/incident_report_model.dart';
 import '../../../../../backend/properties/import.dart';
 import '../../widgets/buttons/userinfomartion.dart';
-import '../../widgets/loadingstate.dart';
+import '../../widgets/loading/loadingstate.dart';
 
 class AdminReportsUsers extends StatefulWidget {
   const AdminReportsUsers({super.key, this.reportInfo});

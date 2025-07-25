@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lottie/lottie.dart';
 import 'package:safezone/backend/architecture/bloc/notificationBloc/notification_bloc.dart';
 import 'package:safezone/backend/architecture/bloc/notificationBloc/notification_state.dart';
+import 'package:safezone/frontend/platforms/mobile/widgets/loading/shimmer_loading.dart';
 import 'package:safezone/resource/schema/colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:safezone/backend/models/userModel/notifications_model.dart';
@@ -44,17 +45,10 @@ class _UnreadState extends State<Unread> {
       body: BlocBuilder<NotificationBloc, NotificationState>(
         builder: (context, state) {
           if (state is NotificationLoading) {
-            return Expanded(
-                child: Center(
-                    child: Transform.translate(
-              offset: const Offset(-40, -30),
-              child: Lottie.asset(
-                'lib/resource/lottie/loading.json',
-                width: 80,
-                height: 80,
-                fit: BoxFit.cover,
-              ),
-            )));
+            return ListView.builder(
+              itemCount: 4,
+              itemBuilder: (context, index) => const ShimmerNotificationCard(),
+            );
           } else if (state is NotificationError) {
             return _buildError(state.message);
           } else if (state is NotificationUpdated) {

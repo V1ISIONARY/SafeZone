@@ -5,7 +5,7 @@ import 'package:safezone/backend/architecture/bloc/incident_report/incident_repo
 import 'package:safezone/backend/architecture/bloc/incident_report/incident_report_event.dart';
 import 'package:safezone/backend/architecture/bloc/incident_report/incident_report_state.dart';
 import 'package:safezone/frontend/platforms/mobile/widgets/cards/reports_history_card.dart';
-import 'package:safezone/frontend/platforms/mobile/widgets/loadingstate.dart';
+import 'package:safezone/frontend/platforms/mobile/widgets/loading/loadingstate.dart';
 import 'package:safezone/resource/schema/colors.dart';
 import 'package:safezone/resource/schema/texts.dart';
 import 'package:shared_preferences/shared_preferences.dart';

@@ -6,7 +6,8 @@ import 'package:safezone/backend/architecture/bloc/incident_report/incident_repo
 import 'package:safezone/backend/architecture/bloc/incident_report/incident_report_event.dart';
 import 'package:safezone/backend/architecture/bloc/incident_report/incident_report_state.dart';
 import 'package:safezone/frontend/platforms/mobile/widgets/cards/reports_history_card.dart';
-import 'package:safezone/frontend/platforms/mobile/widgets/loadingstate.dart';
+import 'package:safezone/frontend/platforms/mobile/widgets/loading/loadingstate.dart';
+import 'package:safezone/frontend/platforms/mobile/widgets/loading/shimmer_loading.dart';
 import 'package:safezone/resource/schema/colors.dart';
 import 'package:safezone/resource/schema/texts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -185,14 +186,14 @@ class _ReportsHistoryState extends State<ReportsHistory>
               controller: _tabController,
               indicatorColor: widgetPricolor,
               labelColor: Colors.black,
-              labelStyle: TextStyle(
-                fontSize: 10
-              ),
+              labelStyle: TextStyle(fontSize: 10),
               overlayColor: MaterialStateProperty.all(Colors.transparent),
-              tabs: _categories.map((category) => SizedBox(
-                height: 35,
-                child: Tab(text: category),
-              )).toList(),
+              tabs: _categories
+                  .map((category) => SizedBox(
+                        height: 35,
+                        child: Tab(text: category),
+                      ))
+                  .toList(),
               dividerColor: Colors.black12,
             ),
             const SizedBox(height: 20),
@@ -214,10 +215,7 @@ class _ReportsHistoryState extends State<ReportsHistory>
     return BlocBuilder<IncidentReportBloc, IncidentReportState>(
       builder: (context, state) {
         if (state is IncidentReportLoading) {
-          return Expanded(
-              child: Center(
-                  child: Transform.translate(
-                      offset: const Offset(-30, -60), child: LoadingState())));
+          return const ShimmerHistoryLoading();
         } else if (state is IncidentReportLoaded) {
           var filteredReports = status == 'All'
               ? state.incidentReports

@@ -12,7 +12,7 @@ import 'package:safezone/backend/architecture/bloc/incident_report/incident_repo
 import 'package:safezone/backend/architecture/bloc/incident_report/incident_report_state.dart';
 import 'package:safezone/backend/models/dangerzoneModel/incident_report_request_model.dart';
 import 'package:safezone/frontend/platforms/mobile/widgets/buttons/custom_button.dart';
-import 'package:safezone/frontend/platforms/mobile/widgets/loadingstate.dart';
+import 'package:safezone/frontend/platforms/mobile/widgets/loading/loadingstate.dart';
 import 'package:safezone/resource/schema/colors.dart';
 import 'package:safezone/resource/schema/texts.dart';
 

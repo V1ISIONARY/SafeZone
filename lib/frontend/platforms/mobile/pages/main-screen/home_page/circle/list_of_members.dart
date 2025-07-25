@@ -8,7 +8,7 @@ import 'package:safezone/backend/models/userModel/circle_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../../../../backend/properties/import.dart';
-import '../../../../widgets/loadingstate.dart';
+import '../../../../widgets/loading/loadingstate.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

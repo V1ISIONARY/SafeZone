@@ -5,7 +5,8 @@ import 'package:safezone/backend/architecture/bloc/safezoneBloc/safezone_bloc.da
 import 'package:safezone/backend/architecture/bloc/safezoneBloc/safezone_event.dart';
 import 'package:safezone/backend/architecture/bloc/safezoneBloc/safezone_state.dart';
 import 'package:safezone/frontend/platforms/mobile/widgets/cards/safe_zone_history_card.dart';
-import 'package:safezone/frontend/platforms/mobile/widgets/loadingstate.dart';
+import 'package:safezone/frontend/platforms/mobile/widgets/loading/loadingstate.dart';
+import 'package:safezone/frontend/platforms/mobile/widgets/loading/shimmer_loading.dart';
 import 'package:safezone/resource/schema/colors.dart';
 import 'package:safezone/resource/schema/texts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -27,8 +28,9 @@ class _SafezoneHistoryState extends State<SafezoneHistory>
     'Pending',
     'Rejected',
     'Under review'
-  ].map((category) => category[0].toUpperCase() + category.substring(1))
-  .toList();
+  ]
+      .map((category) => category[0].toUpperCase() + category.substring(1))
+      .toList();
 
   late final SafeZoneBloc _safeZoneBloc;
   bool _isAscending = false;
@@ -114,11 +116,8 @@ class _SafezoneHistoryState extends State<SafezoneHistory>
                     border: Border.all(width: 1, color: Colors.black),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(
-                    Icons.arrow_back,
-                    color: Colors.black, 
-                    size: 10
-                  ),
+                  child: const Icon(Icons.arrow_back,
+                      color: Colors.black, size: 10),
                 ),
               ),
               const CategoryText(text: "Safe Zones History")
@@ -183,14 +182,14 @@ class _SafezoneHistoryState extends State<SafezoneHistory>
               controller: _tabController,
               indicatorColor: widgetPricolor,
               labelColor: Colors.black,
-              labelStyle: TextStyle(
-                fontSize: 10
-              ),
+              labelStyle: TextStyle(fontSize: 10),
               overlayColor: MaterialStateProperty.all(Colors.transparent),
-              tabs: _categories.map((category) => SizedBox(
-                height: 35,
-                child: Tab(text: category),
-              )).toList(),
+              tabs: _categories
+                  .map((category) => SizedBox(
+                        height: 35,
+                        child: Tab(text: category),
+                      ))
+                  .toList(),
               dividerColor: Colors.black12,
             ),
             const SizedBox(height: 20),
@@ -212,21 +211,14 @@ class _SafezoneHistoryState extends State<SafezoneHistory>
     return BlocBuilder<SafeZoneBloc, SafeZoneState>(
       builder: (context, state) {
         if (state is SafeZoneLoading) {
-          return Expanded(
-            child: Center(
-              child: Transform.translate(
-                offset: const Offset(-30, -60), 
-                child: LoadingState()
-              )
-            )
-          );
+          return const ShimmerHistoryLoading();
         } else if (state is SafeZonesLoaded) {
           final filteredZones = status == 'All'
-            ? state.safeZones
-            : state.safeZones
-                .where((zone) =>
-                    zone.status?.toLowerCase() == status.toLowerCase())
-                .toList();
+              ? state.safeZones
+              : state.safeZones
+                  .where((zone) =>
+                      zone.status?.toLowerCase() == status.toLowerCase())
+                  .toList();
 
           filteredZones.sort((a, b) => _isAscending
               ? DateTime.parse(a.reportTimestamp!)

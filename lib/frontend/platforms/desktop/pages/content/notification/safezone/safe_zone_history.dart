@@ -4,7 +4,7 @@ import 'package:safezone/backend/architecture/bloc/safezoneBloc/safezone_bloc.da
 import 'package:safezone/backend/architecture/bloc/safezoneBloc/safezone_event.dart';
 import 'package:safezone/backend/architecture/bloc/safezoneBloc/safezone_state.dart';
 import 'package:safezone/frontend/platforms/mobile/widgets/cards/safe_zone_history_card.dart';
-import 'package:safezone/frontend/platforms/mobile/widgets/loadingstate.dart';
+import 'package:safezone/frontend/platforms/mobile/widgets/loading/loadingstate.dart';
 import 'package:safezone/resource/schema/colors.dart';
 import 'package:safezone/resource/schema/texts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
