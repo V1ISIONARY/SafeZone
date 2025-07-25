@@ -41,7 +41,7 @@ class SafezoneHistoryCard extends StatelessWidget {
       child: Container(
         width: double.infinity,
         margin: const EdgeInsets.symmetric(vertical: 5),
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
         decoration: const BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.all(Radius.circular(10)),
@@ -50,28 +50,12 @@ class SafezoneHistoryCard extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.all(Radius.circular(10)),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.only(
-                  top: 3.0, 
-                  right: 8
-                ),
-                child: Text(
-                  statusText,
-                  style: TextStyle(fontSize: 15, color: statusColor),
-                ),
-              ),
-            ),
             const SizedBox(
               height: 3,
             ),
             Text(
               safeZone.name!,
-              style: const TextStyle(fontSize: 11, color: Colors.black45),
+              style: const TextStyle(fontSize: 13, color: textColor),
             ),
             const SizedBox(
               height: 5,
@@ -79,6 +63,34 @@ class SafezoneHistoryCard extends StatelessWidget {
             Text(
               safeZone.reportTimestamp!,
               style: const TextStyle(fontSize: 11, color: Colors.black45),
+            ),
+            Row(
+              children: [
+                Container(
+                  width: 8,
+                  height: 8,
+                  margin: const EdgeInsets.only(right: 6, top: 8),
+                  decoration: BoxDecoration(
+                    color: statusColor,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.all(5),
+                  margin: const EdgeInsets.only(top: 8),
+                  decoration: BoxDecoration(
+                    color: const Color(0xffB5B5B5).withOpacity(0.15),
+                    borderRadius: const BorderRadius.all(Radius.circular(10)),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 5),
+                    child: Text(
+                      statusText,
+                      style: const TextStyle(fontSize: 11, color: textColor),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ],
         ),
