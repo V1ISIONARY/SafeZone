@@ -588,7 +588,9 @@ class _CreateReportDTState extends State<CreateReportDT> {
                                           "🚨 Incident Report Created: $incidentReport");
                                       context.push('/review-report',
                                           extra: incidentReport);
-                                    })),
+                                    }
+                                  )
+                                ),
                             const SizedBox(height: 10)
                           ],
                         ),

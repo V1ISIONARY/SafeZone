@@ -1,12 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:safezone/resource/schema/colors.dart';
 import 'package:safezone/resource/schema/texts.dart';
 import 'package:timeline_tile/timeline_tile.dart';
 import 'package:safezone/backend/models/safezoneModel/safezone_model.dart';
 
 class SafeZoneStatusHistoryDT extends StatefulWidget {
-  const SafeZoneStatusHistoryDT({super.key, required this.safezonemodel});
+
+  final VoidCallback? onBack;
   final SafeZoneModel safezonemodel;
+  const SafeZoneStatusHistoryDT({
+    super.key, 
+    this.onBack,
+    required this.safezonemodel
+  });
 
   @override
   State<SafeZoneStatusHistoryDT> createState() => _SafeZoneStatusHistoryDTState();
@@ -71,101 +78,106 @@ class _SafeZoneStatusHistoryDTState extends State<SafeZoneStatusHistoryDT> {
         sortStatusHistory(widget.safezonemodel.statusHistory ?? []);
 
     return Scaffold(
+      backgroundColor: Color.fromARGB(255, 240, 240, 240),
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: Color.fromARGB(255, 240, 240, 240),
         automaticallyImplyLeading: false,
         centerTitle: true,
-        title: const CategoryText(text: "Safe Zone Status History"),
-        leading: GestureDetector(
-          onTap: () {
-            Navigator.pop(context);
-          },
-          child: Container(
-            margin: const EdgeInsets.all(15),
-            decoration: BoxDecoration(
-              border: Border.all(width: 1, color: Colors.black),
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(Icons.arrow_back, color: Colors.black, size: 10),
+        title: Transform.translate(
+          offset: const Offset(-15, 0),
+          child: Row(
+            children: [
+              GestureDetector(
+                onTap: widget.onBack ?? () => Navigator.pop(context),
+                child: Container(
+                  margin: const EdgeInsets.all(10),
+                  height: 20,
+                  width: 20,
+                  decoration: BoxDecoration(
+                    border: Border.all(width: 1, color: Colors.black),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.arrow_back, color: Colors.black, size: 10),
+                ),
+              ),
+              const CategoryText(text: "Safe Zone Status History")
+            ]
           ),
         ),
       ),
       body: Container(
-        decoration: const BoxDecoration(
-          color: Color.fromARGB(41, 168, 168, 168),
-        ),
         child: sortedStatusHistory.isNotEmpty
-            ? ListView.builder(
-                padding: const EdgeInsets.all(16.0),
-                itemCount: sortedStatusHistory.length,
-                itemBuilder: (context, index) {
-                  final status = sortedStatusHistory[index];
-
-                  String statusText =
-                      status is Map ? status['status'] : status.status;
-                  String remarksText = status is Map
-                      ? status['remarks'] ?? 'No remarks'
-                      : status.remarks ?? 'No remarks';
-                  String timestampText =
-                      status is Map ? status['timestamp'] : status.timestamp;
-
-                  return TimelineTile(
-                    alignment: TimelineAlign.start,
-                    isFirst: index == 0,
-                    isLast: index == sortedStatusHistory.length - 1,
-                    indicatorStyle: IndicatorStyle(
-                      width: 32,
-                      color: getStatusColor(statusText),
-                      iconStyle: IconStyle(
-                        iconData: getStatusIcon(statusText),
-                        color: Colors.white,
-                      ),
-                    ),
-                    beforeLineStyle: LineStyle(
-                      color: getStatusColor(statusText).withOpacity(0.5),
-                      thickness: 2,
-                    ),
-                    endChild: Container(
-                      margin: const EdgeInsets.symmetric(vertical: 10),
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Status: $statusText",
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                              color: getStatusColor(statusText),
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            "Remarks: $remarksText",
-                            style: const TextStyle(fontSize: 13, color: labelFormFieldColor),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            "Timestamp: $timestampText",
-                            style: const TextStyle(
-                                fontSize: 11, color: labelFormFieldColor),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
-              )
-            : const Center(
-                child: Text(
-                  "No status history available.",
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
+          ? Transform.translate(
+            offset: Offset(0, -20),
+            child: ListView.builder(
+              padding: const EdgeInsets.only(
+                left: 16.0,
+                right: 16.0,
+                bottom: 16.0
               ),
+              itemCount: sortedStatusHistory.length,
+              itemBuilder: (context, index) {
+                final status = sortedStatusHistory[index];
+
+                String statusText =
+                    status is Map ? status['status'] : status.status;
+                String remarksText = status is Map
+                    ? status['remarks'] ?? 'No remarks'
+                    : status.remarks ?? 'No remarks';
+                String timestampText =
+                    status is Map ? status['timestamp'] : status.timestamp;
+
+                DateTime dateTime = DateTime.parse(timestampText);
+                String formattedTime = DateFormat("d, MMMM, y : hh:mma").format(dateTime);
+
+                return TimelineTile(
+                  alignment: TimelineAlign.start,
+                  isFirst: index == 0,
+                  isLast: index == sortedStatusHistory.length - 1,
+                  indicatorStyle: IndicatorStyle(
+                    width: 32,
+                    color: getStatusColor(statusText),
+                    iconStyle: IconStyle(
+                      iconData: getStatusIcon(statusText),
+                      color: Colors.white,
+                    ),
+                  ),
+                  beforeLineStyle: LineStyle(
+                    color: getStatusColor(statusText).withOpacity(0.5),
+                    thickness: 2,
+                  ),
+                  endChild: Container(
+                    margin: const EdgeInsets.only(
+                      top: 10,
+                      bottom: 10,
+                      left: 10
+                    ),
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        PrimaryText(text: "Status: $statusText"),
+                        const SizedBox(height: 4),
+                        CategoryDescripText(text: "Remarks: $remarksText"),
+                        const SizedBox(height: 4),
+                        CategoryDescripText(text: "Timestamp: $formattedTime"),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            )
+          )
+          : const Center(
+              child: Text(
+                "No status history available.",
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+            ),
       ),
     );
   }

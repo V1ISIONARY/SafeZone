@@ -27,7 +27,6 @@ class _NotifState extends State<Notif> with TickerProviderStateMixin {
   late PageController pageController;
   late List<Widget> topLevelPages;
 
-  
   late TabController _tabController;
   final List<String> _categories = [
     'All',
@@ -62,7 +61,6 @@ class _NotifState extends State<Notif> with TickerProviderStateMixin {
 
     pageController = PageController(initialPage: widget.initialPage);
     _tabController = TabController(length: _categories.length, vsync: this);
-    topLevelPages = [All(userToken: widget.UserToken), Read(userToken: widget.UserToken), Unread(userToken: widget.UserToken)];
 
     _controller = AnimationController(
       vsync: this,

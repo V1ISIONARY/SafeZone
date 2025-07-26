@@ -8,7 +8,7 @@ class HorizontalBtn extends StatelessWidget {
   final String svgIcon;
   final String navigateTo;
   final String description;
-  final void Function(String)? onTap; // Add onTap
+  final void Function(String)? onTap;
 
   const HorizontalBtn({
     super.key,
@@ -37,16 +37,16 @@ class HorizontalBtn extends StatelessWidget {
             Container(
               height: 25,
               width: 25,
-              margin: const EdgeInsets.only(right: 10),
+              margin: const EdgeInsets.only(right: 17),
               child: svgIcon.endsWith('.svg')
-                  ? SvgPicture.asset(
-                      svgIcon,
-                      color: const Color.fromARGB(179, 0, 0, 0),
-                    )
-                  : Image.asset(
-                      svgIcon,
-                      fit: BoxFit.contain,
-                    ),
+                ? SvgPicture.asset(
+                    svgIcon,
+                    color: const Color.fromARGB(179, 0, 0, 0),
+                  )
+                : Image.asset(
+                    svgIcon,
+                    fit: BoxFit.contain,
+                  ),
             ),
             Expanded(
               child: Column(
@@ -57,17 +57,19 @@ class HorizontalBtn extends StatelessWidget {
                 ],
               ),
             ),
-            SizedBox(
+            Spacer(),
+            Container(
               height: 15,
               width: 15,
-              child: SvgPicture.asset(
-                'lib/resource/svg/proceed.svg',
-                color: const Color.fromARGB(179, 0, 0, 0),
-              ),
+              margin: const EdgeInsets.only(right: 17),
+              child: Icon(
+                Icons.chevron_right_outlined,
+                color: Colors.grey[500],
+              )
             ),
           ],
         ),
-      ),
+      )
     );
   }
 }

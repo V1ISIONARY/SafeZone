@@ -1,12 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:safezone/backend/models/dangerzoneModel/incident_report_model.dart';
 import 'package:timeline_tile/timeline_tile.dart';
 
 import '../../../../../../../backend/properties/import.dart';
 
 class ReportsStatusHistoryDT extends StatefulWidget {
-  const ReportsStatusHistoryDT({super.key, required this.reportInfo});
+  
+  final VoidCallback? onBack;
   final IncidentReportModel reportInfo;
+  const ReportsStatusHistoryDT({
+    super.key, 
+    this.onBack,
+    required this.reportInfo
+  });
 
   @override
   State<ReportsStatusHistoryDT> createState() => _ReportsStatusHistoryDTState();
@@ -71,31 +78,38 @@ class _ReportsStatusHistoryDTState extends State<ReportsStatusHistoryDT> {
         sortStatusHistory(widget.reportInfo.statusHistory ?? []);
 
     return Scaffold(
+      backgroundColor: Color.fromARGB(255, 240, 240, 240),
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: Color.fromARGB(255, 240, 240, 240),
         automaticallyImplyLeading: false,
         centerTitle: true,
-        leading: GestureDetector(
-          onTap: () {
-            Navigator.pop(context);
-          },
-          child: Container(
-            margin: const EdgeInsets.all(15),
-            decoration: BoxDecoration(
-              border: Border.all(width: 1, color: Colors.black),
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(Icons.arrow_back, color: Colors.black, size: 10),
+        title: Transform.translate(
+          offset: const Offset(-15, 0),
+          child: Row(
+            children: [
+              GestureDetector(
+                onTap: widget.onBack ?? () => Navigator.pop(context),
+                child: Container(
+                  margin: const EdgeInsets.all(10),
+                  height: 20,
+                  width: 20,
+                  decoration: BoxDecoration(
+                    border: Border.all(width: 1, color: Colors.black),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.arrow_back, color: Colors.black, size: 10),
+                ),
+              ),
+              const CategoryText(text: "Report Status History")
+            ]
           ),
         ),
-        title: CategoryText(text: "Report Status History"),
       ),
       body: Container(
-        decoration: const BoxDecoration(
-          color: Color.fromARGB(41, 168, 168, 168),
-        ),
         child: sortedStatusHistory.isNotEmpty
-            ? ListView.builder(
+          ? Transform.translate(
+              offset: Offset(0, -20),
+              child: ListView.builder(
                 padding: const EdgeInsets.all(16.0),
                 itemCount: sortedStatusHistory.length,
                 itemBuilder: (context, index) {
@@ -107,6 +121,9 @@ class _ReportsStatusHistoryDTState extends State<ReportsStatusHistoryDT> {
                       : status.remarks ?? 'No remarks';
                   String timestampText =
                       status is Map ? status['timestamp'] : status.timestamp;
+                    
+                  DateTime dateTime = DateTime.parse(timestampText);
+                  String formattedTime = DateFormat("d, MMMM, y : hh:mma").format(dateTime);
 
                   return TimelineTile(
                     alignment: TimelineAlign.start,
@@ -125,7 +142,11 @@ class _ReportsStatusHistoryDTState extends State<ReportsStatusHistoryDT> {
                       thickness: 2,
                     ),
                     endChild: Container(
-                      margin: const EdgeInsets.symmetric(vertical: 10),
+                      margin: const EdgeInsets.only(
+                        top: 10,
+                        bottom: 10,
+                        left: 10
+                      ),
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
                         color: Colors.white,
@@ -134,38 +155,24 @@ class _ReportsStatusHistoryDTState extends State<ReportsStatusHistoryDT> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            "Status: $statusText",
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                              color: getStatusColor(statusText),
-                            ),
-                          ),
+                          PrimaryText(text: "Status: $statusText"),
                           const SizedBox(height: 4),
-                          Text(
-                            "Remarks: $remarksText",
-                            style: const TextStyle(
-                                fontSize: 13, color: labelFormFieldColor),
-                          ),
+                          CategoryDescripText(text: "Remarks: $remarksText"),
                           const SizedBox(height: 4),
-                          Text(
-                            "Timestamp: $timestampText",
-                            style: const TextStyle(
-                                fontSize: 11, color: labelFormFieldColor),
-                          ),
+                          CategoryDescripText(text: "Timestamp: $formattedTime"),
                         ],
                       ),
                     ),
                   );
                 },
               )
-            : const Center(
-                child: Text(
-                  "No status history available.",
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
+            )
+          : const Center(
+              child: Text(
+                "No status history available.",
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
+            ),
       ),
     );
   }

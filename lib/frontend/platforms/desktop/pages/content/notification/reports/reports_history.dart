@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 import 'package:lottie/lottie.dart';
 import 'package:safezone/backend/architecture/bloc/incident_report/incident_report_bloc.dart';
 import 'package:safezone/backend/architecture/bloc/incident_report/incident_report_event.dart';
 import 'package:safezone/backend/architecture/bloc/incident_report/incident_report_state.dart';
-import 'package:safezone/frontend/platforms/mobile/widgets/cards/reports_history_card.dart';
+import 'package:safezone/backend/models/dangerzoneModel/incident_report_model.dart';
+import 'package:safezone/frontend/platforms/desktop/pages/content/notification/reports/reports_history_information.dart';
+import 'package:safezone/frontend/platforms/desktop/widget/button/rhcdt.dart';
 import 'package:safezone/frontend/platforms/mobile/widgets/loading/loadingstate.dart';
 import 'package:safezone/resource/schema/colors.dart';
 import 'package:safezone/resource/schema/texts.dart';
@@ -29,8 +32,8 @@ class _ReportsHistoryDTState extends State<ReportsHistoryDT>
     'Rejected',
     'Under review'
   ]
-      .map((category) => category[0].toUpperCase() + category.substring(1))
-      .toList();
+  .map((category) => category[0].toUpperCase() + category.substring(1))
+  .toList();
 
   late final IncidentReportBloc _incidentReportBloc;
   bool _isAscending = false;
@@ -72,121 +75,152 @@ class _ReportsHistoryDTState extends State<ReportsHistoryDT>
     super.dispose();
   }
 
+  String? selectedInternalPage;
+  IncidentReportModel? selectedReportZone;
+
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
-        if (widget.onBack != null) {
-          widget.onBack!();
+    return _getPageForNavigation(selectedInternalPage);
+  }
+
+  Widget _getPageForNavigation(String? page) {
+    switch (page) {
+      case "details":
+        if (selectedReportZone == null) {
+          return const Center(child: Text("No SafeZone selected"));
         }
-        return false;
-      },
-      child: Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.white,
-          automaticallyImplyLeading: false,
-          centerTitle: false,
-          title: Transform.translate(
-            offset: const Offset(-15, 0),
-            child: Row(children: [
-              GestureDetector(
-                onTap: widget.onBack ?? () => Navigator.pop(context),
-                child: Container(
-                  margin: const EdgeInsets.all(10),
-                  height: 20,
-                  width: 20,
-                  decoration: BoxDecoration(
-                    border: Border.all(width: 1, color: Colors.black),
-                    shape: BoxShape.circle,
+        return ReportsHistoryDetailsDT(
+          onBack: () {
+            setState(() {
+              selectedInternalPage = null;
+              selectedReportZone = null;
+            });
+          },
+          reportInfo: selectedReportZone!,
+        );
+      default: 
+        return WillPopScope(
+          onWillPop: () async {
+            if (widget.onBack != null) {
+              widget.onBack!();
+            }
+            return false;
+          },
+          child: Scaffold(
+            backgroundColor: Color.fromARGB(255, 240, 240, 240),
+            appBar: AppBar(
+              backgroundColor: Color.fromARGB(255, 240, 240, 240),
+              automaticallyImplyLeading: false,
+              centerTitle: false,
+              title: Transform.translate(
+                offset: const Offset(-15, 0),
+                child: Row(children: [
+                  GestureDetector(
+                    onTap: widget.onBack ?? () => Navigator.pop(context),
+                    child: Container(
+                      margin: const EdgeInsets.all(10),
+                      height: 20,
+                      width: 20,
+                      decoration: BoxDecoration(
+                        border: Border.all(width: 1, color: Colors.black),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.arrow_back,
+                          color: Colors.black, size: 10),
+                    ),
                   ),
-                  child: const Icon(Icons.arrow_back,
-                      color: Colors.black, size: 10),
-                ),
+                  const CategoryText(text: "My Incident Reports")
+                ]),
               ),
-              const CategoryText(text: "My Incident Reports")
-            ]),
-          ),
-          actions: [
-            Padding(
-              padding: const EdgeInsets.only(right: 12),
-              child: GestureDetector(
-                onTap: _toggleSortOrder,
-                child: Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: const Color.fromARGB(10, 0, 0, 0),
-                    borderRadius: BorderRadius.circular(5),
+              actions: [
+                Padding(
+                  padding: const EdgeInsets.only(right: 12),
+                  child: GestureDetector(
+                    onTap: _toggleSortOrder,
+                    child: Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: const Color.fromARGB(10, 0, 0, 0),
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Icon(
+                            _isAscending
+                                ? Icons.arrow_upward
+                                : Icons.arrow_downward,
+                            size: 15,
+                            color: Colors.black,
+                          ),
+                          const SizedBox(width: 5),
+                          const Text(
+                            "Sort by Date",
+                            style: TextStyle(color: textColor, fontSize: 11),
+                          ),
+                          const SizedBox(width: 5),
+                        ],
+                      ),
+                    ),
                   ),
+                ),
+              ],
+            ),
+            body: Column(
+              children: [
+                Container(
+                  margin: const EdgeInsets.only(
+                      top: 10, left: 16, bottom: 16, right: 16),
                   child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      Icon(
-                        _isAscending
-                            ? Icons.arrow_upward
-                            : Icons.arrow_downward,
-                        size: 15,
-                        color: Colors.black,
+                      const Flexible(
+                        child: CategoryDescripText(
+                          text:
+                              'View and track the status of all your past reports.',
+                        ),
                       ),
-                      const SizedBox(width: 5),
-                      const Text(
-                        "Sort by Date",
-                        style: TextStyle(color: textColor, fontSize: 11),
+                      const SizedBox(width: 8),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                        child: Image.asset(
+                          "lib/resource/svg/check.png",
+                          width: 25,
+                          height: 25,
+                        ),
                       ),
-                      const SizedBox(width: 5),
                     ],
                   ),
                 ),
-              ),
-            ),
-          ],
-        ),
-        body: Column(
-          children: [
-            Container(
-              margin: const EdgeInsets.only(
-                  top: 10, left: 16, bottom: 16, right: 16),
-              child: Row(
-                children: [
-                  const Flexible(
-                    child: CategoryDescripText(
-                      text:
-                          'View and track the status of all your past reports.',
-                    ),
+                TabBar(
+                  controller: _tabController,
+                  indicatorColor: widgetPricolor,
+                  labelColor: Colors.black,
+                  labelStyle: const TextStyle(
+                    fontSize: 10,
                   ),
-                  const SizedBox(width: 8),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                    child: Image.asset(
-                      "lib/resource/svg/check.png",
-                      width: 25,
-                      height: 25,
-                    ),
+                  overlayColor: MaterialStateProperty.all(Colors.transparent),
+                  tabs: _categories.map((category) => SizedBox(
+                    height: 35,
+                    child: Tab(text: category),
+                  )).toList(),
+                  dividerColor: Colors.black12,
+                ),
+                const SizedBox(height: 20),
+                Expanded(
+                  child: TabBarView(
+                    controller: _tabController,
+                    children: _categories
+                        .map((category) => _buildCategoryPage(category))
+                        .toList(),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-            TabBar(
-              controller: _tabController,
-              indicatorColor: btnColor,
-              labelColor: Colors.black,
-              unselectedLabelColor: Colors.black38,
-              tabs: _categories.map((category) => Tab(text: category)).toList(),
-            ),
-            const SizedBox(height: 20),
-            Expanded(
-              child: TabBarView(
-                controller: _tabController,
-                children: _categories
-                    .map((category) => _buildCategoryPage(category))
-                    .toList(),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+          ),
+        );
+      }
+    }
 
   Widget _buildCategoryPage(String status) {
     return BlocBuilder<IncidentReportBloc, IncidentReportState>(
@@ -240,9 +274,18 @@ class _ReportsHistoryDTState extends State<ReportsHistoryDT>
           return ListView.builder(
             itemCount: filteredReports.length,
             itemBuilder: (context, index) {
+              final reportCard = filteredReports[index];
               return Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                child: ReportsCard(incidentReport: filteredReports[index]),
+                child: ReportsCard(
+                  incidentReport: reportCard,
+                  onTap: (){
+                    setState(() {
+                      selectedReportZone = reportCard;
+                      selectedInternalPage = "details";
+                    });
+                  }
+                ),
               );
             },
           );
@@ -253,4 +296,5 @@ class _ReportsHistoryDTState extends State<ReportsHistoryDT>
       },
     );
   }
+
 }
