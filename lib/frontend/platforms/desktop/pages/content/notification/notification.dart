@@ -15,10 +15,12 @@ class NotificationDT extends StatefulWidget {
   final VoidCallback? onClose;
   final String UserToken;
   final int initialPage;
+  final ValueNotifier<String?>? selectedPage;
 
   const NotificationDT({
     super.key,
     this.onClose,
+    this.selectedPage,
     required this.UserToken,
     required this.initialPage,
   });
@@ -32,8 +34,6 @@ class _NotificationDTState extends State<NotificationDT> with TickerProviderStat
   late Animation<double> _animation;
   late PageController pageController;
   late List<Widget> topLevelPages;
-
-  String? selectedInternalPage;
 
   late TabController _tabController;
   final List<String> _categories = [
@@ -63,12 +63,18 @@ class _NotificationDTState extends State<NotificationDT> with TickerProviderStat
     }
   }
 
+  String? selectedInternalPage;
+
   @override
   void initState() {
     super.initState();
 
     _tabController = TabController(length: _categories.length, vsync: this);
     pageController = PageController(initialPage: widget.initialPage);
+
+    if (widget.selectedPage != null) {
+      widget.selectedPage!.addListener(_handlePageSelection);
+    }
 
     _controller = AnimationController(
       vsync: this,
@@ -86,6 +92,25 @@ class _NotificationDTState extends State<NotificationDT> with TickerProviderStat
       TweenSequenceItem(tween: Tween(begin: 10.0, end: 0.0), weight: 1),
     ]).animate(_controller);
   }
+
+  void _handlePageSelection() {
+    final page = widget.selectedPage!.value;
+    print("ito: $page");
+
+    if (!mounted) return;
+
+    setState(() {
+      selectedInternalPage = null;
+    });
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      setState(() {
+        selectedInternalPage = page;
+      });
+    });
+  }
+
 
   void onPageChanged(int page) {
     BlocProvider.of<NotificationCubit>(context).changeSelectedIndex(page);
@@ -261,14 +286,16 @@ class _NotificationDTState extends State<NotificationDT> with TickerProviderStat
 
   @override
   void dispose() {
-    _controller.dispose();
+    widget.selectedPage?.removeListener(_handlePageSelection);
     _tabController.dispose();
     pageController.dispose();
+    _controller.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    print("REBUILD: selectedInternalPage = $selectedInternalPage");
     return Stack(
       children: [
         _getPageForNavigation(selectedInternalPage),

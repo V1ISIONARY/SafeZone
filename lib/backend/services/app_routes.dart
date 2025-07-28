@@ -67,10 +67,10 @@ GoRouter appRouter(bool isFirstRun, String? userToken) => GoRouter(
         return NavigationRT(userToken: token);
       },
     ),
-    GoRoute(
-      path: '/experiement',
-      builder: (context, state) => const Experiement(),
-    ),
+    // GoRoute(
+    //   path: '/experiement',
+    //   builder: (context, state) => const Experiement(),
+    // ),
     GoRoute(
       path: '/register',
       builder: (context, state) => const RegisterMD(),

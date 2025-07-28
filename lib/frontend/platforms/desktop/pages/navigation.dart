@@ -1,9 +1,9 @@
 import 'package:safezone/backend/properties/import.dart';
 import 'package:safezone/backend/properties/properties.dart';
 import 'package:safezone/frontend/platforms/desktop/pages/content/contact.dart';
-import 'package:safezone/frontend/platforms/desktop/pages/content/map/circles/createreport.dart';
-import 'package:safezone/frontend/platforms/desktop/pages/content/map/circles/listofgroup.dart';
-import 'package:safezone/frontend/platforms/desktop/pages/content/map/circles/marksafezone.dart';
+import 'package:safezone/frontend/platforms/desktop/pages/content/map/content/createreport.dart';
+import 'package:safezone/frontend/platforms/desktop/pages/content/map/content/listofgroup.dart';
+import 'package:safezone/frontend/platforms/desktop/pages/content/map/content/marksafezone.dart';
 import 'package:safezone/frontend/platforms/desktop/pages/content/map/map.dart';
 import 'package:safezone/frontend/platforms/desktop/pages/content/map/mapheader.dart';
 import 'package:safezone/frontend/platforms/desktop/pages/content/notification/notification.dart';
@@ -32,6 +32,8 @@ class _NavigationDTState extends State<NavigationDT> {
   bool dropdown = false;
   bool? _wasSmallScreen;
   final sharedController = SharedProperties();
+
+  ValueNotifier<String?> selectedPageNotifier = ValueNotifier(null);
 
   Widget _getSelectedPage() {
     Widget pageContent;
@@ -68,9 +70,12 @@ class _NavigationDTState extends State<NavigationDT> {
         case 0:
           return NotificationDT(
             initialPage: 0,
+            selectedPage: selectedPageNotifier,
+            key: ValueKey(selectedPageNotifier.value),
             onClose: () {
               setState(() {
                 showit = false;
+                selectedPageNotifier.value = null;
                 Sidenav.selectedComsNotifier.value = null;
               });
             },
@@ -110,6 +115,18 @@ class _NavigationDTState extends State<NavigationDT> {
                 Sidenav.selectedDropdownId.value = null;
               });
             },
+            onOpenNotification: (String page) {
+              setState(() {
+                showit = true;
+                selectedComs = 0;
+                selectedPageNotifier.value = null;
+                Sidenav.selectedComsNotifier.value = 0;
+              });
+
+              Future.delayed(Duration(milliseconds: 10), () {
+                selectedPageNotifier.value = page; 
+              });
+            }
           );
         case 2:
           return MarkSafeZoneDT(
@@ -119,6 +136,18 @@ class _NavigationDTState extends State<NavigationDT> {
                 Sidenav.selectedDropdownId.value = null;
               });
             },
+            onOpenNotification: (String page) {
+              setState(() {
+                showit = true;
+                selectedComs = 0;
+                selectedPageNotifier.value = null;
+                Sidenav.selectedComsNotifier.value = 0;
+              });
+
+              Future.delayed(Duration(milliseconds: 10), () {
+                selectedPageNotifier.value = page; 
+              });
+            }
           );
         default:
           return const Center(child: Text('No Dropdown Content'));
@@ -168,7 +197,6 @@ class _NavigationDTState extends State<NavigationDT> {
                           Expanded(
                             child: Container(
                               width: double.infinity,
-                              padding: EdgeInsets.symmetric(horizontal: 10),
                               color: Colors.transparent,
                               child: _getSelectedDropPage(),
                             ),
@@ -189,7 +217,6 @@ class _NavigationDTState extends State<NavigationDT> {
                       alignment: Alignment.centerRight,
                       child: Container(
                         width: 400,
-                        padding: const EdgeInsets.symmetric(horizontal: 15),
                         color: Colors.white,
                         child: _getSelectedDropPage(),
                       ),
@@ -202,7 +229,6 @@ class _NavigationDTState extends State<NavigationDT> {
         ),
       ],
     );
-
 
   }
 

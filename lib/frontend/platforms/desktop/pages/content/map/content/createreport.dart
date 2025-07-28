@@ -13,6 +13,7 @@ import 'package:google_places_flutter/model/prediction.dart';
 import 'package:http/http.dart' as http show get;
 import 'package:intl/intl.dart';
 import 'package:safezone/backend/models/dangerzoneModel/incident_report_request_model.dart';
+import 'package:safezone/frontend/platforms/desktop/pages/content/map/content/report-incident/review_report.dart';
 import 'package:safezone/frontend/platforms/mobile/widgets/buttons/custom_button.dart';
 import 'package:safezone/frontend/platforms/mobile/widgets/report-danger-zone/multiple_images.dart';
 import 'package:safezone/frontend/platforms/mobile/widgets/text_field_widget.dart';
@@ -21,10 +22,13 @@ import 'package:safezone/resource/schema/texts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class CreateReportDT extends StatefulWidget {
+
   final VoidCallback? onClose;
+  final void Function(String page)? onOpenNotification;
   const CreateReportDT({
     super.key,
-    this.onClose
+    this.onClose,
+    this.onOpenNotification
   });
 
   @override
@@ -172,7 +176,7 @@ class _CreateReportDTState extends State<CreateReportDT> {
                 infoWindow: const InfoWindow(title: "Searched Location"),
               ),
             );
-            _updateCircle(); 
+            _updateCircle(); // Add this line
           });
         } else {
           // _showSnackBar("Location not found. Try another search.");
@@ -198,147 +202,173 @@ class _CreateReportDTState extends State<CreateReportDT> {
               fontWeight: FontWeight.w500,
             ),
           ),
-          Padding(
-            padding: EdgeInsets.only(top: 8),
-            child: SliderTheme(
-              data: SliderTheme.of(context).copyWith(
-                activeTrackColor: Colors.grey[600],
-                inactiveTrackColor: Colors.grey[300],
-                trackHeight: 4.0,
-                thumbColor: Colors.grey[700],
-                thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 8.0),
-                overlayColor: Colors.grey.withOpacity(0.2),
-                overlayShape: const RoundSliderOverlayShape(overlayRadius: 16.0),
-                valueIndicatorColor: Colors.grey[700],
-                valueIndicatorTextStyle: GoogleFonts.poppins(
-                  color: Colors.white,
-                  fontSize: 12,
-                ),
-              ),
-              child: Slider(
-                value: _radius,
-                min: 10,
-                max: 300,
-                divisions: 29,
-                label: _radius.round().toString(),
-                onChanged: (value) {
-                  setState(() {
-                    _radius = value;
-                    _updateCircle();
-                  });
-                },
+          SliderTheme(
+            data: SliderTheme.of(context).copyWith(
+              activeTrackColor: Colors.grey[600],
+              inactiveTrackColor: Colors.grey[300],
+              trackHeight: 4.0,
+              thumbColor: Colors.grey[700],
+              thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 8.0),
+              overlayColor: Colors.grey.withOpacity(0.2),
+              overlayShape: const RoundSliderOverlayShape(overlayRadius: 16.0),
+              valueIndicatorColor: Colors.grey[700],
+              valueIndicatorTextStyle: GoogleFonts.poppins(
+                color: Colors.white,
+                fontSize: 12,
               ),
             ),
-          )
+            child: Slider(
+              value: _radius,
+              min: 10,
+              max: 300,
+              divisions: 29,
+              label: _radius.round().toString(),
+              onChanged: (value) {
+                setState(() {
+                  _radius = value;
+                  _updateCircle();
+                });
+              },
+            ),
+          ),
         ],
       ),
     );
   }
 
+  String? selectedInternalPage;
+  IncidentReportRequestModel? incidentreport;
+  
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        automaticallyImplyLeading: false,
-        centerTitle: false,
-        title: Transform.translate(
-          offset: const Offset(-15, 0),
-          child: CategoryText(text: "Report an Incident")
-        ),
-        actions: [
-          GestureDetector(
-            onTap: (){
-              if (widget.onClose != null) {
-                widget.onClose!();
-              }
-            },
-            child: Icon(
-              Icons.cancel_outlined,
-              size: 20,
-              color: Colors.black38,
-            )
-          ),
-        ],
-      ),
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          return Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: SizedBox(
-                        height: 40,
-                        child: TextField(
-                          controller: _searchController,
-                          style: GoogleFonts.poppins(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.black,
-                          ),
-                          decoration: InputDecoration(
-                            hintText: 'Search for location',
-                            hintStyle: GoogleFonts.poppins(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.black38,
-                            ),
-                            contentPadding: const EdgeInsets.only(left: 10, bottom: 8),
-                            border: const OutlineInputBorder(
-                              borderSide: BorderSide(color: btnColor),
-                            ),
-                            focusedBorder: const OutlineInputBorder(
-                              borderSide: BorderSide(color: btnColor),
-                            ),
-                            enabledBorder: const OutlineInputBorder(
-                              borderSide: BorderSide(color: btnColor),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    GestureDetector(
-                      onTap: _searchLocation,
-                      child: Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(5),
-                          boxShadow: const [
-                            BoxShadow(
-                              color: Colors.grey,
-                              blurRadius: 2,
-                              offset: Offset(1, 1),
-                            )
-                          ],
-                        ),
-                        child: const Center(
-                          child: Icon(
-                            size: 20,
-                            Icons.search,
-                            color: widgetPricolor,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+    return _getPageForNavigation(selectedInternalPage);
+  }
+
+  Widget _getPageForNavigation(String? page) {
+    switch (page) {
+      case "details":
+        if (incidentreport == null) {
+          return const Center(child: Text("No SafeZone selected"));
+        }
+        return ReviewReportDT(
+          onBack: () {
+            setState(() {
+              selectedInternalPage = null;
+              incidentreport = null;
+            });
+          },
+          onGoToReports: () {
+            widget.onOpenNotification?.call("Reports"); 
+          },
+          onClose: (){
+            widget.onClose?.call();
+          },
+          reportInfo: incidentreport!,
+        );
+      default:
+        return Container(
+          padding: EdgeInsets.symmetric(horizontal: 15),
+          color: Color.fromARGB(255, 240, 240, 240),
+          child: Scaffold(
+            appBar: AppBar(
+              backgroundColor: Color.fromARGB(255, 240, 240, 240),
+              automaticallyImplyLeading: false,
+              centerTitle: false,
+              title: Transform.translate(
+                offset: const Offset(-15, 0),
+                child: CategoryText(text: "Report an Incident")
               ),
-              ConstrainedBox(
-                constraints: BoxConstraints(
-                  maxHeight: constraints.maxHeight - 80, 
-                  minHeight: 0,
+              actions: [
+                GestureDetector(
+                  onTap: (){
+                    if (widget.onClose != null) {
+                      widget.onClose!();
+                    }
+                  },
+                  child: Icon(
+                    Icons.cancel_outlined,
+                    size: 20,
+                    color: Colors.black38,
+                  )
                 ),
-                child: ClipRect(
-                  child: SizedBox(
-                    height: 215,
-                    child: Container(
+              ],
+            ),
+            body: LayoutBuilder(
+              builder: (context, constraints) {
+                return Column(
+                  children: [
+                    Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 0),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                  child: Container(
+                                height: 40,
+                                child: TextField(
+                                    controller: _searchController,
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.black,
+                                    ),
+                                    decoration: InputDecoration(
+                                      filled: true,
+                                      fillColor: Colors.transparent,
+                                      hintText: 'Search for location',
+                                      hintStyle: GoogleFonts.poppins(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w500,
+                                        color: Colors.black38,
+                                      ),
+                                      contentPadding:
+                                          const EdgeInsets.only(left: 10, bottom: 8),
+                                      border: const OutlineInputBorder(
+                                        borderSide: BorderSide(color: btnColor),
+                                      ),
+                                      focusedBorder: const OutlineInputBorder(
+                                        borderSide: BorderSide(color: btnColor),
+                                      ),
+                                      enabledBorder: const OutlineInputBorder(
+                                        borderSide: BorderSide(color: btnColor),
+                                      ),
+                                    )),
+                              )),
+                              const SizedBox(width: 10),
+                              GestureDetector(
+                                onTap: () {
+                                  _searchLocation();
+                                },
+                                child: Container(
+                                  width: 40,
+                                  height: 40,
+                                  decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(5),
+                                      boxShadow: const [
+                                        BoxShadow(
+                                          color: Colors.grey,
+                                          blurRadius: 2,
+                                          offset: Offset(1, 1),
+                                        )
+                                      ]),
+                                  child: const Center(
+                                    child: Icon(
+                                      size: 20,
+                                      Icons.search,
+                                      color: widgetPricolor,
+                                    ),
+                                  ),
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    Container(
+                      height: 215,
                       margin: const EdgeInsets.only(top: 15, bottom: 10),
                       decoration: BoxDecoration(
                         color: const Color.fromARGB(54, 96, 125, 139),
@@ -443,25 +473,17 @@ class _CreateReportDTState extends State<CreateReportDT> {
                         ),
                       ),
                     ),
-                  ),
-                ),
-              ),
-              Expanded(
-                child: LayoutBuilder(
-                  builder: (context, constraints) {
-                    return ScrollConfiguration(
-                      behavior: ScrollConfiguration.of(context).copyWith(
-                        scrollbars: false,
-                      ),
+                    Expanded(
                       child: SingleChildScrollView(
                         padding: const EdgeInsets.symmetric(vertical: 20),
                         child: Column(
                           children: [
-                            const CategoryDescripText(
-                              color: Colors.grey,
-                              text: 'Help others stay safe by providing details about the incident and location.',
+                            const CategoryText(
+                              color: textColor,
+                              text:
+                                  'Help others stay safe by providing details about the incident and location.',
                             ),
-                            const SizedBox(height: 15),
+                            const SizedBox(height: 20),
                             _buildRadiusSlider(),
                             const SizedBox(height: 10),
                             const Align(
@@ -546,63 +568,72 @@ class _CreateReportDTState extends State<CreateReportDT> {
                             ),
                             const SizedBox(height: 40),
                             Transform.translate(
-                                offset: const Offset(0, -30),
-                                child: CustomButton(
-                                    widthSize: true,
-                                    text: "Continue",
-                                    buttonColor: widgetPricolor,
-                                    onPressed: () {
-                                      if (userId == null ||
-                                          _pinnedLocation == null ||
-                                          _descriptionController.text
-                                              .trim()
-                                              .isEmpty) {
-                                        ScaffoldMessenger.of(context).showSnackBar(
-                                          const SnackBar(
-                                            content: CategoryText(
-                                                text:
-                                                    "Please select a location and enter a description.",
-                                                color: Colors.white),
-                                            backgroundColor: Colors.red,
-                                          ),
-                                        );
-                                        return;
-                                      }
+                              offset: const Offset(0, -30),
+                              child: CustomButton(
+                                widthSize: true,
+                                text: "Continue",
+                                buttonColor: widgetPricolor,
+                                onPressed: () {
+                                  if (userId == null ||
+                                      _pinnedLocation == null ||
+                                      _descriptionController.text.trim().isEmpty) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: CategoryText(
+                                          text: "Please select a location and enter a description.",
+                                          color: Colors.white,
+                                        ),
+                                        backgroundColor: Colors.red,
+                                      ),
+                                    );
+                                    return;
+                                  }
 
-                                      final incidentReport =
-                                          IncidentReportRequestModel(
-                                        userId: userId!,
-                                        description: _descriptionController.text,
-                                        reportDate: DateFormat("yyyy-MM-dd")
-                                            .format(DateTime.now()),
-                                        reportTime: DateFormat("HH:mm:ss")
-                                            .format(DateTime.now()),
-                                        reportTimestamp: reportTimestamp,
-                                        latitude: _pinnedLocation!.latitude,
-                                        longitude: _pinnedLocation!.longitude,
-                                        radius: _radius,
-                                        name:
-                                            _nameController.text,
-                                      );
-                                      print(
-                                          "🚨 Incident Report Created: $incidentReport");
-                                      context.push('/review-report',
-                                          extra: incidentReport);
-                                    }
-                                  )
-                                ),
+                                  final incidentReport = IncidentReportRequestModel(
+                                    userId: userId!,
+                                    description: _descriptionController.text,
+                                    reportDate: DateFormat("yyyy-MM-dd").format(DateTime.now()),
+                                    reportTime: DateFormat("HH:mm:ss").format(DateTime.now()),
+                                    images: selectedImages,
+                                    reportTimestamp: reportTimestamp,
+                                    latitude: _pinnedLocation!.latitude,
+                                    longitude: _pinnedLocation!.longitude,
+                                    radius: _radius,
+                                    name: _nameController.text,
+                                  );
+
+                                  setState(() {
+                                    selectedInternalPage = 'details';
+                                    incidentreport = incidentReport;
+                                  });
+
+                                  Future.delayed(const Duration(milliseconds: 300), () {
+                                    setState(() {
+                                      _pinnedLocation = null;
+                                      _markers.clear();
+                                      _circles.clear();
+                                      _descriptionController.clear();
+                                      _nameController.clear();
+                                      _radius = 100;
+                                      selectedImages.clear();
+                                      reportTimestamp = '';
+                                    });
+                                  });
+                                }
+                              )
+                            ),
                             const SizedBox(height: 10)
                           ],
                         ),
                       ),
-                    );
-                  }
-                )
-              )
-            ]
-          );
-        }
-      )
-    );
+                    )
+                  ]
+                );
+              }
+            )
+          )
+        );
+    }
   }
+
 }
