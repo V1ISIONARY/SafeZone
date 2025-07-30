@@ -39,7 +39,6 @@ export 'package:safezone/frontend/platforms/mobile/widgets/buttons/custom_button
 
 export 'package:safezone/frontend/platforms/mobile/pages/main-screen/contacts_page/contact.dart';
 export 'package:safezone/frontend/platforms/mobile/pages/main-screen/home_page/map.dart';
-export 'package:safezone/frontend/platforms/mobile/pages/main-screen/notifications_page/notification.dart';
 export 'package:safezone/frontend/platforms/mobile/pages/main-screen/settings_page/main-settings.dart';
 export 'package:awesome_notifications/awesome_notifications.dart';
 export 'package:safezone/frontend/platforms/mobile/widgets/buttons/percentage_average.dart';

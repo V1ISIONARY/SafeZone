@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lottie/lottie.dart';
 import 'package:safezone/backend/architecture/bloc/notificationBloc/notification_bloc.dart';
 import 'package:safezone/backend/architecture/bloc/notificationBloc/notification_event.dart';
@@ -74,6 +75,10 @@ class _AllState extends State<All> {
 
           return GestureDetector(
             onTap: () {
+              context.push(
+                '/notification-details',
+                extra: notification,
+              );
               if (!notification.isRead) {
                 // Update the notification to read in local state
                 setState(() {

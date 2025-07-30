@@ -137,7 +137,7 @@ class _SosSuccessState extends State<SosSuccess> {
                   children: [
                     const SizedBox(height: 200),
                     Image.asset(
-                      "lib/resources/svg/sos-success.png",
+                      "lib/resource/svg/sos-success.png",
                       width: 150,
                       height: 150,
                     ),

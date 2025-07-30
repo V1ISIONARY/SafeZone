@@ -383,69 +383,90 @@ class _ListOfMembersState extends State<ListOfMembers> {
                                             ),
                                           ),
                                           const SizedBox(height: 20),
-                                          SizedBox(
-                                            width: double.infinity,
-                                            child: ElevatedButton.icon(
-                                              onPressed: () {
-                                                Clipboard.setData(ClipboardData(
-                                                    text: _updatedCircleInfo!
-                                                        .code));
-                                              },
-                                              style: ElevatedButton.styleFrom(
-                                                backgroundColor: widgetPricolor,
-                                                foregroundColor: Colors.white,
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                        vertical: 12),
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(8),
-                                                ),
-                                                elevation: 2,
-                                              ),
-                                              icon: const Icon(
-                                                Icons.copy,
-                                                size: 20,
-                                                color: Colors.white,
-                                              ),
-                                              label: const Text(
-                                                "Copy code",
-                                                style: TextStyle(
-                                                  fontSize: 13,
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          const SizedBox(height: 10),
-                                          SizedBox(
-                                            width: double.infinity,
-                                            child: ElevatedButton(
-                                              onPressed: () {
-                                                context.read<CircleBloc>().add(
-                                                      GenerateCodeEvent(
-                                                          circleId:
-                                                              widget.circleId),
-                                                    );
-                                              },
-                                              style: ElevatedButton.styleFrom(
-                                                backgroundColor: widgetPricolor,
-                                                foregroundColor: Colors.white,
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                        vertical: 12),
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(8),
-                                                ),
-                                                elevation: 2,
-                                              ),
-                                              child: const Text(
-                                                "Generate new code",
-                                                style: TextStyle(
-                                                  fontSize: 13,
+                                          Row(
+                                            children: [
+                                              Expanded(
+                                                child: SizedBox(
+                                                  child: ElevatedButton.icon(
+                                                    onPressed: () {
+                                                      Clipboard.setData(
+                                                          ClipboardData(
+                                                              text:
+                                                                  _updatedCircleInfo!
+                                                                      .code));
+                                                    },
+                                                    style: ElevatedButton
+                                                        .styleFrom(
+                                                      backgroundColor:
+                                                          widgetPricolor,
+                                                      foregroundColor:
+                                                          Colors.white,
+                                                      padding: const EdgeInsets
+                                                          .symmetric(
+                                                          vertical: 12),
+                                                      shape:
+                                                          RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(8),
+                                                      ),
+                                                      elevation: 2,
+                                                    ),
+                                                    icon: const Icon(
+                                                      Icons.copy,
+                                                      size: 20,
+                                                      color: Colors.white,
+                                                    ),
+                                                    label: const Text(
+                                                      "Copy code",
+                                                      style: TextStyle(
+                                                        fontSize: 13,
+                                                      ),
+                                                    ),
+                                                  ),
                                                 ),
                                               ),
-                                            ),
+                                              const SizedBox(width: 10),
+                                              Expanded(
+                                                child: SizedBox(
+                                                  width: double.infinity,
+                                                  child: ElevatedButton(
+                                                    onPressed: () {
+                                                      context
+                                                          .read<CircleBloc>()
+                                                          .add(
+                                                            GenerateCodeEvent(
+                                                                circleId: widget
+                                                                    .circleId),
+                                                          );
+                                                    },
+                                                    style: ElevatedButton
+                                                        .styleFrom(
+                                                      backgroundColor:
+                                                          widgetPricolor,
+                                                      foregroundColor:
+                                                          Colors.white,
+                                                      padding: const EdgeInsets
+                                                          .symmetric(
+                                                          vertical: 12),
+                                                      shape:
+                                                          RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(8),
+                                                      ),
+                                                      elevation: 2,
+                                                    ),
+                                                    child: const Text(
+                                                      "Generate new code",
+                                                      style: TextStyle(
+                                                        fontSize: 13,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
                                           ),
                                           const SizedBox(height: 10),
                                         ],

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lottie/lottie.dart';
 import 'package:safezone/backend/architecture/bloc/notificationBloc/notification_bloc.dart';
 import 'package:safezone/backend/architecture/bloc/notificationBloc/notification_state.dart';
@@ -78,6 +79,10 @@ class _UnreadState extends State<Unread> {
             final notification = unreadNotifications[index];
             return GestureDetector(
               onTap: () {
+                context.push(
+                  '/notification-details',
+                  extra: notification,
+                );
                 _markAsRead(notification);
               },
               child: Container(

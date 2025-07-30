@@ -1,3 +1,5 @@
+import 'package:safezone/frontend/platforms/mobile/pages/main-screen/notifications_page/notification.dart';
+
 import '../../../../../backend/properties/import.dart';
 
 

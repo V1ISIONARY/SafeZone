@@ -7,24 +7,19 @@ class CategoryText extends StatelessWidget {
   final String? alignment;
   final Color? color;
 
-  const CategoryText({
-    super.key, 
-    required this.text,
-    this.alignment,
-    this.color
-  });
+  const CategoryText(
+      {super.key, required this.text, this.alignment, this.color});
 
   @override
   Widget build(BuildContext context) {
-    return (
-      Text(
-        text,
-        style: GoogleFonts.inter(
-          fontSize: 13, fontWeight: FontWeight.w500, color: color ?? Colors.black
-        ),
-        textAlign: _getTextAlignment(),
-      )
-    );
+    return (Text(
+      text,
+      style: GoogleFonts.inter(
+          fontSize: 13,
+          fontWeight: FontWeight.w500,
+          color: color ?? Colors.black),
+      textAlign: _getTextAlignment(),
+    ));
   }
 
   TextAlign _getTextAlignment() {
@@ -39,7 +34,6 @@ class CategoryText extends StatelessWidget {
         return TextAlign.start;
     }
   }
-  
 }
 
 class CategoryDescripText extends StatelessWidget {
@@ -57,7 +51,7 @@ class CategoryDescripText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Text(
-      text, 
+      text,
       style: GoogleFonts.inter(
         fontSize: 9,
         fontWeight: FontWeight.w500,
@@ -80,7 +74,6 @@ class CategoryDescripText extends StatelessWidget {
         return TextAlign.start;
     }
   }
-
 }
 
 class CategoryDescripTextE extends StatelessWidget {
@@ -126,10 +119,11 @@ class CategoryDescripTextE extends StatelessWidget {
   }
 
   String limitText(String text, int maxLength) {
-    return text.length > maxLength ? '${text.substring(0, maxLength)}...' : text;
+    return text.length > maxLength
+        ? '${text.substring(0, maxLength)}...'
+        : text;
   }
 }
-
 
 class CategoryDescripTextEllipsis extends StatelessWidget {
   final String text;
@@ -169,7 +163,6 @@ class CategoryDescripTextEllipsis extends StatelessWidget {
         return TextAlign.start;
     }
   }
-  
 }
 
 class PrimaryText extends StatelessWidget {
@@ -234,5 +227,33 @@ class AppbarText extends StatelessWidget {
       default:
         return TextAlign.start;
     }
+  }
+}
+
+class RowText extends StatelessWidget {
+  const RowText({super.key, required this.title, required this.text});
+
+  final String title;
+  final String text;
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 10),
+      child: Row(
+        children: [
+          Text(
+            title,
+            style: GoogleFonts.inter(
+                fontWeight: FontWeight.w500, color: textColor, fontSize: 13),
+          ),
+          Spacer(),
+          Text(
+            text,
+            style: GoogleFonts.inter(
+                fontWeight: FontWeight.w500, color: textColor, fontSize: 13),
+          ),
+        ],
+      ),
+    );
   }
 }

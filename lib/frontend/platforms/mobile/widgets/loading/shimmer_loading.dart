@@ -60,7 +60,7 @@ class ShimmerHistoryLoading extends StatelessWidget {
               SizedBox(height: 10),
               ShimmerBox(
                   flex: 1,
-                  widthFactor: 0.9,
+                  widthFactor: 0.4,
                   color: Color.fromARGB(255, 247, 247, 247)),
             ],
           ),
