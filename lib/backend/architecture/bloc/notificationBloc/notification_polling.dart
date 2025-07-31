@@ -77,6 +77,7 @@ class NotificationPollingService {
           NotificationService.createNewNotification(
             title: notification.title,
             body: notification.message,
+            typeOfNotif: notification.type,
           );
 
           // Mark the notification as processed

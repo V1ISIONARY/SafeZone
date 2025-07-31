@@ -50,15 +50,14 @@ class MapDT extends StatefulWidget {
 }
 
 class _MapDTState extends State<MapDT> with TickerProviderStateMixin {
-
   final sharedController = SharedProperties();
-  
+
   Map<String, BitmapDescriptor> memberMarkers = {};
   List<SafeZoneModel> policeStations = [];
   List<Map<String, dynamic>> members = [];
   Set<Marker> markers = {};
   Set<Marker> membersMarkers = {};
-  
+
   List<LatLng> _safeZones = [];
   List<LatLng> _dangerZones = [];
   final locs.Location location = locs.Location();
@@ -69,7 +68,7 @@ class _MapDTState extends State<MapDT> with TickerProviderStateMixin {
   final GlobalKey _searchKey = GlobalKey();
   final GlobalKey _circleKey = GlobalKey();
   final GlobalKey _reportKey = GlobalKey();
-  
+
   bool _isAllZoneShown = false;
   bool _isSafeZoneShown = false;
   bool _isDangerZoneShown = false;
@@ -199,7 +198,8 @@ class _MapDTState extends State<MapDT> with TickerProviderStateMixin {
     _changeHintText();
 
     _focusNodeText.addListener(() {
-      if (_focusNodeText.hasFocus && sharedController.mapSearchTE.text.isEmpty) {
+      if (_focusNodeText.hasFocus &&
+          sharedController.mapSearchTE.text.isEmpty) {
         _controllerFade.forward();
         _controller.forward();
       } else if (!_focusNodeText.hasFocus &&
@@ -300,7 +300,8 @@ class _MapDTState extends State<MapDT> with TickerProviderStateMixin {
 
   void _changeHintText() {
     Future.delayed(const Duration(seconds: 2), () {
-      if (!_focusNodeText.hasFocus && sharedController.mapSearchTE.text.isEmpty) {
+      if (!_focusNodeText.hasFocus &&
+          sharedController.mapSearchTE.text.isEmpty) {
         _controller.forward().then((_) {
           setState(() {
             _currentHintIndex = (_currentHintIndex + 1) % hints.length;
@@ -319,7 +320,8 @@ class _MapDTState extends State<MapDT> with TickerProviderStateMixin {
     try {
       Position position = await getCurrentLocation();
       if (sharedController.googleMapController != null) {
-        sharedController.googleMapController!.animateCamera(CameraUpdate.newCameraPosition(
+        sharedController.googleMapController!
+            .animateCamera(CameraUpdate.newCameraPosition(
           CameraPosition(
             target: LatLng(position.latitude, position.longitude),
             zoom: 14.0,
@@ -441,7 +443,8 @@ class _MapDTState extends State<MapDT> with TickerProviderStateMixin {
       LatLng userLocation = LatLng(position.latitude, position.longitude);
 
       if (sharedController.googleMapController != null) {
-        sharedController.googleMapController!.animateCamera(CameraUpdate.newCameraPosition(
+        sharedController.googleMapController!
+            .animateCamera(CameraUpdate.newCameraPosition(
           CameraPosition(
             target: userLocation,
             zoom: 14.0,
@@ -484,12 +487,12 @@ class _MapDTState extends State<MapDT> with TickerProviderStateMixin {
       if (isInsideSafeZone && !wasInsideSafeZone) {
         _showZoneDialog("Safe Zone", "You have entered a safe zone.");
         _sendBroadcastNotification(
-            "Group member - Safe Zone", "has entered a safe zone.");
+            "Group member - Safe Zone", "has entered a safe zone.", "Safe");
         await _prefs.setBool('wasInsideSafeZone', true);
       } else if (!isInsideSafeZone && wasInsideSafeZone) {
         _showZoneDialog("Safe Zone", "You have exited the safe zone.");
         _sendBroadcastNotification(
-            "Group member - Safe Zone", "has exited the safe zone.");
+            "Group member - Safe Zone", "has exited the safe zone.", "Safe");
         await _prefs.setBool('wasInsideSafeZone', false);
       }
 
@@ -497,18 +500,19 @@ class _MapDTState extends State<MapDT> with TickerProviderStateMixin {
         _showZoneDialog("Danger Zone",
             "You have entered a danger zone. Please be cautious.");
         _sendBroadcastNotification("Group member - Danger Zone",
-            "has entered a danger zone. Please be cautious.");
+            "has entered a danger zone. Please be cautious.", "Danger");
         await _prefs.setBool('wasInsideDangerZone', true);
       } else if (!isInsideDangerZone && wasInsideDangerZone) {
         _showZoneDialog("Danger Zone", "You have exited the danger zone.");
-        _sendBroadcastNotification(
-            "Group member - Danger Zone", "has exited the danger zone.");
+        _sendBroadcastNotification("Group member - Danger Zone",
+            "has exited the danger zone.", "Danger");
         await _prefs.setBool('wasInsideDangerZone', false);
       }
     });
   }
 
-  Future<void> _sendBroadcastNotification(String title, String message) async {
+  Future<void> _sendBroadcastNotification(
+      String title, String message, String zone) async {
     final prefs = await SharedPreferences.getInstance();
     int userId = prefs.getInt('id') ?? 0;
     String firstName = prefs.getString('first_name') ?? "User";
@@ -522,13 +526,22 @@ class _MapDTState extends State<MapDT> with TickerProviderStateMixin {
         : '';
     String fullName = "$formattedFirstName $formattedLastName".trim();
 
-    if (userId != 0) {
+    if (userId != 0 && zone == "Safe") {
       context.read<NotificationBloc>().add(
             BroadcastNotification(
               userId,
               title,
               "$fullName $message",
-              "Zone Alert",
+              "Safe",
+            ),
+          );
+    } else if (userId != 0 && zone == "Danger") {
+      context.read<NotificationBloc>().add(
+            BroadcastNotification(
+              userId,
+              title,
+              "$fullName $message",
+              "Danger",
             ),
           );
     } else {
@@ -540,7 +553,8 @@ class _MapDTState extends State<MapDT> with TickerProviderStateMixin {
 
   Future<void> _createCustomMarker() async {
     try {
-      const String defaultProfileUrl = 'https://example.com/default.jpg'; // Replace with a real URL
+      const String defaultProfileUrl =
+          'https://example.com/default.jpg'; // Replace with a real URL
 
       customMarker = await MarkerUtils.createCustomMarker(
         context,
@@ -940,7 +954,8 @@ class _MapDTState extends State<MapDT> with TickerProviderStateMixin {
       _initialPosition = newPosition;
     });
 
-    final GoogleMapController controller = await sharedController.mapController.future;
+    final GoogleMapController controller =
+        await sharedController.mapController.future;
     controller
         .animateCamera(CameraUpdate.newLatLngZoom(_initialPosition, 14.0));
   }
@@ -1023,8 +1038,8 @@ class _MapDTState extends State<MapDT> with TickerProviderStateMixin {
                     return Expanded(
                       child: Center(
                         child: Transform.translate(
-                          offset: const Offset(-40, 0),
-                          child: const LoadingState()),
+                            offset: const Offset(-40, 0),
+                            child: const LoadingState()),
                       ),
                     );
                   } else if (state is MapDataLoaded) {
@@ -1038,7 +1053,9 @@ class _MapDTState extends State<MapDT> with TickerProviderStateMixin {
                       zoom: 16.0,
                     ),
                     mapType: sharedController.currentMapType,
-                    markers: sharedController.showMarkers ? _createMarkers(state) : {},
+                    markers: sharedController.showMarkers
+                        ? _createMarkers(state)
+                        : {},
                     circles: sharedController.circles,
                     polylines: sharedController.polylines,
                     onMapCreated: (GoogleMapController controller) async {
@@ -1127,246 +1144,243 @@ class _MapDTState extends State<MapDT> with TickerProviderStateMixin {
               children: [
                 SizedBox(height: 10),
                 widget.UserToken == 'guest'
-                  ? Container()
-                  : PreferredSize(
-                    preferredSize: const Size.fromHeight(120.0),
-                    child: Container(
-                      width: double.infinity,
-                      margin: EdgeInsets.symmetric(
-                          horizontal: 15, vertical: 5),
-                      child: Column(children: [
-                        Row(
-                          children: [
-                            SizedBox(width: 10),
-                            Expanded(
-                                child: GestureDetector(
-                                    onTap: _toggleCircles,
-                                    child: Container(
-                                        height: 40,
-                                        decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          borderRadius:
-                                              BorderRadius.circular(20),
-                                          boxShadow: const [
-                                            BoxShadow(
-                                              color: Colors.grey,
-                                              blurRadius: 2,
-                                              offset: Offset(1, 1),
-                                            ),
-                                          ],
-                                        ),
-                                        padding:
-                                            const EdgeInsets.symmetric(
-                                                horizontal: 15),
-                                        child: Row(children: [
-                                          _circles.isEmpty
-                                              ? Center(
-                                                  child: Container(
-                                                    width: 20,
-                                                    height: 20,
-                                                    child:
-                                                        CircularProgressIndicator(
-                                                      strokeWidth: 0.8,
-                                                      color:
-                                                          widgetPricolor,
-                                                    ),
+                    ? Container()
+                    : PreferredSize(
+                        preferredSize: const Size.fromHeight(120.0),
+                        child: Container(
+                            width: double.infinity,
+                            margin: EdgeInsets.symmetric(
+                                horizontal: 15, vertical: 5),
+                            child: Column(children: [
+                              Row(
+                                children: [
+                                  SizedBox(width: 10),
+                                  Expanded(
+                                      child: GestureDetector(
+                                          onTap: _toggleCircles,
+                                          child: Container(
+                                              height: 40,
+                                              decoration: BoxDecoration(
+                                                color: Colors.white,
+                                                borderRadius:
+                                                    BorderRadius.circular(20),
+                                                boxShadow: const [
+                                                  BoxShadow(
+                                                    color: Colors.grey,
+                                                    blurRadius: 2,
+                                                    offset: Offset(1, 1),
                                                   ),
-                                                )
-                                              : Column(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .center,
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment
-                                                          .start,
-                                                  children: _circles
-                                                      .where((circle) =>
-                                                          circle.isActive)
-                                                      .map((circle) =>
-                                                          CategoryDescripText(
-                                                            text: circle
-                                                                .name,
-                                                            color: Colors
-                                                                .black,
-                                                          ))
-                                                      .toList(),
-                                                ),
-                                          // SizedBox(width: 40),
-                                          // LimitedImageCircles(
-                                          //   imageUrls: [
-                                          //     "lib/resource/image/jpg/profile.jpg",
-                                          //     "lib/resource/image/jpg/profile.jpg",
-                                          //     "lib/resource/image/jpg/profile.jpg",
-                                          //     "lib/resource/image/jpg/profile.jpg",
-                                          //   ],
-                                          // ),
-                                          Spacer(),
-                                          // Icon(Icons.keyboard_arrow_down,
-                                          //     color: Colors.black38),
-                                        ])))),
-                            SizedBox(width: 10),
-                            for (var circle in _circles
-                                .where((circle) => circle.isActive))
-                              circle.code.isEmpty
-                                  ? Container()
-                                  : GestureDetector(
-                                      onTap: () {
-                                        bool hasActiveCircle =
-                                            _circles.any((circle) =>
-                                                circle.isActive);
-                                        if (hasActiveCircle) {
-                                          showModalBottomSheet(
-                                            context: context,
-                                            isScrollControlled: true,
-                                            shape:
-                                                const RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.vertical(
-                                                      top:
-                                                          Radius.circular(
-                                                              10)),
-                                            ),
-                                            builder:
-                                                (BuildContext context) {
-                                              return FractionallySizedBox(
-                                                  heightFactor: 0.3,
-                                                  child: Container(
-                                                    width:
-                                                        double.infinity,
-                                                    decoration:
-                                                        BoxDecoration(
-                                                      borderRadius:
-                                                          BorderRadius.vertical(
-                                                              top: Radius
-                                                                  .circular(
-                                                                      10)),
-                                                      color: Colors.white,
-                                                    ),
-                                                    child: Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      children: [
-                                                        Container(
-                                                          width: double
-                                                              .infinity,
-                                                          height: 50,
-                                                          child: Row(
-                                                            crossAxisAlignment:
-                                                                CrossAxisAlignment
-                                                                    .center,
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .center,
-                                                            children: [
-                                                              Expanded(
-                                                                  child:
-                                                                      SizedBox()),
-                                                              CategoryText(
-                                                                  text:
-                                                                      'Invite Code'),
-                                                              Expanded(
-                                                                child: Align(
-                                                                    alignment: Alignment.centerRight,
-                                                                    child: Container(
-                                                                        margin: EdgeInsets.only(right: 15),
-                                                                        child: GestureDetector(
-                                                                          onTap: () {
-                                                                            Navigator.pop(context);
-                                                                          },
-                                                                          child: CategoryDescripText(text: 'Done', color: widgetPricolor),
-                                                                        ))),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                          decoration:
-                                                              BoxDecoration(
-                                                            color: Colors
-                                                                .white,
-                                                            boxShadow: const [
-                                                              BoxShadow(
-                                                                color: Colors
-                                                                    .grey,
-                                                                blurRadius:
-                                                                    2,
-                                                                offset:
-                                                                    Offset(
-                                                                        1,
-                                                                        1),
-                                                              ),
-                                                            ],
-                                                            borderRadius:
-                                                                BorderRadius.vertical(
-                                                                    top: Radius.circular(
-                                                                        10)),
+                                                ],
+                                              ),
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 15),
+                                              child: Row(children: [
+                                                _circles.isEmpty
+                                                    ? Center(
+                                                        child: Container(
+                                                          width: 20,
+                                                          height: 20,
+                                                          child:
+                                                              CircularProgressIndicator(
+                                                            strokeWidth: 0.8,
+                                                            color:
+                                                                widgetPricolor,
                                                           ),
                                                         ),
-                                                        Container(
-                                                            margin: EdgeInsets.symmetric(
-                                                                horizontal:
-                                                                    15,
-                                                                vertical:
-                                                                    15),
-                                                            width: double
-                                                                .infinity,
-                                                            child: Column(
-                                                              mainAxisAlignment:
-                                                                  MainAxisAlignment
-                                                                      .center,
-                                                              crossAxisAlignment:
-                                                                  CrossAxisAlignment
-                                                                      .center,
-                                                              children: [
-                                                                for (var circle in _circles.where((circle) =>
-                                                                    circle
-                                                                        .isActive))
-                                                                  Container(
-                                                                      margin:
-                                                                          EdgeInsets.symmetric(vertical: 30),
-                                                                      child: Text(circle.code, style: TextStyle(fontWeight: FontWeight.bold, color: widgetPricolor, fontSize: 30))),
-                                                                CategoryText(
-                                                                    text:
-                                                                        'Share this invite code with the\n people you want in your Circle: ',
-                                                                    alignment:
-                                                                        'center',
-                                                                    color:
-                                                                        Colors.black),
-                                                              ],
-                                                            ))
-                                                      ],
-                                                    ),
-                                                  ));
+                                                      )
+                                                    : Column(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .center,
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: _circles
+                                                            .where((circle) =>
+                                                                circle.isActive)
+                                                            .map((circle) =>
+                                                                CategoryDescripText(
+                                                                  text: circle
+                                                                      .name,
+                                                                  color: Colors
+                                                                      .black,
+                                                                ))
+                                                            .toList(),
+                                                      ),
+                                                // SizedBox(width: 40),
+                                                // LimitedImageCircles(
+                                                //   imageUrls: [
+                                                //     "lib/resource/image/jpg/profile.jpg",
+                                                //     "lib/resource/image/jpg/profile.jpg",
+                                                //     "lib/resource/image/jpg/profile.jpg",
+                                                //     "lib/resource/image/jpg/profile.jpg",
+                                                //   ],
+                                                // ),
+                                                Spacer(),
+                                                // Icon(Icons.keyboard_arrow_down,
+                                                //     color: Colors.black38),
+                                              ])))),
+                                  SizedBox(width: 10),
+                                  for (var circle in _circles
+                                      .where((circle) => circle.isActive))
+                                    circle.code.isEmpty
+                                        ? Container()
+                                        : GestureDetector(
+                                            onTap: () {
+                                              bool hasActiveCircle =
+                                                  _circles.any((circle) =>
+                                                      circle.isActive);
+                                              if (hasActiveCircle) {
+                                                showModalBottomSheet(
+                                                  context: context,
+                                                  isScrollControlled: true,
+                                                  shape:
+                                                      const RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.vertical(
+                                                            top:
+                                                                Radius.circular(
+                                                                    10)),
+                                                  ),
+                                                  builder:
+                                                      (BuildContext context) {
+                                                    return FractionallySizedBox(
+                                                        heightFactor: 0.3,
+                                                        child: Container(
+                                                          width:
+                                                              double.infinity,
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            borderRadius:
+                                                                BorderRadius.vertical(
+                                                                    top: Radius
+                                                                        .circular(
+                                                                            10)),
+                                                            color: Colors.white,
+                                                          ),
+                                                          child: Column(
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .start,
+                                                            children: [
+                                                              Container(
+                                                                width: double
+                                                                    .infinity,
+                                                                height: 50,
+                                                                child: Row(
+                                                                  crossAxisAlignment:
+                                                                      CrossAxisAlignment
+                                                                          .center,
+                                                                  mainAxisAlignment:
+                                                                      MainAxisAlignment
+                                                                          .center,
+                                                                  children: [
+                                                                    Expanded(
+                                                                        child:
+                                                                            SizedBox()),
+                                                                    CategoryText(
+                                                                        text:
+                                                                            'Invite Code'),
+                                                                    Expanded(
+                                                                      child: Align(
+                                                                          alignment: Alignment.centerRight,
+                                                                          child: Container(
+                                                                              margin: EdgeInsets.only(right: 15),
+                                                                              child: GestureDetector(
+                                                                                onTap: () {
+                                                                                  Navigator.pop(context);
+                                                                                },
+                                                                                child: CategoryDescripText(text: 'Done', color: widgetPricolor),
+                                                                              ))),
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                                decoration:
+                                                                    BoxDecoration(
+                                                                  color: Colors
+                                                                      .white,
+                                                                  boxShadow: const [
+                                                                    BoxShadow(
+                                                                      color: Colors
+                                                                          .grey,
+                                                                      blurRadius:
+                                                                          2,
+                                                                      offset:
+                                                                          Offset(
+                                                                              1,
+                                                                              1),
+                                                                    ),
+                                                                  ],
+                                                                  borderRadius:
+                                                                      BorderRadius.vertical(
+                                                                          top: Radius.circular(
+                                                                              10)),
+                                                                ),
+                                                              ),
+                                                              Container(
+                                                                  margin: EdgeInsets.symmetric(
+                                                                      horizontal:
+                                                                          15,
+                                                                      vertical:
+                                                                          15),
+                                                                  width: double
+                                                                      .infinity,
+                                                                  child: Column(
+                                                                    mainAxisAlignment:
+                                                                        MainAxisAlignment
+                                                                            .center,
+                                                                    crossAxisAlignment:
+                                                                        CrossAxisAlignment
+                                                                            .center,
+                                                                    children: [
+                                                                      for (var circle in _circles.where((circle) =>
+                                                                          circle
+                                                                              .isActive))
+                                                                        Container(
+                                                                            margin:
+                                                                                EdgeInsets.symmetric(vertical: 30),
+                                                                            child: Text(circle.code, style: TextStyle(fontWeight: FontWeight.bold, color: widgetPricolor, fontSize: 30))),
+                                                                      CategoryText(
+                                                                          text:
+                                                                              'Share this invite code with the\n people you want in your Circle: ',
+                                                                          alignment:
+                                                                              'center',
+                                                                          color:
+                                                                              Colors.black),
+                                                                    ],
+                                                                  ))
+                                                            ],
+                                                          ),
+                                                        ));
+                                                  },
+                                                );
+                                              }
                                             },
-                                          );
-                                        }
-                                      },
-                                      child: Container(
-                                          width: 40,
-                                          height: 40,
-                                          decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                            boxShadow: const [
-                                              BoxShadow(
-                                                color: Colors.grey,
-                                                blurRadius: 2,
-                                                offset: Offset(1, 1),
-                                              ),
-                                            ],
-                                          ),
-                                          child: Center(
-                                              child: Icon(
-                                            Icons.person_add,
-                                            size: 20,
-                                            color: widgetPricolor,
-                                          ))))
-                          ],
-                        )
-                      ]
-                    )
-                  )
-                ),
+                                            child: Container(
+                                                width: 40,
+                                                height: 40,
+                                                decoration: BoxDecoration(
+                                                  color: Colors.white,
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
+                                                  boxShadow: const [
+                                                    BoxShadow(
+                                                      color: Colors.grey,
+                                                      blurRadius: 2,
+                                                      offset: Offset(1, 1),
+                                                    ),
+                                                  ],
+                                                ),
+                                                child: Center(
+                                                    child: Icon(
+                                                  Icons.person_add,
+                                                  size: 20,
+                                                  color: widgetPricolor,
+                                                ))))
+                                ],
+                              )
+                            ]))),
               ],
             ),
           ],
