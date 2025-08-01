@@ -268,10 +268,10 @@ class _CreateReportDTState extends State<CreateReportDT> {
       default:
         return Container(
           padding: EdgeInsets.symmetric(horizontal: 15),
-          color: Color.fromARGB(255, 240, 240, 240),
+          color: Colors.white54,
           child: Scaffold(
             appBar: AppBar(
-              backgroundColor: Color.fromARGB(255, 240, 240, 240),
+              backgroundColor: Colors.white54,
               automaticallyImplyLeading: false,
               centerTitle: false,
               title: Transform.translate(

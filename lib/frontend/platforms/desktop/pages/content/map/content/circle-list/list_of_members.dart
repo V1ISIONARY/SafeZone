@@ -208,7 +208,7 @@ class _ListOfMembersDTState extends State<ListOfMembersDT> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Color.fromARGB(255, 240, 240, 240),
+      color: Colors.white54,
       child: BlocListener<CircleBloc, CircleState>(
       listener: (context, state) {
         if (state is CircleMembersLoadedState) {
@@ -226,7 +226,6 @@ class _ListOfMembersDTState extends State<ListOfMembersDT> {
           });
           print("Error fetching members: ${state.message}");
         } else if (state is CircleCodeGeneratedState) {
-          // Update the circleInfo with the new code and expiry
           setState(() {
             _updatedCircleInfo = CircleModel(
               id: widget.circleInfo.id,
@@ -312,7 +311,7 @@ class _ListOfMembersDTState extends State<ListOfMembersDT> {
                 : null,
           ),
           AppBar(
-            backgroundColor: Color.fromARGB(255, 240, 240, 240),
+            backgroundColor: Colors.white54,
             automaticallyImplyLeading: false,
             centerTitle: true,
             title: Transform.translate(
@@ -361,7 +360,7 @@ class _ListOfMembersDTState extends State<ListOfMembersDT> {
                   ? const Expanded(child: Center(child: Text("No members found")))
                   : Expanded(
                       child: Container(
-                        color: Color.fromARGB(255, 240, 240, 240),
+                        color: Colors.white54,
                         padding: const EdgeInsets.symmetric(vertical: 15),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,

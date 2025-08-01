@@ -273,7 +273,7 @@ class _MarkSafeZoneDTState extends State<MarkSafeZoneDT> {
       default:
         return Container(
           padding: EdgeInsets.symmetric(horizontal: 15),
-          color: Color.fromARGB(255, 240, 240, 240),
+          color: Colors.white54,
           child: Scaffold(
             appBar: AppBar(
               backgroundColor: Colors.white,

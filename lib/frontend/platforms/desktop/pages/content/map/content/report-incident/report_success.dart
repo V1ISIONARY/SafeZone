@@ -20,10 +20,10 @@ class _ReportSuccessDTState extends State<ReportSuccessDT> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromARGB(255, 240, 240, 240),
+      backgroundColor: Colors.white54,
       appBar: AppBar(
         title: const Text(""),
-        backgroundColor: Color.fromARGB(255, 240, 240, 240),
+        backgroundColor: Colors.white54,
       ),
       body: Center(
         child: Padding(

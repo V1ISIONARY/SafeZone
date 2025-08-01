@@ -291,11 +291,11 @@ class _ListOfGroupsDTState extends State<ListOfGroupsDT> {
             padding: EdgeInsets.symmetric(
               horizontal: 15,
             ),
-            color: Color.fromARGB(255, 240, 240, 240),
+            color: Colors.white54,
             child: Scaffold(
-              backgroundColor: Color.fromARGB(255, 240, 240, 240),
+              backgroundColor: Colors.white54,
               appBar: AppBar(
-                backgroundColor:Color.fromARGB(255, 240, 240, 240),
+                backgroundColor:Colors.white54,
                 automaticallyImplyLeading: false,
                 centerTitle: false,
                 title: Transform.translate(
@@ -502,7 +502,7 @@ class _ListOfGroupsDTState extends State<ListOfGroupsDT> {
                                               ),
                                               decoration: const BoxDecoration(
                                                 shape: BoxShape.circle,
-                                                color: Color.fromARGB(255, 240, 240, 240),
+                                                color: Colors.white54,
                                               ),
                                               child: const Icon(Icons.group),
                                             ),

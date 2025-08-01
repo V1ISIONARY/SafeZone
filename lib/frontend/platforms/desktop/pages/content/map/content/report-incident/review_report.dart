@@ -141,9 +141,9 @@ class _ReviewReportDTState extends State<ReviewReportDT> {
         );
       default: 
         return Scaffold(
-          backgroundColor: Color.fromARGB(255, 240, 240, 240),
+          backgroundColor: Colors.white54,
           appBar: AppBar(
-            backgroundColor: Color.fromARGB(255, 240, 240, 240),
+            backgroundColor: Colors.white54,
             automaticallyImplyLeading: false,
             centerTitle: true,
             title: Transform.translate(

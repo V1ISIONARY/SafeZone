@@ -141,7 +141,7 @@ class _ReviewSafezoneState extends State<ReviewSafezone> {
       default: 
         return Scaffold(
           appBar: AppBar(
-            backgroundColor: Color.fromARGB(255, 240, 240, 240),
+            backgroundColor: Colors.white54,
             automaticallyImplyLeading: false,
             centerTitle: true,
             title: Transform.translate(

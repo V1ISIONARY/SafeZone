@@ -86,9 +86,9 @@ class _ContactDTState extends State<ContactDT> with SingleTickerProviderStateMix
       child: Stack(
         children:[
           Scaffold(
-            backgroundColor: Colors.white,
+            backgroundColor: Colors.white54,
             appBar: AppBar(
-              backgroundColor: Colors.white,
+              backgroundColor: Colors.white54,
               automaticallyImplyLeading: false,
               centerTitle: false,
               title: Transform.translate(
