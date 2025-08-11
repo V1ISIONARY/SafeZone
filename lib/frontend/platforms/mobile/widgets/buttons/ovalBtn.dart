@@ -1,8 +1,4 @@
-import 'package:flutter/material.dart';
-import 'package:page_transition/page_transition.dart';
-
 import '../../../../../backend/properties/import.dart';
-import '../../pages/introduction/slides.dart';
 
 class OvalBtn extends StatefulWidget {
   final String text;
@@ -26,7 +22,7 @@ class _OvalBtnState extends State<OvalBtn> {
         Navigator.push(
           context,
           PageTransition(
-            child: _getNavigateToScreen(widget.navigateTo), 
+            child: _getNavigateToScreen(widget.navigateTo),
             type: PageTransitionType.rightToLeft,
             duration: const Duration(milliseconds: 300),
           ),
@@ -41,7 +37,7 @@ class _OvalBtnState extends State<OvalBtn> {
         ),
         child: Center(
           child: Text(
-            widget.text, 
+            widget.text,
             style: const TextStyle(
               fontSize: 12,
               color: Colors.white,

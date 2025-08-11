@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:safezone/backend/models/safezoneModel/safezone_model.dart';
 import '../../../../../backend/properties/import.dart';
 
@@ -8,33 +6,34 @@ class AdminSafeZonesCard extends StatelessWidget {
   final String address;
   final VoidCallback? onRefresh;
 
-
   const AdminSafeZonesCard(
-      {super.key, required this.safeZone, required this.address, this.onRefresh});
+      {super.key,
+      required this.safeZone,
+      required this.address,
+      this.onRefresh});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () async {
-  final shouldRefresh = await context.push(
-    "/admin-safezone-details",
-    extra: {
-      'safezone': safeZone,
-      'address': address,
-      
-    },
-  );
+        final shouldRefresh = await context.push(
+          "/admin-safezone-details",
+          extra: {
+            'safezone': safeZone,
+            'address': address,
+          },
+        );
 
-  // Log the shouldRefresh value
-  print("shouldRefresh: $shouldRefresh");
+        // Log the shouldRefresh value
+        print("shouldRefresh: $shouldRefresh");
 
-  // Refresh the data if needed
-  if (shouldRefresh == true) {
-    print('refreshing');
-    onRefresh!();
-    // Trigger a refresh (you'll need to pass a callback or use a state management solution)
-  }
-},
+        // Refresh the data if needed
+        if (shouldRefresh == true) {
+          print('refreshing');
+          onRefresh!();
+          // Trigger a refresh (you'll need to pass a callback or use a state management solution)
+        }
+      },
       child: Container(
         width: double.infinity,
         height: 70,
@@ -53,11 +52,11 @@ class AdminSafeZonesCard extends StatelessWidget {
               margin: const EdgeInsets.only(left: 15),
               decoration: const BoxDecoration(
                 shape: BoxShape.circle,
-                color: Color.fromARGB(136, 101, 180, 137), 
+                color: Color.fromARGB(136, 101, 180, 137),
               ),
               child: const Icon(
-                Icons.shield_outlined, 
-                color: Colors.white, 
+                Icons.shield_outlined,
+                color: Colors.white,
                 size: 24,
               ),
             ),
@@ -83,11 +82,12 @@ class AdminSafeZonesCard extends StatelessWidget {
                     ],
                   ),
                   safeZone.description == null || safeZone.description!.isEmpty
-                    ? Container()
-                    : Padding(
-                      padding: const EdgeInsets.only(top: 1),
-                      child: CategoryDescripTextEllipsis(text: safeZone.description!),
-                    )
+                      ? Container()
+                      : Padding(
+                          padding: const EdgeInsets.only(top: 1),
+                          child: CategoryDescripTextEllipsis(
+                              text: safeZone.description!),
+                        )
                 ],
               ),
             ),
@@ -96,5 +96,4 @@ class AdminSafeZonesCard extends StatelessWidget {
       ),
     );
   }
-  
 }

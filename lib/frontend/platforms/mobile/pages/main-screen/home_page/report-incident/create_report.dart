@@ -261,7 +261,7 @@ class _CreateReportState extends State<CreateReport> {
                     child: Row(
                       children: [
                         Expanded(
-                            child: Container(
+                            child: SizedBox(
                           height: 40,
                           child: TextField(
                               controller: _searchController,
@@ -562,8 +562,7 @@ class _CreateReportState extends State<CreateReport> {
                                   latitude: _pinnedLocation!.latitude,
                                   longitude: _pinnedLocation!.longitude,
                                   radius: _radius,
-                                  name:
-                                      _nameController.text,
+                                  name: _nameController.text,
                                 );
                                 print(
                                     "🚨 Incident Report Created: $incidentReport");

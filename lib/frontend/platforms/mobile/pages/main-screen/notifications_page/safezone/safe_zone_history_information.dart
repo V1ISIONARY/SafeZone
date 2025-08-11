@@ -1,11 +1,5 @@
-import 'dart:async';
-import 'dart:convert';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
-import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart' as gmaps;
-import 'package:go_router/go_router.dart';
 import 'package:safezone/backend/models/safezoneModel/safezone_model.dart';
 
 import '../../../../../../../backend/properties/import.dart';

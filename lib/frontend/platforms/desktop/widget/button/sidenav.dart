@@ -15,14 +15,14 @@ class Sidenav extends StatefulWidget {
   static final ValueNotifier<int?> selectedComsNotifier = ValueNotifier(null);
 
   const Sidenav({
-    Key? key,
+    super.key,
     required this.icon,
     required this.label,
     this.hoverTrailing,
     this.withDrop,
     this.onTap,
     this.dropdownItems,
-  }) : super(key: key);
+  });
 
   @override
   State<Sidenav> createState() => _SidenavState();
@@ -31,7 +31,7 @@ class Sidenav extends StatefulWidget {
 class DropdownItem {
   final String label;
   final VoidCallback onTap;
-  final String id; 
+  final String id;
 
   DropdownItem({
     required this.label,
@@ -39,7 +39,6 @@ class DropdownItem {
     required this.id,
   });
 }
-
 
 final sharedController = SharedProperties();
 
@@ -74,29 +73,27 @@ class _SidenavState extends State<Sidenav> {
     widget.onTap?.call();
   }
 
-
   @override
   Widget build(BuildContext context) {
-
     final bool isDropdown = widget.withDrop == true;
 
     final bool isMainSelected = Sidenav.selectedLabel.value == widget.label;
-    final bool isComsSelected =
-        (widget.label == 'Notification' && Sidenav.selectedComsNotifier.value == 0) ||
+    final bool isComsSelected = (widget.label == 'Notification' &&
+            Sidenav.selectedComsNotifier.value == 0) ||
         (widget.label == 'Contact' && Sidenav.selectedComsNotifier.value == 1);
     final bool isSelected = isMainSelected || isComsSelected;
 
+    final Color backgroundColor = (widget.label == 'Notification' &&
+                Sidenav.selectedComsNotifier.value == 0) ||
+            (widget.label == 'Contact' &&
+                Sidenav.selectedComsNotifier.value == 1)
+        ? btnColor.withOpacity(0.3)
+        : (Sidenav.selectedLabel.value == widget.label
+            ? Colors.grey.shade300
+            : (_hovering ? Colors.grey.shade50 : Colors.transparent));
 
-    final Color backgroundColor = 
-      (widget.label == 'Notification' && Sidenav.selectedComsNotifier.value == 0) ||
-      (widget.label == 'Contact' && Sidenav.selectedComsNotifier.value == 1)
-          ? btnColor.withOpacity(0.3)
-          : (Sidenav.selectedLabel.value == widget.label
-              ? Colors.grey.shade300
-              : (_hovering ? Colors.grey.shade50 : Colors.transparent));
-
-    final Color iconColor = Colors.black54;
-    final Color textColor = Colors.black54;
+    const Color iconColor = Colors.black54;
+    const Color textColor = Colors.black54;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -107,18 +104,33 @@ class _SidenavState extends State<Sidenav> {
             color: backgroundColor,
             borderRadius: BorderRadius.circular(5),
             child: sharedController.isSidebarCollapsed.value
-              ? ShiftedTooltip(
-                  message: widget.label,
-                  horizontalOffset: 20,
-                  decoration: BoxDecoration(
-                    color: Colors.black,
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  textStyle: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 8,
-                  ),
-                  child: InkWell(
+                ? ShiftedTooltip(
+                    message: widget.label,
+                    horizontalOffset: 20,
+                    decoration: BoxDecoration(
+                      color: Colors.black,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    textStyle: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 8,
+                    ),
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(5),
+                      onTap: _handleTap,
+                      onHover: (hovering) {
+                        setState(() {
+                          _hovering = hovering;
+                        });
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 8, horizontal: 8),
+                        child: Icon(widget.icon, color: iconColor, size: 15),
+                      ),
+                    ),
+                  )
+                : InkWell(
                     borderRadius: BorderRadius.circular(5),
                     onTap: _handleTap,
                     onHover: (hovering) {
@@ -129,85 +141,70 @@ class _SidenavState extends State<Sidenav> {
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
                           vertical: 8, horizontal: 8),
-                      child: Icon(widget.icon, color: iconColor, size: 15),
-                    ),
-                  ),
-                )
-              : InkWell(
-                  borderRadius: BorderRadius.circular(5),
-                  onTap: _handleTap,
-                  onHover: (hovering) {
-                    setState(() {
-                      _hovering = hovering;
-                    });
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 8, 
-                      horizontal: 8
-                    ),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Icon(widget.icon, color: iconColor, size: 15),
-                        const SizedBox(width: 5),
-                        Text(
-                          widget.label,
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
-                            color: textColor,
-                          ),
-                        ),
-                        const Spacer(),
-                        if (_hovering && widget.hoverTrailing != null)
-                          Row(
-                            children: widget.hoverTrailing!.map((child) {
-                              if (child is Text) {
-                                return Text(
-                                  child.data ?? '',
-                                  style: child.style?.copyWith(
-                                        color: Colors.black38,
-                                      ) ??
-                                      const TextStyle(
-                                          color: Colors.black38, fontSize: 10),
-                                );
-                              } else if (child is Icon) {
-                                return Icon(
-                                  child.icon,
-                                  color: Colors.black38,
-                                  size: child.size,
-                                );
-                              } else {
-                                return child;
-                              }
-                            }).toList(),
-                          ),
-                        if (isDropdown)
-                          GestureDetector(
-                            onTap: () {
-                              if (!sharedController.isSidebarCollapsed.value) {
-                                setState(() {
-                                  _showDropdown = !_showDropdown;
-                                });
-                                Sidenav.selectedLabel.value = widget.label;
-                              }
-                            },
-                            child: Container(
-                              margin: const EdgeInsets.only(left: 5),
-                              child: Icon(
-                                _showDropdown
-                                    ? Icons.keyboard_arrow_up
-                                    : Icons.keyboard_arrow_down,
-                                color: Colors.black,
-                                size: 12,
-                              ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Icon(widget.icon, color: iconColor, size: 15),
+                          const SizedBox(width: 5),
+                          Text(
+                            widget.label,
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                              color: textColor,
                             ),
-                          )
-                      ],
+                          ),
+                          const Spacer(),
+                          if (_hovering && widget.hoverTrailing != null)
+                            Row(
+                              children: widget.hoverTrailing!.map((child) {
+                                if (child is Text) {
+                                  return Text(
+                                    child.data ?? '',
+                                    style: child.style?.copyWith(
+                                          color: Colors.black38,
+                                        ) ??
+                                        const TextStyle(
+                                            color: Colors.black38,
+                                            fontSize: 10),
+                                  );
+                                } else if (child is Icon) {
+                                  return Icon(
+                                    child.icon,
+                                    color: Colors.black38,
+                                    size: child.size,
+                                  );
+                                } else {
+                                  return child;
+                                }
+                              }).toList(),
+                            ),
+                          if (isDropdown)
+                            GestureDetector(
+                              onTap: () {
+                                if (!sharedController
+                                    .isSidebarCollapsed.value) {
+                                  setState(() {
+                                    _showDropdown = !_showDropdown;
+                                  });
+                                  Sidenav.selectedLabel.value = widget.label;
+                                }
+                              },
+                              child: Container(
+                                margin: const EdgeInsets.only(left: 5),
+                                child: Icon(
+                                  _showDropdown
+                                      ? Icons.keyboard_arrow_up
+                                      : Icons.keyboard_arrow_down,
+                                  color: Colors.black,
+                                  size: 12,
+                                ),
+                              ),
+                            )
+                        ],
+                      ),
                     ),
                   ),
-                ),
           ),
         ),
         if (_showDropdown && widget.dropdownItems != null)
@@ -217,12 +214,11 @@ class _SidenavState extends State<Sidenav> {
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: widget.dropdownItems!
-                  .map((item) => _buildDropdownButton(context, item))
-                  .toList(),
+                    .map((item) => _buildDropdownButton(context, item))
+                    .toList(),
               );
             },
           ),
-
       ],
     );
   }
@@ -230,17 +226,17 @@ class _SidenavState extends State<Sidenav> {
   String? _hoveredDropdownLabel;
   String? _selectedDropdownLabel;
   Widget _buildDropdownButton(BuildContext context, DropdownItem item) {
-  final bool isHovered = _hoveredDropdownLabel == item.label;
-  final bool isSelected = Sidenav.selectedDropdownId.value == item.id;
+    final bool isHovered = _hoveredDropdownLabel == item.label;
+    final bool isSelected = Sidenav.selectedDropdownId.value == item.id;
 
-  return Container(
-    margin: const EdgeInsets.only(left: 20, bottom: 5),
+    return Container(
+      margin: const EdgeInsets.only(left: 20, bottom: 5),
       child: Material(
         color: isSelected
-          ? Colors.grey.shade200
-          : isHovered
-              ? Colors.grey.shade100
-              : Colors.transparent,
+            ? Colors.grey.shade200
+            : isHovered
+                ? Colors.grey.shade100
+                : Colors.transparent,
         borderRadius: BorderRadius.circular(5),
         child: InkWell(
           borderRadius: BorderRadius.circular(5),
@@ -273,7 +269,6 @@ class _SidenavState extends State<Sidenav> {
       ),
     );
   }
-  
 }
 
 class ShiftedTooltip extends StatefulWidget {
@@ -284,13 +279,13 @@ class ShiftedTooltip extends StatefulWidget {
   final TextStyle? textStyle;
 
   const ShiftedTooltip({
-    Key? key,
+    super.key,
     required this.child,
     required this.message,
     this.horizontalOffset = 20,
     this.decoration,
     this.textStyle,
-  }) : super(key: key);
+  });
 
   @override
   State<ShiftedTooltip> createState() => _ShiftedTooltipState();
@@ -301,7 +296,7 @@ class _ShiftedTooltipState extends State<ShiftedTooltip> {
 
   void _showTooltip() {
     _overlayEntry = _createOverlayEntry();
-    Overlay.of(context)?.insert(_overlayEntry!);
+    Overlay.of(context).insert(_overlayEntry!);
   }
 
   void _hideTooltip() {
@@ -323,14 +318,14 @@ class _ShiftedTooltipState extends State<ShiftedTooltip> {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: widget.decoration ??
-              BoxDecoration(
-                color: Colors.black,
-                borderRadius: BorderRadius.circular(4),
-              ),
+                BoxDecoration(
+                  color: Colors.black,
+                  borderRadius: BorderRadius.circular(4),
+                ),
             child: Text(
               widget.message,
               style: widget.textStyle ??
-                const TextStyle(color: Colors.white, fontSize: 10),
+                  const TextStyle(color: Colors.white, fontSize: 10),
             ),
           ),
         ),

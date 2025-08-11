@@ -4,7 +4,7 @@ import 'package:safezone/backend/architecture/bloc/profileBloc/profile_state.dar
 import 'package:safezone/backend/properties/import.dart';
 
 Future<void> showUploadPictureBottomSheet(
-    BuildContext context, int user_id) async {
+    BuildContext context, int userId) async {
   showModalBottomSheet(
     context: context,
     builder: (context) {
@@ -114,7 +114,7 @@ Future<void> showUploadPictureBottomSheet(
                       );
                       if (confirmed == true) {
                         BlocProvider.of<ProfileBloc>(context).add(
-                          UploadProfilePictureEvent(user_id, imageFile),
+                          UploadProfilePictureEvent(userId, imageFile),
                         );
                       }
                     }

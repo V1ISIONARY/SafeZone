@@ -12,7 +12,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../../backend/properties/import.dart';
 
-
 class LoginMD extends StatefulWidget {
   const LoginMD({super.key});
 
@@ -21,13 +20,14 @@ class LoginMD extends StatefulWidget {
 }
 
 class _LoginMDState extends State<LoginMD> {
-  bool _rememberMe = false;
-  bool _passwordVisible = false;
+  final bool _rememberMe = false;
+  final bool _passwordVisible = false;
   final sharedController = SharedProperties();
-  final NotificationPollingService _pollingService = NotificationPollingService();
+  final NotificationPollingService _pollingService =
+      NotificationPollingService();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  
+
   @override
   void dispose() {
     emailController.dispose();
@@ -109,44 +109,39 @@ class _LoginMDState extends State<LoginMD> {
                     controller: sharedController.emailController,
                     cursorColor: labelFormFieldColor,
                     style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.black,
-                      fontWeight: FontWeight.w100
-                    ),
-                    decoration: InputDecoration(
-                      hintText: "safezone@gmail.com",
-                      hintStyle: TextStyle(
                         fontSize: 12,
-                        color: labelFormFieldColor,
-                        fontWeight: FontWeight.w100
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide(color: Colors.black12)
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide(color: Colors.black12, width: 2)
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide(color: widgetPricolor, width: 2),
-                      ),
-                      filled: true,
-                      fillColor: Colors.transparent,
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 15, vertical: 12
-                      ),
-                      prefixIcon: Container(
-                        margin: EdgeInsets.only(left: 10),
-                        child: Icon(
-                          Icons.email_outlined, 
-                          color: sharedController.emailController.text.isNotEmpty
-                            ? widgetPricolor
-                            : Colors.black26
+                        color: Colors.black,
+                        fontWeight: FontWeight.w100),
+                    decoration: InputDecoration(
+                        hintText: "safezone@gmail.com",
+                        hintStyle: TextStyle(
+                            fontSize: 12,
+                            color: labelFormFieldColor,
+                            fontWeight: FontWeight.w100),
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide(color: Colors.black12)),
+                        enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide:
+                                BorderSide(color: Colors.black12, width: 2)),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide:
+                              BorderSide(color: widgetPricolor, width: 2),
                         ),
-                      )
-                    ),
+                        filled: true,
+                        fillColor: Colors.transparent,
+                        contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 15, vertical: 12),
+                        prefixIcon: Container(
+                          margin: EdgeInsets.only(left: 10),
+                          child: Icon(Icons.email_outlined,
+                              color: sharedController
+                                      .emailController.text.isNotEmpty
+                                  ? widgetPricolor
+                                  : Colors.black26),
+                        )),
                     onChanged: (text) {
                       setState(() {});
                     },
@@ -166,60 +161,56 @@ class _LoginMDState extends State<LoginMD> {
                     controller: sharedController.passwordController,
                     obscureText: !sharedController.passwordVisible,
                     style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.black,
-                      fontWeight: FontWeight.w100
-                    ),
-                    decoration: InputDecoration(
-                      filled: true,
-                      fillColor: Colors.transparent,
-                      hintText: "exampl*******",
-                      hintStyle: TextStyle(
                         fontSize: 12,
-                        color: labelFormFieldColor,
-                        fontWeight: FontWeight.w100
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide(color: Colors.black12)
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide(color: Colors.black12, width: 2)
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide(color: widgetPricolor, width: 2),
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 15, vertical: 12
-                      ),
-                      prefixIcon: Padding(
-                        padding: const EdgeInsets.only(left: 10),
-                        child: Icon(
-                          Icons.lock_outline, 
-                          color: sharedController.passwordController.text.isNotEmpty
-                            ? widgetPricolor
-                            : Colors.black26
+                        color: Colors.black,
+                        fontWeight: FontWeight.w100),
+                    decoration: InputDecoration(
+                        filled: true,
+                        fillColor: Colors.transparent,
+                        hintText: "exampl*******",
+                        hintStyle: TextStyle(
+                            fontSize: 12,
+                            color: labelFormFieldColor,
+                            fontWeight: FontWeight.w100),
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide(color: Colors.black12)),
+                        enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide:
+                                BorderSide(color: Colors.black12, width: 2)),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide:
+                              BorderSide(color: widgetPricolor, width: 2),
                         ),
-                      ),
-                      suffixIcon: Padding(
-                        padding: EdgeInsets.only(right: 10),
-                        child: GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              sharedController.passwordVisible = !sharedController.passwordVisible;
-                            });
-                          },
-                          child: Icon(
-                            sharedController.passwordVisible
-                                ? Icons.visibility_outlined
-                                : Icons.visibility_off_outlined,
-                            color: Color(0xFF707070),
+                        contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 15, vertical: 12),
+                        prefixIcon: Padding(
+                          padding: const EdgeInsets.only(left: 10),
+                          child: Icon(Icons.lock_outline,
+                              color: sharedController
+                                      .passwordController.text.isNotEmpty
+                                  ? widgetPricolor
+                                  : Colors.black26),
+                        ),
+                        suffixIcon: Padding(
+                          padding: EdgeInsets.only(right: 10),
+                          child: GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                sharedController.passwordVisible =
+                                    !sharedController.passwordVisible;
+                              });
+                            },
+                            child: Icon(
+                              sharedController.passwordVisible
+                                  ? Icons.visibility_outlined
+                                  : Icons.visibility_off_outlined,
+                              color: Color(0xFF707070),
+                            ),
                           ),
-                        ),
-                      )
-                    ),
+                        )),
                     onChanged: (text) {
                       setState(() {});
                     },
@@ -260,7 +251,7 @@ class _LoginMDState extends State<LoginMD> {
                         ],
                       ),
                       GestureDetector(
-                        onTap: (){
+                        onTap: () {
                           Navigator.push(
                             context,
                             PageTransition(
@@ -290,44 +281,44 @@ class _LoginMDState extends State<LoginMD> {
                       child: GestureDetector(
                         onTap: () {
                           final email = sharedController.emailController.text;
-                          final password = sharedController.passwordController.text;
+                          final password =
+                              sharedController.passwordController.text;
                           context.read<AuthenticationBloc>().add(
-                            UserLogin(email, password),
-                          );
+                                UserLogin(email, password),
+                              );
                         },
                         child: BlocBuilder<AuthenticationBloc,
-                          AuthenticationState>(
-                            builder: (context, state) {
-                          return Container(
-                            height: 50,
-                            width: double.infinity,
-                            decoration: BoxDecoration(
-                              color: widgetPricolor,
-                              borderRadius: BorderRadius.circular(50),
-                            ),
-                            child: Center(
-                              child: state is LoginLoading
-                                  ? Container(
-                                      height: 20,
-                                      width: 20,
-                                      child: Center(
-                                          child: CircularProgressIndicator(
-                                              color: Colors.white,
-                                              strokeWidth: 1)),
-                                    )
-                                  : Text(
-                                      'Sign In',
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: Colors.white,
+                            AuthenticationState>(
+                          builder: (context, state) {
+                            return Container(
+                              height: 50,
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                color: widgetPricolor,
+                                borderRadius: BorderRadius.circular(50),
+                              ),
+                              child: Center(
+                                child: state is LoginLoading
+                                    ? SizedBox(
+                                        height: 20,
+                                        width: 20,
+                                        child: Center(
+                                            child: CircularProgressIndicator(
+                                                color: Colors.white,
+                                                strokeWidth: 1)),
+                                      )
+                                    : Text(
+                                        'Sign In',
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          color: Colors.white,
+                                        ),
                                       ),
-                                    ),
-                            ),
-                          );
-                        },
-                      ),
-                    )
-                  ),
+                              ),
+                            );
+                          },
+                        ),
+                      )),
                   Container(
                     width: double.infinity,
                     margin: EdgeInsets.symmetric(horizontal: 20),
@@ -373,13 +364,15 @@ class _LoginMDState extends State<LoginMD> {
                   BlocListener<AuthenticationBloc, AuthenticationState>(
                     listener: (context, state) async {
                       if (state is LoginSuccess) {
-                        final SharedPreferences prefs = await SharedPreferences.getInstance();
+                        final SharedPreferences prefs =
+                            await SharedPreferences.getInstance();
                         int userId = prefs.getInt('id') ?? 0;
                         await prefs.setString('userToken', userId.toString());
 
                         if (userId != 0) {
                           int intervalInSeconds = 10;
-                          _pollingService.startPolling(userId, intervalInSeconds);
+                          _pollingService.startPolling(
+                              userId, intervalInSeconds);
                         }
 
                         GoRouter.of(context).go(

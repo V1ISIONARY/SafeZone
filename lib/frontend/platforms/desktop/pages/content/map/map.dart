@@ -83,7 +83,7 @@ class _MapDTState extends State<MapDT> with TickerProviderStateMixin {
   late FocusNode _focusNodeCircles;
   late stt.SpeechToText _speech;
 
-  bool _isListening = false;
+  final bool _isListening = false;
   bool _isExpanded = false;
   bool _circleHeight = false;
 
@@ -123,9 +123,9 @@ class _MapDTState extends State<MapDT> with TickerProviderStateMixin {
     });
   }
 
-  bool _showTitle = false;
-  double _appBarHeight = 0;
-  Color _appBarColor = Colors.transparent;
+  final bool _showTitle = false;
+  final double _appBarHeight = 0;
+  final Color _appBarColor = Colors.transparent;
 
   List<CircleModel> _circles = [];
   int? _userId;
@@ -1142,19 +1142,19 @@ class _MapDTState extends State<MapDT> with TickerProviderStateMixin {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 widget.UserToken == 'guest'
                     ? Container()
                     : PreferredSize(
                         preferredSize: const Size.fromHeight(120.0),
                         child: Container(
                             width: double.infinity,
-                            margin: EdgeInsets.symmetric(
+                            margin: const EdgeInsets.symmetric(
                                 horizontal: 15, vertical: 5),
                             child: Column(children: [
                               Row(
                                 children: [
-                                  SizedBox(width: 10),
+                                  const SizedBox(width: 10),
                                   Expanded(
                                       child: GestureDetector(
                                           onTap: _toggleCircles,
@@ -1178,11 +1178,11 @@ class _MapDTState extends State<MapDT> with TickerProviderStateMixin {
                                               child: Row(children: [
                                                 _circles.isEmpty
                                                     ? Center(
-                                                        child: Container(
+                                                        child: SizedBox(
                                                           width: 20,
                                                           height: 20,
                                                           child:
-                                                              CircularProgressIndicator(
+                                                              const CircularProgressIndicator(
                                                             strokeWidth: 0.8,
                                                             color:
                                                                 widgetPricolor,
@@ -1217,11 +1217,11 @@ class _MapDTState extends State<MapDT> with TickerProviderStateMixin {
                                                 //     "lib/resource/image/jpg/profile.jpg",
                                                 //   ],
                                                 // ),
-                                                Spacer(),
+                                                const Spacer(),
                                                 // Icon(Icons.keyboard_arrow_down,
                                                 //     color: Colors.black38),
                                               ])))),
-                                  SizedBox(width: 10),
+                                  const SizedBox(width: 10),
                                   for (var circle in _circles
                                       .where((circle) => circle.isActive))
                                     circle.code.isEmpty
@@ -1251,7 +1251,7 @@ class _MapDTState extends State<MapDT> with TickerProviderStateMixin {
                                                           width:
                                                               double.infinity,
                                                           decoration:
-                                                              BoxDecoration(
+                                                              const BoxDecoration(
                                                             borderRadius:
                                                                 BorderRadius.vertical(
                                                                     top: Radius
@@ -1268,6 +1268,27 @@ class _MapDTState extends State<MapDT> with TickerProviderStateMixin {
                                                                 width: double
                                                                     .infinity,
                                                                 height: 50,
+                                                                decoration:
+                                                                    const BoxDecoration(
+                                                                  color: Colors
+                                                                      .white,
+                                                                  boxShadow: [
+                                                                    BoxShadow(
+                                                                      color: Colors
+                                                                          .grey,
+                                                                      blurRadius:
+                                                                          2,
+                                                                      offset:
+                                                                          Offset(
+                                                                              1,
+                                                                              1),
+                                                                    ),
+                                                                  ],
+                                                                  borderRadius:
+                                                                      BorderRadius.vertical(
+                                                                          top: Radius.circular(
+                                                                              10)),
+                                                                ),
                                                                 child: Row(
                                                                   crossAxisAlignment:
                                                                       CrossAxisAlignment
@@ -1296,30 +1317,10 @@ class _MapDTState extends State<MapDT> with TickerProviderStateMixin {
                                                                     ),
                                                                   ],
                                                                 ),
-                                                                decoration:
-                                                                    BoxDecoration(
-                                                                  color: Colors
-                                                                      .white,
-                                                                  boxShadow: const [
-                                                                    BoxShadow(
-                                                                      color: Colors
-                                                                          .grey,
-                                                                      blurRadius:
-                                                                          2,
-                                                                      offset:
-                                                                          Offset(
-                                                                              1,
-                                                                              1),
-                                                                    ),
-                                                                  ],
-                                                                  borderRadius:
-                                                                      BorderRadius.vertical(
-                                                                          top: Radius.circular(
-                                                                              10)),
-                                                                ),
                                                               ),
                                                               Container(
-                                                                  margin: EdgeInsets.symmetric(
+                                                                  margin: const EdgeInsets
+                                                                      .symmetric(
                                                                       horizontal:
                                                                           15,
                                                                       vertical:
@@ -1339,9 +1340,9 @@ class _MapDTState extends State<MapDT> with TickerProviderStateMixin {
                                                                               .isActive))
                                                                         Container(
                                                                             margin:
-                                                                                EdgeInsets.symmetric(vertical: 30),
-                                                                            child: Text(circle.code, style: TextStyle(fontWeight: FontWeight.bold, color: widgetPricolor, fontSize: 30))),
-                                                                      CategoryText(
+                                                                                const EdgeInsets.symmetric(vertical: 30),
+                                                                            child: Text(circle.code, style: const TextStyle(fontWeight: FontWeight.bold, color: widgetPricolor, fontSize: 30))),
+                                                                      const CategoryText(
                                                                           text:
                                                                               'Share this invite code with the\n people you want in your Circle: ',
                                                                           alignment:
@@ -1372,7 +1373,7 @@ class _MapDTState extends State<MapDT> with TickerProviderStateMixin {
                                                     ),
                                                   ],
                                                 ),
-                                                child: Center(
+                                                child: const Center(
                                                     child: Icon(
                                                   Icons.person_add,
                                                   size: 20,

@@ -1,12 +1,7 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:fl_chart/fl_chart.dart';
-import 'package:lottie/lottie.dart';
 import '../../../../../backend/architecture/bloc/adminBloc/analytics/analytics_admin_bloc.dart';
 import '../../../../../backend/architecture/bloc/adminBloc/analytics/analytics_admin_event.dart';
 import '../../../../../backend/architecture/bloc/adminBloc/analytics/analytics_admin_state.dart';
 import '../../../../../backend/properties/import.dart';
-import '../../widgets/buttons/percentage_average.dart';
 
 class AdminInitialScreen extends StatefulWidget {
   final int? initialPage;

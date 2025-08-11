@@ -32,8 +32,8 @@ class _ReportsHistoryDTState extends State<ReportsHistoryDT>
     'Rejected',
     'Under review'
   ]
-  .map((category) => category[0].toUpperCase() + category.substring(1))
-  .toList();
+      .map((category) => category[0].toUpperCase() + category.substring(1))
+      .toList();
 
   late final IncidentReportBloc _incidentReportBloc;
   bool _isAscending = false;
@@ -98,7 +98,7 @@ class _ReportsHistoryDTState extends State<ReportsHistoryDT>
           },
           reportInfo: selectedReportZone!,
         );
-      default: 
+      default:
         return WillPopScope(
           onWillPop: () async {
             if (widget.onBack != null) {
@@ -107,9 +107,9 @@ class _ReportsHistoryDTState extends State<ReportsHistoryDT>
             return false;
           },
           child: Scaffold(
-            backgroundColor: Color.fromARGB(255, 240, 240, 240),
+            backgroundColor: const Color.fromARGB(255, 240, 240, 240),
             appBar: AppBar(
-              backgroundColor: Color.fromARGB(255, 240, 240, 240),
+              backgroundColor: const Color.fromARGB(255, 240, 240, 240),
               automaticallyImplyLeading: false,
               centerTitle: false,
               title: Transform.translate(
@@ -199,11 +199,13 @@ class _ReportsHistoryDTState extends State<ReportsHistoryDT>
                   labelStyle: const TextStyle(
                     fontSize: 10,
                   ),
-                  overlayColor: MaterialStateProperty.all(Colors.transparent),
-                  tabs: _categories.map((category) => SizedBox(
-                    height: 35,
-                    child: Tab(text: category),
-                  )).toList(),
+                  overlayColor: WidgetStateProperty.all(Colors.transparent),
+                  tabs: _categories
+                      .map((category) => SizedBox(
+                            height: 35,
+                            child: Tab(text: category),
+                          ))
+                      .toList(),
                   dividerColor: Colors.black12,
                 ),
                 const SizedBox(height: 20),
@@ -219,8 +221,8 @@ class _ReportsHistoryDTState extends State<ReportsHistoryDT>
             ),
           ),
         );
-      }
     }
+  }
 
   Widget _buildCategoryPage(String status) {
     return BlocBuilder<IncidentReportBloc, IncidentReportState>(
@@ -229,7 +231,8 @@ class _ReportsHistoryDTState extends State<ReportsHistoryDT>
           return Expanded(
               child: Center(
                   child: Transform.translate(
-                      offset: const Offset(-30, -60), child: LoadingState())));
+                      offset: const Offset(-30, -60),
+                      child: const LoadingState())));
         } else if (state is IncidentReportLoaded) {
           var filteredReports = status == 'All'
               ? state.incidentReports
@@ -250,7 +253,7 @@ class _ReportsHistoryDTState extends State<ReportsHistoryDT>
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Container(
+                  SizedBox(
                     width: 150,
                     height: 150,
                     child: Image.asset(
@@ -278,14 +281,13 @@ class _ReportsHistoryDTState extends State<ReportsHistoryDT>
               return Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 10.0),
                 child: ReportsCard(
-                  incidentReport: reportCard,
-                  onTap: (){
-                    setState(() {
-                      selectedReportZone = reportCard;
-                      selectedInternalPage = "details";
-                    });
-                  }
-                ),
+                    incidentReport: reportCard,
+                    onTap: () {
+                      setState(() {
+                        selectedReportZone = reportCard;
+                        selectedInternalPage = "details";
+                      });
+                    }),
               );
             },
           );
@@ -296,5 +298,4 @@ class _ReportsHistoryDTState extends State<ReportsHistoryDT>
       },
     );
   }
-
 }

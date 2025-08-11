@@ -11,22 +11,17 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../../../backend/properties/import.dart';
 
 class ContactDT extends StatefulWidget {
-
   final String UserToken;
   final VoidCallback? onClose;
 
-  const ContactDT({
-    super.key,
-    this.onClose,
-    required this.UserToken
-  });
+  const ContactDT({super.key, this.onClose, required this.UserToken});
 
   @override
   State<ContactDT> createState() => _ContactDTState();
 }
 
-class _ContactDTState extends State<ContactDT> with SingleTickerProviderStateMixin {
-
+class _ContactDTState extends State<ContactDT>
+    with SingleTickerProviderStateMixin {
   int userId = 0;
   List<ContactsModel> localContacts = [];
   late AnimationController _controller;
@@ -47,9 +42,7 @@ class _ContactDTState extends State<ContactDT> with SingleTickerProviderStateMix
   void initState() {
     super.initState();
 
-    widget.UserToken == 'guest'
-      ? const SizedBox()
-      : loadUserId();
+    widget.UserToken == 'guest' ? const SizedBox() : loadUserId();
 
     _controller = AnimationController(
       vsync: this,
@@ -66,7 +59,6 @@ class _ContactDTState extends State<ContactDT> with SingleTickerProviderStateMix
       TweenSequenceItem(tween: Tween(begin: -10.0, end: 10.0), weight: 1),
       TweenSequenceItem(tween: Tween(begin: 10.0, end: 0.0), weight: 1),
     ]).animate(_controller);
-
   }
 
   void _startShake() {
@@ -82,37 +74,33 @@ class _ContactDTState extends State<ContactDT> with SingleTickerProviderStateMix
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 15),
-      child: Stack(
-        children:[
+        padding: const EdgeInsets.symmetric(horizontal: 15),
+        child: Stack(children: [
           Scaffold(
-            backgroundColor: Colors.white54,
-            appBar: AppBar(
               backgroundColor: Colors.white54,
-              automaticallyImplyLeading: false,
-              centerTitle: false,
-              title: Transform.translate(
-                offset: const Offset(-15, 0),
-                child: CategoryText(text: "Contact")
+              appBar: AppBar(
+                backgroundColor: Colors.white54,
+                automaticallyImplyLeading: false,
+                centerTitle: false,
+                title: Transform.translate(
+                    offset: const Offset(-15, 0),
+                    child: const CategoryText(text: "Contact")),
+                actions: [
+                  GestureDetector(
+                      onTap: () {
+                        if (widget.onClose != null) {
+                          widget.onClose!();
+                        }
+                      },
+                      child: const Icon(
+                        Icons.cancel_outlined,
+                        size: 20,
+                        color: Colors.black38,
+                      )),
+                ],
               ),
-              actions: [
-                GestureDetector(
-                  onTap: (){
-                    if (widget.onClose != null) {
-                      widget.onClose!();
-                    }
-                  },
-                  child: Icon(
-                    Icons.cancel_outlined,
-                    size: 20,
-                    color: Colors.black38,
-                  )
-                ),
-              ],
-            ),
-            body: Container(
-              child: Stack(
-                children:[
+              body: Container(
+                child: Stack(children: [
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -120,18 +108,16 @@ class _ContactDTState extends State<ContactDT> with SingleTickerProviderStateMix
                         builder: (context, state) {
                           if (state is ContactLoading) {
                             return Expanded(
-                              child: Center(
-                                child: Transform.translate(
-                                  offset: const Offset(-40, -60), 
-                                  child: Lottie.asset(
-                                    'lib/resource/lottie/loading.json',
-                                    width: 80,
-                                    height: 80,
-                                    fit: BoxFit.cover,
-                                  ),
-                                )
-                              )
-                            );
+                                child: Center(
+                                    child: Transform.translate(
+                              offset: const Offset(-40, -60),
+                              child: Lottie.asset(
+                                'lib/resource/lottie/loading.json',
+                                width: 80,
+                                height: 80,
+                                fit: BoxFit.cover,
+                              ),
+                            )));
                           } else if (state is ContactLoaded) {
                             localContacts = state.contacts;
                             return Expanded(
@@ -148,84 +134,79 @@ class _ContactDTState extends State<ContactDT> with SingleTickerProviderStateMix
                             );
                           } else if (state is ContactError) {
                             return const Center(
-                              // child: Text(
-                              //   state.error,
-                              //   style: const TextStyle(color: Colors.red),
-                              // ),
-                            );
+                                // child: Text(
+                                //   state.error,
+                                //   style: const TextStyle(color: Colors.red),
+                                // ),
+                                );
                           } else {
                             return Expanded(
-                              child: widget.UserToken == 'guest'
-                              ? const SizedBox()
-                              : const Center(
-                                  child: Text("No contacts found."),
-                                )
-                            );
+                                child: widget.UserToken == 'guest'
+                                    ? const SizedBox()
+                                    : const Center(
+                                        child: Text("No contacts found."),
+                                      ));
                           }
                         },
                       ),
                     ],
                   ),
-                ]
-              ),
-            )
-          ),
+                ]),
+              )),
           widget.UserToken == 'guest'
-            ? GestureDetector(
-                onTap: _startShake,
-                child: Container(
-                  width: double.infinity,
-                  height: double.infinity,
-                  color: Colors.black38,
-                  child: Center(
-                    child: Container(
-                      width: 200,
-                      color: Colors.transparent,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          AnimatedBuilder(
-                            animation: _animation,
-                            builder: (context, child) {
-                              return Transform.translate(
-                                offset: Offset(_animation.value, 0),
-                                child: SizedBox(
-                                  width: 130,
-                                  height: 110,
-                                  child: Image.asset(
-                                    'lib/resource/image/png/lock.png',
-                                    fit: BoxFit.cover,
+              ? GestureDetector(
+                  onTap: _startShake,
+                  child: Container(
+                    width: double.infinity,
+                    height: double.infinity,
+                    color: Colors.black38,
+                    child: Center(
+                      child: Container(
+                        width: 200,
+                        color: Colors.transparent,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            AnimatedBuilder(
+                              animation: _animation,
+                              builder: (context, child) {
+                                return Transform.translate(
+                                  offset: Offset(_animation.value, 0),
+                                  child: SizedBox(
+                                    width: 130,
+                                    height: 110,
+                                    child: Image.asset(
+                                      'lib/resource/image/png/lock.png',
+                                      fit: BoxFit.cover,
+                                    ),
                                   ),
-                                ),
-                              );
-                            },
-                          ),
-                          const Text(
-                            'Lock',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 15,
+                                );
+                              },
                             ),
-                            textAlign: TextAlign.center,
-                          ),
-                          const Text(
-                            'You need to sign in to your account to access all features.',
-                            style: TextStyle(
-                              color: Colors.white60,
-                              fontSize: 9,
+                            const Text(
+                              'Lock',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 15,
+                              ),
+                              textAlign: TextAlign.center,
                             ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
+                            const Text(
+                              'You need to sign in to your account to access all features.',
+                              style: TextStyle(
+                                color: Colors.white60,
+                                fontSize: 9,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
-                ),
-              )
-            : const SizedBox(),
-        ]
-      )
-    );
+                )
+              : const SizedBox(),
+        ]));
   }
 }

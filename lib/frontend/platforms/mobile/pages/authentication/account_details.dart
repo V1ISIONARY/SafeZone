@@ -1,11 +1,7 @@
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:safezone/backend/architecture/bloc/authBloc/auth_event.dart';
 import 'package:safezone/backend/architecture/bloc/profileBloc/profile_bloc.dart';
 import 'package:safezone/backend/architecture/bloc/profileBloc/profile_state.dart';
 import 'package:safezone/frontend/platforms/mobile/widgets/bottomsheet/uploadProfilePicture.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../../backend/architecture/bloc/authBloc/auth_bloc.dart';
 import '../../../../../backend/properties/import.dart';

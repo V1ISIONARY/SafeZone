@@ -31,7 +31,7 @@ class NotificationBtn extends StatelessWidget {
           ),
         );
       },
-      child:Container(
+      child: Container(
         width: double.infinity,
         margin: const EdgeInsets.symmetric(vertical: 15),
         decoration: const BoxDecoration(
@@ -46,14 +46,14 @@ class NotificationBtn extends StatelessWidget {
               width: 25,
               margin: const EdgeInsets.only(right: 17),
               child: svgIcon.endsWith('.svg')
-                ? SvgPicture.asset(
-                    svgIcon,
-                    color: const Color.fromARGB(179, 0, 0, 0),
-                  )
-                : Image.asset(
-                    svgIcon,
-                    fit: BoxFit.contain,
-                  ),
+                  ? SvgPicture.asset(
+                      svgIcon,
+                      color: const Color.fromARGB(179, 0, 0, 0),
+                    )
+                  : Image.asset(
+                      svgIcon,
+                      fit: BoxFit.contain,
+                    ),
             ),
             Expanded(
               child: Column(
@@ -64,16 +64,15 @@ class NotificationBtn extends StatelessWidget {
                 ],
               ),
             ),
-            Spacer(),
+            const Spacer(),
             Container(
-              height: 15,
-              width: 15,
-              margin: const EdgeInsets.only(right: 17),
-              child: Icon(
-                Icons.chevron_right_outlined,
-                color: Colors.grey[500],
-              )
-            ),
+                height: 15,
+                width: 15,
+                margin: const EdgeInsets.only(right: 17),
+                child: Icon(
+                  Icons.chevron_right_outlined,
+                  color: Colors.grey[500],
+                )),
           ],
         ),
       ),

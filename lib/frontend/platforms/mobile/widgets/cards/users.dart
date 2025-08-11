@@ -4,7 +4,7 @@ import '../../../../../backend/properties/import.dart';
 class LimitedImageCircles extends StatelessWidget {
   final List<String> imageUrls;
 
-  const LimitedImageCircles({Key? key, required this.imageUrls}) : super(key: key);
+  const LimitedImageCircles({super.key, required this.imageUrls});
 
   @override
   Widget build(BuildContext context) {
@@ -35,14 +35,17 @@ class LimitedImageCircles extends StatelessWidget {
           child: Container(
             width: 20,
             height: 20,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               shape: BoxShape.circle,
               color: widgetPricolor,
             ),
             child: Center(
               child: Text(
                 "+${count - maxVisible}",
-                style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold),
               ),
             ),
           ),

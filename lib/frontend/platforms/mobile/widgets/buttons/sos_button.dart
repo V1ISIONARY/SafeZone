@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:safezone/resource/schema/colors.dart';
 
 class SosButton extends StatefulWidget {
-  const SosButton({Key? key}) : super(key: key);
+  const SosButton({super.key});
 
   @override
   State<SosButton> createState() => _SosButtonState();

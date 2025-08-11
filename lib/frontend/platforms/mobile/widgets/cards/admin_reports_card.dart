@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:safezone/backend/models/dangerzoneModel/incident_report_model.dart';
 
 import '../../../../../backend/properties/import.dart';
@@ -53,11 +51,11 @@ class AdminReportsCard extends StatelessWidget {
                 margin: const EdgeInsets.only(left: 15),
                 decoration: const BoxDecoration(
                   shape: BoxShape.circle,
-                  color: dangerStatusColor, 
+                  color: dangerStatusColor,
                 ),
                 child: const Icon(
-                  Icons.warning, 
-                  color: Colors.white, 
+                  Icons.warning,
+                  color: Colors.white,
                   size: 24,
                 ),
               ),

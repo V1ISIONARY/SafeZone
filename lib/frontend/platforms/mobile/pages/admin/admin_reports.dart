@@ -23,7 +23,7 @@ class _AdminReportsState extends State<AdminReports> {
   late final IncidentReportBloc _incidentReportBloc;
   bool _isAscending = false;
   String _selectedFilter = "All";
-  Map<int, String> _addresses = {};
+  final Map<int, String> _addresses = {};
 
   final List<String> _categories = [
     'All',
@@ -167,13 +167,12 @@ class _AdminReportsState extends State<AdminReports> {
       builder: (context, state) {
         if (state is IncidentReportLoading) {
           return Expanded(
-              child: Center(
-                child: Transform.translate(
-                    offset: const Offset(-20, -30),
-                    child: const LoadingState()),
-              ),
-            );
-          } else if (state is IncidentReportLoaded) {
+            child: Center(
+              child: Transform.translate(
+                  offset: const Offset(-20, -30), child: const LoadingState()),
+            ),
+          );
+        } else if (state is IncidentReportLoaded) {
           List filteredZones = _selectedFilter == 'All'
               ? state.incidentReports
               : state.incidentReports

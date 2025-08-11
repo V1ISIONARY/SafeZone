@@ -6,60 +6,57 @@ import '../../../../../../../resource/schema/texts.dart';
 import '../../../../widgets/texts/policy.dart';
 
 class TermsPolicy extends StatelessWidget {
-  
-  const TermsPolicy({
-    super.key
-  });
+  const TermsPolicy({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromARGB(255, 240, 240, 240),
-      appBar: AppBar(
-        backgroundColor: Color.fromARGB(255, 240, 240, 240),
-        automaticallyImplyLeading: false,
-        centerTitle: true,
-        title: const CategoryText(text: "Terms & Policy"),
-        leading: GestureDetector(
-          onTap: () {
-            Navigator.pop(context);
-          },
-          child: Container(
-            margin: const EdgeInsets.all(15),
-            decoration: BoxDecoration(
-              border: Border.all(width: 1, color: Colors.black),
-              shape: BoxShape.circle,
+        backgroundColor: const Color.fromARGB(255, 240, 240, 240),
+        appBar: AppBar(
+          backgroundColor: const Color.fromARGB(255, 240, 240, 240),
+          automaticallyImplyLeading: false,
+          centerTitle: true,
+          title: const CategoryText(text: "Terms & Policy"),
+          leading: GestureDetector(
+            onTap: () {
+              Navigator.pop(context);
+            },
+            child: Container(
+              margin: const EdgeInsets.all(15),
+              decoration: BoxDecoration(
+                border: Border.all(width: 1, color: Colors.black),
+                shape: BoxShape.circle,
+              ),
+              child:
+                  const Icon(Icons.arrow_back, color: Colors.black, size: 10),
             ),
-            child: const Icon(Icons.arrow_back, color: Colors.black, size: 10),
           ),
         ),
-      ),
-      body: Container(
-        margin: EdgeInsets.only(top: 10, left: 15, right: 15),
-        child: ListView(
-          children: [
-            TermsPolicyBtn(
-              title: 'Terms of Service',
-              svgIcon: 'lib/resource/svg/documents.svg',
-              navigateTo: 'TermsService',
-              description: 'Terms you accept by using SafeZone.',
-            ),
-            TermsPolicyBtn(
-              title: 'Privacy Policy',
-              svgIcon: 'lib/resource/svg/lock.svg',
-              navigateTo: 'PrivacyPolicy',
-              description: 'The information we collect and how it is used.',
-            ),
-            TermsPolicyBtn(
-              title: 'Community Standards',
-              svgIcon: 'lib/resource/svg/police.svg',
-              navigateTo: 'CommunityStandards',
-              description: 'Prohibited actions and how to report misconduct.',
-            ),
-          ],
-        ),
-      )
-    );
+        body: Container(
+          margin: const EdgeInsets.only(top: 10, left: 15, right: 15),
+          child: ListView(
+            children: const [
+              TermsPolicyBtn(
+                title: 'Terms of Service',
+                svgIcon: 'lib/resource/svg/documents.svg',
+                navigateTo: 'TermsService',
+                description: 'Terms you accept by using SafeZone.',
+              ),
+              TermsPolicyBtn(
+                title: 'Privacy Policy',
+                svgIcon: 'lib/resource/svg/lock.svg',
+                navigateTo: 'PrivacyPolicy',
+                description: 'The information we collect and how it is used.',
+              ),
+              TermsPolicyBtn(
+                title: 'Community Standards',
+                svgIcon: 'lib/resource/svg/police.svg',
+                navigateTo: 'CommunityStandards',
+                description: 'Prohibited actions and how to report misconduct.',
+              ),
+            ],
+          ),
+        ));
   }
 }
 

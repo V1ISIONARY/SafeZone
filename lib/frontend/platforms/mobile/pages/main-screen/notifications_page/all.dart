@@ -113,7 +113,7 @@ class _AllState extends State<All> {
                         color: Colors.white,
                         border: Border.all(
                           color: notification.isRead
-                              ? Color.fromARGB(44, 0, 0, 0)
+                              ? const Color.fromARGB(44, 0, 0, 0)
                               : Colors.transparent,
                           width: notification.isRead ? 1 : 0,
                         ),
@@ -166,7 +166,7 @@ class _AllState extends State<All> {
 
   Widget _buildPlaceholder() {
     return widget.userToken == 'guest'
-        ? SizedBox.shrink()
+        ? const SizedBox.shrink()
         : Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,

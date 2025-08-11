@@ -5,10 +5,13 @@ class AuthResWidget extends StatelessWidget {
   final Widget? tablet;
   final Widget desktop;
 
-  const AuthResWidget({Key? key, required this.mobile, this.tablet, required this.desktop}) : super(key: key);
+  const AuthResWidget(
+      {super.key, required this.mobile, this.tablet, required this.desktop});
 
-  static bool isMobile(BuildContext context) => MediaQuery.of(context).size.width <= 760;
-  static bool isDesktop(BuildContext context) => MediaQuery.of(context).size.width < 840;
+  static bool isMobile(BuildContext context) =>
+      MediaQuery.of(context).size.width <= 760;
+  static bool isDesktop(BuildContext context) =>
+      MediaQuery.of(context).size.width < 840;
 
   // static bool isMobile(BuildContext context) => MediaQuery.of(context).size.width <= 1150;
   // static bool isDesktop(BuildContext context) => MediaQuery.of(context).size.width < 840;

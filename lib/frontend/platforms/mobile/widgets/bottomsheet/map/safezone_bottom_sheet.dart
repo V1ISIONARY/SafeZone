@@ -1,9 +1,6 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:safezone/backend/models/safezoneModel/safezone_model.dart';
 import 'package:safezone/backend/properties/import.dart';
-import 'package:safezone/resource/schema/colors.dart';
 
 Future<void> showSafeZoneBottomSheet(
     SafeZoneModel safeZone, BuildContext context) async {

@@ -1,16 +1,10 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:lottie/lottie.dart';
 import 'package:safezone/backend/architecture/bloc/contactBloc/contact_bloc.dart';
 import 'package:safezone/backend/architecture/bloc/contactBloc/contact_event.dart';
 import 'package:safezone/backend/architecture/bloc/contactBloc/contact_state.dart';
 import 'package:safezone/backend/models/userModel/contacts_model.dart';
 import 'package:safezone/frontend/platforms/mobile/widgets/loading/shimmer_loading.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../../../backend/properties/import.dart';
-import '../../../widgets/dialogs/common_dialog.dart';
 
 class Contact extends StatefulWidget {
   final String UserToken;

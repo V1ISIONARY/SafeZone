@@ -54,7 +54,7 @@ class _SosCountdownState extends State<SosCountdown> {
             child: const Icon(Icons.arrow_back, color: Colors.white, size: 10),
           ),
         ),
-        title: CategoryText(text: "SOS", color: Colors.white),
+        title: const CategoryText(text: "SOS", color: Colors.white),
       ),
       body: GestureDetector(
         onDoubleTap: () => context.go('/sos-cancelled'),
@@ -80,7 +80,7 @@ class _SosCountdownState extends State<SosCountdown> {
                     style: const TextStyle(
                       fontSize: 64,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFFEFEFEF), 
+                      color: Color(0xFFEFEFEF),
                     ),
                   ),
                   const SizedBox(height: 60),

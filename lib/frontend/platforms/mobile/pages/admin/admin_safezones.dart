@@ -5,10 +5,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:lottie/lottie.dart';
-import 'package:safezone/backend/architecture/bloc/safezoneBloc/safezone_state.dart' show SafeZoneError, SafeZoneLoading, SafeZoneState, SafeZonesLoaded;
+import 'package:safezone/backend/architecture/bloc/safezoneBloc/safezone_state.dart'
+    show SafeZoneError, SafeZoneLoading, SafeZoneState, SafeZonesLoaded;
 
-import '../../../../../backend/architecture/bloc/safezoneBloc/safezone_bloc.dart' show SafeZoneBloc;
-import '../../../../../backend/architecture/bloc/safezoneBloc/safezone_event.dart' show FetchAllSafeZones;
+import '../../../../../backend/architecture/bloc/safezoneBloc/safezone_bloc.dart'
+    show SafeZoneBloc;
+import '../../../../../backend/architecture/bloc/safezoneBloc/safezone_event.dart'
+    show FetchAllSafeZones;
 import '../../../../../backend/properties/import.dart';
 import '../../widgets/cards/admin_safezones_card.dart';
 import '../../widgets/loading/loadingstate.dart';
@@ -24,7 +27,7 @@ class _AdminSafezonesState extends State<AdminSafezones> {
   late final SafeZoneBloc _safeZoneBloc;
   bool _isAscending = false;
   String _selectedFilter = "All";
-  Map<int, String> _addresses = {};
+  final Map<int, String> _addresses = {};
 
   final List<String> _categories = [
     'All',
@@ -167,13 +170,12 @@ class _AdminSafezonesState extends State<AdminSafezones> {
       builder: (context, state) {
         if (state is SafeZoneLoading) {
           return Expanded(
-              child: Center(
-                child: Transform.translate(
-                    offset: const Offset(-20, -30),
-                    child: const LoadingState()),
-              ),
-            );
-          } else if (state is SafeZonesLoaded) {
+            child: Center(
+              child: Transform.translate(
+                  offset: const Offset(-20, -30), child: const LoadingState()),
+            ),
+          );
+        } else if (state is SafeZonesLoaded) {
           List filteredZones = _selectedFilter == 'All'
               ? state.safeZones
               : state.safeZones
@@ -206,10 +208,9 @@ class _AdminSafezonesState extends State<AdminSafezones> {
                 padding: const EdgeInsets.symmetric(horizontal: 10.0),
                 // child: SafezoneHistoryCard(safeZone: filteredZones[index]),
                 child: AdminSafeZonesCard(
-                  safeZone: safeZone,
-                  address: _addresses[safeZone.id] ?? "Fetching address...",
-                  onRefresh: _loadSafezones
-                ),
+                    safeZone: safeZone,
+                    address: _addresses[safeZone.id] ?? "Fetching address...",
+                    onRefresh: _loadSafezones),
               );
             },
           );

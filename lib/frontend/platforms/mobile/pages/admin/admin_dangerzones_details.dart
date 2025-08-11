@@ -24,7 +24,7 @@ class AdminDangerZoneDetails extends StatefulWidget {
 class _AdminDangerZoneDetailsState extends State<AdminDangerZoneDetails> {
   final Completer<gmaps.GoogleMapController> _mapController = Completer();
   String _address = "Fetching address...";
-  bool _isLoading = false;
+  final bool _isLoading = false;
 
   @override
   void initState() {

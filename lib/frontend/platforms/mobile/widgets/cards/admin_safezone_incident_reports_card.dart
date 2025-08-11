@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:safezone/backend/models/dangerzoneModel/incident_report_model.dart';
 
 import '../../../../../backend/properties/import.dart';
@@ -47,7 +45,10 @@ class AdminSafezoneIncidentReportsCard extends StatelessWidget {
                 padding: const EdgeInsets.only(
                     top: 3.0, bottom: 3.0, right: 8, left: 8),
                 child: Text(incidentReport.dangerZone?.name ?? "Incident",
-                    style: const TextStyle(fontSize: 11, color: textColor, fontWeight: FontWeight.bold)),
+                    style: const TextStyle(
+                        fontSize: 11,
+                        color: textColor,
+                        fontWeight: FontWeight.bold)),
               ),
             ),
             const SizedBox(

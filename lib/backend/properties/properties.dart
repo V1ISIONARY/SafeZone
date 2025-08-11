@@ -3,10 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-import '../../frontend/platforms/mobile/pages/main-screen/home_page/map.dart';
-
 class SharedProperties {
-
   static final SharedProperties _instance = SharedProperties._internal();
   factory SharedProperties() => _instance;
   SharedProperties._internal();
@@ -37,8 +34,7 @@ class SharedProperties {
   ValueNotifier<bool> isSidebarCollapsed = ValueNotifier(false);
   ValueNotifier<bool> isSidebarTab = ValueNotifier(false);
   ValueNotifier<bool> isSidebarTabUi = ValueNotifier(false);
-  
+
   ValueNotifier<bool> authenticationPage = ValueNotifier(true);
   ValueNotifier<bool> inSlide = ValueNotifier(false);
-
 }

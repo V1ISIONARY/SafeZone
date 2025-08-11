@@ -22,14 +22,9 @@ import 'package:safezone/resource/schema/texts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class CreateReportDT extends StatefulWidget {
-
   final VoidCallback? onClose;
   final void Function(String page)? onOpenNotification;
-  const CreateReportDT({
-    super.key,
-    this.onClose,
-    this.onOpenNotification
-  });
+  const CreateReportDT({super.key, this.onClose, this.onOpenNotification});
 
   @override
   State<CreateReportDT> createState() => _CreateReportDTState();
@@ -238,7 +233,7 @@ class _CreateReportDTState extends State<CreateReportDT> {
 
   String? selectedInternalPage;
   IncidentReportRequestModel? incidentreport;
-  
+
   @override
   Widget build(BuildContext context) {
     return _getPageForNavigation(selectedInternalPage);
@@ -258,45 +253,41 @@ class _CreateReportDTState extends State<CreateReportDT> {
             });
           },
           onGoToReports: () {
-            widget.onOpenNotification?.call("Reports"); 
+            widget.onOpenNotification?.call("Reports");
           },
-          onClose: (){
+          onClose: () {
             widget.onClose?.call();
           },
           reportInfo: incidentreport!,
         );
       default:
         return Container(
-          padding: EdgeInsets.symmetric(horizontal: 15),
-          color: Colors.white54,
-          child: Scaffold(
-            appBar: AppBar(
-              backgroundColor: Colors.white54,
-              automaticallyImplyLeading: false,
-              centerTitle: false,
-              title: Transform.translate(
-                offset: const Offset(-15, 0),
-                child: CategoryText(text: "Report an Incident")
-              ),
-              actions: [
-                GestureDetector(
-                  onTap: (){
-                    if (widget.onClose != null) {
-                      widget.onClose!();
-                    }
-                  },
-                  child: Icon(
-                    Icons.cancel_outlined,
-                    size: 20,
-                    color: Colors.black38,
-                  )
+            padding: const EdgeInsets.symmetric(horizontal: 15),
+            color: Colors.white54,
+            child: Scaffold(
+                appBar: AppBar(
+                  backgroundColor: Colors.white54,
+                  automaticallyImplyLeading: false,
+                  centerTitle: false,
+                  title: Transform.translate(
+                      offset: const Offset(-15, 0),
+                      child: const CategoryText(text: "Report an Incident")),
+                  actions: [
+                    GestureDetector(
+                        onTap: () {
+                          if (widget.onClose != null) {
+                            widget.onClose!();
+                          }
+                        },
+                        child: const Icon(
+                          Icons.cancel_outlined,
+                          size: 20,
+                          color: Colors.black38,
+                        )),
+                  ],
                 ),
-              ],
-            ),
-            body: LayoutBuilder(
-              builder: (context, constraints) {
-                return Column(
-                  children: [
+                body: LayoutBuilder(builder: (context, constraints) {
+                  return Column(children: [
                     Column(
                       children: [
                         Padding(
@@ -304,7 +295,7 @@ class _CreateReportDTState extends State<CreateReportDT> {
                           child: Row(
                             children: [
                               Expanded(
-                                  child: Container(
+                                  child: SizedBox(
                                 height: 40,
                                 child: TextField(
                                     controller: _searchController,
@@ -322,8 +313,8 @@ class _CreateReportDTState extends State<CreateReportDT> {
                                         fontWeight: FontWeight.w500,
                                         color: Colors.black38,
                                       ),
-                                      contentPadding:
-                                          const EdgeInsets.only(left: 10, bottom: 8),
+                                      contentPadding: const EdgeInsets.only(
+                                          left: 10, bottom: 8),
                                       border: const OutlineInputBorder(
                                         borderSide: BorderSide(color: btnColor),
                                       ),
@@ -459,8 +450,8 @@ class _CreateReportDTState extends State<CreateReportDT> {
                                 Marker(
                                   markerId: const MarkerId("pinned_location"),
                                   position: location,
-                                  infoWindow:
-                                      const InfoWindow(title: "Incident Location"),
+                                  infoWindow: const InfoWindow(
+                                      title: "Incident Location"),
                                 ),
                               );
                               _updateCircle();
@@ -536,7 +527,8 @@ class _CreateReportDTState extends State<CreateReportDT> {
                             const Align(
                               alignment: Alignment.centerLeft,
                               child: CategoryText(
-                                  text: "Incident Report Title:", alignment: 'start'),
+                                  text: "Incident Report Title:",
+                                  alignment: 'start'),
                             ),
                             const SizedBox(height: 15),
                             TextFieldWidget.buildTextField(
@@ -554,7 +546,8 @@ class _CreateReportDTState extends State<CreateReportDT> {
                               minLines: 5,
                             ),
                             Container(
-                              margin: const EdgeInsets.only(top: 10, bottom: 20),
+                              margin:
+                                  const EdgeInsets.only(top: 10, bottom: 20),
                               child: const CategoryText(
                                   text:
                                       "Upload images to provide more context about the incident (optional)"),
@@ -568,72 +561,75 @@ class _CreateReportDTState extends State<CreateReportDT> {
                             ),
                             const SizedBox(height: 40),
                             Transform.translate(
-                              offset: const Offset(0, -30),
-                              child: CustomButton(
-                                widthSize: true,
-                                text: "Continue",
-                                buttonColor: widgetPricolor,
-                                onPressed: () {
-                                  if (userId == null ||
-                                      _pinnedLocation == null ||
-                                      _descriptionController.text.trim().isEmpty) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: CategoryText(
-                                          text: "Please select a location and enter a description.",
-                                          color: Colors.white,
-                                        ),
-                                        backgroundColor: Colors.red,
-                                      ),
-                                    );
-                                    return;
-                                  }
+                                offset: const Offset(0, -30),
+                                child: CustomButton(
+                                    widthSize: true,
+                                    text: "Continue",
+                                    buttonColor: widgetPricolor,
+                                    onPressed: () {
+                                      if (userId == null ||
+                                          _pinnedLocation == null ||
+                                          _descriptionController.text
+                                              .trim()
+                                              .isEmpty) {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          const SnackBar(
+                                            content: CategoryText(
+                                              text:
+                                                  "Please select a location and enter a description.",
+                                              color: Colors.white,
+                                            ),
+                                            backgroundColor: Colors.red,
+                                          ),
+                                        );
+                                        return;
+                                      }
 
-                                  final incidentReport = IncidentReportRequestModel(
-                                    userId: userId!,
-                                    description: _descriptionController.text,
-                                    reportDate: DateFormat("yyyy-MM-dd").format(DateTime.now()),
-                                    reportTime: DateFormat("HH:mm:ss").format(DateTime.now()),
-                                    images: selectedImages,
-                                    reportTimestamp: reportTimestamp,
-                                    latitude: _pinnedLocation!.latitude,
-                                    longitude: _pinnedLocation!.longitude,
-                                    radius: _radius,
-                                    name: _nameController.text,
-                                  );
+                                      final incidentReport =
+                                          IncidentReportRequestModel(
+                                        userId: userId!,
+                                        description:
+                                            _descriptionController.text,
+                                        reportDate: DateFormat("yyyy-MM-dd")
+                                            .format(DateTime.now()),
+                                        reportTime: DateFormat("HH:mm:ss")
+                                            .format(DateTime.now()),
+                                        images: selectedImages,
+                                        reportTimestamp: reportTimestamp,
+                                        latitude: _pinnedLocation!.latitude,
+                                        longitude: _pinnedLocation!.longitude,
+                                        radius: _radius,
+                                        name: _nameController.text,
+                                      );
 
-                                  setState(() {
-                                    selectedInternalPage = 'details';
-                                    incidentreport = incidentReport;
-                                  });
+                                      setState(() {
+                                        selectedInternalPage = 'details';
+                                        incidentreport = incidentReport;
+                                      });
 
-                                  Future.delayed(const Duration(milliseconds: 300), () {
-                                    setState(() {
-                                      _pinnedLocation = null;
-                                      _markers.clear();
-                                      _circles.clear();
-                                      _descriptionController.clear();
-                                      _nameController.clear();
-                                      _radius = 100;
-                                      selectedImages.clear();
-                                      reportTimestamp = '';
-                                    });
-                                  });
-                                }
-                              )
-                            ),
+                                      Future.delayed(
+                                          const Duration(milliseconds: 300),
+                                          () {
+                                        setState(() {
+                                          _pinnedLocation = null;
+                                          _markers.clear();
+                                          _circles.clear();
+                                          _descriptionController.clear();
+                                          _nameController.clear();
+                                          _radius = 100;
+                                          selectedImages.clear();
+                                          reportTimestamp = '';
+                                        });
+                                      });
+                                    })),
                             const SizedBox(height: 10)
                           ],
                         ),
                       ),
                     )
-                  ]
-                );
-              }
-            )
-          )
-        );
+                  ]);
+                })));
     }
   }
-
 }

@@ -50,7 +50,7 @@ class _RegisterMDState extends State<RegisterMD> {
       _notificationText = text;
     });
 
-    Future.delayed(Duration(seconds: 5), () {
+    Future.delayed(const Duration(seconds: 5), () {
       if (mounted) {
         setState(() {
           _appBarHeight = 0;
@@ -616,7 +616,7 @@ class _RegisterMDState extends State<RegisterMD> {
                     ),
                     contentPadding: const EdgeInsets.symmetric(horizontal: 15),
                     suffixIcon: Padding(
-                        padding: EdgeInsets.only(right: 15),
+                        padding: const EdgeInsets.only(right: 15),
                         child: GestureDetector(
                           onTap: () {
                             setState(() {
@@ -630,7 +630,7 @@ class _RegisterMDState extends State<RegisterMD> {
                             color: Colors.grey,
                           ),
                         )))),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             AnimatedContainer(
               duration: const Duration(milliseconds: 300),
               curve: Curves.easeInOut,
@@ -641,7 +641,7 @@ class _RegisterMDState extends State<RegisterMD> {
                 color: strengthColor,
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             if (showConfirmPassword)
               Column(
                 children: [

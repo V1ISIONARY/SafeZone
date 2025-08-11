@@ -126,7 +126,8 @@ class _NotificationDetailsState extends State<NotificationDetails> {
                             title: "Location",
                             text: "widget.notificationModel.location"),
                         RowText(title: "Contact", text: "09123454345"),
-                        RowText(title: "Remarks", text: "remarksremarksremarks"),
+                        RowText(
+                            title: "Remarks", text: "remarksremarksremarks"),
                         RowText(title: "Otherother", text: "asdfasdfasdf"),
                       ],
                     ),

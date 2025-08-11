@@ -5,10 +5,13 @@ class NavResWidget extends StatelessWidget {
   final Widget? tablet;
   final Widget desktop;
 
-  const NavResWidget({Key? key, required this.mobile, this.tablet, required this.desktop}) : super(key: key);
+  const NavResWidget(
+      {super.key, required this.mobile, this.tablet, required this.desktop});
 
-  static bool isMobile(BuildContext context) => MediaQuery.of(context).size.width <= 600;
-  static bool isDesktop(BuildContext context) => MediaQuery.of(context).size.width < 1000;
+  static bool isMobile(BuildContext context) =>
+      MediaQuery.of(context).size.width <= 600;
+  static bool isDesktop(BuildContext context) =>
+      MediaQuery.of(context).size.width < 1000;
 
   // static bool isMobile(BuildContext context) => MediaQuery.of(context).size.width <= 1150;
   // static bool isDesktop(BuildContext context) => MediaQuery.of(context).size.width < 840;

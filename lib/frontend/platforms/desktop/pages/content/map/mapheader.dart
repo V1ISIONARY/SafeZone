@@ -35,88 +35,94 @@ class _MapHeaderState extends State<MapHeader> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               ValueListenableBuilder(
-                valueListenable: sharedController.isSidebarCollapsed,
-                builder: (context, value, child) {
-                  return value 
-                    ? Container(
-                        margin: const EdgeInsets.only(left: 10, right: 15),
-                        child: Tooltip(
-                          message: 'Open sidebar',
-                          preferBelow: false,
-                          decoration: BoxDecoration(
-                            color: Colors.black,
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          textStyle: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 8,
-                          ),
-                          child: Material(
-                            color: Colors.transparent,
-                            child: InkWell(
-                              borderRadius: BorderRadius.circular(5),
-                              hoverColor: Colors.grey.shade300,
-                              onTap: () {
-                                sharedController.isSidebarCollapsed.value = !sharedController.isSidebarCollapsed.value;
-                              },
-                              child: Padding(
-                                padding: const EdgeInsets.all(5),
-                                child: SvgPicture.asset(
-                                  'lib/resource/svg/open_sidebar.svg',
-                                  color: Colors.black45,
-                                  height: 18,
-                                  width: 19,
-                                ),
+                  valueListenable: sharedController.isSidebarCollapsed,
+                  builder: (context, value, child) {
+                    return value
+                        ? Container(
+                            margin: const EdgeInsets.only(left: 10, right: 15),
+                            child: Tooltip(
+                              message: 'Open sidebar',
+                              preferBelow: false,
+                              decoration: BoxDecoration(
+                                color: Colors.black,
+                                borderRadius: BorderRadius.circular(4),
                               ),
-                            ),
-                          ),
-                        ),
-                      )
-                    : ValueListenableBuilder(
-                        valueListenable: sharedController.isSidebarTab,
-                        builder: (context, tabvalue, child) {
-                          return tabvalue 
-                            ? Container(
-                              margin: const EdgeInsets.only(left: 10, right: 15),
-                              child: Tooltip(
-                                message: 'Open tab',
-                                preferBelow: false,
-                                decoration: BoxDecoration(
-                                  color: Colors.black,
-                                  borderRadius: BorderRadius.circular(4),
-                                ),
-                                textStyle: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 8,
-                                ),
-                                child: Material(
-                                  color: Colors.transparent,
-                                  child: InkWell(
-                                    borderRadius: BorderRadius.circular(5),
-                                    hoverColor: Colors.grey.shade300,
-                                    onTap: () {
-                                      sharedController.isSidebarTabUi.value = !sharedController.isSidebarTabUi.value;
-                                    },
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(5),
-                                      child: SvgPicture.asset(
-                                        'lib/resource/svg/navigation_tab.svg',
-                                        color: Colors.black45,
-                                        height: 18,
-                                        width: 19,
-                                      ),
+                              textStyle: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 8,
+                              ),
+                              child: Material(
+                                color: Colors.transparent,
+                                child: InkWell(
+                                  borderRadius: BorderRadius.circular(5),
+                                  hoverColor: Colors.grey.shade300,
+                                  onTap: () {
+                                    sharedController.isSidebarCollapsed.value =
+                                        !sharedController
+                                            .isSidebarCollapsed.value;
+                                  },
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(5),
+                                    child: SvgPicture.asset(
+                                      'lib/resource/svg/open_sidebar.svg',
+                                      color: Colors.black45,
+                                      height: 18,
+                                      width: 19,
                                     ),
                                   ),
                                 ),
                               ),
-                            )
-                            : Container(
-                              margin: const EdgeInsets.only(left: 10),
-                            );
-                        }
-                      );
-                }
-              ),
+                            ),
+                          )
+                        : ValueListenableBuilder(
+                            valueListenable: sharedController.isSidebarTab,
+                            builder: (context, tabvalue, child) {
+                              return tabvalue
+                                  ? Container(
+                                      margin: const EdgeInsets.only(
+                                          left: 10, right: 15),
+                                      child: Tooltip(
+                                        message: 'Open tab',
+                                        preferBelow: false,
+                                        decoration: BoxDecoration(
+                                          color: Colors.black,
+                                          borderRadius:
+                                              BorderRadius.circular(4),
+                                        ),
+                                        textStyle: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 8,
+                                        ),
+                                        child: Material(
+                                          color: Colors.transparent,
+                                          child: InkWell(
+                                            borderRadius:
+                                                BorderRadius.circular(5),
+                                            hoverColor: Colors.grey.shade300,
+                                            onTap: () {
+                                              sharedController
+                                                      .isSidebarTabUi.value =
+                                                  !sharedController
+                                                      .isSidebarTabUi.value;
+                                            },
+                                            child: Padding(
+                                              padding: const EdgeInsets.all(5),
+                                              child: SvgPicture.asset(
+                                                'lib/resource/svg/navigation_tab.svg',
+                                                color: Colors.black45,
+                                                height: 18,
+                                                width: 19,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    )
+                                  : Container(
+                                      margin: const EdgeInsets.only(left: 10),
+                                    );
+                            });
+                  }),
               Row(
                 children: [
                   Image.asset(
@@ -135,7 +141,8 @@ class _MapHeaderState extends State<MapHeader> {
                     double minMargin = 0;
                     double screenWidth = constraints.maxWidth;
 
-                    double margin = (screenWidth / 10).clamp(minMargin, maxMargin);
+                    double margin =
+                        (screenWidth / 10).clamp(minMargin, maxMargin);
 
                     return Container(
                       margin: EdgeInsets.symmetric(horizontal: margin),
@@ -155,27 +162,32 @@ class _MapHeaderState extends State<MapHeader> {
                                   fontWeight: FontWeight.w100,
                                 ),
                                 decoration: InputDecoration(
-                                  hintText: "Search | Dagupan City > Pantal East > Sagur",
-                                  hintStyle: TextStyle(
+                                  hintText:
+                                      "Search | Dagupan City > Pantal East > Sagur",
+                                  hintStyle: const TextStyle(
                                     fontSize: 10,
                                     color: labelFormFieldColor,
                                     fontWeight: FontWeight.w100,
                                   ),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(20),
-                                    borderSide: const BorderSide(color: Colors.black12),
+                                    borderSide:
+                                        const BorderSide(color: Colors.black12),
                                   ),
                                   enabledBorder: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(20),
-                                    borderSide: const BorderSide(color: Colors.black12, width: 2),
+                                    borderSide: const BorderSide(
+                                        color: Colors.black12, width: 2),
                                   ),
                                   focusedBorder: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(20),
-                                    borderSide: BorderSide(color: widgetPricolor, width: 2),
+                                    borderSide: const BorderSide(
+                                        color: widgetPricolor, width: 2),
                                   ),
                                   filled: true,
                                   fillColor: Colors.transparent,
-                                  contentPadding: const EdgeInsets.only(left: 15, top: 12, bottom: 12),
+                                  contentPadding: const EdgeInsets.only(
+                                      left: 15, top: 12, bottom: 12),
                                   suffixIcon: Padding(
                                     padding: const EdgeInsets.all(3),
                                     child: GestureDetector(
@@ -184,10 +196,12 @@ class _MapHeaderState extends State<MapHeader> {
                                       },
                                       child: Container(
                                         width: 70,
-                                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 12, vertical: 6),
                                         decoration: BoxDecoration(
                                           color: btnColor,
-                                          borderRadius: BorderRadius.circular(15),
+                                          borderRadius:
+                                              BorderRadius.circular(15),
                                         ),
                                         alignment: Alignment.center,
                                         child: const Text(
@@ -209,7 +223,7 @@ class _MapHeaderState extends State<MapHeader> {
                             child: Container(
                               height: 33,
                               width: 33,
-                              decoration: BoxDecoration(
+                              decoration: const BoxDecoration(
                                 color: btnColor,
                                 shape: BoxShape.circle,
                               ),
@@ -271,7 +285,9 @@ class _MapHeaderState extends State<MapHeader> {
                               child: Text(
                                 'Map',
                                 style: TextStyle(
-                                  color: isMapSelected ? Colors.white : Colors.grey,
+                                  color: isMapSelected
+                                      ? Colors.white
+                                      : Colors.grey,
                                   fontSize: 10,
                                   fontWeight: FontWeight.w500,
                                 ),
@@ -290,7 +306,9 @@ class _MapHeaderState extends State<MapHeader> {
                               child: Text(
                                 'Satellite',
                                 style: TextStyle(
-                                  color: isMapSelected ? Colors.grey : Colors.white,
+                                  color: isMapSelected
+                                      ? Colors.grey
+                                      : Colors.white,
                                   fontSize: 10,
                                   fontWeight: FontWeight.w500,
                                 ),
@@ -318,11 +336,12 @@ class _MapHeaderState extends State<MapHeader> {
                     ),
                   ],
                 ),
-                child: Center(
+                child: const Center(
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: const [
-                      Icon(Icons.layers_outlined, size: 15, color: Colors.black),
+                    children: [
+                      Icon(Icons.layers_outlined,
+                          size: 15, color: Colors.black),
                       SizedBox(width: 4),
                       Text(
                         'Layers',

@@ -1,10 +1,4 @@
-import 'dart:async';
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart' as gmaps;
-import 'package:go_router/go_router.dart';
-import 'package:lottie/lottie.dart';
 
 import '../../../../../backend/architecture/bloc/adminBloc/safezone/safezone_admin_bloc.dart';
 import '../../../../../backend/architecture/bloc/adminBloc/safezone/safezone_admin_event.dart';
@@ -164,7 +158,7 @@ class _AdminSafezoneDetailsState extends State<AdminSafezoneDetails> {
 
             // Return true to indicate that the data should be refreshed
             context.pop(true);
-                    } else if (state is SafeZoneAdminFailure) {
+          } else if (state is SafeZoneAdminFailure) {
             setState(() {
               _isLoading = false;
             });
@@ -198,13 +192,13 @@ class _AdminSafezoneDetailsState extends State<AdminSafezoneDetails> {
               builder: (context, state) {
             if (_isLoading) {
               return Expanded(
-              child: Center(
-                child: Transform.translate(
-                    offset: const Offset(-20, -30),
-                    child: const LoadingState()),
-              ),
-            );
-          }
+                child: Center(
+                  child: Transform.translate(
+                      offset: const Offset(-20, -30),
+                      child: const LoadingState()),
+                ),
+              );
+            }
             return SingleChildScrollView(
               child: Column(
                 children: [

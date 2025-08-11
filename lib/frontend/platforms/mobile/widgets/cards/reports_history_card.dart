@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:safezone/backend/models/dangerzoneModel/incident_report_model.dart';
 import '../../../../../backend/properties/import.dart';
 
@@ -74,7 +72,7 @@ class ReportsCard extends StatelessWidget {
                   height: 8,
                   margin: const EdgeInsets.only(right: 6, top: 8),
                   decoration: BoxDecoration(
-                    color: statusColor, 
+                    color: statusColor,
                     shape: BoxShape.circle,
                   ),
                 ),
@@ -89,9 +87,7 @@ class ReportsCard extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(horizontal: 5),
                     child: Text(
                       statusText,
-                      style: const TextStyle(
-                          fontSize: 11,
-                          color: textColor),
+                      style: const TextStyle(fontSize: 11, color: textColor),
                     ),
                   ),
                 ),

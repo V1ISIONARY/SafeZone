@@ -246,7 +246,7 @@ class RowText extends StatelessWidget {
             style: GoogleFonts.inter(
                 fontWeight: FontWeight.w500, color: textColor, fontSize: 13),
           ),
-          Spacer(),
+          const Spacer(),
           Text(
             text,
             style: GoogleFonts.inter(

@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:safezone/backend/models/safezoneModel/safezone_model.dart';
 import '../../../../../backend/properties/import.dart';
 
@@ -7,11 +5,7 @@ class SafezoneHistoryCard extends StatelessWidget {
   final SafeZoneModel safeZone;
   final VoidCallback? onTap;
 
-  const SafezoneHistoryCard({
-    super.key, 
-    this.onTap,
-    required this.safeZone
-  });
+  const SafezoneHistoryCard({super.key, this.onTap, required this.safeZone});
 
   @override
   Widget build(BuildContext context) {

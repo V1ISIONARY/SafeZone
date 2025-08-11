@@ -13,7 +13,7 @@ class LoginRT extends StatefulWidget {
 class _LoginRTState extends State<LoginRT> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return const Scaffold(
       backgroundColor: Colors.transparent,
       body: AuthResWidget(
         mobile: LoginMD(),

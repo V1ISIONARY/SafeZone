@@ -34,7 +34,7 @@ class _ReviewSafezoneState extends State<ReviewSafezone> {
   Color _appBarColor = Colors.transparent;
 
   Future<void> _checkIfShown() async {
-    Future.delayed(Duration(milliseconds: 200), () {
+    Future.delayed(const Duration(milliseconds: 200), () {
       if (mounted) {
         setState(() {
           _appBarHeight = 40;
@@ -43,7 +43,7 @@ class _ReviewSafezoneState extends State<ReviewSafezone> {
         });
       }
 
-      Future.delayed(Duration(seconds: 5), () {
+      Future.delayed(const Duration(seconds: 5), () {
         if (mounted) {
           setState(() {
             _appBarHeight = 0;
@@ -148,7 +148,7 @@ class _ReviewSafezoneState extends State<ReviewSafezone> {
             children: [
               Container(
                 padding: const EdgeInsets.all(10),
-                margin: EdgeInsets.only(bottom: 15),
+                margin: const EdgeInsets.only(bottom: 15),
                 decoration: BoxDecoration(
                   border: Border.all(color: btnColor, width: 0.5),
                   borderRadius: BorderRadius.circular(10),

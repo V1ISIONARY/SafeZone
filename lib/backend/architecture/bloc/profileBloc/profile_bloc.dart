@@ -1,4 +1,3 @@
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:safezone/backend/properties/import.dart';
 import 'package:safezone/backend/repository/profileApi/profile_repo.dart';
 import 'profile_event.dart';
@@ -24,7 +23,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     });
 
     // Update Status Event
-      on<UpdateStatusEvent>((event, emit) async {
+    on<UpdateStatusEvent>((event, emit) async {
       emit(UpdateStatusLoading());
       try {
         final success = await profileRepository.updateAcivityStatus(
@@ -40,7 +39,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     });
 
     // Upload Profile Picture Event
-       on<UploadProfilePictureEvent>((event, emit) async {
+    on<UploadProfilePictureEvent>((event, emit) async {
       emit(ProfileLoading());
       try {
         emit(ProfilePictureUploading());

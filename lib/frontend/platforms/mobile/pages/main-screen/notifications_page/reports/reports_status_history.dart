@@ -88,7 +88,7 @@ class _ReportsStatusHistoryState extends State<ReportsStatusHistory> {
             child: const Icon(Icons.arrow_back, color: Colors.black, size: 10),
           ),
         ),
-        title: CategoryText(text: "Report Status History"),
+        title: const CategoryText(text: "Report Status History"),
       ),
       body: Container(
         decoration: const BoxDecoration(

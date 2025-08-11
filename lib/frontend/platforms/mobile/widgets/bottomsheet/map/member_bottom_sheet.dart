@@ -1,8 +1,5 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:safezone/backend/properties/import.dart';
-import 'package:safezone/resource/schema/colors.dart';
 
 Future<String> getAddressFromCoordinates(
     double latitude, double longitude) async {

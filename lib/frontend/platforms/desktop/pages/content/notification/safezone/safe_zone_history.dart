@@ -12,14 +12,9 @@ import 'package:safezone/resource/schema/texts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SafezoneHistoryDT extends StatefulWidget {
-
-  final bool ?fromSuccess;
+  final bool? fromSuccess;
   final VoidCallback? onBack;
-  const SafezoneHistoryDT({
-    super.key,
-    this.onBack,
-    this.fromSuccess
-  });
+  const SafezoneHistoryDT({super.key, this.onBack, this.fromSuccess});
 
   @override
   State<SafezoneHistoryDT> createState() => _SafezoneHistoryDTState();
@@ -106,34 +101,33 @@ class _SafezoneHistoryDTState extends State<SafezoneHistoryDT>
             if (widget.onBack != null) {
               widget.onBack!();
             }
-            return false; 
+            return false;
           },
           child: Scaffold(
-            backgroundColor: Color.fromARGB(255, 240, 240, 240),
+            backgroundColor: const Color.fromARGB(255, 240, 240, 240),
             appBar: AppBar(
-              backgroundColor: Color.fromARGB(255, 240, 240, 240),
+              backgroundColor: const Color.fromARGB(255, 240, 240, 240),
               automaticallyImplyLeading: false,
               centerTitle: true,
               title: Transform.translate(
                 offset: const Offset(-15, 0),
-                child: Row(
-                  children: [
-                    GestureDetector(
-                      onTap: widget.onBack ?? () => Navigator.pop(context),
-                      child: Container(
-                        margin: const EdgeInsets.all(10),
-                        height: 20,
-                        width: 20,
-                        decoration: BoxDecoration(
-                          border: Border.all(width: 1, color: Colors.black),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(Icons.arrow_back, color: Colors.black, size: 10),
+                child: Row(children: [
+                  GestureDetector(
+                    onTap: widget.onBack ?? () => Navigator.pop(context),
+                    child: Container(
+                      margin: const EdgeInsets.all(10),
+                      height: 20,
+                      width: 20,
+                      decoration: BoxDecoration(
+                        border: Border.all(width: 1, color: Colors.black),
+                        shape: BoxShape.circle,
                       ),
+                      child: const Icon(Icons.arrow_back,
+                          color: Colors.black, size: 10),
                     ),
-                    const CategoryText(text: "Safe Zones History")
-                  ]
-                ),
+                  ),
+                  const CategoryText(text: "Safe Zones History")
+                ]),
               ),
               actions: [
                 Padding(
@@ -152,8 +146,8 @@ class _SafezoneHistoryDTState extends State<SafezoneHistoryDT>
                         children: [
                           Icon(
                             _isAscending
-                              ? Icons.arrow_upward
-                              : Icons.arrow_downward,
+                                ? Icons.arrow_upward
+                                : Icons.arrow_downward,
                             size: 15,
                             color: Colors.black,
                           ),
@@ -173,12 +167,14 @@ class _SafezoneHistoryDTState extends State<SafezoneHistoryDT>
             body: Column(
               children: [
                 Container(
-                  margin: const EdgeInsets.only(top: 10, left: 16, right: 16, bottom: 16),
+                  margin: const EdgeInsets.only(
+                      top: 10, left: 16, right: 16, bottom: 16),
                   child: Row(
                     children: [
                       const Flexible(
                         child: CategoryDescripText(
-                          text: 'View and track the status of all your past safe zones.',
+                          text:
+                              'View and track the status of all your past safe zones.',
                         ),
                       ),
                       const SizedBox(width: 8),
@@ -197,14 +193,14 @@ class _SafezoneHistoryDTState extends State<SafezoneHistoryDT>
                   controller: _tabController,
                   indicatorColor: widgetPricolor,
                   labelColor: Colors.black,
-                  labelStyle: TextStyle(
-                    fontSize: 10
-                  ),
-                  overlayColor: MaterialStateProperty.all(Colors.transparent),
-                  tabs: _categories.map((category) => SizedBox(
-                    height: 35,
-                    child: Tab(text: category),
-                  )).toList(),
+                  labelStyle: const TextStyle(fontSize: 10),
+                  overlayColor: WidgetStateProperty.all(Colors.transparent),
+                  tabs: _categories
+                      .map((category) => SizedBox(
+                            height: 35,
+                            child: Tab(text: category),
+                          ))
+                      .toList(),
                   dividerColor: Colors.black12,
                 ),
                 const SizedBox(height: 20),
@@ -220,21 +216,18 @@ class _SafezoneHistoryDTState extends State<SafezoneHistoryDT>
             ),
           ),
         );
-      }
     }
+  }
 
   Widget _buildCategoryPage(String status) {
     return BlocBuilder<SafeZoneBloc, SafeZoneState>(
       builder: (context, state) {
         if (state is SafeZoneLoading) {
           return Expanded(
-            child: Center(
-              child: Transform.translate(
-                offset: const Offset(-30, -60), 
-                child: LoadingState()
-              )
-            )
-          );
+              child: Center(
+                  child: Transform.translate(
+                      offset: const Offset(-30, -60),
+                      child: const LoadingState())));
         } else if (state is SafeZonesLoaded) {
           final filteredZones = status == 'All'
               ? state.safeZones
@@ -255,7 +248,7 @@ class _SafezoneHistoryDTState extends State<SafezoneHistoryDT>
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Container(
+                  SizedBox(
                     width: 150,
                     height: 150,
                     child: Image.asset(
@@ -301,5 +294,4 @@ class _SafezoneHistoryDTState extends State<SafezoneHistoryDT>
       },
     );
   }
-
 }

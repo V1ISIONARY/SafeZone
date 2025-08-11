@@ -265,7 +265,7 @@ class _MarkSafeZoneState extends State<MarkSafeZone> {
                       child: Row(
                         children: [
                           Expanded(
-                              child: Container(
+                              child: SizedBox(
                             height: 40,
                             child: TextField(
                                 controller: _searchController,
@@ -286,16 +286,13 @@ class _MarkSafeZoneState extends State<MarkSafeZone> {
                                   contentPadding: const EdgeInsets.only(
                                       left: 10, bottom: 8),
                                   border: const OutlineInputBorder(
-                                    borderSide:
-                                        BorderSide(color: btnColor),
+                                    borderSide: BorderSide(color: btnColor),
                                   ),
                                   focusedBorder: const OutlineInputBorder(
-                                    borderSide:
-                                        BorderSide(color: btnColor),
+                                    borderSide: BorderSide(color: btnColor),
                                   ),
                                   enabledBorder: const OutlineInputBorder(
-                                    borderSide:
-                                        BorderSide(color: btnColor),
+                                    borderSide: BorderSide(color: btnColor),
                                   ),
                                 )),
                           )),

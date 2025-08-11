@@ -58,22 +58,20 @@ class Settingsbtn extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     PrimaryText(text: title),
-                    if (description != null) 
-                      DescriptionText(text: description!)
+                    if (description != null) DescriptionText(text: description!)
                   ],
                 ),
               ],
             ),
-            Spacer(),
+            const Spacer(),
             Container(
-              height: 15,
-              width: 15,
-              margin: const EdgeInsets.only(right: 17),
-              child: Icon(
-                Icons.chevron_right_outlined,
-                color: Colors.grey[500],
-              )
-            ),
+                height: 15,
+                width: 15,
+                margin: const EdgeInsets.only(right: 17),
+                child: Icon(
+                  Icons.chevron_right_outlined,
+                  color: Colors.grey[500],
+                )),
           ],
         ),
       ),

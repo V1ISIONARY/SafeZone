@@ -5,7 +5,6 @@ import 'package:page_transition/page_transition.dart';
 import '../../../../../resource/schema/colors.dart';
 import '../../../../root/authentication/starter.dart';
 import '../../../../root/content/navigation.dart';
-import '../../widgets/bottom_navigation.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});

@@ -81,9 +81,9 @@ class _ReportsHistoryState extends State<ReportsHistory>
         return false;
       },
       child: Scaffold(
-        backgroundColor: Color.fromARGB(255, 240, 240, 240),
+        backgroundColor: const Color.fromARGB(255, 240, 240, 240),
         appBar: AppBar(
-          backgroundColor: Color.fromARGB(255, 240, 240, 240),
+          backgroundColor: const Color.fromARGB(255, 240, 240, 240),
           automaticallyImplyLeading: false,
           centerTitle: false,
           title: Transform.translate(
@@ -186,8 +186,8 @@ class _ReportsHistoryState extends State<ReportsHistory>
               controller: _tabController,
               indicatorColor: widgetPricolor,
               labelColor: Colors.black,
-              labelStyle: TextStyle(fontSize: 10),
-              overlayColor: MaterialStateProperty.all(Colors.transparent),
+              labelStyle: const TextStyle(fontSize: 10),
+              overlayColor: WidgetStateProperty.all(Colors.transparent),
               tabs: _categories
                   .map((category) => SizedBox(
                         height: 35,
@@ -236,7 +236,7 @@ class _ReportsHistoryState extends State<ReportsHistory>
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Container(
+                  SizedBox(
                     width: 150,
                     height: 150,
                     child: Image.asset(

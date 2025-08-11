@@ -15,81 +15,79 @@ class _CheckState extends State<Check> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
+      body: SizedBox(
         width: double.infinity,
         height: double.infinity,
         child: Stack(
           children: [
             Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
+                child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
                     width: 90,
                     height: 90,
                     decoration: BoxDecoration(
-                      color: Colors.black12,
-                      borderRadius: BorderRadius.circular(10)
-                    ),
-                    child: Icon(
+                        color: Colors.black12,
+                        borderRadius: BorderRadius.circular(10)),
+                    child: const Icon(
                       Icons.email,
                       color: widgetPricolor,
                       size: 50,
-                    )
+                    )),
+                const SizedBox(height: 30),
+                const Text(
+                  'Check your mail',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                    fontSize: 20,
                   ),
-                  SizedBox(height: 30),
-                  Text(
-                    'Check your mail',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                      fontSize: 20,
-                    ),
+                ),
+                const SizedBox(height: 15),
+                Flexible(
+                    child: Text(
+                  "We have sent a password recover\ninstructions to your email.",
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.poppins(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.black45,
                   ),
-                  SizedBox(height: 15),
-                  Flexible(
-                    child: Text("We have sent a password recover\ninstructions to your email.", textAlign: TextAlign.center,
-                      style: GoogleFonts.poppins(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.black45,
+                )),
+                const SizedBox(height: 30),
+                SizedBox(
+                  width: 200,
+                  height: 50,
+                  child: GestureDetector(
+                    onTap: () {
+                      // sendOTP(emailController.text);
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: widgetPricolor,
+                        borderRadius: BorderRadius.circular(50),
                       ),
-                    )
-                  ),
-                  SizedBox(height: 30),
-                  SizedBox(
-                    width: 200, 
-                    height: 50,
-                    child: GestureDetector(
-                      onTap: () {
-                        // sendOTP(emailController.text);
-                      },
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: widgetPricolor,
-                          borderRadius: BorderRadius.circular(50),
-                        ),
-                        child: const Center(
-                          child: Text(
-                            'Open email app',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.white,
-                            ),
+                      child: const Center(
+                        child: Text(
+                          'Open email app',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.white,
                           ),
                         ),
                       ),
                     ),
                   ),
-                ],
-              )
-            ),
+                ),
+              ],
+            )),
             Positioned(
-              bottom: 30,
-              right: 0,
-              left: 0,
-              child: Center(
-                child: RichText(
+                bottom: 30,
+                right: 0,
+                left: 0,
+                child: Center(
+                    child: RichText(
                   textAlign: TextAlign.center,
                   text: TextSpan(
                     text: 'Did not receive the email? Check your spam filter\n',
@@ -103,7 +101,7 @@ class _CheckState extends State<Check> {
                         text: 'try another email address',
                         style: const TextStyle(
                           fontSize: 11,
-                          color: widgetPricolor, 
+                          color: widgetPricolor,
                         ),
                         recognizer: TapGestureRecognizer()
                           ..onTap = () {
@@ -112,9 +110,7 @@ class _CheckState extends State<Check> {
                       ),
                     ],
                   ),
-                )
-              )
-            )
+                )))
           ],
         ),
       ),

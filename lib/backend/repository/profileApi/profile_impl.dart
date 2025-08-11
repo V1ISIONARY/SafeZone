@@ -3,9 +3,7 @@ import 'dart:io';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:safezone/backend/models/userModel/profile_model.dart';
-import 'package:http_parser/http_parser.dart';
 import 'package:safezone/backend/repository/profileApi/profile_repo.dart';
-import 'package:mime/mime.dart';
 
 class ProfileImplementation extends ProfileRepository {
   static String baseUrl = '${dotenv.env['API_URL']}/profile';

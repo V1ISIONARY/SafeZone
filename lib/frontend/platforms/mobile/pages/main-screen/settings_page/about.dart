@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:safezone/frontend/platforms/mobile/widgets/texts/policy.dart';
 
 import '../../../../../../backend/properties/import.dart';
@@ -34,14 +33,16 @@ class About extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const CategoryDescripText(
-              text: 'We aim to design, develop, and test the SafeZone application to enhance women\'s safety in public areas by addressing the shortcomings of existing safety protocols. Our goal is to create a comprehensive solution featuring real-time location monitoring, SOS alerts, safe area finders, and user notifications.  We are dedicated to rigorous testing to ensure the application meets user needs and remains reliable in emergencies. Committed to promoting gender equality, we strive to improve women\'s safety through innovative and user-focused design. Guided by inclusivity and innovation, our efforts aim to create a lasting and meaningful impact on society.',
+              text:
+                  'We aim to design, develop, and test the SafeZone application to enhance women\'s safety in public areas by addressing the shortcomings of existing safety protocols. Our goal is to create a comprehensive solution featuring real-time location monitoring, SOS alerts, safe area finders, and user notifications.  We are dedicated to rigorous testing to ensure the application meets user needs and remains reliable in emergencies. Committed to promoting gender equality, we strive to improve women\'s safety through innovative and user-focused design. Guided by inclusivity and innovation, our efforts aim to create a lasting and meaningful impact on society.',
             ),
             const Divider(height: 30, thickness: 1),
             const CategoryText(
               text: 'Our Journey',
             ),
             const CategoryDescripText(
-              text: '2024: The idea for SafeZone was born as our Capstone Project. We\'ve worked tirelessly, fueled by passion and countless late-night brainstorming sessions, to bring this app to life.',
+              text:
+                  '2024: The idea for SafeZone was born as our Capstone Project. We\'ve worked tirelessly, fueled by passion and countless late-night brainstorming sessions, to bring this app to life.',
             ),
             const SizedBox(height: 5),
             const Divider(height: 30, thickness: 1),
@@ -50,21 +51,29 @@ class About extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             const Padding(
-              padding: EdgeInsets.only(left: 10, top: 15),
-              child: PolicyText(title: 'Asuncion, Miro R.', description: 'Project Manager/Backend Developer \n\n[Short bio]')
-            ),
+                padding: EdgeInsets.only(left: 10, top: 15),
+                child: PolicyText(
+                    title: 'Asuncion, Miro R.',
+                    description:
+                        'Project Manager/Backend Developer \n\n[Short bio]')),
             const Padding(
-              padding: EdgeInsets.only(left: 10, top: 15),
-              child: PolicyText(title: 'Maylan, Glaiza Darlene T.', description: 'Document Writer, Frontend Developer \n\n[Short bio]')
-            ),
+                padding: EdgeInsets.only(left: 10, top: 15),
+                child: PolicyText(
+                    title: 'Maylan, Glaiza Darlene T.',
+                    description:
+                        'Document Writer, Frontend Developer \n\n[Short bio]')),
             const Padding(
-              padding: EdgeInsets.only(left: 10, top: 15),
-              child: PolicyText(title: 'Solis, Jaira Fredniecole B.', description: 'Frontend Developer, Backend Developer \n\n[Short bio]')
-            ),
+                padding: EdgeInsets.only(left: 10, top: 15),
+                child: PolicyText(
+                    title: 'Solis, Jaira Fredniecole B.',
+                    description:
+                        'Frontend Developer, Backend Developer \n\n[Short bio]')),
             const Padding(
-              padding: EdgeInsets.only(left: 10, top: 15),
-              child: PolicyText(title: 'Romero, Justine Louise V.', description: 'Frontend Developer, Backend Developer \n\n[Short bio]')
-            ),
+                padding: EdgeInsets.only(left: 10, top: 15),
+                child: PolicyText(
+                    title: 'Romero, Justine Louise V.',
+                    description:
+                        'Frontend Developer, Backend Developer \n\n[Short bio]')),
             const Divider(height: 30, thickness: 1),
             const CategoryText(
               text: 'Our Values',
@@ -108,7 +117,11 @@ class About extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(Icons.check, color: Color(0xFDFE8D88), size: 15,),
+          const Icon(
+            Icons.check,
+            color: Color(0xFDFE8D88),
+            size: 15,
+          ),
           const SizedBox(width: 8),
           Expanded(
             child: Text(

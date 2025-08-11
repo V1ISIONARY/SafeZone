@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-
 import '../../../../../../backend/properties/import.dart';
 
 class UserGuide extends StatelessWidget {
@@ -44,8 +42,7 @@ class UserGuide extends StatelessWidget {
                 "Creating an Account\nOpen the SafeZone app and select 'Sign Up'...",
           ),
           _SectionContent(
-            content:
-                "Logging In\nOpen the app and select 'Sign In'...",
+            content: "Logging In\nOpen the app and select 'Sign In'...",
           ),
           _SectionTitle(title: "Main Features"),
           _SectionContent(
@@ -92,8 +89,7 @@ class UserGuide extends StatelessWidget {
           ),
           _SectionTitle(title: "Troubleshooting and Support"),
           _SectionContent(
-            content:
-                "Common Issues\nApp Crashing: Restart the application...",
+            content: "Common Issues\nApp Crashing: Restart the application...",
           ),
           _SectionContent(
             content:

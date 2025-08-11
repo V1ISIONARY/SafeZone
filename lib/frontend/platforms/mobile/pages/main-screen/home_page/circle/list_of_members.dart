@@ -37,7 +37,7 @@ class _ListOfMembersState extends State<ListOfMembers> {
   bool _isToggling = false;
 
   Future<void> _checkIfShown() async {
-    Future.delayed(Duration(milliseconds: 200), () {
+    Future.delayed(const Duration(milliseconds: 200), () {
       if (mounted) {
         setState(() {
           _appBarHeight = 40;
@@ -46,7 +46,7 @@ class _ListOfMembersState extends State<ListOfMembers> {
         });
       }
 
-      Future.delayed(Duration(seconds: 5), () {
+      Future.delayed(const Duration(seconds: 5), () {
         if (mounted) {
           setState(() {
             _appBarHeight = 0;
@@ -526,7 +526,7 @@ class _ListOfMembersState extends State<ListOfMembers> {
                                                           size: 20);
                                                     },
                                                   )
-                                                : Icon(Icons.person,
+                                                : const Icon(Icons.person,
                                                     color: textColor, size: 20),
                                           ),
                                         ),

@@ -24,7 +24,7 @@ class _SosSuccessState extends State<SosSuccess> {
 
   Future<void> _checkIfShown(
       {required String text, required Color color}) async {
-    Future.delayed(Duration(milliseconds: 200), () {
+    Future.delayed(const Duration(milliseconds: 200), () {
       if (mounted) {
         setState(() {
           _appBarHeight = 40;
@@ -34,7 +34,7 @@ class _SosSuccessState extends State<SosSuccess> {
         });
       }
 
-      Future.delayed(Duration(seconds: 5), () {
+      Future.delayed(const Duration(seconds: 5), () {
         if (mounted) {
           setState(() {
             _appBarHeight = 0;

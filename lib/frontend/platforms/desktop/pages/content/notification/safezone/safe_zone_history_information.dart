@@ -12,18 +12,15 @@ import 'package:safezone/frontend/platforms/desktop/pages/content/notification/s
 import '../../../../../../../backend/properties/import.dart';
 
 class SafeZoneHistoryDetailsDT extends StatefulWidget {
-
   final VoidCallback? onBack;
   final SafeZoneModel safezonemodel;
 
-  const SafeZoneHistoryDetailsDT({
-    super.key, 
-    this.onBack,
-    required this.safezonemodel
-  });
+  const SafeZoneHistoryDetailsDT(
+      {super.key, this.onBack, required this.safezonemodel});
 
   @override
-  State<SafeZoneHistoryDetailsDT> createState() => _SafeZoneHistoryDetailsDTState();
+  State<SafeZoneHistoryDetailsDT> createState() =>
+      _SafeZoneHistoryDetailsDTState();
 }
 
 class _SafeZoneHistoryDetailsDTState extends State<SafeZoneHistoryDetailsDT> {
@@ -156,15 +153,14 @@ class _SafeZoneHistoryDetailsDTState extends State<SafeZoneHistoryDetailsDT> {
         );
       default:
         return Scaffold(
-          backgroundColor: Color.fromARGB(255, 240, 240, 240),
-          appBar: AppBar(
-            backgroundColor: Color.fromARGB(255, 240, 240, 240),
-            automaticallyImplyLeading: false,
-            centerTitle: true,
-            title: Transform.translate(
-              offset: const Offset(-15, 0),
-              child: Row(
-                children: [
+            backgroundColor: const Color.fromARGB(255, 240, 240, 240),
+            appBar: AppBar(
+              backgroundColor: const Color.fromARGB(255, 240, 240, 240),
+              automaticallyImplyLeading: false,
+              centerTitle: true,
+              title: Transform.translate(
+                offset: const Offset(-15, 0),
+                child: Row(children: [
                   GestureDetector(
                     onTap: widget.onBack ?? () => Navigator.pop(context),
                     child: Container(
@@ -175,315 +171,324 @@ class _SafeZoneHistoryDetailsDTState extends State<SafeZoneHistoryDetailsDT> {
                         border: Border.all(width: 1, color: Colors.black),
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(Icons.arrow_back, color: Colors.black, size: 10),
+                      child: const Icon(Icons.arrow_back,
+                          color: Colors.black, size: 10),
                     ),
                   ),
                   const CategoryText(text: "Safe Zone Details")
-                ]
+                ]),
               ),
             ),
-          ),
-          body: ScrollConfiguration(
-            behavior: ScrollConfiguration.of(context).copyWith(
-              scrollbars: false,
-            ),
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  Container(
-                    decoration: const BoxDecoration(
-                      color: Color.fromARGB(255, 240, 240, 240),
-                    ),
+            body: ScrollConfiguration(
+                behavior: ScrollConfiguration.of(context).copyWith(
+                  scrollbars: false,
+                ),
+                child: SingleChildScrollView(
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.all(15),
-                          decoration: BoxDecoration(
-                            gradient: statusGradient(widget.safezonemodel.status!),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Text(
-                                widget.safezonemodel.status!,
-                                style: const TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.white),
-                              ),
-                              const SizedBox(
-                                height: 5,
-                              ),
-                              CategoryDescripText(
-                                color: Colors.white,
-                                text: reportStatusMessage(widget.safezonemodel.status!),
-                              ),
-                            ],
-                          ),
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              selectedInternalPage = 'details';
-                            });
-                          },
-                          child: Container(
+                  children: [
+                    Container(
+                      decoration: const BoxDecoration(
+                        color: Color.fromARGB(255, 240, 240, 240),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
                             width: double.infinity,
-                            margin: const EdgeInsets.only(bottom: 15),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 16
+                            padding: const EdgeInsets.all(15),
+                            decoration: BoxDecoration(
+                              gradient:
+                                  statusGradient(widget.safezonemodel.status!),
                             ),
-                            color: Colors.white,
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
-                                Container(
-                                  height: 25,
-                                  width: 25,
-                                  margin: const EdgeInsets.only(right: 17),
-                                  child: Image.asset(
-                                    "lib/resource/image/png/updates.png",
-                                    fit: BoxFit.contain,
-                                    color: Color.fromARGB(179, 0, 0, 0),
-                                  ),
+                                Text(
+                                  widget.safezonemodel.status!,
+                                  style: const TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.white),
                                 ),
-                                const Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      PrimaryText(text: "Check status history")
-                                    ],
-                                  ),
+                                const SizedBox(
+                                  height: 5,
                                 ),
-                                Container(
-                                  height: 15,
-                                  width: 15,
-                                  margin: const EdgeInsets.only(right: 17),
-                                  child: Icon(
-                                    Icons.chevron_right_outlined,
-                                    color: Colors.grey[500],
-                                  )
+                                CategoryDescripText(
+                                  color: Colors.white,
+                                  text: reportStatusMessage(
+                                      widget.safezonemodel.status!),
                                 ),
                               ],
                             ),
                           ),
-                        ),
-                        Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 16),
-                          child: Column(
-                            children: [
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(3),
-                                child: SizedBox(
-                                  height: 215,
-                                  width: double.infinity,
-                                  child: gmaps.GoogleMap(
-                                    initialCameraPosition:
-                                        const gmaps.CameraPosition(
-                                      target: gmaps.LatLng(16.043859, 120.335182),
-                                      zoom: 14.0,
+                          GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                selectedInternalPage = 'details';
+                              });
+                            },
+                            child: Container(
+                              width: double.infinity,
+                              margin: const EdgeInsets.only(bottom: 15),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: 16),
+                              color: Colors.white,
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    height: 25,
+                                    width: 25,
+                                    margin: const EdgeInsets.only(right: 17),
+                                    child: Image.asset(
+                                      "lib/resource/image/png/updates.png",
+                                      fit: BoxFit.contain,
+                                      color: const Color.fromARGB(179, 0, 0, 0),
                                     ),
-                                    markers: {
-                                      gmaps.Marker(
-                                        markerId:
-                                            const gmaps.MarkerId("pinned location"),
-                                        position: gmaps.LatLng(
-                                          widget.safezonemodel.latitude ?? 0.0,
-                                          widget.safezonemodel.longitude ?? 0.0,
+                                  ),
+                                  const Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        PrimaryText(
+                                            text: "Check status history")
+                                      ],
+                                    ),
+                                  ),
+                                  Container(
+                                      height: 15,
+                                      width: 15,
+                                      margin: const EdgeInsets.only(right: 17),
+                                      child: Icon(
+                                        Icons.chevron_right_outlined,
+                                        color: Colors.grey[500],
+                                      )),
+                                ],
+                              ),
+                            ),
+                          ),
+                          Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: 16),
+                              child: Column(
+                                children: [
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(3),
+                                    child: SizedBox(
+                                      height: 215,
+                                      width: double.infinity,
+                                      child: gmaps.GoogleMap(
+                                        initialCameraPosition:
+                                            const gmaps.CameraPosition(
+                                          target: gmaps.LatLng(
+                                              16.043859, 120.335182),
+                                          zoom: 14.0,
                                         ),
-                                        infoWindow: const gmaps.InfoWindow(
-                                            title: "Pinned Location"),
+                                        markers: {
+                                          gmaps.Marker(
+                                            markerId: const gmaps.MarkerId(
+                                                "pinned location"),
+                                            position: gmaps.LatLng(
+                                              widget.safezonemodel.latitude ??
+                                                  0.0,
+                                              widget.safezonemodel.longitude ??
+                                                  0.0,
+                                            ),
+                                            infoWindow: const gmaps.InfoWindow(
+                                                title: "Pinned Location"),
+                                          ),
+                                        },
+                                        onMapCreated: (gmaps.GoogleMapController
+                                            controller) {
+                                          _mapController.complete(controller);
+                                        },
                                       ),
-                                    },
-                                    onMapCreated:
-                                        (gmaps.GoogleMapController controller) {
-                                      _mapController.complete(controller);
-                                    },
-                                  ),
-                                ),
-                              ),
-                              Padding(
-                                padding: EdgeInsets.symmetric(vertical: 40),
-                                child: Text(
-                                  widget.safezonemodel.name ?? "My Safe Zone",
-                                  style: const TextStyle(
-                                    fontSize: 15,
-                                    color: Colors.black
-                                  ),
-                                ),
-                              ),
-                              Container(
-                                padding: const EdgeInsets.all(8),
-                                decoration: const BoxDecoration(
-                                  color: Color.fromARGB(5, 0, 0, 0)
-                                ),
-                                child: Wrap(
-                                  children: [
-                                    const CategoryText(text: "Location: ",),
-                                    SizedBox(
-                                      height: 10,
                                     ),
-                                    CategoryDescripTextE(text:_address)
-                                  ],
-                                ),
-                              ),
-                              const SizedBox(
-                                height: 20,
-                              ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: List.generate(5, (index) {
-                                  int ratingValue = index + 1;
-                                  return Container(
-                                    margin: const EdgeInsets.all(3),
-                                    width: 50,
-                                    height: 40,
-                                    decoration: BoxDecoration(
-                                      color:
-                                          widget.safezonemodel.scale == ratingValue
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 40),
+                                    child: Text(
+                                      widget.safezonemodel.name ??
+                                          "My Safe Zone",
+                                      style: const TextStyle(
+                                          fontSize: 15, color: Colors.black),
+                                    ),
+                                  ),
+                                  Container(
+                                    padding: const EdgeInsets.all(8),
+                                    decoration: const BoxDecoration(
+                                        color: Color.fromARGB(5, 0, 0, 0)),
+                                    child: Wrap(
+                                      children: [
+                                        const CategoryText(
+                                          text: "Location: ",
+                                        ),
+                                        const SizedBox(
+                                          height: 10,
+                                        ),
+                                        CategoryDescripTextE(text: _address)
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(
+                                    height: 20,
+                                  ),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: List.generate(5, (index) {
+                                      int ratingValue = index + 1;
+                                      return Container(
+                                        margin: const EdgeInsets.all(3),
+                                        width: 50,
+                                        height: 40,
+                                        decoration: BoxDecoration(
+                                          color: widget.safezonemodel.scale ==
+                                                  ratingValue
                                               ? btnColor.withOpacity(0.1)
                                               : bgColor,
-                                      border: Border.all(
-                                        color: widget.safezonemodel.scale ==
-                                                ratingValue
-                                            ? btnColor
-                                            : const Color(0xff707070)
-                                                .withOpacity(0.5),
-                                        width: 1.5,
-                                      ),
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: Center(
-                                      child: Text(
-                                        ratingValue.toString(),
-                                        style: const TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w400,
-                                          color: textColor,
+                                          border: Border.all(
+                                            color: widget.safezonemodel.scale ==
+                                                    ratingValue
+                                                ? btnColor
+                                                : const Color(0xff707070)
+                                                    .withOpacity(0.5),
+                                            width: 1.5,
+                                          ),
+                                          borderRadius:
+                                              BorderRadius.circular(8),
                                         ),
+                                        child: Center(
+                                          child: Text(
+                                            ratingValue.toString(),
+                                            style: const TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w400,
+                                              color: textColor,
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    }),
+                                  ),
+                                  const SizedBox(height: 20),
+                                  Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: Text(
+                                      widget.safezonemodel.description!,
+                                      style: const TextStyle(
+                                          fontSize: 13, color: textColor),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 20),
+                                  const Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: Text(
+                                      "What time of day do you feel this area is safe?",
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        color: textColor,
                                       ),
                                     ),
-                                  );
-                                }),
-                              ),
-                              const SizedBox(height: 20),
-                              Align(
-                                alignment: Alignment.centerLeft,
-                                child: Text(
-                                  widget.safezonemodel.description!,
-                                  style: const TextStyle(
-                                      fontSize: 13, color: textColor),
-                                ),
-                              ),
-                              const SizedBox(height: 20),
-                              const Align(
-                                alignment: Alignment.centerLeft,
-                                child: Text(
-                                  "What time of day do you feel this area is safe?",
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    color: textColor,
                                   ),
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Column(
-                                children: [
-                                  CustomRadioButton(
-                                    value: "Daytime",
-                                    groupValue: widget.safezonemodel.timeOfDay!,
-                                    label: "Daytime",
-                                    onChanged: null,
+                                  const SizedBox(height: 4),
+                                  Column(
+                                    children: [
+                                      CustomRadioButton(
+                                        value: "Daytime",
+                                        groupValue:
+                                            widget.safezonemodel.timeOfDay!,
+                                        label: "Daytime",
+                                        onChanged: null,
+                                      ),
+                                      CustomRadioButton(
+                                        value: "Nighttime",
+                                        groupValue:
+                                            widget.safezonemodel.timeOfDay!,
+                                        label: "Nighttime",
+                                        onChanged: null,
+                                      ),
+                                      CustomRadioButton(
+                                        value: "Both",
+                                        groupValue:
+                                            widget.safezonemodel.timeOfDay!,
+                                        label: "Both",
+                                        onChanged: null,
+                                      ),
+                                    ],
                                   ),
-                                  CustomRadioButton(
-                                    value: "Nighttime",
-                                    groupValue: widget.safezonemodel.timeOfDay!,
-                                    label: "Nighttime",
-                                    onChanged: null,
+                                  const SizedBox(height: 12),
+                                  const Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: Text(
+                                      "How often do you visit this area?",
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        color: textColor,
+                                      ),
+                                    ),
                                   ),
-                                  CustomRadioButton(
-                                    value: "Both",
-                                    groupValue: widget.safezonemodel.timeOfDay!,
-                                    label: "Both",
-                                    onChanged: null,
+                                  const SizedBox(height: 4),
+                                  Column(
+                                    children: [
+                                      CustomRadioButton(
+                                        value: "Daily",
+                                        groupValue:
+                                            widget.safezonemodel.frequency!,
+                                        label: "Daily",
+                                        onChanged: null,
+                                      ),
+                                      CustomRadioButton(
+                                        value: "Weekly",
+                                        groupValue:
+                                            widget.safezonemodel.frequency!,
+                                        label: "Weekly",
+                                        onChanged: null,
+                                      ),
+                                      CustomRadioButton(
+                                        value: "Occasionally",
+                                        groupValue:
+                                            widget.safezonemodel.frequency!,
+                                        label: "Occasionally",
+                                        onChanged: null,
+                                      ),
+                                      CustomRadioButton(
+                                        value: "Rarely",
+                                        groupValue:
+                                            widget.safezonemodel.frequency!,
+                                        label: "Rarely",
+                                        onChanged: null,
+                                      ),
+                                    ],
                                   ),
+                                  const SizedBox(height: 10),
                                 ],
-                              ),
-                              const SizedBox(height: 12),
-                              const Align(
-                                alignment: Alignment.centerLeft,
-                                child: Text(
-                                  "How often do you visit this area?",
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    color: textColor,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Column(
-                                children: [
-                                  CustomRadioButton(
-                                    value: "Daily",
-                                    groupValue: widget.safezonemodel.frequency!,
-                                    label: "Daily",
-                                    onChanged: null,
-                                  ),
-                                  CustomRadioButton(
-                                    value: "Weekly",
-                                    groupValue: widget.safezonemodel.frequency!,
-                                    label: "Weekly",
-                                    onChanged: null,
-                                  ),
-                                  CustomRadioButton(
-                                    value: "Occasionally",
-                                    groupValue: widget.safezonemodel.frequency!,
-                                    label: "Occasionally",
-                                    onChanged: null,
-                                  ),
-                                  CustomRadioButton(
-                                    value: "Rarely",
-                                    groupValue: widget.safezonemodel.frequency!,
-                                    label: "Rarely",
-                                    onChanged: null,
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 10),
-                            ],
-                          )
-                        ),
-                        const SizedBox(
-                          height: 1,
-                        ),
-                        Container(
-                          width: double.infinity,
-                          margin: const EdgeInsets.only(bottom: 15),
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 16),
-                          child: HistoryInformationText(
-                            text: "Date",
-                            data: widget.safezonemodel.reportTimestamp!,
+                              )),
+                          const SizedBox(
+                            height: 1,
                           ),
-                        ),
-                      ],
+                          Container(
+                            width: double.infinity,
+                            margin: const EdgeInsets.only(bottom: 15),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 16),
+                            child: HistoryInformationText(
+                              text: "Date",
+                              data: widget.safezonemodel.reportTimestamp!,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                  const SizedBox(
-                    height: 50,
-                  ),
-                ],
-              )
-            )
-          )
-        );
+                    const SizedBox(
+                      height: 50,
+                    ),
+                  ],
+                ))));
     }
   }
-
 }

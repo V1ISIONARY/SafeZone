@@ -1,12 +1,4 @@
-import 'dart:async';
-
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart' as gmaps;
-import 'package:go_router/go_router.dart';
-import 'package:insta_image_viewer/insta_image_viewer.dart';
-import 'package:lottie/lottie.dart';
 import 'package:safezone/backend/models/dangerzoneModel/incident_report_model.dart';
 
 import '../../../../../backend/architecture/bloc/adminBloc/incident_report/admin_incident_report_bloc.dart';
@@ -186,13 +178,13 @@ class _AdminReportsDetailsState extends State<AdminReportsDetails> {
           builder: (context, state) {
             if (_isLoading) {
               return Expanded(
-              child: Center(
-                child: Transform.translate(
-                    offset: const Offset(-20, -30),
-                    child: const LoadingState()),
-              ),
-            );
-          }
+                child: Center(
+                  child: Transform.translate(
+                      offset: const Offset(-20, -30),
+                      child: const LoadingState()),
+                ),
+              );
+            }
             return SingleChildScrollView(
               child: Column(
                 children: [
@@ -420,7 +412,8 @@ class _AdminReportsDetailsState extends State<AdminReportsDetails> {
                                                           Widget child,
                                                           ImageChunkEvent?
                                                               loadingProgress) {
-                                                    if (loadingProgress == null) {
+                                                    if (loadingProgress ==
+                                                        null) {
                                                       return child;
                                                     }
                                                     return Center(

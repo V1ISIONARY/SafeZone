@@ -89,7 +89,7 @@ class _ForgotState extends State<Forgot> {
       _notificationText = text;
     });
 
-    Future.delayed(Duration(seconds: 5), () {
+    Future.delayed(const Duration(seconds: 5), () {
       if (mounted) {
         setState(() {
           _appBarHeight = 0;
@@ -105,7 +105,7 @@ class _ForgotState extends State<Forgot> {
   Color _otpColor = Colors.transparent;
 
   Future<void> _checkIfShownOtp(bool open) async {
-    Future.delayed(Duration(milliseconds: 200), () {
+    Future.delayed(const Duration(milliseconds: 200), () {
       setState(() {
         if (open) {
           _otp = 50;
@@ -124,10 +124,10 @@ class _ForgotState extends State<Forgot> {
   Widget build(BuildContext context) {
     return Scaffold(
         body: Column(children: [
-          AppBar(
-                  toolbarHeight: 0,
-                  automaticallyImplyLeading: false,
-                ),
+      AppBar(
+        toolbarHeight: 0,
+        automaticallyImplyLeading: false,
+      ),
       AnimatedContainer(
         duration: const Duration(milliseconds: 300),
         height: _appBarHeight,
@@ -150,22 +150,22 @@ class _ForgotState extends State<Forgot> {
             Navigator.pop(context);
           },
           child: Container(
-            margin: EdgeInsets.all(15),
+            margin: const EdgeInsets.all(15),
             decoration: BoxDecoration(
               border: Border.all(width: 1, color: Colors.black),
               shape: BoxShape.circle,
             ),
-            child: Icon(Icons.arrow_back, color: Colors.black, size: 10),
+            child: const Icon(Icons.arrow_back, color: Colors.black, size: 10),
           ),
         ),
       ),
       Expanded(
           child: Container(
-        margin: EdgeInsets.symmetric(horizontal: 15),
+        margin: const EdgeInsets.symmetric(horizontal: 15),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            const Text(
               'Forgot Password',
               style: TextStyle(
                 fontWeight: FontWeight.bold,
@@ -173,7 +173,7 @@ class _ForgotState extends State<Forgot> {
                 fontSize: 20,
               ),
             ),
-            SizedBox(height: 5),
+            const SizedBox(height: 5),
             Flexible(
                 child: Text(
               "Enter the email associated with you account and we'll send an email with\nintructions to reset your password.",
@@ -183,7 +183,7 @@ class _ForgotState extends State<Forgot> {
                 color: Colors.black45,
               ),
             )),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             TextField(
               controller: emailController,
               style: const TextStyle(
@@ -208,7 +208,7 @@ class _ForgotState extends State<Forgot> {
                   contentPadding: const EdgeInsets.symmetric(horizontal: 15),
                   suffixIcon: _showTitleOtp
                       ? Padding(
-                          padding: EdgeInsets.only(right: 15),
+                          padding: const EdgeInsets.only(right: 15),
                           child: GestureDetector(
                             onTap: () {
                               setState(() {
@@ -216,7 +216,7 @@ class _ForgotState extends State<Forgot> {
                                 _checkIfShownOtp(false);
                               });
                             },
-                            child: Icon(
+                            child: const Icon(
                               Icons.close,
                               color: Colors.grey,
                             ),
@@ -258,7 +258,7 @@ class _ForgotState extends State<Forgot> {
                     )
                   : null,
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             _showTitleOtp
                 ? SizedBox(
                     width: double.infinity,
@@ -274,7 +274,7 @@ class _ForgotState extends State<Forgot> {
                             PageTransition(
                               child: Createnew(email: emailController.text),
                               type: PageTransitionType.rightToLeft,
-                              duration: Duration(milliseconds: 300),
+                              duration: const Duration(milliseconds: 300),
                             ),
                           );
                         } else {

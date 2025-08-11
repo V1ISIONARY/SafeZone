@@ -139,7 +139,7 @@ class _ReviewReportState extends State<ReviewReport> {
           } else if (state is IncidentReportError) {
             Navigator.pop(context);
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.message + "haysssss")),
+              SnackBar(content: Text("${state.message}haysssss")),
             );
           }
         },
@@ -356,7 +356,7 @@ class _ReviewReportState extends State<ReviewReport> {
                                   Icons.schedule,
                                   color: widgetPricolor,
                                 ),
-                                SizedBox(width: 5),
+                                const SizedBox(width: 5),
                                 CategoryDescripTextE(
                                     text:
                                         "${DateFormat.yMMMMd().format(DateTime.now())} • ${DateFormat.jm().format(DateTime.now())}",

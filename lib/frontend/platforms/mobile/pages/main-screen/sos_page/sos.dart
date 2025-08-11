@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:safezone/frontend/platforms/mobile/widgets/buttons/sos_button.dart';
 
 import '../../../../../../backend/properties/import.dart';

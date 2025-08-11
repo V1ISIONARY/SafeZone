@@ -72,8 +72,8 @@ class TermsPolicyBtn extends StatelessWidget {
                 const Spacer(),
                 Align(
                   alignment: Alignment.center,
-                  child: Container(
-                    height: 25, 
+                  child: SizedBox(
+                    height: 25,
                     width: 25,
                     child: Icon(
                       Icons.chevron_right_outlined,

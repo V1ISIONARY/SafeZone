@@ -45,9 +45,7 @@ import 'package:safezone/frontend/platforms/mobile/pages/main-screen/sos_page/so
 import 'package:safezone/frontend/platforms/mobile/pages/main-screen/sos_page/sos_cancel.dart';
 import 'package:safezone/frontend/platforms/mobile/pages/main-screen/sos_page/sos_countdown.dart';
 import 'package:safezone/frontend/platforms/mobile/pages/main-screen/sos_page/sos_success.dart';
-import 'package:safezone/frontend/platforms/mobile/widgets/bottom_navigation.dart';
 import 'package:safezone/frontend/root/authentication/starter.dart';
-import 'package:safezone/frontend/root/experiement.dart';
 import 'package:safezone/main.dart';
 
 import '../../frontend/root/content/navigation.dart';

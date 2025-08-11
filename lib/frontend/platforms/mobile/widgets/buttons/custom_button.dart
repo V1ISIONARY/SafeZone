@@ -1,9 +1,6 @@
-import 'package:flutter/material.dart';
-
 import '../../../../../backend/properties/import.dart';
 
 class CustomButton extends StatelessWidget {
-
   final String text;
   final VoidCallback onPressed;
   final Color buttonColor;
@@ -12,18 +9,17 @@ class CustomButton extends StatelessWidget {
   final double width;
   final double height;
   final bool widthSize;
-  
-  const CustomButton({
-    super.key,
-    required this.text,
-    required this.onPressed,
-    this.buttonColor = btnColor,
-    this.textColor = Colors.white,
-    this.isOutlined = false,
-    this.width = 350,
-    this.height = 50,
-    this.widthSize = false
-  });
+
+  const CustomButton(
+      {super.key,
+      required this.text,
+      required this.onPressed,
+      this.buttonColor = btnColor,
+      this.textColor = Colors.white,
+      this.isOutlined = false,
+      this.width = 350,
+      this.height = 50,
+      this.widthSize = false});
 
   @override
   Widget build(BuildContext context) {
@@ -32,14 +28,13 @@ class CustomButton extends StatelessWidget {
       height: height,
       child: TextButton(
         style: TextButton.styleFrom(
-          backgroundColor: isOutlined ? buttonColor.withOpacity(0.05) : buttonColor,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10.0),
-            side: BorderSide(
-              color: isOutlined ? buttonColor : Colors.transparent,
-            )
-          )
-        ),
+            backgroundColor:
+                isOutlined ? buttonColor.withOpacity(0.05) : buttonColor,
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10.0),
+                side: BorderSide(
+                  color: isOutlined ? buttonColor : Colors.transparent,
+                ))),
         onPressed: onPressed,
         child: Text(
           textAlign: TextAlign.center,
@@ -52,5 +47,4 @@ class CustomButton extends StatelessWidget {
       ),
     );
   }
-
 }

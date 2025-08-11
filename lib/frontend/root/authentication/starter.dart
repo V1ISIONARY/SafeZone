@@ -8,7 +8,7 @@ class Starter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return const Scaffold(
       backgroundColor: Colors.transparent,
       body: AuthResWidget(
         mobile: StarterMD(),

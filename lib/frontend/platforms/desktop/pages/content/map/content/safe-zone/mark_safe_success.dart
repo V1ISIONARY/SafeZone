@@ -1,14 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
-import 'package:safezone/backend/architecture/bloc/mapBloc/map_bloc.dart';
-import 'package:safezone/backend/architecture/bloc/mapBloc/map_event.dart';
 import 'package:safezone/frontend/platforms/mobile/widgets/buttons/custom_button.dart';
 import 'package:safezone/resource/schema/colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class MarkSafeSuccess extends StatefulWidget {
-
   final VoidCallback? onGoToSZ;
   final VoidCallback? onBack;
   final VoidCallback? onClose;
@@ -21,7 +16,6 @@ class MarkSafeSuccess extends StatefulWidget {
 
   @override
   State<MarkSafeSuccess> createState() => _MarkSafeSuccessState();
-  
 }
 
 class _MarkSafeSuccessState extends State<MarkSafeSuccess> {
@@ -42,9 +36,8 @@ class _MarkSafeSuccessState extends State<MarkSafeSuccess> {
             children: [
               const SizedBox(height: 200),
               Transform.scale(
-                scale: 0.8,
-                child: Column(
-                  children: [
+                  scale: 0.8,
+                  child: Column(children: [
                     Image.asset(
                       "lib/resource/svg/success.png",
                       width: 150,
@@ -56,23 +49,19 @@ class _MarkSafeSuccessState extends State<MarkSafeSuccess> {
                       textAlign: TextAlign.center,
                       style: TextStyle(color: textColor, fontSize: 15),
                     ),
-                  ]
-                )
-              ),
+                  ])),
               const Spacer(),
               Transform.scale(
-                scale: 0.8,
-                child: Column(
-                  children: [
+                  scale: 0.8,
+                  child: Column(children: [
                     CustomButton(
-                      text: "Go to your safezone history",
-                      widthSize: true,
-                      buttonColor: widgetPricolor,
-                      onPressed: (){
-                        widget.onGoToSZ?.call();
-                        widget.onClose?.call();
-                      }
-                    ),
+                        text: "Go to your safezone history",
+                        widthSize: true,
+                        buttonColor: widgetPricolor,
+                        onPressed: () {
+                          widget.onGoToSZ?.call();
+                          widget.onClose?.call();
+                        }),
                     const SizedBox(height: 10),
                     CustomButton(
                       widthSize: true,
@@ -82,13 +71,14 @@ class _MarkSafeSuccessState extends State<MarkSafeSuccess> {
                       isOutlined: true,
                       onPressed: () async {
                         final prefs = await SharedPreferences.getInstance();
-                        final userToken = prefs.getString('userToken'); 
+                        final userToken = prefs.getString('userToken');
                         if (userToken != null) {
                           widget.onBack?.call();
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                              content: Text("User token not found! Please log in again."),
+                              content: Text(
+                                  "User token not found! Please log in again."),
                               backgroundColor: Colors.red,
                             ),
                           );
@@ -96,9 +86,7 @@ class _MarkSafeSuccessState extends State<MarkSafeSuccess> {
                         // context.read<MapBloc>().add(FetchMapData());
                       },
                     ),
-                  ]
-                )
-              ),
+                  ])),
               const SizedBox(height: 30),
             ],
           ),

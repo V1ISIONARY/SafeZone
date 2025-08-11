@@ -21,16 +21,11 @@ import 'package:safezone/resource/schema/texts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class MarkSafeZoneDT extends StatefulWidget {
-
   final void Function(String page)? onOpenNotification;
   final VoidCallback? onReturn;
   final VoidCallback? onClose;
-  const MarkSafeZoneDT({
-    super.key,
-    this.onClose,
-    this.onReturn,
-    this.onOpenNotification
-  });
+  const MarkSafeZoneDT(
+      {super.key, this.onClose, this.onReturn, this.onOpenNotification});
 
   @override
   State<MarkSafeZoneDT> createState() => _MarkSafeZoneDTState();
@@ -243,7 +238,7 @@ class _MarkSafeZoneDTState extends State<MarkSafeZoneDT> {
 
   String? selectedInternalPage;
   SafeZoneModel? safezonemodel;
-  
+
   @override
   Widget build(BuildContext context) {
     return _getPageForNavigation(selectedInternalPage);
@@ -261,147 +256,146 @@ class _MarkSafeZoneDTState extends State<MarkSafeZoneDT> {
               selectedInternalPage = null;
               safezonemodel = null;
             });
-          },       
-          onGoToSZ: () {
-            widget.onOpenNotification?.call("Safezone"); 
           },
-          onClose: (){
+          onGoToSZ: () {
+            widget.onOpenNotification?.call("Safezone");
+          },
+          onClose: () {
             widget.onClose?.call();
           },
           safeZone: safezonemodel!,
         );
       default:
         return Container(
-          padding: EdgeInsets.symmetric(horizontal: 15),
-          color: Colors.white54,
-          child: Scaffold(
-            appBar: AppBar(
-              backgroundColor: Colors.white,
-              automaticallyImplyLeading: false,
-              centerTitle: false,
-              title: Transform.translate(
-                offset: const Offset(-15, 0),
-                child: CategoryText(text: "Mark As SafeZone")
-              ),
-              actions: [
-                GestureDetector(
-                  onTap: (){
-                    if (widget.onClose != null) {
-                      widget.onClose!();
-                    }
-                  },
-                  child: Icon(
-                    Icons.cancel_outlined,
-                    size: 20,
-                    color: Colors.black38,
-                  )
+            padding: const EdgeInsets.symmetric(horizontal: 15),
+            color: Colors.white54,
+            child: Scaffold(
+                appBar: AppBar(
+                  backgroundColor: Colors.white,
+                  automaticallyImplyLeading: false,
+                  centerTitle: false,
+                  title: Transform.translate(
+                      offset: const Offset(-15, 0),
+                      child: const CategoryText(text: "Mark As SafeZone")),
+                  actions: [
+                    GestureDetector(
+                        onTap: () {
+                          if (widget.onClose != null) {
+                            widget.onClose!();
+                          }
+                        },
+                        child: const Icon(
+                          Icons.cancel_outlined,
+                          size: 20,
+                          color: Colors.black38,
+                        )),
+                  ],
                 ),
-              ],
-            ),
-            body: LayoutBuilder(
-              builder: (context, constraints) {
-                return Column(
-                  children: [
-                    Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 0),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                  child: Container(
-                                height: 40,
-                                child: TextField(
-                                    controller: _searchController,
-                                    style: GoogleFonts.poppins(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w500,
-                                      color: Colors.black,
-                                    ),
-                                    decoration: InputDecoration(
-                                      filled: true,
-                                      fillColor: Colors.transparent,
-                                      hintText: 'Search for location',
-                                      hintStyle: GoogleFonts.poppins(
+                body: LayoutBuilder(builder: (context, constraints) {
+                  return Column(
+                    children: [
+                      Column(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 0),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                    child: SizedBox(
+                                  height: 40,
+                                  child: TextField(
+                                      controller: _searchController,
+                                      style: GoogleFonts.poppins(
                                         fontSize: 12,
                                         fontWeight: FontWeight.w500,
-                                        color: Colors.black38,
+                                        color: Colors.black,
                                       ),
-                                      contentPadding: const EdgeInsets.only(
-                                          left: 10, bottom: 8),
-                                      border: const OutlineInputBorder(
-                                        borderSide:
-                                            BorderSide(color: btnColor),
+                                      decoration: InputDecoration(
+                                        filled: true,
+                                        fillColor: Colors.transparent,
+                                        hintText: 'Search for location',
+                                        hintStyle: GoogleFonts.poppins(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w500,
+                                          color: Colors.black38,
+                                        ),
+                                        contentPadding: const EdgeInsets.only(
+                                            left: 10, bottom: 8),
+                                        border: const OutlineInputBorder(
+                                          borderSide:
+                                              BorderSide(color: btnColor),
+                                        ),
+                                        focusedBorder: const OutlineInputBorder(
+                                          borderSide:
+                                              BorderSide(color: btnColor),
+                                        ),
+                                        enabledBorder: const OutlineInputBorder(
+                                          borderSide:
+                                              BorderSide(color: btnColor),
+                                        ),
+                                      )),
+                                )),
+                                const SizedBox(width: 10),
+                                GestureDetector(
+                                  onTap: () {
+                                    _searchLocation();
+                                  },
+                                  child: Container(
+                                    width: 40,
+                                    height: 40,
+                                    decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(5),
+                                        boxShadow: const [
+                                          BoxShadow(
+                                            color: Colors.grey,
+                                            blurRadius: 2,
+                                            offset: Offset(1, 1),
+                                          )
+                                        ]),
+                                    child: const Center(
+                                      child: Icon(
+                                        size: 20,
+                                        Icons.search,
+                                        color: widgetPricolor,
                                       ),
-                                      focusedBorder: const OutlineInputBorder(
-                                        borderSide:
-                                            BorderSide(color: btnColor),
-                                      ),
-                                      enabledBorder: const OutlineInputBorder(
-                                        borderSide:
-                                            BorderSide(color: btnColor),
-                                      ),
-                                    )),
-                              )),
-                              const SizedBox(width: 10),
-                              GestureDetector(
-                                onTap: () {
-                                  _searchLocation();
-                                },
-                                child: Container(
-                                  width: 40,
-                                  height: 40,
-                                  decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.circular(5),
-                                      boxShadow: const [
-                                        BoxShadow(
-                                          color: Colors.grey,
-                                          blurRadius: 2,
-                                          offset: Offset(1, 1),
-                                        )
-                                      ]),
-                                  child: const Center(
-                                    child: Icon(
-                                      size: 20,
-                                      Icons.search,
-                                      color: widgetPricolor,
                                     ),
                                   ),
-                                ),
-                              )
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    ConstrainedBox(
-                      constraints: BoxConstraints(
-                        maxHeight: constraints.maxHeight - 80, 
-                        minHeight: 0,
-                      ),
-                      child: ClipRect(
-                        child: SizedBox(
-                          height: 215,
-                          child: Container(
-                            height: 215,
-                            margin: const EdgeInsets.only(top: 15, bottom: 20),
-                            decoration: BoxDecoration(
-                              color: const Color.fromARGB(54, 96, 125, 139),
-                              borderRadius: BorderRadius.circular(8),
+                                )
+                              ],
                             ),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(8),
-                              child: GoogleMap(
-                                initialCameraPosition: const CameraPosition(
-                                  target: LatLng(16.043859, 120.335182),
-                                  zoom: 14.0,
-                                ),
-                                markers: _markers,
-                                circles: _circles,
-                                onMapCreated: (GoogleMapController controller) {
-                                  _mapController.complete(controller);
-                                  String style = '''
+                          ),
+                        ],
+                      ),
+                      ConstrainedBox(
+                          constraints: BoxConstraints(
+                            maxHeight: constraints.maxHeight - 80,
+                            minHeight: 0,
+                          ),
+                          child: ClipRect(
+                              child: SizedBox(
+                            height: 215,
+                            child: Container(
+                              height: 215,
+                              margin:
+                                  const EdgeInsets.only(top: 15, bottom: 20),
+                              decoration: BoxDecoration(
+                                color: const Color.fromARGB(54, 96, 125, 139),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(8),
+                                child: GoogleMap(
+                                  initialCameraPosition: const CameraPosition(
+                                    target: LatLng(16.043859, 120.335182),
+                                    zoom: 14.0,
+                                  ),
+                                  markers: _markers,
+                                  circles: _circles,
+                                  onMapCreated:
+                                      (GoogleMapController controller) {
+                                    _mapController.complete(controller);
+                                    String style = '''
                                 [
                                   {
                                     "featureType": "administrative",
@@ -468,273 +462,276 @@ class _MarkSafeZoneDTState extends State<MarkSafeZoneDT> {
                                   }
                                 ]
                               ''';
-                                  controller.setMapStyle(style);
-                                },
-                                onTap: (LatLng location) {
-                                  setState(() {
-                                    _pinnedLocation = location;
-                                    _markers.clear();
-                                    _markers.add(
-                                      Marker(
-                                        markerId: const MarkerId("pinned_location"),
-                                        position: location,
-                                        infoWindow: const InfoWindow(title: "Safe Zone"),
-                                      ),
-                                    );
-                                    _updateCircle();
-                                  });
-                                },
-                                zoomGesturesEnabled: true,
-                                scrollGesturesEnabled: true,
-                                rotateGesturesEnabled: true,
-                                tiltGesturesEnabled: true,
-                              ),
-                            ),
-                          ),
-                        )
-                      )
-                    ),
-                    Expanded(
-                      child: SingleChildScrollView(
-                        child: Column(
-                          children: [
-                            _buildRadiusSlider(),
-                            const Align(
-                              alignment: Alignment.centerLeft,
-                              child: CategoryText(
-                                  text: "Safe zone title:", alignment: 'start'),
-                            ),
-                            const SizedBox(height: 15),
-                            TextFieldWidget.buildTextField(
-                              controller: _nameController,
-                              label: "Title",
-                              hint: "Enter safe zone title",
-                              maxLines: 5,
-                            ),
-                            const SizedBox(height: 15),
-                            const Align(
-                              alignment: Alignment.centerLeft,
-                              child: CategoryText(
-                                text:
-                                    "On a scale of 1 to 5, how would you rate the safety of this area?",
-                                alignment: 'start',
-                              ),
-                            ),
-                            const SizedBox(height: 20),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: List.generate(5, (index) {
-                                int ratingValue = index + 1;
-                                return GestureDetector(
-                                  onTap: () {
+                                    controller.setMapStyle(style);
+                                  },
+                                  onTap: (LatLng location) {
                                     setState(() {
-                                      selectedRating = ratingValue;
+                                      _pinnedLocation = location;
+                                      _markers.clear();
+                                      _markers.add(
+                                        Marker(
+                                          markerId:
+                                              const MarkerId("pinned_location"),
+                                          position: location,
+                                          infoWindow: const InfoWindow(
+                                              title: "Safe Zone"),
+                                        ),
+                                      );
+                                      _updateCircle();
                                     });
                                   },
-                                  child: Container(
-                                    margin: const EdgeInsets.all(3),
-                                    width: 60,
-                                    height: 50,
-                                    decoration: BoxDecoration(
-                                      color: selectedRating == ratingValue
-                                          ? btnColor.withOpacity(0.1)
-                                          : bgColor,
-                                      border: Border.all(
+                                  zoomGesturesEnabled: true,
+                                  scrollGesturesEnabled: true,
+                                  rotateGesturesEnabled: true,
+                                  tiltGesturesEnabled: true,
+                                ),
+                              ),
+                            ),
+                          ))),
+                      Expanded(
+                        child: SingleChildScrollView(
+                          child: Column(
+                            children: [
+                              _buildRadiusSlider(),
+                              const Align(
+                                alignment: Alignment.centerLeft,
+                                child: CategoryText(
+                                    text: "Safe zone title:",
+                                    alignment: 'start'),
+                              ),
+                              const SizedBox(height: 15),
+                              TextFieldWidget.buildTextField(
+                                controller: _nameController,
+                                label: "Title",
+                                hint: "Enter safe zone title",
+                                maxLines: 5,
+                              ),
+                              const SizedBox(height: 15),
+                              const Align(
+                                alignment: Alignment.centerLeft,
+                                child: CategoryText(
+                                  text:
+                                      "On a scale of 1 to 5, how would you rate the safety of this area?",
+                                  alignment: 'start',
+                                ),
+                              ),
+                              const SizedBox(height: 20),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: List.generate(5, (index) {
+                                  int ratingValue = index + 1;
+                                  return GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        selectedRating = ratingValue;
+                                      });
+                                    },
+                                    child: Container(
+                                      margin: const EdgeInsets.all(3),
+                                      width: 60,
+                                      height: 50,
+                                      decoration: BoxDecoration(
                                         color: selectedRating == ratingValue
-                                            ? btnColor
-                                            : const Color(0xff707070)
-                                                .withOpacity(0.5),
-                                        width: 1.5,
+                                            ? btnColor.withOpacity(0.1)
+                                            : bgColor,
+                                        border: Border.all(
+                                          color: selectedRating == ratingValue
+                                              ? btnColor
+                                              : const Color(0xff707070)
+                                                  .withOpacity(0.5),
+                                          width: 1.5,
+                                        ),
+                                        borderRadius: BorderRadius.circular(8),
                                       ),
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: Center(
-                                      child: Text(
-                                        ratingValue.toString(),
-                                        style: const TextStyle(
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.w400,
-                                          color: textColor,
+                                      child: Center(
+                                        child: Text(
+                                          ratingValue.toString(),
+                                          style: const TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w400,
+                                            color: textColor,
+                                          ),
                                         ),
                                       ),
                                     ),
-                                  ),
-                                );
-                              }),
-                            ),
-                            const SizedBox(height: 30),
-                            const Align(
-                              alignment: Alignment.centerLeft,
-                              child: CategoryText(
-                                  text: "Why did you give this rating?",
-                                  alignment: 'start'),
-                            ),
-                            const SizedBox(height: 15),
-                            TextFieldWidget.buildTextField(
-                              controller: _descriptionController,
-                              label: "Description",
-                              hint: "Enter details about the safe zone",
-                              maxLines: 5,
-                              minLines: 5,
-                            ),
-                            const SizedBox(height: 15),
-                            const Align(
-                              alignment: Alignment.centerLeft,
-                              child: CategoryText(
-                                  text:
-                                      "What time of day do you feel this area is safe?",
-                                  alignment: 'start'),
-                            ),
-                            const SizedBox(height: 10),
-                            Column(
-                              children: [
-                                CustomRadioButton(
-                                  value: "Daytime",
-                                  groupValue: selectedTime,
-                                  label: "Daytime",
-                                  onChanged: (value) {
-                                    setState(() {
-                                      selectedTime = value!;
-                                    });
-                                  },
-                                ),
-                                CustomRadioButton(
-                                  value: "Nighttime",
-                                  groupValue: selectedTime,
-                                  label: "Nighttime",
-                                  onChanged: (value) {
-                                    setState(() {
-                                      selectedTime = value!;
-                                    });
-                                  },
-                                ),
-                                CustomRadioButton(
-                                  value: "Both",
-                                  groupValue: selectedTime,
-                                  label: "Both",
-                                  onChanged: (value) {
-                                    setState(() {
-                                      selectedTime = value!;
-                                    });
-                                  },
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 20),
-                            const Align(
-                              alignment: Alignment.centerLeft,
-                              child: Text("How often do you visit this area?"),
-                            ),
-                            const SizedBox(height: 10),
-                            Column(
-                              children: [
-                                CustomRadioButton(
-                                  value: "Daily",
-                                  groupValue: selectedOften,
-                                  label: "Daily",
-                                  onChanged: (value) {
-                                    setState(() {
-                                      selectedOften = value!;
-                                    });
-                                  },
-                                ),
-                                CustomRadioButton(
-                                  value: "Weekly",
-                                  groupValue: selectedOften,
-                                  label: "Weekly",
-                                  onChanged: (value) {
-                                    setState(() {
-                                      selectedOften = value!;
-                                    });
-                                  },
-                                ),
-                                CustomRadioButton(
-                                  value: "Occasionally",
-                                  groupValue: selectedOften,
-                                  label: "Occasionally",
-                                  onChanged: (value) {
-                                    setState(() {
-                                      selectedOften = value!;
-                                    });
-                                  },
-                                ),
-                                CustomRadioButton(
-                                  value: "Rarely",
-                                  groupValue: selectedOften,
-                                  label: "Rarely",
-                                  onChanged: (value) {
-                                    setState(() {
-                                      selectedOften = value!;
-                                    });
-                                  },
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 30),
-                            CustomButton(
-                              text: "Submit",
-                              widthSize: true,
-                              buttonColor: widgetPricolor,
-                              onPressed: () {
-                                if (_pinnedLocation == null || _descriptionController.text.trim().isEmpty) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: CategoryText(
-                                        text: "Please select a location and enter a description.",
-                                        color: Colors.white,
-                                      ),
-                                      backgroundColor: Colors.green,
-                                    ),
                                   );
-                                  return;
-                                }
+                                }),
+                              ),
+                              const SizedBox(height: 30),
+                              const Align(
+                                alignment: Alignment.centerLeft,
+                                child: CategoryText(
+                                    text: "Why did you give this rating?",
+                                    alignment: 'start'),
+                              ),
+                              const SizedBox(height: 15),
+                              TextFieldWidget.buildTextField(
+                                controller: _descriptionController,
+                                label: "Description",
+                                hint: "Enter details about the safe zone",
+                                maxLines: 5,
+                                minLines: 5,
+                              ),
+                              const SizedBox(height: 15),
+                              const Align(
+                                alignment: Alignment.centerLeft,
+                                child: CategoryText(
+                                    text:
+                                        "What time of day do you feel this area is safe?",
+                                    alignment: 'start'),
+                              ),
+                              const SizedBox(height: 10),
+                              Column(
+                                children: [
+                                  CustomRadioButton(
+                                    value: "Daytime",
+                                    groupValue: selectedTime,
+                                    label: "Daytime",
+                                    onChanged: (value) {
+                                      setState(() {
+                                        selectedTime = value!;
+                                      });
+                                    },
+                                  ),
+                                  CustomRadioButton(
+                                    value: "Nighttime",
+                                    groupValue: selectedTime,
+                                    label: "Nighttime",
+                                    onChanged: (value) {
+                                      setState(() {
+                                        selectedTime = value!;
+                                      });
+                                    },
+                                  ),
+                                  CustomRadioButton(
+                                    value: "Both",
+                                    groupValue: selectedTime,
+                                    label: "Both",
+                                    onChanged: (value) {
+                                      setState(() {
+                                        selectedTime = value!;
+                                      });
+                                    },
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 20),
+                              const Align(
+                                alignment: Alignment.centerLeft,
+                                child:
+                                    Text("How often do you visit this area?"),
+                              ),
+                              const SizedBox(height: 10),
+                              Column(
+                                children: [
+                                  CustomRadioButton(
+                                    value: "Daily",
+                                    groupValue: selectedOften,
+                                    label: "Daily",
+                                    onChanged: (value) {
+                                      setState(() {
+                                        selectedOften = value!;
+                                      });
+                                    },
+                                  ),
+                                  CustomRadioButton(
+                                    value: "Weekly",
+                                    groupValue: selectedOften,
+                                    label: "Weekly",
+                                    onChanged: (value) {
+                                      setState(() {
+                                        selectedOften = value!;
+                                      });
+                                    },
+                                  ),
+                                  CustomRadioButton(
+                                    value: "Occasionally",
+                                    groupValue: selectedOften,
+                                    label: "Occasionally",
+                                    onChanged: (value) {
+                                      setState(() {
+                                        selectedOften = value!;
+                                      });
+                                    },
+                                  ),
+                                  CustomRadioButton(
+                                    value: "Rarely",
+                                    groupValue: selectedOften,
+                                    label: "Rarely",
+                                    onChanged: (value) {
+                                      setState(() {
+                                        selectedOften = value!;
+                                      });
+                                    },
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 30),
+                              CustomButton(
+                                  text: "Submit",
+                                  widthSize: true,
+                                  buttonColor: widgetPricolor,
+                                  onPressed: () {
+                                    if (_pinnedLocation == null ||
+                                        _descriptionController.text
+                                            .trim()
+                                            .isEmpty) {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        const SnackBar(
+                                          content: CategoryText(
+                                            text:
+                                                "Please select a location and enter a description.",
+                                            color: Colors.white,
+                                          ),
+                                          backgroundColor: Colors.green,
+                                        ),
+                                      );
+                                      return;
+                                    }
 
-                                final SafeZoneModel safeZone = SafeZoneModel(
-                                  userId: userId!,
-                                  latitude: _pinnedLocation!.latitude,
-                                  longitude: _pinnedLocation!.longitude,
-                                  radius: _radius,
-                                  scale: selectedRating.toDouble(),
-                                  name: _nameController.text,
-                                  description: _descriptionController.text,
-                                  timeOfDay: selectedTime,
-                                  frequency: selectedOften,
-                                  reportTimestamp: reportTimestamp,
-                                );
+                                    final SafeZoneModel safeZone =
+                                        SafeZoneModel(
+                                      userId: userId!,
+                                      latitude: _pinnedLocation!.latitude,
+                                      longitude: _pinnedLocation!.longitude,
+                                      radius: _radius,
+                                      scale: selectedRating.toDouble(),
+                                      name: _nameController.text,
+                                      description: _descriptionController.text,
+                                      timeOfDay: selectedTime,
+                                      frequency: selectedOften,
+                                      reportTimestamp: reportTimestamp,
+                                    );
 
-                                setState(() {
-                                  selectedInternalPage = 'details';
-                                  safezonemodel = safeZone;
-                                });
+                                    setState(() {
+                                      selectedInternalPage = 'details';
+                                      safezonemodel = safeZone;
+                                    });
 
-                                Future.delayed(const Duration(milliseconds: 300), () {
-                                  setState(() {
-                                    _pinnedLocation = null;
-                                    _markers.clear(); 
-                                    _circles.clear();
-                                    _descriptionController.clear();
-                                    _nameController.clear();
-                                    _radius = 100;
-                                    selectedRating = 0;
-                                    selectedTime = '';
-                                    selectedOften = '';
-                                  });
-                                });
-
-                              }
-                            ),
-                            const SizedBox(height: 30),
-                          ],
+                                    Future.delayed(
+                                        const Duration(milliseconds: 300), () {
+                                      setState(() {
+                                        _pinnedLocation = null;
+                                        _markers.clear();
+                                        _circles.clear();
+                                        _descriptionController.clear();
+                                        _nameController.clear();
+                                        _radius = 100;
+                                        selectedRating = 0;
+                                        selectedTime = '';
+                                        selectedOften = '';
+                                      });
+                                    });
+                                  }),
+                              const SizedBox(height: 30),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                  ],
-                );
-              }
-            )
-          )
-        );
+                    ],
+                  );
+                })));
     }
   }
-
 }

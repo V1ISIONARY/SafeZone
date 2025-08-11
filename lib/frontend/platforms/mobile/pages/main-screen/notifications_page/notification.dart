@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:safezone/backend/architecture/cubic/notification.dart';
 import 'package:safezone/frontend/platforms/mobile/pages/main-screen/notifications_page/all.dart';
 import 'package:safezone/frontend/platforms/mobile/pages/main-screen/notifications_page/read.dart';
+import 'package:safezone/frontend/platforms/mobile/pages/main-screen/notifications_page/soshistory.dart';
 import 'package:safezone/frontend/platforms/mobile/pages/main-screen/notifications_page/unread.dart';
 import 'package:safezone/frontend/platforms/mobile/widgets/buttons/notification_btn.dart';
 import 'package:safezone/resource/schema/colors.dart';
@@ -28,12 +29,9 @@ class _NotifState extends State<Notif> with TickerProviderStateMixin {
   late List<Widget> topLevelPages;
 
   late TabController _tabController;
-  final List<String> _categories = [
-    'All',
-    'Read',
-    'Unread',
-  ].map((category) => category[0].toUpperCase() + category.substring(1))
-  .toList();
+  final List<String> _categories = ['All', 'Read', 'Unread', 'SOS History']
+      .map((category) => category[0].toUpperCase() + category.substring(1))
+      .toList();
 
   Widget _mainWrapperBody(String category) {
     return PageView(
@@ -46,11 +44,17 @@ class _NotifState extends State<Notif> with TickerProviderStateMixin {
   List<Widget> getTopLevelPagesForCategory(String category) {
     switch (category) {
       case 'Read':
+        print('111111111111111111111111111');
         return [Read(userToken: widget.UserToken)];
       case 'Unread':
+        print('2222222222222222222222222222222');
         return [Unread(userToken: widget.UserToken)];
+      case 'SOS History':
+        print('33333333333333333333333333333333');
+        return [Soshistory(userToken: widget.UserToken)];
       case 'All':
       default:
+        print('4444444444444444444444444444444');
         return [All(userToken: widget.UserToken)];
     }
   }
@@ -106,9 +110,9 @@ class _NotifState extends State<Notif> with TickerProviderStateMixin {
             title: const Text(
               "Notification",
               style: TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.bold,
-                color: Colors.black),
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black),
             ),
           ),
           body: ScrollConfiguration(
@@ -120,9 +124,8 @@ class _NotifState extends State<Notif> with TickerProviderStateMixin {
                 Transform.translate(
                   offset: const Offset(0, -10),
                   child: const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 15),
-                    child: Column(
-                      children: [
+                      padding: EdgeInsets.symmetric(horizontal: 15),
+                      child: Column(children: [
                         NotificationBtn(
                           title: "My Incident Reports",
                           svgIcon: "lib/resource/svg/report_notif.svg",
@@ -137,20 +140,20 @@ class _NotifState extends State<Notif> with TickerProviderStateMixin {
                           description:
                               "Check the status and details of your submitted safe zones",
                         ),
-                      ]
-                    )
-                  ),
+                      ])),
                 ),
                 TabBar(
                   controller: _tabController,
                   indicatorColor: widgetPricolor,
                   labelColor: Colors.black,
                   labelStyle: const TextStyle(fontSize: 10),
-                  overlayColor: MaterialStateProperty.all(Colors.transparent),
-                  tabs: _categories.map((category) => SizedBox(
-                    height: 35,
-                    child: Tab(text: category),
-                  )).toList(),
+                  overlayColor: WidgetStateProperty.all(Colors.transparent),
+                  tabs: _categories
+                      .map((category) => SizedBox(
+                            height: 35,
+                            child: Tab(text: category),
+                          ))
+                      .toList(),
                   dividerColor: Colors.black12,
                 ),
                 const SizedBox(height: 20),
@@ -158,8 +161,8 @@ class _NotifState extends State<Notif> with TickerProviderStateMixin {
                   child: TabBarView(
                     controller: _tabController,
                     children: _categories
-                      .map((category) => _mainWrapperBody(category))
-                      .toList(),
+                        .map((category) => _mainWrapperBody(category))
+                        .toList(),
                   ),
                 ),
               ],
@@ -167,59 +170,59 @@ class _NotifState extends State<Notif> with TickerProviderStateMixin {
           ),
         ),
         widget.UserToken == 'guest'
-          ? GestureDetector(
-              onTap: _startShake,
-              child: Container(
-                width: double.infinity,
-                height: double.infinity,
-                color: Colors.black38,
-                child: Center(
-                  child: Container(
-                    width: 200,
-                    color: Colors.transparent,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        AnimatedBuilder(
-                          animation: _animation,
-                          builder: (context, child) {
-                            return Transform.translate(
-                              offset: Offset(_animation.value, 0),
-                              child: SizedBox(
-                                width: 130,
-                                height: 110,
-                                child: Image.asset(
-                                  'lib/resource/image/png/lock.png',
-                                  fit: BoxFit.cover,
+            ? GestureDetector(
+                onTap: _startShake,
+                child: Container(
+                  width: double.infinity,
+                  height: double.infinity,
+                  color: Colors.black38,
+                  child: Center(
+                    child: Container(
+                      width: 200,
+                      color: Colors.transparent,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          AnimatedBuilder(
+                            animation: _animation,
+                            builder: (context, child) {
+                              return Transform.translate(
+                                offset: Offset(_animation.value, 0),
+                                child: SizedBox(
+                                  width: 130,
+                                  height: 110,
+                                  child: Image.asset(
+                                    'lib/resource/image/png/lock.png',
+                                    fit: BoxFit.cover,
+                                  ),
                                 ),
-                              ),
-                            );
-                          },
-                        ),
-                        const Text(
-                          'Lock',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 15,
+                              );
+                            },
                           ),
-                          textAlign: TextAlign.center,
-                        ),
-                        const Text(
-                          'You need to sign in to your account to access all features.',
-                          style: TextStyle(
-                            color: Colors.white60,
-                            fontSize: 9,
+                          const Text(
+                            'Lock',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 15,
+                            ),
+                            textAlign: TextAlign.center,
                           ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
+                          const Text(
+                            'You need to sign in to your account to access all features.',
+                            style: TextStyle(
+                              color: Colors.white60,
+                              fontSize: 9,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
-            )
-          : const SizedBox(),
+              )
+            : const SizedBox(),
       ],
     );
   }

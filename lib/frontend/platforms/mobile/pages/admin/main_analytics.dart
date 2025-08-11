@@ -69,7 +69,7 @@ class _MainAnalyticsState extends State<MainAnalytics>
   }
 
   Widget _bodyNavigator(BuildContext context) {
-    return Container(
+    return SizedBox(
       width: double.infinity,
       height: 40,
       child: Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
@@ -105,7 +105,7 @@ class _MainAnalyticsState extends State<MainAnalytics>
                   ),
                   Padding(
                       padding: const EdgeInsets.only(top: 10),
-                      child: Container(
+                      child: SizedBox(
                         height: 4,
                         width: double.infinity,
                         child: Center(

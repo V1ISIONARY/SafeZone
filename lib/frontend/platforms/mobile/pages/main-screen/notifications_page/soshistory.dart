@@ -2,25 +2,24 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:safezone/backend/architecture/bloc/notificationBloc/notification_bloc.dart';
+import 'package:safezone/backend/architecture/bloc/notificationBloc/notification_event.dart';
 import 'package:safezone/backend/architecture/bloc/notificationBloc/notification_state.dart';
+import 'package:safezone/backend/models/userModel/notifications_model.dart';
 import 'package:safezone/frontend/platforms/mobile/widgets/loading/shimmer_loading.dart';
 import 'package:safezone/resource/schema/colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:safezone/backend/models/userModel/notifications_model.dart';
 
-import '../../../../../../backend/architecture/bloc/notificationBloc/notification_event.dart';
-
-class Unread extends StatefulWidget {
+class Soshistory extends StatefulWidget {
   final String userToken;
 
-  const Unread({super.key, required this.userToken});
+  const Soshistory({super.key, required this.userToken});
 
   @override
-  State<Unread> createState() => _UnreadState();
+  State<Soshistory> createState() => _SoshistoryState();
 }
 
-class _UnreadState extends State<Unread> {
-  List<NotificationModel> unreadNotifications = [];
+class _SoshistoryState extends State<Soshistory> {
+  List<NotificationModel> SoshistoryNotifications = [];
   int userId = 0;
 
   @override
@@ -51,15 +50,12 @@ class _UnreadState extends State<Unread> {
             );
           } else if (state is NotificationError) {
             return _buildError(state.message);
-          } else if (state is NotificationUpdated) {
-            print("");
-            _fetchUserIdAndNotifications();
           } else if (state is NotificationLoaded) {
-            unreadNotifications = state.notifications
-                .where((notification) => !notification.isRead)
+            SoshistoryNotifications = state.notifications
+                .where((notification) => notification.type == "SOS")
                 .toList();
 
-            return unreadNotifications.isNotEmpty
+            return SoshistoryNotifications.isNotEmpty
                 ? _buildNotificationList()
                 : _buildPlaceholder();
           }
@@ -73,17 +69,14 @@ class _UnreadState extends State<Unread> {
     return Container(
         margin: const EdgeInsets.only(bottom: 30.0),
         child: ListView.builder(
-          itemCount: unreadNotifications.length,
+          itemCount: SoshistoryNotifications.length,
           itemBuilder: (context, index) {
-            final notification = unreadNotifications[index];
+            final notification = SoshistoryNotifications[index];
             return GestureDetector(
-              onTap: () {
-                context.push(
-                  '/notification-details',
-                  extra: notification,
-                );
-                _markAsRead(notification);
-              },
+              onTap: () => context.push(
+                '/notification-details',
+                extra: notification,
+              ),
               child: Container(
                 width: double.infinity,
                 margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
@@ -105,7 +98,7 @@ class _UnreadState extends State<Unread> {
                         ),
                         child: const Icon(
                           Icons.notifications,
-                          color: widgetPricolor,
+                          color: Colors.grey,
                         ),
                       ),
                       const SizedBox(width: 16),
@@ -147,20 +140,6 @@ class _UnreadState extends State<Unread> {
         ));
   }
 
-  void _markAsRead(NotificationModel notification) {
-    final updatedNotification = notification.copyWith(isRead: true);
-
-    context
-        .read<NotificationBloc>()
-        .add(MarkNotificationAsRead(updatedNotification.id));
-
-    context.read<NotificationBloc>().add(FetchNotifications(userId));
-
-    setState(() {
-      unreadNotifications.removeWhere((notif) => notif.id == notification.id);
-    });
-  }
-
   Widget _buildPlaceholder() {
     return widget.userToken == 'guest'
         ? Container()
@@ -175,7 +154,7 @@ class _UnreadState extends State<Unread> {
                 ),
                 const SizedBox(height: 10),
                 const Text(
-                  'No Unread Notifications',
+                  'No Soshistory Notifications',
                   style: TextStyle(
                     color: Colors.black,
                     fontSize: 15,
@@ -183,7 +162,7 @@ class _UnreadState extends State<Unread> {
                   textAlign: TextAlign.center,
                 ),
                 const Text(
-                  'You have no new notifications.',
+                  'You have not Soshistory any notifications yet.',
                   style: TextStyle(
                     color: Colors.black54,
                     fontSize: 9,

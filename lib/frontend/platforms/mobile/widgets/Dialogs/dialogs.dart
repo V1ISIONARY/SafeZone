@@ -22,9 +22,9 @@ void showCreateReportDialog(BuildContext context) {
                 height: 74,
               ),
               const SizedBox(height: 10),
-              CategoryText(text: "Report an Incident"),
+              const CategoryText(text: "Report an Incident"),
               const SizedBox(height: 5),
-              CategoryDescripText(
+              const CategoryDescripText(
                   text:
                       "Report any incidents or unsafe situations to help keep you\nand others safe",
                   alignment: 'center'),
@@ -69,9 +69,9 @@ void showMarkSafeDialog(BuildContext context) {
                 height: 74,
               ),
               const SizedBox(height: 10),
-              CategoryText(text: "Mark this place safe"),
+              const CategoryText(text: "Mark this place safe"),
               const SizedBox(height: 5),
-              CategoryDescripText(
+              const CategoryDescripText(
                 text:
                     "Are you sure this location is safe? Marking it as safe\nwill help others.",
                 alignment: "center",

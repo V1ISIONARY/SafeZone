@@ -152,7 +152,7 @@ class _ReportsHistoryDetailsState extends State<ReportsHistoryDetails> {
             child: const Icon(Icons.arrow_back, color: Colors.black, size: 10),
           ),
         ),
-        title: CategoryText(text: "Report Details"),
+        title: const CategoryText(text: "Report Details"),
       ),
       body: SingleChildScrollView(
         child: Column(

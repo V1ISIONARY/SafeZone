@@ -29,7 +29,8 @@ class NotificationDT extends StatefulWidget {
   State<NotificationDT> createState() => _NotificationDTState();
 }
 
-class _NotificationDTState extends State<NotificationDT> with TickerProviderStateMixin {
+class _NotificationDTState extends State<NotificationDT>
+    with TickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _animation;
   late PageController pageController;
@@ -40,8 +41,9 @@ class _NotificationDTState extends State<NotificationDT> with TickerProviderStat
     'All',
     'Read',
     'Unread',
-  ].map((category) => category[0].toUpperCase() + category.substring(1))
-  .toList();
+  ]
+      .map((category) => category[0].toUpperCase() + category.substring(1))
+      .toList();
 
   Widget _mainWrapperBody(String category) {
     return PageView(
@@ -111,7 +113,6 @@ class _NotificationDTState extends State<NotificationDT> with TickerProviderStat
     });
   }
 
-
   void onPageChanged(int page) {
     BlocProvider.of<NotificationCubit>(context).changeSelectedIndex(page);
   }
@@ -158,7 +159,7 @@ class _NotificationDTState extends State<NotificationDT> with TickerProviderStat
                   ),
                   Padding(
                     padding: const EdgeInsets.only(top: 10),
-                    child: Container(
+                    child: SizedBox(
                       height: 4,
                       width: double.infinity,
                       child: Center(
@@ -167,12 +168,12 @@ class _NotificationDTState extends State<NotificationDT> with TickerProviderStat
                           height: 0.5,
                           color: Colors.black38,
                           child: isSelected
-                            ? Container(
-                                width: double.infinity,
-                                height: 5.0,
-                                color: widgetPricolor,
-                              )
-                            : const SizedBox(),
+                              ? Container(
+                                  width: double.infinity,
+                                  height: 5.0,
+                                  color: widgetPricolor,
+                                )
+                              : const SizedBox(),
                         ),
                       ),
                     ),
@@ -206,81 +207,84 @@ class _NotificationDTState extends State<NotificationDT> with TickerProviderStat
         );
       default:
         return Scaffold(
-          appBar: AppBar(
-            backgroundColor: Colors.white,
-            automaticallyImplyLeading: false,
-            centerTitle: false,
-            title: CategoryText(text: "Notification"),
-            actions: [
-              GestureDetector(
-               onTap: () {
-                  if (widget.onClose != null) {
-                    widget.onClose!();
-                  }
-                },
-                child: const Icon(
-                  Icons.cancel_outlined,
-                  size: 20,
-                  color: Colors.black38,
-                ),
-              ),
-              const SizedBox(width: 15)
-            ],
-          ),
-          body: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 0.0),
-                child: HorizontalBtn(
-                  title: "My Incident Reports",
-                  svgIcon: "lib/resource/svg/report_notif.svg",
-                  navigateTo: "Reports",
-                  description: "Check the status and details of your submitted reports",
-                  onTap: (page) {
-                    setState(() {
-                      selectedInternalPage = page;
-                    });
+            appBar: AppBar(
+              backgroundColor: Colors.white,
+              automaticallyImplyLeading: false,
+              centerTitle: false,
+              title: const CategoryText(text: "Notification"),
+              actions: [
+                GestureDetector(
+                  onTap: () {
+                    if (widget.onClose != null) {
+                      widget.onClose!();
+                    }
                   },
+                  child: const Icon(
+                    Icons.cancel_outlined,
+                    size: 20,
+                    color: Colors.black38,
+                  ),
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 0.0),
-                child: HorizontalBtn(
-                  title: "My Safe Zones",
-                  svgIcon: "lib/resource/svg/safe.png",
-                  navigateTo: "Safezone",
-                  description: "Check the status and details of your submitted safe zones",
-                  onTap: (page) {
-                    setState(() {
-                      selectedInternalPage = page;
-                    });
-                  },
+                const SizedBox(width: 15)
+              ],
+            ),
+            body: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 0.0),
+                  child: HorizontalBtn(
+                    title: "My Incident Reports",
+                    svgIcon: "lib/resource/svg/report_notif.svg",
+                    navigateTo: "Reports",
+                    description:
+                        "Check the status and details of your submitted reports",
+                    onTap: (page) {
+                      setState(() {
+                        selectedInternalPage = page;
+                      });
+                    },
+                  ),
                 ),
-              ),
-              TabBar(
-                controller: _tabController,
-                indicatorColor: widgetPricolor,
-                labelColor: Colors.black,
-                labelStyle: TextStyle(fontSize: 10),
-                overlayColor: MaterialStateProperty.all(Colors.transparent),
-                tabs: _categories.map((category) => SizedBox(
-                  height: 35,
-                  child: Tab(text: category),
-                )).toList(),
-                dividerColor: Colors.black12,
-              ),
-              const SizedBox(height: 20),
-              Expanded(
-                child: TabBarView(
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 0.0),
+                  child: HorizontalBtn(
+                    title: "My Safe Zones",
+                    svgIcon: "lib/resource/svg/safe.png",
+                    navigateTo: "Safezone",
+                    description:
+                        "Check the status and details of your submitted safe zones",
+                    onTap: (page) {
+                      setState(() {
+                        selectedInternalPage = page;
+                      });
+                    },
+                  ),
+                ),
+                TabBar(
                   controller: _tabController,
-                  children: _categories
-                    .map((category) => _mainWrapperBody(category))
-                    .toList(),
+                  indicatorColor: widgetPricolor,
+                  labelColor: Colors.black,
+                  labelStyle: const TextStyle(fontSize: 10),
+                  overlayColor: WidgetStateProperty.all(Colors.transparent),
+                  tabs: _categories
+                      .map((category) => SizedBox(
+                            height: 35,
+                            child: Tab(text: category),
+                          ))
+                      .toList(),
+                  dividerColor: Colors.black12,
                 ),
-              ),
-            ],
-          )
-        );
+                const SizedBox(height: 20),
+                Expanded(
+                  child: TabBarView(
+                    controller: _tabController,
+                    children: _categories
+                        .map((category) => _mainWrapperBody(category))
+                        .toList(),
+                  ),
+                ),
+              ],
+            ));
     }
   }
 
@@ -300,59 +304,59 @@ class _NotificationDTState extends State<NotificationDT> with TickerProviderStat
       children: [
         _getPageForNavigation(selectedInternalPage),
         widget.UserToken == 'guest'
-          ? GestureDetector(
-              onTap: _startShake,
-              child: Container(
-                width: double.infinity,
-                height: double.infinity,
-                color: Colors.black38,
-                child: Center(
-                  child: Container(
-                    width: 200,
-                    color: Colors.transparent,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        AnimatedBuilder(
-                          animation: _animation,
-                          builder: (context, child) {
-                            return Transform.translate(
-                              offset: Offset(_animation.value, 0),
-                              child: SizedBox(
-                                width: 130,
-                                height: 110,
-                                child: Image.asset(
-                                  'lib/resource/image/png/lock.png',
-                                  fit: BoxFit.cover,
+            ? GestureDetector(
+                onTap: _startShake,
+                child: Container(
+                  width: double.infinity,
+                  height: double.infinity,
+                  color: Colors.black38,
+                  child: Center(
+                    child: Container(
+                      width: 200,
+                      color: Colors.transparent,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          AnimatedBuilder(
+                            animation: _animation,
+                            builder: (context, child) {
+                              return Transform.translate(
+                                offset: Offset(_animation.value, 0),
+                                child: SizedBox(
+                                  width: 130,
+                                  height: 110,
+                                  child: Image.asset(
+                                    'lib/resource/image/png/lock.png',
+                                    fit: BoxFit.cover,
+                                  ),
                                 ),
-                              ),
-                            );
-                          },
-                        ),
-                        const Text(
-                          'Lock',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 15,
+                              );
+                            },
                           ),
-                          textAlign: TextAlign.center,
-                        ),
-                        const Text(
-                          'You need to sign in to your account to access all features.',
-                          style: TextStyle(
-                            color: Colors.white60,
-                            fontSize: 9,
+                          const Text(
+                            'Lock',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 15,
+                            ),
+                            textAlign: TextAlign.center,
                           ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
+                          const Text(
+                            'You need to sign in to your account to access all features.',
+                            style: TextStyle(
+                              color: Colors.white60,
+                              fontSize: 9,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
-            )
-          : const SizedBox(),
+              )
+            : const SizedBox(),
       ],
     );
   }

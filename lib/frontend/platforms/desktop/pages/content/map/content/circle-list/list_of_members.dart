@@ -13,19 +13,17 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../../../../../backend/properties/import.dart';
 
 class ListOfMembersDT extends StatefulWidget {
-
   final int circleId;
   final VoidCallback? onClose;
   final VoidCallback? onBack;
   final CircleModel circleInfo;
 
-  const ListOfMembersDT({
-    super.key, 
-    this.onBack,
-    this.onClose,
-    required this.circleId, 
-    required this.circleInfo
-  });
+  const ListOfMembersDT(
+      {super.key,
+      this.onBack,
+      this.onClose,
+      required this.circleId,
+      required this.circleInfo});
 
   @override
   State<ListOfMembersDT> createState() => _ListOfMembersDTState();
@@ -45,7 +43,7 @@ class _ListOfMembersDTState extends State<ListOfMembersDT> {
   bool _isToggling = false;
 
   Future<void> _checkIfShown() async {
-    Future.delayed(Duration(milliseconds: 200), () {
+    Future.delayed(const Duration(milliseconds: 200), () {
       if (mounted) {
         setState(() {
           _appBarHeight = 40;
@@ -54,7 +52,7 @@ class _ListOfMembersDTState extends State<ListOfMembersDT> {
         });
       }
 
-      Future.delayed(Duration(seconds: 5), () {
+      Future.delayed(const Duration(seconds: 5), () {
         if (mounted) {
           setState(() {
             _appBarHeight = 0;
@@ -69,7 +67,9 @@ class _ListOfMembersDTState extends State<ListOfMembersDT> {
   @override
   void initState() {
     super.initState();
-    context.read<CircleBloc>().add(FetchMembersEvent(circleId: widget.circleId));
+    context
+        .read<CircleBloc>()
+        .add(FetchMembersEvent(circleId: widget.circleId));
     _loadUserId();
     _updatedCircleInfo = widget.circleInfo;
   }
@@ -208,118 +208,119 @@ class _ListOfMembersDTState extends State<ListOfMembersDT> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.white54,
-      child: BlocListener<CircleBloc, CircleState>(
-      listener: (context, state) {
-        if (state is CircleMembersLoadedState) {
-          setState(() {
-            members = state.members;
-            isLoading = false;
-          });
-        } else if (state is CircleLoadingState) {
-          setState(() {
-            isLoading = true;
-          });
-        } else if (state is CircleErrorState) {
-          setState(() {
-            isLoading = false;
-          });
-          print("Error fetching members: ${state.message}");
-        } else if (state is CircleCodeGeneratedState) {
-          setState(() {
-            _updatedCircleInfo = CircleModel(
-              id: widget.circleInfo.id,
-              name: widget.circleInfo.name,
-              code: state.code,
-              codeExpiry: state.expiry,
-              isActive: true,
-              createdAt: '',
-            );
-            isLoading = false;
-          });
-          _checkIfShown();
-        }
-      },
-        child: Scaffold(
-            body: Column(children: [
-          AppBar(
-            toolbarHeight: 0,
-            automaticallyImplyLeading: false,
-          ),
-          if (_isSharingLocation != null)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const PrimaryText(text: "Share my location with this circle"),
-                  Spacer(),
-                  GestureDetector(
-                    onTap: _isToggling
-                      ? null
-                      : () {
-                          _toggleSharing(!_isSharingLocation!);
-                        },
-                    child: Container(
-                      height: 20,
-                      width: 35,
-                      padding: const EdgeInsets.symmetric(horizontal: 2),
-                      decoration: BoxDecoration(
-                        color: _isSharingLocation!
-                            ? Colors.green.shade300
-                            : Colors.black26,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: AnimatedAlign(
-                        duration: const Duration(milliseconds: 200),
-                        alignment: _isSharingLocation!
-                            ? Alignment.centerRight
-                            : Alignment.centerLeft,
-                        child: Container(
-                          height: 16,
-                          width: 16,
-                          decoration: const BoxDecoration(
-                            color: Colors.white,
-                            shape: BoxShape.circle,
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black26,
-                                spreadRadius: 0.5,
-                                blurRadius: 4,
-                                offset: Offset(0, 2),
-                              ),
-                            ],
+        color: Colors.white54,
+        child: BlocListener<CircleBloc, CircleState>(
+          listener: (context, state) {
+            if (state is CircleMembersLoadedState) {
+              setState(() {
+                members = state.members;
+                isLoading = false;
+              });
+            } else if (state is CircleLoadingState) {
+              setState(() {
+                isLoading = true;
+              });
+            } else if (state is CircleErrorState) {
+              setState(() {
+                isLoading = false;
+              });
+              print("Error fetching members: ${state.message}");
+            } else if (state is CircleCodeGeneratedState) {
+              setState(() {
+                _updatedCircleInfo = CircleModel(
+                  id: widget.circleInfo.id,
+                  name: widget.circleInfo.name,
+                  code: state.code,
+                  codeExpiry: state.expiry,
+                  isActive: true,
+                  createdAt: '',
+                );
+                isLoading = false;
+              });
+              _checkIfShown();
+            }
+          },
+          child: Scaffold(
+              body: Column(children: [
+            AppBar(
+              toolbarHeight: 0,
+              automaticallyImplyLeading: false,
+            ),
+            if (_isSharingLocation != null)
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const PrimaryText(
+                        text: "Share my location with this circle"),
+                    const Spacer(),
+                    GestureDetector(
+                      onTap: _isToggling
+                          ? null
+                          : () {
+                              _toggleSharing(!_isSharingLocation!);
+                            },
+                      child: Container(
+                        height: 20,
+                        width: 35,
+                        padding: const EdgeInsets.symmetric(horizontal: 2),
+                        decoration: BoxDecoration(
+                          color: _isSharingLocation!
+                              ? Colors.green.shade300
+                              : Colors.black26,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: AnimatedAlign(
+                          duration: const Duration(milliseconds: 200),
+                          alignment: _isSharingLocation!
+                              ? Alignment.centerRight
+                              : Alignment.centerLeft,
+                          child: Container(
+                            height: 16,
+                            width: 16,
+                            decoration: const BoxDecoration(
+                              color: Colors.white,
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black26,
+                                  spreadRadius: 0.5,
+                                  blurRadius: 4,
+                                  offset: Offset(0, 2),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  )
-                ],
+                    )
+                  ],
+                ),
               ),
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              height: _appBarHeight,
+              color: _appBarColor,
+              width: double.infinity,
+              alignment: Alignment.center,
+              child: _showTitle
+                  ? const CategoryDescripText(
+                      text: "New code generated successfully!",
+                      color: Colors.white,
+                    )
+                  : null,
             ),
-          AnimatedContainer(
-            duration: const Duration(milliseconds: 300),
-            height: _appBarHeight,
-            color: _appBarColor,
-            width: double.infinity,
-            alignment: Alignment.center,
-            child: _showTitle
-                ? const CategoryDescripText(
-                    text: "New code generated successfully!",
-                    color: Colors.white,
-                  )
-                : null,
-          ),
-          AppBar(
-            backgroundColor: Colors.white54,
-            automaticallyImplyLeading: false,
-            centerTitle: true,
-            title: Transform.translate(
-              offset: const Offset(-15, 0),
-              child: Row(
-                children: [
+            AppBar(
+              backgroundColor: Colors.white54,
+              automaticallyImplyLeading: false,
+              centerTitle: true,
+              title: Transform.translate(
+                offset: const Offset(-15, 0),
+                child: Row(children: [
                   GestureDetector(
-                    onTap: (){
+                    onTap: () {
                       widget.onBack?.call();
                     },
                     child: Container(
@@ -330,262 +331,289 @@ class _ListOfMembersDTState extends State<ListOfMembersDT> {
                         border: Border.all(width: 1, color: Colors.black),
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(Icons.arrow_back, color: Colors.black, size: 10),
+                      child: const Icon(Icons.arrow_back,
+                          color: Colors.black, size: 10),
                     ),
                   ),
                   const CategoryText(text: "Members"),
-                ]
+                ]),
               ),
-            ),
-            actions: <Widget>[
-              IconButton(
-                icon: const Icon(
-                  Icons.exit_to_app,
-                  size: 23,
-                ),
-                onPressed: _leaveGroup,
-              ),
-              const SizedBox(width: 15),
-            ],
-          ),
-          isLoading
-              ? Expanded(
-                  child: Center(
-                    child: Transform.translate(
-                        offset: const Offset(-40, -40),
-                        child: const LoadingState()),
+              actions: <Widget>[
+                IconButton(
+                  icon: const Icon(
+                    Icons.exit_to_app,
+                    size: 23,
                   ),
-                )
-              : members.isEmpty
-                  ? const Expanded(child: Center(child: Text("No members found")))
-                  : Expanded(
-                      child: Container(
-                        color: Colors.white54,
-                        padding: const EdgeInsets.symmetric(vertical: 15),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 15),
-                              child: Theme(
-                                data: Theme.of(context).copyWith(
-                                    dividerColor:
-                                        const Color.fromARGB(6, 92, 92, 92)),
-                                child: ExpansionTile(
-                                  title: const Text(
-                                    "Invite Members",
-                                    style:
-                                        TextStyle(color: textColor, fontSize: 13),
-                                  ),
-                                  children: [
-                                    Center(
-                                      child: Container(
-                                        width: MediaQuery.of(context).size.width *
-                                            0.9,
-                                        padding: const EdgeInsets.all(12),
-                                        decoration: BoxDecoration(
-                                          color: const Color.fromARGB(
-                                              29, 151, 163, 175),
-                                          borderRadius: BorderRadius.circular(8),
-                                        ),
-                                        child: Column(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            const SizedBox(height: 10),
-                                            const Text(
-                                              "Invite Members",
-                                              style: TextStyle(
-                                                color: textColor,
-                                                fontSize: 13,
-                                                fontWeight: FontWeight.bold,
-                                              ),
+                  onPressed: _leaveGroup,
+                ),
+                const SizedBox(width: 15),
+              ],
+            ),
+            isLoading
+                ? Expanded(
+                    child: Center(
+                      child: Transform.translate(
+                          offset: const Offset(-40, -40),
+                          child: const LoadingState()),
+                    ),
+                  )
+                : members.isEmpty
+                    ? const Expanded(
+                        child: Center(child: Text("No members found")))
+                    : Expanded(
+                        child: Container(
+                          color: Colors.white54,
+                          padding: const EdgeInsets.symmetric(vertical: 15),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 15),
+                                child: Theme(
+                                    data: Theme.of(context).copyWith(
+                                        dividerColor: const Color.fromARGB(
+                                            6, 92, 92, 92)),
+                                    child: ExpansionTile(
+                                      title: const Text(
+                                        "Invite Members",
+                                        style: TextStyle(
+                                            color: textColor, fontSize: 13),
+                                      ),
+                                      children: [
+                                        Center(
+                                          child: Container(
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.9,
+                                            padding: const EdgeInsets.all(12),
+                                            decoration: BoxDecoration(
+                                              color: const Color.fromARGB(
+                                                  29, 151, 163, 175),
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
                                             ),
-                                            const SizedBox(height: 5),
-                                            const Text(
-                                              "Copy the code below and share it to invite others.",
-                                              style: TextStyle(
-                                                color: labelFormFieldColor,
-                                                fontSize: 11,
-                                              ),
-                                              textAlign: TextAlign.center,
-                                            ),
-                                            const SizedBox(height: 20),
-                                            Text(
-                                              (_updatedCircleInfo != null &&
-                                                      _updatedCircleInfo!
-                                                          .code.isNotEmpty)
-                                                  ? _updatedCircleInfo!.code
-                                                  : 'No Generated Code',
-                                              textAlign: TextAlign.center,
-                                              style: TextStyle(
-                                                fontSize:
-                                                    (_updatedCircleInfo != null &&
+                                            child: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                const SizedBox(height: 10),
+                                                const Text(
+                                                  "Invite Members",
+                                                  style: TextStyle(
+                                                    color: textColor,
+                                                    fontSize: 13,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 5),
+                                                const Text(
+                                                  "Copy the code below and share it to invite others.",
+                                                  style: TextStyle(
+                                                    color: labelFormFieldColor,
+                                                    fontSize: 11,
+                                                  ),
+                                                  textAlign: TextAlign.center,
+                                                ),
+                                                const SizedBox(height: 20),
+                                                Text(
+                                                  (_updatedCircleInfo != null &&
+                                                          _updatedCircleInfo!
+                                                              .code.isNotEmpty)
+                                                      ? _updatedCircleInfo!.code
+                                                      : 'No Generated Code',
+                                                  textAlign: TextAlign.center,
+                                                  style: TextStyle(
+                                                    fontSize:
+                                                        (_updatedCircleInfo !=
+                                                                    null &&
+                                                                _updatedCircleInfo!
+                                                                    .code
+                                                                    .isNotEmpty)
+                                                            ? 30
+                                                            : 25,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: (_updatedCircleInfo !=
+                                                                null &&
                                                             _updatedCircleInfo!
-                                                                .code.isNotEmpty)
-                                                        ? 30
-                                                        : 25,
-                                                fontWeight: FontWeight.bold,
-                                                color:
-                                                    (_updatedCircleInfo != null &&
-                                                            _updatedCircleInfo!
-                                                                .code.isNotEmpty)
+                                                                .code
+                                                                .isNotEmpty)
                                                         ? widgetPricolor
                                                         : Colors.black26,
-                                              ),
-                                            ),
-                                            const SizedBox(height: 20),
-                                            SizedBox(
-                                              width: double.infinity,
-                                              child: ElevatedButton.icon(
-                                                onPressed: () {
-                                                  Clipboard.setData(ClipboardData(
-                                                      text: _updatedCircleInfo!
-                                                          .code));
-                                                },
-                                                style: ElevatedButton.styleFrom(
-                                                  backgroundColor: widgetPricolor,
-                                                  foregroundColor: Colors.white,
-                                                  padding:
-                                                      const EdgeInsets.symmetric(
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 20),
+                                                SizedBox(
+                                                  width: double.infinity,
+                                                  child: ElevatedButton.icon(
+                                                    onPressed: () {
+                                                      Clipboard.setData(
+                                                          ClipboardData(
+                                                              text:
+                                                                  _updatedCircleInfo!
+                                                                      .code));
+                                                    },
+                                                    style: ElevatedButton
+                                                        .styleFrom(
+                                                      backgroundColor:
+                                                          widgetPricolor,
+                                                      foregroundColor:
+                                                          Colors.white,
+                                                      padding: const EdgeInsets
+                                                          .symmetric(
                                                           vertical: 12),
-                                                  shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(8),
+                                                      shape:
+                                                          RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(8),
+                                                      ),
+                                                      elevation: 2,
+                                                    ),
+                                                    icon: const Icon(
+                                                      Icons.copy,
+                                                      size: 20,
+                                                      color: Colors.white,
+                                                    ),
+                                                    label: const Text(
+                                                      "Copy code",
+                                                      style: TextStyle(
+                                                        fontSize: 13,
+                                                      ),
+                                                    ),
                                                   ),
-                                                  elevation: 2,
                                                 ),
-                                                icon: const Icon(
-                                                  Icons.copy,
-                                                  size: 20,
-                                                  color: Colors.white,
-                                                ),
-                                                label: const Text(
-                                                  "Copy code",
-                                                  style: TextStyle(
-                                                    fontSize: 13,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                            const SizedBox(height: 10),
-                                            SizedBox(
-                                              width: double.infinity,
-                                              child: ElevatedButton(
-                                                onPressed: () {
-                                                  context.read<CircleBloc>().add(
-                                                        GenerateCodeEvent(
-                                                            circleId:
-                                                                widget.circleId),
-                                                      );
-                                                },
-                                                style: ElevatedButton.styleFrom(
-                                                  backgroundColor: widgetPricolor,
-                                                  foregroundColor: Colors.white,
-                                                  padding:
-                                                      const EdgeInsets.symmetric(
+                                                const SizedBox(height: 10),
+                                                SizedBox(
+                                                  width: double.infinity,
+                                                  child: ElevatedButton(
+                                                    onPressed: () {
+                                                      context
+                                                          .read<CircleBloc>()
+                                                          .add(
+                                                            GenerateCodeEvent(
+                                                                circleId: widget
+                                                                    .circleId),
+                                                          );
+                                                    },
+                                                    style: ElevatedButton
+                                                        .styleFrom(
+                                                      backgroundColor:
+                                                          widgetPricolor,
+                                                      foregroundColor:
+                                                          Colors.white,
+                                                      padding: const EdgeInsets
+                                                          .symmetric(
                                                           vertical: 12),
-                                                  shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(8),
+                                                      shape:
+                                                          RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(8),
+                                                      ),
+                                                      elevation: 2,
+                                                    ),
+                                                    child: const Text(
+                                                      "Generate new code",
+                                                      style: TextStyle(
+                                                        fontSize: 13,
+                                                      ),
+                                                    ),
                                                   ),
-                                                  elevation: 2,
                                                 ),
-                                                child: const Text(
-                                                  "Generate new code",
-                                                  style: TextStyle(
-                                                    fontSize: 13,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                            const SizedBox(height: 10),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                )),
-                            ),
-                            const Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 15),
-                              child: Divider(
-                                color: labelFormFieldColor,
-                                thickness: 0.1,
-                              ),
-                            ),
-                            const SizedBox(height: 10),
-                            Expanded(
-                              child: ListView.builder(
-                                itemCount: members.length,
-                                itemBuilder: (context, index) {
-                                  final member = members[index];
-                                  final fullName =
-                                      '${member['first_name']} ${member['last_name']}';
-                                  final status = member['status'];
-                                  return Container(
-                                      padding: EdgeInsets.symmetric(horizontal: 15),
-                                      margin: const EdgeInsets.only(bottom: 15),
-                                      child: Row(
-                                        crossAxisAlignment: CrossAxisAlignment.center,
-                                        mainAxisAlignment: MainAxisAlignment.start,
-                                        children: [
-                                          Padding(
-                                            padding:
-                                                const EdgeInsets.only(left: 0.0),
-                                            child: Container(
-                                              width: 40,
-                                              height: 40,
-                                              decoration: BoxDecoration(
-                                                borderRadius: BorderRadius.circular(10),
-                                                color: Colors.grey[300],
-                                              ),
-                                              clipBehavior: Clip.antiAlias,
-                                              child: member['profile_picture'] !=
-                                                          null &&
-                                                      member['profile_picture']
-                                                          .toString()
-                                                          .isNotEmpty
-                                                  ? Image.network(
-                                                      member['profile_picture'],
-                                                      fit: BoxFit.cover,
-                                                      errorBuilder: (context,
-                                                          error, stackTrace) {
-                                                        return const Icon(
-                                                            Icons.person,
-                                                            color: textColor,
-                                                            size: 20);
-                                                      },
-                                                    )
-                                                  : Icon(Icons.person,
-                                                      color: textColor, size: 20),
-                                            ),
-                                          ),
-                                          const SizedBox(width: 10),
-                                          Expanded(
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                CategoryText(text: fullName),
-                                                const SizedBox(height: 2),
-                                                CategoryDescripText(
-                                                    text: 'Status: $status',
-                                                    alignment: 'start'),
+                                                const SizedBox(height: 10),
                                               ],
                                             ),
                                           ),
-                                        ],
-                                      )
-                                    );
-                                },
+                                        ),
+                                      ],
+                                    )),
                               ),
-                            ),
-                          ],
+                              const Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 15),
+                                child: Divider(
+                                  color: labelFormFieldColor,
+                                  thickness: 0.1,
+                                ),
+                              ),
+                              const SizedBox(height: 10),
+                              Expanded(
+                                child: ListView.builder(
+                                  itemCount: members.length,
+                                  itemBuilder: (context, index) {
+                                    final member = members[index];
+                                    final fullName =
+                                        '${member['first_name']} ${member['last_name']}';
+                                    final status = member['status'];
+                                    return Container(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 15),
+                                        margin:
+                                            const EdgeInsets.only(bottom: 15),
+                                        child: Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          children: [
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                  left: 0.0),
+                                              child: Container(
+                                                width: 40,
+                                                height: 40,
+                                                decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
+                                                  color: Colors.grey[300],
+                                                ),
+                                                clipBehavior: Clip.antiAlias,
+                                                child: member['profile_picture'] !=
+                                                            null &&
+                                                        member['profile_picture']
+                                                            .toString()
+                                                            .isNotEmpty
+                                                    ? Image.network(
+                                                        member[
+                                                            'profile_picture'],
+                                                        fit: BoxFit.cover,
+                                                        errorBuilder: (context,
+                                                            error, stackTrace) {
+                                                          return const Icon(
+                                                              Icons.person,
+                                                              color: textColor,
+                                                              size: 20);
+                                                        },
+                                                      )
+                                                    : const Icon(Icons.person,
+                                                        color: textColor,
+                                                        size: 20),
+                                              ),
+                                            ),
+                                            const SizedBox(width: 10),
+                                            Expanded(
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  CategoryText(text: fullName),
+                                                  const SizedBox(height: 2),
+                                                  CategoryDescripText(
+                                                      text: 'Status: $status',
+                                                      alignment: 'start'),
+                                                ],
+                                              ),
+                                            ),
+                                          ],
+                                        ));
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                    )
-        ])),
-      )
-    );
+                      )
+          ])),
+        ));
   }
 }

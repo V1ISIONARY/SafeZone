@@ -18,18 +18,16 @@ import 'package:safezone/resource/schema/colors.dart';
 import 'package:safezone/resource/schema/texts.dart';
 
 class ReviewSafezone extends StatefulWidget {
-  
   final VoidCallback? onBack;
   final VoidCallback? onClose;
   final VoidCallback? onGoToSZ;
   final SafeZoneModel safeZone;
-  const ReviewSafezone({
-    super.key, 
-    this.onBack,
-    this.onClose,
-    this.onGoToSZ,
-    required this.safeZone
-  });
+  const ReviewSafezone(
+      {super.key,
+      this.onBack,
+      this.onClose,
+      this.onGoToSZ,
+      required this.safeZone});
 
   @override
   State<ReviewSafezone> createState() => _ReviewSafezoneState();
@@ -45,7 +43,7 @@ class _ReviewSafezoneState extends State<ReviewSafezone> {
   Color _appBarColor = Colors.transparent;
 
   Future<void> _checkIfShown() async {
-    Future.delayed(Duration(milliseconds: 200), () {
+    Future.delayed(const Duration(milliseconds: 200), () {
       if (mounted) {
         setState(() {
           _appBarHeight = 40;
@@ -54,7 +52,7 @@ class _ReviewSafezoneState extends State<ReviewSafezone> {
         });
       }
 
-      Future.delayed(Duration(seconds: 5), () {
+      Future.delayed(const Duration(seconds: 5), () {
         if (mounted) {
           setState(() {
             _appBarHeight = 0;
@@ -116,7 +114,7 @@ class _ReviewSafezoneState extends State<ReviewSafezone> {
       });
     }
   }
-  
+
   String? selectedInternalPage;
 
   @override
@@ -131,14 +129,14 @@ class _ReviewSafezoneState extends State<ReviewSafezone> {
           onGoToSZ: () {
             widget.onGoToSZ?.call();
           },
-          onBack: (){
+          onBack: () {
             widget.onBack?.call();
           },
-          onClose: (){
+          onClose: () {
             widget.onClose?.call();
           },
         );
-      default: 
+      default:
         return Scaffold(
           appBar: AppBar(
             backgroundColor: Colors.white54,
@@ -146,26 +144,25 @@ class _ReviewSafezoneState extends State<ReviewSafezone> {
             centerTitle: true,
             title: Transform.translate(
               offset: const Offset(-15, 0),
-              child: Row(
-                children: [
-                  GestureDetector(
-                    onTap: (){
-                      widget.onBack?.call();
-                    },
-                    child: Container(
-                      margin: const EdgeInsets.all(10),
-                      height: 20,
-                      width: 20,
-                      decoration: BoxDecoration(
-                        border: Border.all(width: 1, color: Colors.black),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(Icons.arrow_back, color: Colors.black, size: 10),
+              child: Row(children: [
+                GestureDetector(
+                  onTap: () {
+                    widget.onBack?.call();
+                  },
+                  child: Container(
+                    margin: const EdgeInsets.all(10),
+                    height: 20,
+                    width: 20,
+                    decoration: BoxDecoration(
+                      border: Border.all(width: 1, color: Colors.black),
+                      shape: BoxShape.circle,
                     ),
+                    child: const Icon(Icons.arrow_back,
+                        color: Colors.black, size: 10),
                   ),
-                  const CategoryText(text: "Review Your SafeZone")
-                ]
-              ),
+                ),
+                const CategoryText(text: "Review Your SafeZone")
+              ]),
             ),
           ),
           body: BlocListener<SafeZoneBloc, SafeZoneState>(
@@ -188,7 +185,7 @@ class _ReviewSafezoneState extends State<ReviewSafezone> {
                 children: [
                   Container(
                     padding: const EdgeInsets.all(10),
-                    margin: EdgeInsets.only(bottom: 15),
+                    margin: const EdgeInsets.only(bottom: 15),
                     decoration: BoxDecoration(
                       border: Border.all(color: btnColor, width: 0.5),
                       borderRadius: BorderRadius.circular(10),
@@ -225,7 +222,8 @@ class _ReviewSafezoneState extends State<ReviewSafezone> {
                             markerId: const MarkerId("safe zone"),
                             position: LatLng(widget.safeZone.latitude!,
                                 widget.safeZone.longitude!),
-                            infoWindow: const InfoWindow(title: "Pinned Location"),
+                            infoWindow:
+                                const InfoWindow(title: "Pinned Location"),
                           ),
                         },
                         circles: {
@@ -355,7 +353,8 @@ class _ReviewSafezoneState extends State<ReviewSafezone> {
                                 Text(
                                   widget.safeZone.scale.toString(),
                                   style: const TextStyle(
-                                      fontSize: 45, fontWeight: FontWeight.bold),
+                                      fontSize: 45,
+                                      fontWeight: FontWeight.bold),
                                 ),
                                 const CategoryText(text: 'Rating'),
                               ],
@@ -376,7 +375,8 @@ class _ReviewSafezoneState extends State<ReviewSafezone> {
                                 child: Column(children: [
                                   Expanded(
                                       child: Row(
-                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       const CategoryText(text: 'Safe Time : '),
@@ -384,7 +384,8 @@ class _ReviewSafezoneState extends State<ReviewSafezone> {
                                       Row(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.center,
-                                        mainAxisAlignment: MainAxisAlignment.start,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
                                         children: [
                                           const SizedBox(width: 5),
                                           CategoryText(
@@ -403,15 +404,18 @@ class _ReviewSafezoneState extends State<ReviewSafezone> {
                                       )),
                                   Expanded(
                                       child: Row(
-                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      const CategoryText(text: 'Visit Frequency'),
+                                      const CategoryText(
+                                          text: 'Visit Frequency'),
                                       const SizedBox(width: 5),
                                       Row(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.center,
-                                        mainAxisAlignment: MainAxisAlignment.start,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
                                         children: [
                                           const SizedBox(width: 5),
                                           CategoryText(
@@ -537,16 +541,19 @@ class _ReviewSafezoneState extends State<ReviewSafezone> {
                         text: "Submit",
                         widthSize: true,
                         buttonColor: widgetPricolor,
-                        onPressed: state is SafeZoneLoading || !(locationName.contains('Dagupan City'))
-                          ? () {
-                              _checkIfShown();
-                            }
-                          : () {
-                              context.read<SafeZoneBloc>().add(CreateSafeZone(widget.safeZone));
-                              setState(() {
-                                selectedInternalPage = 'success';
-                              });
-                            },
+                        onPressed: state is SafeZoneLoading ||
+                                !(locationName.contains('Dagupan City'))
+                            ? () {
+                                _checkIfShown();
+                              }
+                            : () {
+                                context
+                                    .read<SafeZoneBloc>()
+                                    .add(CreateSafeZone(widget.safeZone));
+                                setState(() {
+                                  selectedInternalPage = 'success';
+                                });
+                              },
                       );
                     },
                   ),
@@ -558,5 +565,4 @@ class _ReviewSafezoneState extends State<ReviewSafezone> {
         );
     }
   }
-
 }
