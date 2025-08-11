@@ -8,6 +8,7 @@ import 'package:safezone/backend/models/userModel/notifications_model.dart';
 import 'package:safezone/frontend/platforms/mobile/widgets/loading/shimmer_loading.dart';
 import 'package:safezone/resource/schema/colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Soshistory extends StatefulWidget {
   final String userToken;
