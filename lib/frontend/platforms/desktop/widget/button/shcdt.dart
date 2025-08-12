@@ -58,7 +58,7 @@ class SafezoneHistoryCard extends StatelessWidget {
               height: 5,
             ),
             Text(
-              safeZone.reportTimestamp!,
+              safeZone.reportTimestamp!.split(' 00:00:00 GMT')[0],
               style: const TextStyle(fontSize: 11, color: Colors.black45),
             ),
             Row(

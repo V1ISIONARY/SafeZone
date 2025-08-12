@@ -62,7 +62,7 @@ class ReportsCard extends StatelessWidget {
               height: 5,
             ),
             Text(
-              incidentReport.reportDate!,
+              incidentReport.reportDate!.split(' 00:00:00 GMT')[0],
               style: const TextStyle(fontSize: 11, color: Colors.black45),
             ),
             Row(

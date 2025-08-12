@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:safezone/resource/schema/colors.dart';
 import 'package:safezone/resource/schema/texts.dart';
 import 'package:timeline_tile/timeline_tile.dart';
@@ -106,8 +107,9 @@ class _SafeZoneStatusHistoryState extends State<SafeZoneStatusHistory> {
                   String remarksText = status is Map
                       ? status['remarks'] ?? 'No remarks'
                       : status.remarks ?? 'No remarks';
-                  String timestampText =
-                      status is Map ? status['timestamp'] : status.timestamp;
+                  String timestampText = status is Map ? status['timestamp'] : status.timestamp;
+                  DateTime dateTime = DateTime.parse(timestampText).toLocal();
+                  String formatted = DateFormat('EEE, dd MMM yyyy : h:mma').format(dateTime);
 
                   return TimelineTile(
                     alignment: TimelineAlign.start,
@@ -150,7 +152,7 @@ class _SafeZoneStatusHistoryState extends State<SafeZoneStatusHistory> {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            "Timestamp: $timestampText",
+                            "Timestamp: $formatted",
                             style: const TextStyle(
                                 fontSize: 11, color: labelFormFieldColor),
                           ),

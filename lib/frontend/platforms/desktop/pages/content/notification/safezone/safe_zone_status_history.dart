@@ -121,8 +121,7 @@ class _SafeZoneStatusHistoryDTState extends State<SafeZoneStatusHistoryDT> {
                         status is Map ? status['timestamp'] : status.timestamp;
 
                     DateTime dateTime = DateTime.parse(timestampText);
-                    String formattedTime =
-                        DateFormat("d, MMMM, y : hh:mma").format(dateTime);
+                    String formattedTime = DateFormat("d, MMMM, y : hh:mma").format(dateTime);
 
                     return TimelineTile(
                       alignment: TimelineAlign.start,

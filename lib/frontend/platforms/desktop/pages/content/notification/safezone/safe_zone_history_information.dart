@@ -478,7 +478,7 @@ class _SafeZoneHistoryDetailsDTState extends State<SafeZoneHistoryDetailsDT> {
                                 horizontal: 16, vertical: 16),
                             child: HistoryInformationText(
                               text: "Date",
-                              data: widget.safezonemodel.reportTimestamp!,
+                              data: widget.safezonemodel.reportTimestamp!.split(' 00:00:00 GMT')[0],
                             ),
                           ),
                         ],

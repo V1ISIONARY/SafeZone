@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:safezone/backend/models/dangerzoneModel/incident_report_model.dart';
 import 'package:timeline_tile/timeline_tile.dart';
 
@@ -105,8 +106,9 @@ class _ReportsStatusHistoryState extends State<ReportsStatusHistory> {
                   String remarksText = status is Map
                       ? status['remarks'] ?? 'No remarks'
                       : status.remarks ?? 'No remarks';
-                  String timestampText =
-                      status is Map ? status['timestamp'] : status.timestamp;
+                  String timestampText = status is Map ? status['timestamp'] : status.timestamp;
+                  DateTime dateTime = DateTime.parse(timestampText).toLocal();
+                  String formatted = DateFormat('EEE, dd MMM yyyy : h:mma').format(dateTime);
 
                   return TimelineTile(
                     alignment: TimelineAlign.start,
@@ -150,7 +152,7 @@ class _ReportsStatusHistoryState extends State<ReportsStatusHistory> {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            "Timestamp: $timestampText",
+                            "Timestamp: $formatted",
                             style: const TextStyle(
                                 fontSize: 11, color: labelFormFieldColor),
                           ),

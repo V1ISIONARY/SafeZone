@@ -334,7 +334,7 @@ class _ReportsHistoryDetailsState extends State<ReportsHistoryDetails> {
                           const SizedBox(height: 12),
                           HistoryInformationText(
                             text: "Report Date",
-                            data: widget.reportInfo.reportDate!,
+                            data: widget.reportInfo.reportDate!.split(' 00:00:00 GMT')[0],
                           ),
                           const SizedBox(height: 20),
                           Theme(
