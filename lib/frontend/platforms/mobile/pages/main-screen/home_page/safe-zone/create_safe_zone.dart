@@ -74,9 +74,26 @@ class _MarkSafeZoneState extends State<MarkSafeZone> {
         final data = json.decode(response.body);
 
         if (data["status"] == "OK") {
+          String buildingName = "";
+          String formattedAddress = data["results"][0]["formatted_address"];
+
+          for (var component in data["results"][0]["address_components"]) {
+            if (component["types"].contains("establishment") ||
+                component["types"].contains("point_of_interest") ||
+                component["types"].contains("premise")) {
+              buildingName = component["long_name"];
+              break;
+            }
+          }
+
+          String displayAddress = buildingName.isNotEmpty
+              ? "$buildingName, $formattedAddress"
+              : formattedAddress;
+
           setState(() {
-            _currentAddress = data["results"][0]["formatted_address"];
-            _nameController.text = _currentAddress;
+            _currentAddress = displayAddress;
+            _nameController.text =
+                buildingName.isNotEmpty ? buildingName : formattedAddress;
           });
         } else {
           setState(() {
@@ -112,6 +129,9 @@ class _MarkSafeZoneState extends State<MarkSafeZone> {
           markerId: const MarkerId("pinned_location"),
           position: LatLng(lat, lng),
           infoWindow: const InfoWindow(title: "Safe Zone"),
+          icon: BitmapDescriptor.defaultMarkerWithHue(
+            BitmapDescriptor.hueGreen,
+          ),
         ),
       );
     });
@@ -196,6 +216,9 @@ class _MarkSafeZoneState extends State<MarkSafeZone> {
                 markerId: const MarkerId("searched_location"),
                 position: searchedLocation,
                 infoWindow: const InfoWindow(title: "Searched Location"),
+                icon: BitmapDescriptor.defaultMarkerWithHue(
+                  BitmapDescriptor.hueGreen,
+                ),
               ),
             );
           });
@@ -385,10 +408,12 @@ class _MarkSafeZoneState extends State<MarkSafeZone> {
                       _markers.clear();
                       _markers.add(
                         Marker(
-                          markerId: const MarkerId("pinned_location"),
-                          position: location,
-                          infoWindow: const InfoWindow(title: "Safe Zone"),
-                        ),
+                            markerId: const MarkerId("pinned_location"),
+                            position: location,
+                            infoWindow: const InfoWindow(title: "Safe Zone"),
+                            icon: BitmapDescriptor.defaultMarkerWithHue(
+                              BitmapDescriptor.hueGreen,
+                            )),
                       );
                       _updateCircle();
                     });

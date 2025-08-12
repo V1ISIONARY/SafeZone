@@ -67,8 +67,8 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
   List<LatLng> _safeZones = [];
   List<LatLng> _dangerZones = [];
   final locs.Location location = locs.Location();
-  static const LatLng sourceLocation = LatLng(16.0471, 120.3425);
-  LatLng _initialPosition = const LatLng(37.7749, -122.4194); // Default: SF
+  static const LatLng sourceLocation = LatLng(16.0433, 120.3333);
+  LatLng _initialPosition = const LatLng(37.7749, -122.4194); 
   final apiKey = dotenv.env['GOOGLE_API_KEY'];
   final GlobalKey _safeKey = GlobalKey();
   final GlobalKey _searchKey = GlobalKey();
@@ -1051,7 +1051,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                   return GoogleMap(
                     initialCameraPosition: const CameraPosition(
                       target: sourceLocation,
-                      zoom: 16.0,
+                      zoom: 14.0,
                     ),
                     mapType: sharedController.currentMapType,
                     markers: sharedController.showMarkers
