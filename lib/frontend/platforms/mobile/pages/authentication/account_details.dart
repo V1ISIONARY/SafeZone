@@ -65,62 +65,103 @@ class _AccountDetailsState extends State<AccountDetails> {
     final TextEditingController newPasswordController = TextEditingController();
     final TextEditingController confirmNewPasswordController =
         TextEditingController();
+
+    bool showCurrentPassword = false;
+    bool showNewPassword = false;
+    bool showConfirmPassword = false;
     String? errorMessage;
 
     showDialog(
       context: context,
+      barrierDismissible: true,
       builder: (context) {
         return StatefulBuilder(
           builder: (context, setState) {
             return AlertDialog(
-              title: const Text("Change Password"),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextField(
-                    controller: currentPasswordController,
-                    decoration: const InputDecoration(
-                      labelText: 'Current Password',
-                      border: OutlineInputBorder(),
-                      suffixIcon: Icon(Icons.lock),
+              backgroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              title: const Text(
+                "Change Password",
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                  color: textColor,
+                ),
+              ),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _buildPasswordField(
+                      controller: currentPasswordController,
+                      label: "Current Password",
+                      obscureText: !showCurrentPassword,
+                      onToggle: () {
+                        setState(() {
+                          showCurrentPassword = !showCurrentPassword;
+                        });
+                      },
                     ),
-                    obscureText: true,
-                  ),
-                  const SizedBox(height: 10),
-                  TextField(
-                    controller: newPasswordController,
-                    decoration: const InputDecoration(
-                      labelText: 'New Password',
-                      border: OutlineInputBorder(),
-                      suffixIcon: Icon(Icons.lock_outline),
-                    ),
-                    obscureText: true,
-                  ),
-                  const SizedBox(height: 10),
-                  TextField(
-                    controller: confirmNewPasswordController,
-                    decoration: const InputDecoration(
-                      labelText: 'Confirm New Password',
-                      border: OutlineInputBorder(),
-                      suffixIcon: Icon(Icons.lock_outline),
-                    ),
-                    obscureText: true,
-                  ),
-                  if (errorMessage != null) ...[
                     const SizedBox(height: 10),
-                    Text(
-                      errorMessage!,
-                      style: const TextStyle(color: Colors.red),
+                    _buildPasswordField(
+                      controller: newPasswordController,
+                      label: "New Password",
+                      obscureText: !showNewPassword,
+                      onToggle: () {
+                        setState(() {
+                          showNewPassword = !showNewPassword;
+                        });
+                      },
                     ),
+                    const SizedBox(height: 10),
+                    _buildPasswordField(
+                      controller: confirmNewPasswordController,
+                      label: "Confirm New Password",
+                      obscureText: !showConfirmPassword,
+                      onToggle: () {
+                        setState(() {
+                          showConfirmPassword = !showConfirmPassword;
+                        });
+                      },
+                    ),
+                    if (errorMessage != null) ...[
+                      const SizedBox(height: 10),
+                      Text(
+                        errorMessage!,
+                        style: const TextStyle(
+                          color: Colors.red,
+                          fontSize: 11,
+                        ),
+                      ),
+                    ],
                   ],
-                ],
+                ),
               ),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(),
-                  child: const Text("Cancel"),
+                  style: TextButton.styleFrom(
+                    foregroundColor: Colors.grey[700],
+                    textStyle: const TextStyle(fontSize: 13),
+                  ),
+                  child: const Text(
+                    "Cancel",
+                    style: TextStyle(color: textColor, fontSize: 13),
+                  ),
                 ),
-                TextButton(
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: widgetPricolor,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 10,
+                    ),
+                  ),
                   onPressed: () {
                     String currentPassword = currentPasswordController.text;
                     String newPassword = newPasswordController.text;
@@ -143,23 +184,66 @@ class _AccountDetailsState extends State<AccountDetails> {
                             'Password must be at least 8 characters.';
                       });
                     } else {
-                      // Dispatch event to update password
                       context.read<AuthenticationBloc>().add(
                             ChangePasswordEvent(
                               password: currentPassword,
                               newPassword: newPassword,
                             ),
                           );
-                      Navigator.of(context).pop(); // Close dialog
+                      Navigator.of(context).pop();
                     }
                   },
-                  child: const Text("Confirm"),
+                  child: const Text(
+                    "Confirm",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 13,
+                    ),
+                  ),
                 ),
               ],
             );
           },
         );
       },
+    );
+  }
+
+  Widget _buildPasswordField({
+    required TextEditingController controller,
+    required String label,
+    required bool obscureText,
+    required VoidCallback onToggle,
+  }) {
+    return TextField(
+      controller: controller,
+      obscureText: obscureText,
+      style: const TextStyle(fontSize: 11),
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: const TextStyle(fontSize: 11, color: Colors.grey),
+        suffixIcon: IconButton(
+          icon: Icon(
+            obscureText ? Icons.visibility_off : Icons.visibility,
+            size: 18,
+            color: Colors.grey,
+          ),
+          onPressed: onToggle,
+        ),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: Colors.grey, width: 1),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: Colors.blue, width: 2),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: Colors.grey, width: 1),
+        ),
+      ),
     );
   }
 

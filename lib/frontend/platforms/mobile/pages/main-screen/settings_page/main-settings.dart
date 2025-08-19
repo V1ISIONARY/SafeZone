@@ -366,11 +366,11 @@ class _SettingsState extends State<Settings> {
                               isAdmin == false
                                   ? Container()
                                   : Settingsbtn(
-                                      title: 'Report Analytics',
+                                      title: 'Admin Analytics Dashboard',
                                       svgIcon: 'lib/resource/svg/monitor.svg',
                                       navigateTo: 'analytics',
                                       description:
-                                          'Report Analytics delivers data insights with reports and dashboards.',
+                                          'Admin Analytics Dashboard delivers data insights with reports and dashboards.',
                                       onTap: () {},
                                     )
                             ]),
