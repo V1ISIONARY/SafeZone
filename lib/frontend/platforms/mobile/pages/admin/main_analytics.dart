@@ -141,7 +141,7 @@ class _MainAnalyticsState extends State<MainAnalytics>
           backgroundColor: Colors.white,
           automaticallyImplyLeading: false,
           centerTitle: true,
-          title: const CategoryText(text: "Reports Analytics"),
+          title: const CategoryText(text: "Admin Analytics Dashboard"),
           leading: GestureDetector(
             onTap: () {
               Navigator.pop(context);

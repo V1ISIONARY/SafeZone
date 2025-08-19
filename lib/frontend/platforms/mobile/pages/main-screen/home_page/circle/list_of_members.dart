@@ -85,21 +85,57 @@ class _ListOfMembersState extends State<ListOfMembers> {
   void _leaveGroup() async {
     final confirm = await showDialog<bool>(
       context: context,
+      barrierDismissible: true,
       builder: (context) {
         return AlertDialog(
-          title: const Text("Leave Circle"),
-          content: const Text("Are you sure you want to leave this circle?"),
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          title: const Text(
+            "Leave Circle",
+            style: TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
+              color: textColor,
+            ),
+          ),
+          content: const Text(
+            "Are you sure you want to leave this circle?",
+            style: TextStyle(
+              fontSize: 12,
+              color: Colors.black87,
+            ),
+          ),
           actions: [
             TextButton(
-              child: const Text("Cancel"),
               onPressed: () => Navigator.of(context).pop(false),
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.grey[700],
+                textStyle: const TextStyle(fontSize: 13),
+              ),
+              child: const Text(
+                "Cancel",
+                style: TextStyle(color: textColor, fontSize: 13),
+              ),
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.red,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               ),
-              child: const Text("Leave"),
               onPressed: () => Navigator.of(context).pop(true),
+              child: const Text(
+                "Leave",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 13,
+                ),
+              ),
             ),
           ],
         );

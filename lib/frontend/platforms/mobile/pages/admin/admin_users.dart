@@ -1,8 +1,15 @@
+// ignore_for_file: curly_braces_in_flow_control_structures
+
+import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../../backend/architecture/bloc/adminBloc/analytics/analytics_admin_bloc.dart';
 import '../../../../../backend/architecture/bloc/adminBloc/analytics/analytics_admin_event.dart';
 import '../../../../../backend/architecture/bloc/adminBloc/analytics/analytics_admin_state.dart';
 import '../../../../../backend/models/dangerzoneModel/incident_report_model.dart';
 import '../../../../../backend/properties/import.dart';
+import '../../../../../frontend/platforms/mobile/widgets/loading/loadingstate.dart';
+import '../../../../../resource/schema/texts.dart';
 
 class AdminReportsUsers extends StatefulWidget {
   const AdminReportsUsers({super.key, this.reportInfo});
@@ -45,105 +52,237 @@ class _AdminReportsUsersState extends State<AdminReportsUsers> {
     }
   }
 
+  Widget _buildAgeChart(Map<String, int> ageGroups) {
+    return Container(
+      height: 250,
+      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.only(bottom: 20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.2),
+            blurRadius: 5,
+            spreadRadius: 1,
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const CategoryText(text: 'Age Distribution'),
+          const SizedBox(height: 10),
+          Expanded(
+            child: BarChart(
+              BarChartData(
+                alignment: BarChartAlignment.spaceAround,
+                barTouchData: BarTouchData(enabled: true),
+                titlesData: FlTitlesData(
+                  show: true,
+                  bottomTitles: AxisTitles(
+                    sideTitles: SideTitles(
+                      showTitles: true,
+                      getTitlesWidget: (value, meta) {
+                        return Padding(
+                          padding: const EdgeInsets.only(top: 8.0),
+                          child: Text(
+                            ageGroups.keys.elementAt(value.toInt()),
+                            style: const TextStyle(fontSize: 10),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  leftTitles: AxisTitles(
+                    sideTitles: SideTitles(
+                      showTitles: true,
+                      reservedSize: 30,
+                      getTitlesWidget: (value, meta) {
+                        return Text(value.toInt().toString());
+                      },
+                    ),
+                  ),
+                ),
+                borderData: FlBorderData(show: false),
+                barGroups: ageGroups.entries.map((e) {
+                  return BarChartGroupData(
+                    x: ageGroups.keys.toList().indexOf(e.key),
+                    barRods: [
+                      BarChartRodData(
+                        toY: e.value.toDouble(),
+                        color: Colors.blue[400],
+                        width: 20,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                    ],
+                  );
+                }).toList(),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildGenderChart(Map<String, int> genderCount) {
+    return Container(
+      height: 250,
+      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.only(bottom: 20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.2),
+            blurRadius: 5,
+            spreadRadius: 1,
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const CategoryText(text: 'Gender Distribution'),
+          const SizedBox(height: 10),
+          Expanded(
+            child: PieChart(
+              PieChartData(
+                sectionsSpace: 2,
+                centerSpaceRadius: 40,
+                sections: genderCount.entries.map((e) {
+                  return PieChartSectionData(
+                    value: e.value.toDouble(),
+                    title: '${e.key}\n(${e.value})',
+                    color: _getGenderColor(e.key),
+                    radius: 60,
+                    titleStyle: const TextStyle(
+                      fontSize: 12,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  );
+                }).toList(),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Color _getGenderColor(String gender) {
+    switch (gender.toLowerCase()) {
+      case 'male':
+        return Colors.blue;
+      case 'female':
+        return Colors.pink;
+      default:
+        return Colors.grey;
+    }
+  }
+
+  Map<String, dynamic> _processDemographics(List<dynamic> users) {
+    final ageGroups = {'<18': 0, '18-24': 0, '25-34': 0, '35-44': 0, '45+': 0};
+    final genderCount = {'Male': 0, 'Female': 0, 'Other': 0};
+    final locationCount = <String, int>{};
+
+    for (var user in users) {
+      final age = user['age'] ?? 0;
+      if (age < 18) {
+        ageGroups['<18'];
+      } else if (age <= 24)
+        ageGroups['18-24'];
+      else if (age <= 34)
+        ageGroups['25-34'];
+      else if (age <= 44)
+        ageGroups['35-44'];
+      else
+        ageGroups['45+'];
+
+      final gender = user['gender']?.toString() ?? 'Other';
+      if (gender.toLowerCase().contains('male')) {
+        genderCount['Male'];
+      } else if (gender.toLowerCase().contains('female'))
+        genderCount['Female'];
+      else
+        genderCount['Other'];
+    }
+
+    return {
+      'ageGroups': ageGroups,
+      'genderCount': genderCount,
+      'locationCount': locationCount,
+    };
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFFF5F5F5),
       body: BlocBuilder<AdminBloc, AdminState>(
         builder: (context, state) {
           if (state is AdminLoading) {
-            return Expanded(
-              child: Center(
-                child: Transform.translate(
-                    offset: const Offset(-20, -30),
-                    child: const LoadingState()),
-              ),
-            );
+            return const Center(child: LoadingState());
           } else if (state is UsersWithDataLoaded) {
-            final usersData = state.data;
+            final demographics = _processDemographics(state.data);
 
-            // Initialize filtered users if empty
-            if (_filteredUsers.isEmpty) {
-              _filteredUsers = usersData;
-            }
-
-            return Container(
-              margin: const EdgeInsets.only(top: 15, left: 15, right: 15),
-              child: ListView(
+            return SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const CategoryText(text: 'Location that has been reported.'),
                   const SizedBox(height: 20),
-                  Container(
-                    margin: const EdgeInsets.only(bottom: 15),
-                    width: double.infinity,
-                    height: 200,
-                    decoration: BoxDecoration(
-                      color: const Color.fromARGB(10, 0, 0, 0),
-                      borderRadius: BorderRadius.circular(5),
-                    ),
-                  ),
-                  Container(
-                    width: double.infinity,
-                    height: 60,
-                    margin: const EdgeInsets.symmetric(vertical: 10),
-                    child: TextField(
-                      controller: _searchController,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 13,
-                      ),
-                      decoration: InputDecoration(
-                        filled: true,
-                        fillColor: widgetPricolor,
-                        hintText: 'Search for specific user',
-                        hintStyle: const TextStyle(
-                          color: Colors.white,
-                        ),
-                        prefixIcon: const Icon(
-                          Icons.search,
-                          color: Colors.white,
-                        ), // Add search icon here
-                        contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 12.0, vertical: 12.0),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(5.0),
-                          borderSide: const BorderSide(color: widgetPricolor),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(5.0),
-                          borderSide: const BorderSide(color: widgetPricolor),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(5.0),
-                          borderSide: const BorderSide(color: widgetPricolor),
-                        ),
-                      ),
-                    ),
-                  ),
-                  // Display users count
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 10),
-                    child: Text(
-                      'Total Users: ${_filteredUsers.length}',
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  // Display filtered user information
-                  ..._filteredUsers.map((user) {
-                    final username = user['username'] ?? 'Unknown';
-                    final profileImage = user['profile_picture_url'] ?? '';
-                    final safeZonesCount = (user['safe_zones'] as List).length;
-                    final incidentsCount =
-                        (user['incident_reports'] as List).length;
 
-                    return Userinfomartion(
-                      username: username,
-                      profileImage: profileImage,
-                      safeZone: safeZonesCount,
-                      incidents: incidentsCount,
+                  _buildAgeChart(
+                      Map<String, int>.from(demographics['ageGroups'])),
+                  _buildGenderChart(
+                      Map<String, int>.from(demographics['genderCount'])),
+
+                  const SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const CategoryText(text: 'User List'),
+                      Text(
+                        'Total: ${_filteredUsers.isEmpty ? state.data.length : _filteredUsers.length}',
+                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+
+                  TextField(
+                    controller: _searchController,
+                    style:
+                        const TextStyle(fontSize: 13),
+                    decoration: InputDecoration(
+                      filled: true,
+                      fillColor: Colors.white,
+                      hintText: 'Search users...',
+                      hintStyle: const TextStyle(
+                          fontSize: 13), 
+                      prefixIcon: const Icon(Icons.search),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+
+                  ...(_filteredUsers.isEmpty ? state.data : _filteredUsers)
+                      .map((user) {
+                    return Container(
+                      child: Userinfomartion(
+                        username: user['username'] ?? 'Unknown',
+                        profileImage: user['profile_picture_url'] ?? '',
+                        safeZone: (user['safe_zones'] as List?)?.length ?? 0,
+                        incidents:
+                            (user['incident_reports'] as List?)?.length ?? 0,
+                      ),
                     );
                   }),
                 ],
@@ -151,9 +290,8 @@ class _AdminReportsUsersState extends State<AdminReportsUsers> {
             );
           } else if (state is AdminError) {
             return Center(child: Text('Error: ${state.message}'));
-          } else {
-            return const Center(child: Text('No data available..'));
           }
+          return const Center(child: Text('No data available'));
         },
       ),
     );

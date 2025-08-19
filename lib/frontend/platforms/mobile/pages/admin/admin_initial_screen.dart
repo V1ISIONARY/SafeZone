@@ -1,7 +1,13 @@
-import '../../../../../backend/architecture/bloc/adminBloc/analytics/analytics_admin_bloc.dart';
-import '../../../../../backend/architecture/bloc/adminBloc/analytics/analytics_admin_event.dart';
-import '../../../../../backend/architecture/bloc/adminBloc/analytics/analytics_admin_state.dart';
-import '../../../../../backend/properties/import.dart';
+import 'dart:math';
+
+import 'package:flutter/material.dart';
+import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:safezone/backend/architecture/bloc/adminBloc/analytics/analytics_admin_bloc.dart';
+import 'package:safezone/backend/architecture/bloc/adminBloc/analytics/analytics_admin_event.dart';
+import 'package:safezone/backend/architecture/bloc/adminBloc/analytics/analytics_admin_state.dart';
+import 'package:safezone/frontend/platforms/mobile/widgets/loading/loadingstate.dart';
+import 'package:safezone/resource/schema/colors.dart';
 
 class AdminInitialScreen extends StatefulWidget {
   final int? initialPage;
@@ -13,6 +19,7 @@ class AdminInitialScreen extends StatefulWidget {
 
 class _AdminInitialScreenState extends State<AdminInitialScreen> {
   String selectedCategory = 'Monthly';
+  String selectedMetric = 'Safe Zones';
   final Map<String, List<FlSpot>> graphData = {
     'Monthly': [],
     'Weekly': [],
@@ -31,14 +38,49 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> {
     });
   }
 
+  void _updateMetric(String metric) {
+    setState(() {
+      selectedMetric = metric;
+    });
+  }
+
   Widget _bottomTitleWidgets(double value, TitleMeta meta) {
     const List<String> days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-    if (value % 1 != 0 || value < 0 || value >= days.length) return Container();
+    const List<String> months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec'
+    ];
+    List<String> hours = List.generate(24, (index) => '$index:00');
+
+    if (value % 1 != 0 || value < 0) return Container();
+
+    String text;
+    if (selectedCategory == 'Weekly') {
+      if (value >= days.length) return Container();
+      text = days[value.toInt()];
+    } else if (selectedCategory == 'Monthly') {
+      if (value >= 31) return Container();
+      text = '${value.toInt() + 1}';
+    } else {
+      if (value >= hours.length) return Container();
+      text = hours[value.toInt()];
+    }
+
     return SideTitleWidget(
       axisSide: meta.axisSide,
       child: Text(
-        days[value.toInt()],
-        style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
+        text,
+        style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold),
       ),
     );
   }
@@ -48,7 +90,7 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> {
       axisSide: meta.axisSide,
       child: Text(
         '${value.toInt()}',
-        style: const TextStyle(fontSize: 10),
+        style: const TextStyle(fontSize: 9),
       ),
     );
   }
@@ -60,15 +102,11 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> {
       body: BlocBuilder<AdminBloc, AdminState>(
         builder: (context, state) {
           if (state is AdminLoading) {
-            return Expanded(
-              child: Center(
-                child: Transform.translate(
-                    offset: const Offset(-20, -30),
-                    child: const LoadingState()),
-              ),
-            );
+            return const Center(child: LoadingState());
           } else if (state is AdminError) {
-            return Center(child: Text('Error: ${state.message}'));
+            return Center(
+                child: Text('Error: ${state.message}',
+                    style: const TextStyle(fontSize: 11)));
           } else if (state is AllDataLoaded) {
             final data = state.data;
             final users = data['users'];
@@ -80,150 +118,545 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> {
             final int totalIncidentReports = incidentReports.length;
             final int totalVerifiedSafeZones =
                 safeZones.where((zone) => zone['is_verified'] == true).length;
+            final int pendingIncidentReports = incidentReports
+                .where((report) => report['status'] == 'pending')
+                .length;
+            final int verifiedIncidentReports = incidentReports
+                .where((report) => report['status'] == 'verified')
+                .length;
+            final int activeUsers = users
+                .where((user) => user['profile']['activity_status'] == true)
+                .length;
+            final int femaleUsers = users
+                .where((user) => user['profile']['is_girl'] == true)
+                .length;
+            final int maleUsers = totalUsers - femaleUsers;
 
-            graphData['Monthly'] = _generateGraphData(safeZones, 'Monthly');
-            graphData['Weekly'] = _generateGraphData(safeZones, 'Weekly');
-            graphData['Today'] = _generateGraphData(safeZones, 'Today');
+            graphData['Monthly'] = _generateGraphData(
+                selectedMetric == 'Safe Zones' ? safeZones : incidentReports,
+                'Monthly');
+            graphData['Weekly'] = _generateGraphData(
+                selectedMetric == 'Safe Zones' ? safeZones : incidentReports,
+                'Weekly');
+            graphData['Today'] = _generateGraphData(
+                selectedMetric == 'Safe Zones' ? safeZones : incidentReports,
+                'Today');
 
-            return ListView(
-              padding: const EdgeInsets.only(left: 15, right: 15, top: 15),
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
+            return SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 20),
+                  const Text(
+                    'Dashboard Overview',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Last updated: ${DateTime.now().toString()}',
+                    style: TextStyle(
+                      fontSize: 9,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: SummaryCard(
+                          title: 'Total Users',
+                          value: totalUsers,
+                          icon: Icons.people,
+                          color: labelFormFieldColor,
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: SummaryCard(
+                          title: 'Active Users',
+                          value: activeUsers,
+                          icon: Icons.person,
+                          color: labelFormFieldColor,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: SummaryCard(
+                          title: 'Safe Zones',
+                          value: totalSafeZones,
+                          icon: Icons.location_on,
+                          color: greenStatusColor,
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: SummaryCard(
+                          title: 'Incident Reports',
+                          value: totalIncidentReports,
+                          icon: Icons.warning,
+                          color: dangerStatusColor,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 30),
+                  const Text(
+                    'Analytics',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Container(
+                    height: 50,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 10, vertical: 10),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(5),
+                      color: const Color.fromARGB(10, 0, 0, 0),
+                    ),
+                    child: Row(
                       children: [
-                        const CategoryText(text: 'Reports'),
-                        const Spacer(),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children:
-                              ['Monthly', 'Weekly', 'Today'].map((category) {
-                            return GestureDetector(
-                              onTap: () => _updateGraph(category),
-                              child: Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 8.0),
-                                child: Text(
-                                  category,
-                                  style: TextStyle(
-                                    fontSize: 10,
-                                    fontWeight: selectedCategory == category
-                                        ? FontWeight.w500
-                                        : FontWeight.w300,
-                                    color: selectedCategory == category
-                                        ? widgetPricolor
-                                        : Colors.black38,
+                        const Text(
+                          'Metric:',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 11),
+                        ),
+                        const SizedBox(width: 8),
+                        ...['Safe Zones', 'Incident Reports'].map((metric) {
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 4),
+                            child: ChoiceChip(
+                              label: Text(metric,
+                                  style: const TextStyle(fontSize: 11)),
+                              selected: selectedMetric == metric,
+                              onSelected: (selected) => _updateMetric(metric),
+                              selectedColor: widgetPricolor.withOpacity(0.2),
+                              backgroundColor: Colors.white,
+                              side: BorderSide.none,
+                              labelStyle: TextStyle(
+                                color: selectedMetric == metric
+                                    ? widgetPricolor
+                                    : Colors.black54,
+                                fontWeight: selectedMetric == metric
+                                    ? FontWeight.bold
+                                    : FontWeight.normal,
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Container(
+                    height: 50,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 10, vertical: 10),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(5),
+                      color: const Color.fromARGB(10, 0, 0, 0),
+                    ),
+                    child: Row(
+                      children: [
+                        const Text(
+                          'Timeframe:',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 11),
+                        ),
+                        const SizedBox(width: 8),
+                        ...['Monthly', 'Weekly', 'Today'].map((category) {
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 4),
+                            child: ChoiceChip(
+                              label: Text(category,
+                                  style: const TextStyle(fontSize: 11)),
+                              selected: selectedCategory == category,
+                              backgroundColor: Colors.white,
+                              side: BorderSide.none,
+                              onSelected: (selected) => _updateGraph(category),
+                              selectedColor: widgetPricolor.withOpacity(0.2),
+                              labelStyle: TextStyle(
+                                color: selectedCategory == category
+                                    ? widgetPricolor
+                                    : Colors.black54,
+                                fontWeight: selectedCategory == category
+                                    ? FontWeight.bold
+                                    : FontWeight.normal,
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Container(
+                    height: 300,
+                    margin: const EdgeInsets.only(bottom: 15),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 10, vertical: 10),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(5),
+                      color: const Color.fromARGB(10, 0, 0, 0),
+                    ),
+                    child: Column(
+                      children: [
+                        Text(
+                          '$selectedMetric ($selectedCategory)',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 13,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Expanded(
+                          child: LineChart(
+                            LineChartData(
+                              titlesData: FlTitlesData(
+                                leftTitles: AxisTitles(
+                                  sideTitles: SideTitles(
+                                    showTitles: true,
+                                    getTitlesWidget: _leftTitleWidgets,
+                                    reservedSize: 30,
                                   ),
                                 ),
+                                bottomTitles: AxisTitles(
+                                  sideTitles: SideTitles(
+                                    showTitles: true,
+                                    getTitlesWidget: _bottomTitleWidgets,
+                                    reservedSize: 22,
+                                    interval:
+                                        selectedCategory == 'Today' ? 4 : 1,
+                                  ),
+                                ),
+                                topTitles: const AxisTitles(
+                                    sideTitles: SideTitles(showTitles: false)),
+                                rightTitles: const AxisTitles(
+                                    sideTitles: SideTitles(showTitles: false)),
                               ),
-                            );
-                          }).toList(),
+                              borderData: FlBorderData(
+                                show: true,
+                                border: Border.all(
+                                  color: Colors.grey.withOpacity(0.2),
+                                  width: 1,
+                                ),
+                              ),
+                              gridData: FlGridData(
+                                show: true,
+                                drawVerticalLine: true,
+                                horizontalInterval: 1,
+                                verticalInterval:
+                                    selectedCategory == 'Today' ? 4 : 1,
+                                getDrawingHorizontalLine: (value) {
+                                  return FlLine(
+                                    color: Colors.grey.withOpacity(0.1),
+                                    strokeWidth: 1,
+                                  );
+                                },
+                                getDrawingVerticalLine: (value) {
+                                  return FlLine(
+                                    color: Colors.grey.withOpacity(0.1),
+                                    strokeWidth: 1,
+                                  );
+                                },
+                              ),
+                              lineBarsData: [
+                                LineChartBarData(
+                                  spots: graphData[selectedCategory]!,
+                                  isCurved: true,
+                                  color: widgetPricolor,
+                                  barWidth: 3,
+                                  isStrokeCapRound: true,
+                                  belowBarData: BarAreaData(
+                                    show: true,
+                                    color: widgetPricolor.withOpacity(0.1),
+                                  ),
+                                  dotData: FlDotData(show: true),
+                                ),
+                              ],
+                              minX: 0,
+                              maxX: selectedCategory == 'Monthly'
+                                  ? 30
+                                  : selectedCategory == 'Weekly'
+                                      ? 6
+                                      : 23,
+                              minY: 0,
+                              maxY: graphData[selectedCategory]!.isEmpty
+                                  ? 10
+                                  : graphData[selectedCategory]!
+                                          .map((spot) => spot.y)
+                                          .reduce(max) *
+                                      1.2,
+                            ),
+                          ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 20),
-                    SizedBox(
-                      height: 250,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(5),
-                          color: const Color.fromARGB(10, 0, 0, 0),
-                        ),
-                        padding: const EdgeInsets.only(
-                            right: 20, top: 20, bottom: 15),
-                        child: LineChart(
-                          LineChartData(
-                            titlesData: FlTitlesData(
-                              leftTitles: AxisTitles(
-                                sideTitles: SideTitles(
-                                  showTitles: true,
-                                  getTitlesWidget: _leftTitleWidgets,
-                                  reservedSize: 25,
-                                ),
-                              ),
-                              bottomTitles: AxisTitles(
-                                sideTitles: SideTitles(
-                                  showTitles: true,
-                                  getTitlesWidget: _bottomTitleWidgets,
-                                  reservedSize: 22,
-                                  interval: 1,
-                                ),
-                              ),
-                              topTitles: const AxisTitles(
-                                  sideTitles: SideTitles(showTitles: false)),
-                              rightTitles: const AxisTitles(
-                                  sideTitles: SideTitles(showTitles: false)),
-                            ),
-                            borderData: FlBorderData(show: false),
-                            gridData: const FlGridData(show: true),
-                            lineBarsData: [
-                              LineChartBarData(
-                                spots: graphData[selectedCategory]!,
-                                isCurved: true,
-                                color: widgetPricolor,
-                                barWidth: 3,
-                                isStrokeCapRound: true,
-                                belowBarData: BarAreaData(show: false),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
+                  ),
+                  const SizedBox(height: 30),
+                  const Text(
+                    'Detailed Metrics',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold,
                     ),
-                  ],
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 15),
-                  child: Row(
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
                     children: [
                       Expanded(
-                          child: PercentageAverage(
-                              count: totalSafeZones,
-                              title: 'Total Safe Zones')),
-                      const SizedBox(width: 10),
+                        child: MetricTile(
+                          title: 'Verified Safe Zones',
+                          value: totalVerifiedSafeZones,
+                          total: totalSafeZones,
+                        ),
+                      ),
+                      const SizedBox(width: 16),
                       Expanded(
-                          child: PercentageAverage(
-                              count: totalIncidentReports,
-                              title: 'Total Incident Reports')),
+                        child: MetricTile(
+                          title: 'Pending Verification',
+                          value: totalSafeZones - totalVerifiedSafeZones,
+                          total: totalSafeZones,
+                        ),
+                      ),
                     ],
                   ),
-                ),
-                Column(
-                  children: [
-                    PercentageAverage(count: totalUsers, title: 'Total Users'),
-                    PercentageAverage(
-                        count: totalVerifiedSafeZones,
-                        title: 'Total Verified Safe Zones'),
-                  ],
-                ),
-              ],
+                  const SizedBox(height: 20),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: MetricTile(
+                          title: 'Verified Reports',
+                          value: verifiedIncidentReports,
+                          total: totalIncidentReports,
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: MetricTile(
+                          title: 'Pending Reports',
+                          value: pendingIncidentReports,
+                          total: totalIncidentReports,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: MetricTile(
+                          title: 'Female Users',
+                          value: femaleUsers,
+                          total: totalUsers,
+                        ),
+                      ),
+                      const SizedBox(width: 20),
+                      Expanded(
+                        child: MetricTile(
+                          title: 'Male Users',
+                          value: maleUsers,
+                          total: totalUsers,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 30),
+                ],
+              ),
             );
           } else {
-            return const Center(child: Text('No data available'));
+            return const Center(
+                child:
+                    Text('No data available', style: TextStyle(fontSize: 11)));
           }
         },
       ),
     );
   }
 
-  List<FlSpot> _generateGraphData(List<dynamic> safeZones, String category) {
+  List<FlSpot> _generateGraphData(List<dynamic> data, String category) {
     Map<int, int> dataPoints = {};
 
-    for (var zone in safeZones) {
-      DateTime reportDate = DateTime.parse(zone['report_timestamp']);
+    for (var item in data) {
+      DateTime reportDate = DateTime.parse(item['report_timestamp']);
       int key = category == 'Today'
           ? reportDate.hour
           : category == 'Weekly'
-              ? reportDate.weekday
-              : reportDate.day;
+              ? reportDate.weekday - 1
+              : reportDate.day - 1;
       dataPoints[key] = (dataPoints[key] ?? 0) + 1;
     }
 
-    return dataPoints.entries
-        .map((entry) => FlSpot(entry.key.toDouble(), entry.value.toDouble()))
-        .toList();
+    int maxKey = category == 'Today'
+        ? 23
+        : category == 'Weekly'
+            ? 6
+            : 30;
+
+    List<FlSpot> spots = [];
+    for (int i = 0; i <= maxKey; i++) {
+      spots.add(FlSpot(i.toDouble(), dataPoints[i]?.toDouble() ?? 0));
+    }
+
+    return spots;
+  }
+}
+
+class SummaryCard extends StatelessWidget {
+  final String title;
+  final int value;
+  final IconData icon;
+  final Color color;
+
+  const SummaryCard({
+    super.key,
+    required this.title,
+    required this.value,
+    required this.icon,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      child: Container(
+        height: 90,
+        margin: const EdgeInsets.only(bottom: 15),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(5),
+          color: const Color.fromARGB(10, 0, 0, 0),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  value.toString(),
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.black,
+                  ),
+                ),
+                Icon(icon, color: color),
+              ],
+            ),
+            Text(
+              title,
+              style: TextStyle(
+                color: Colors.grey[600],
+                fontSize: 11,
+              ),
+            ),
+            const Spacer(),
+            Container(
+              height: 10,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(2),
+                color: Colors.black12,
+              ),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Container(
+                  width: 100,
+                  height: double.infinity,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(2),
+                    color: widgetPricolor,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class MetricTile extends StatelessWidget {
+  final String title;
+  final int value;
+  final int total;
+
+  const MetricTile({
+    super.key,
+    required this.title,
+    required this.value,
+    required this.total,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    double percentage = total == 0 ? 0 : (value / total * 100);
+    double progressWidth = total == 0 ? 0 : (value / total * 100);
+
+    return GestureDetector(
+      child: Container(
+        height: 90,
+        margin: const EdgeInsets.only(bottom: 15),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(5),
+          color: const Color.fromARGB(10, 0, 0, 0),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              title,
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 11,
+              ),
+            ),
+            Spacer(),
+            Text(
+              '$value / $total (${percentage.toStringAsFixed(1)}%)',
+              style: TextStyle(
+                fontSize: 20,
+                color: Colors.grey[600],
+              ),
+            ),
+            const Spacer(),
+            Container(
+              height: 10,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(2),
+                color: Colors.black12,
+              ),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Container(
+                  width: progressWidth,
+                  height: double.infinity,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(2),
+                    color: widgetPricolor,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

@@ -34,12 +34,37 @@ class Userinfomartion extends StatelessWidget {
                 shape: BoxShape.circle,
               ),
               child: ClipOval(
-                child: Image.network(
-                  profileImage,
-                  fit: BoxFit.cover,
-                  width: 40,
-                  height: 40,
-                ),
+                child: profileImage.isEmpty
+                    ? Container(
+                        decoration: BoxDecoration(
+                          color: Colors.grey[200],
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.person,
+                          size: 30,
+                          color: Colors.grey,
+                        ),
+                      )
+                    : Image.network(
+                        profileImage,
+                        fit: BoxFit.cover,
+                        width: 40,
+                        height: 40,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            decoration: BoxDecoration(
+                              color: Colors.grey[200],
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.person,
+                              size: 30,
+                              color: Colors.grey,
+                            ),
+                          );
+                        },
+                      ),
               ),
             ),
             Padding(
