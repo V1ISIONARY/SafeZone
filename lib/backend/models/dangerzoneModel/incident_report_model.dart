@@ -6,6 +6,7 @@ class IncidentReportModel {
   int? dangerZoneId;
   String? description;
   String? reportDate;
+  String? reportType;
   String? reportTime;
   List<String>? images;
   String? reportTimestamp;
@@ -20,6 +21,7 @@ class IncidentReportModel {
     this.dangerZoneId,
     this.description,
     this.reportDate,
+    this.reportType,
     this.reportTime,
     this.images,
     this.reportTimestamp,
@@ -36,6 +38,7 @@ class IncidentReportModel {
       dangerZoneId: json['danger_zone_id'],
       description: json['description'],
       reportDate: json['report_date'],
+      reportType: json['report_type'],
       reportTime: json['report_time'],
       images: json['images'] != null ? List<String>.from(json['images']) : null,
       reportTimestamp: json['report_timestamp'],
@@ -59,6 +62,7 @@ class IncidentReportModel {
       'danger_zone_id': dangerZoneId,
       'description': description,
       'report_date': reportDate,
+      'report_type': reportType,
       'report_time': reportTime,
       'images': images,
       'report_timestamp': reportTimestamp,

@@ -339,6 +339,40 @@ class _ReviewReportState extends State<ReviewReport> {
                           ],
                         )),
                     Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const SizedBox(height: 15),
+                          const CategoryText(text: 'Report Type'),
+                          const SizedBox(height: 5),
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              const Icon(
+                                size: 15,
+                                Icons.report_problem,
+                                color: widgetPricolor,
+                              ),
+                              const SizedBox(width: 5),
+                              CategoryDescripTextE(
+                                text: widget.reportInfo.reportType ??
+                                    "Not specified",
+                                alignment: 'start',
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 15),
+                          const Divider(
+                            height: 0.5,
+                            color: Colors.black26,
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
                         padding: const EdgeInsets.symmetric(horizontal: 20),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,

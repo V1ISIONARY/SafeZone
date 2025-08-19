@@ -6,6 +6,7 @@ class IncidentReportRequestModel {
   final int? dangerZoneId;
   final String? description;
   final String? reportDate;
+  final String? reportType;
   final String? reportTime;
   final List<File>? images;
   final String? reportTimestamp;
@@ -20,6 +21,7 @@ class IncidentReportRequestModel {
     this.dangerZoneId,
     this.description,
     this.reportDate,
+    this.reportType,
     this.reportTime,
     this.images,
     this.reportTimestamp,
@@ -36,6 +38,7 @@ class IncidentReportRequestModel {
       dangerZoneId: json['danger_zone_id'],
       description: json['description'],
       reportDate: json['report_date'],
+      reportType: json['report_type'],
       reportTime: json['report_time'],
       reportTimestamp: json['report_timestamp'],
       latitude: json['latitude'],
@@ -52,6 +55,7 @@ class IncidentReportRequestModel {
       'danger_zone_id': dangerZoneId,
       'description': description,
       'report_date': reportDate,
+      'report_type': reportType,
       'report_time': reportTime,
       'report_timestamp': reportTimestamp,
       'latitude': latitude,

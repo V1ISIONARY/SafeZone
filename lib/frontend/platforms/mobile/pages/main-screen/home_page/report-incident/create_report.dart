@@ -554,10 +554,13 @@ class _CreateReportState extends State<CreateReport> {
                                   description: _descriptionController.text,
                                   reportDate: DateFormat("yyyy-MM-dd")
                                       .format(DateTime.now()),
+                                  reportType: _selectedType == 'Others'
+                                      ? _otherTypeController.text
+                                      : _selectedType,
                                   reportTime: DateFormat("HH:mm:ss")
                                       .format(DateTime.now()),
                                   images:
-                                      selectedImages, // Pass the File objects directly
+                                      selectedImages,
                                   reportTimestamp: reportTimestamp,
                                   latitude: _pinnedLocation!.latitude,
                                   longitude: _pinnedLocation!.longitude,

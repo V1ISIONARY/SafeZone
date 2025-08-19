@@ -104,6 +104,7 @@ class IncidentRepositoryImpl implements IncidentReportRepository {
     }
     request.fields['description'] = incidentReport.description ?? '';
     request.fields['report_date'] = incidentReport.reportDate ?? '';
+    request.fields['report_type'] = incidentReport.reportType ?? '';
     request.fields['report_time'] = incidentReport.reportTime ?? '';
     request.fields['report_timestamp'] = incidentReport.reportTimestamp ?? '';
     request.fields['latitude'] = incidentReport.latitude.toString();
@@ -148,6 +149,7 @@ class IncidentRepositoryImpl implements IncidentReportRepository {
         'danger_zone_id': incidentReport.dangerZoneId,
         'description': incidentReport.description,
         'report_date': incidentReport.reportDate,
+        'report_type': incidentReport.reportType,
         'report_time': incidentReport.reportTime,
         'report_timestamp': incidentReport.reportTimestamp,
         'latitude': incidentReport.latitude,
