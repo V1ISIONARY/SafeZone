@@ -26,6 +26,88 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> {
     'Today': [],
   };
 
+  final List<String> _reportTypes = [
+    'Harassment',
+    'Assault',
+    'Theft',
+    'Suspicious Activity',
+    'Verbal Abuse',
+    'Stalking',
+    'Domestic Violence',
+    'Unsafe Environment',
+    'Others',
+  ];
+
+  // Add this method to count reports by type
+  Map<String, int> _countReportsByType(List<dynamic> incidentReports) {
+    Map<String, int> reportCounts = {};
+
+    // Initialize all types with 0
+    for (var type in _reportTypes) {
+      reportCounts[type] = 0;
+    }
+
+    // Count reports by type
+    for (var report in incidentReports) {
+      String reportType = report['report_type'] ?? 'Others';
+      if (_reportTypes.contains(reportType)) {
+        reportCounts[reportType] = (reportCounts[reportType] ?? 0) + 1;
+      } else {
+        reportCounts['Others'] = (reportCounts['Others'] ?? 0) + 1;
+      }
+    }
+
+    return reportCounts;
+  }
+
+  // Add this method to generate pie chart data
+  List<PieChartSectionData> _generatePieChartData(
+      Map<String, int> reportCounts, int totalReports) {
+    if (totalReports == 0) {
+      return [
+        PieChartSectionData(
+          value: 1,
+          color: Colors.grey[300],
+          title: 'No Data',
+          radius: 60,
+          titleStyle:
+              const TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
+        )
+      ];
+    }
+
+    List<Color> colors = [
+      Colors.blue,
+      Colors.red,
+      Colors.orange,
+      Colors.green,
+      Colors.purple,
+      Colors.pink,
+      Colors.brown,
+      Colors.teal,
+      Colors.grey,
+    ];
+
+    return _reportTypes.asMap().entries.map((entry) {
+      int index = entry.key;
+      String type = entry.value;
+      int count = reportCounts[type] ?? 0;
+      double percentage = (count / totalReports) * 100;
+
+      return PieChartSectionData(
+        value: count.toDouble(),
+        color: colors[index % colors.length],
+        title: percentage > 5 ? '${percentage.toStringAsFixed(1)}%' : '',
+        radius: 60,
+        titleStyle: const TextStyle(
+          fontSize: 10,
+          fontWeight: FontWeight.bold,
+          color: Colors.white,
+        ),
+      );
+    }).toList();
+  }
+
   @override
   void initState() {
     super.initState();
@@ -141,6 +223,10 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> {
             graphData['Today'] = _generateGraphData(
                 selectedMetric == 'Safe Zones' ? safeZones : incidentReports,
                 'Today');
+            final Map<String, int> reportCounts =
+                _countReportsByType(incidentReports);
+            final List<PieChartSectionData> pieChartData =
+                _generatePieChartData(reportCounts, totalIncidentReports);
 
             return SingleChildScrollView(
               padding: const EdgeInsets.all(16),
@@ -471,6 +557,103 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> {
                         ),
                       ),
                     ],
+                  ),
+                  const SizedBox(height: 30),
+                  const Text(
+                    'Incident Reports by Type',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: Colors.white,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.2),
+                          blurRadius: 5,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      children: [
+                        SizedBox(
+                          height: 200,
+                          child: PieChart(
+                            PieChartData(
+                              sections: pieChartData,
+                              centerSpaceRadius: 40,
+                              sectionsSpace: 2,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: _reportTypes.asMap().entries.map((entry) {
+                            int index = entry.key;
+                            String type = entry.value;
+                            int count = reportCounts[type] ?? 0;
+                            double percentage = totalIncidentReports == 0
+                                ? 0
+                                : (count / totalIncidentReports) * 100;
+
+                            List<Color> colors = [
+                              Colors.blue,
+                              Colors.red,
+                              Colors.orange,
+                              Colors.green,
+                              Colors.purple,
+                              Colors.pink,
+                              Colors.brown,
+                              Colors.teal,
+                              Colors.grey,
+                            ];
+
+                            return Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 6),
+                              decoration: BoxDecoration(
+                                color: colors[index % colors.length]
+                                    .withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(
+                                    color: colors[index % colors.length]
+                                        .withOpacity(0.3)),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Container(
+                                    width: 12,
+                                    height: 12,
+                                    decoration: BoxDecoration(
+                                      color: colors[index % colors.length],
+                                      shape: BoxShape.circle,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    '$type: $count (${percentage.toStringAsFixed(1)}%)',
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      color: Colors.grey[700],
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ],
+                    ),
                   ),
                   const SizedBox(height: 30),
                 ],
