@@ -25,6 +25,7 @@ import 'package:safezone/frontend/platforms/mobile/pages/main-screen/notificatio
 import 'package:safezone/frontend/platforms/mobile/pages/main-screen/notifications_page/reports/reports_history_information.dart';
 import 'package:safezone/frontend/platforms/mobile/pages/main-screen/notifications_page/reports/reports_history.dart';
 import 'package:safezone/frontend/platforms/mobile/pages/main-screen/notifications_page/reports/reports_status_history.dart';
+import 'package:safezone/frontend/platforms/mobile/pages/main-screen/notifications_page/safezone/safe_zone_history.dart';
 import 'package:safezone/frontend/platforms/mobile/pages/main-screen/notifications_page/safezone/safe_zone_history_information.dart';
 import 'package:safezone/frontend/platforms/mobile/pages/main-screen/home_page/report-incident/create_report.dart';
 import 'package:safezone/frontend/platforms/mobile/pages/main-screen/home_page/report-incident/report_success.dart';
@@ -129,7 +130,7 @@ GoRouter appRouter(bool isFirstRun, String? userToken) => GoRouter(
             path: '/safezone-history',
             builder: (context, state) {
               final maybe = state.extra as bool;
-              return ReportsHistory(fromSuccess: maybe);
+              return SafezoneHistory(fromSuccess: maybe);
             }),
         GoRoute(
           path: '/safezone-history-details',
