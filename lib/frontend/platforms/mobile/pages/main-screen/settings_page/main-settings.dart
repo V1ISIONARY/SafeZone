@@ -370,7 +370,7 @@ class _SettingsState extends State<Settings> {
                                       svgIcon: 'lib/resource/svg/monitor.svg',
                                       navigateTo: 'analytics',
                                       description:
-                                          'Admin Analytics Dashboard delivers data insights with reports and dashboards.',
+                                          'Access charts and data on reports, safe zones, and user demographics.',
                                       onTap: () {},
                                     )
                             ]),

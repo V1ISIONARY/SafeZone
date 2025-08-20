@@ -38,16 +38,13 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> {
     'Others',
   ];
 
-  // Add this method to count reports by type
   Map<String, int> _countReportsByType(List<dynamic> incidentReports) {
     Map<String, int> reportCounts = {};
 
-    // Initialize all types with 0
     for (var type in _reportTypes) {
       reportCounts[type] = 0;
     }
 
-    // Count reports by type
     for (var report in incidentReports) {
       String reportType = report['report_type'] ?? 'Others';
       if (_reportTypes.contains(reportType)) {
@@ -60,7 +57,6 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> {
     return reportCounts;
   }
 
-  // Add this method to generate pie chart data
   List<PieChartSectionData> _generatePieChartData(
       Map<String, int> reportCounts, int totalReports) {
     if (totalReports == 0) {
