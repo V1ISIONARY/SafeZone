@@ -74,3 +74,25 @@ class UpdateStatusError extends ProfileState {
   @override
   List<Object?> get props => [message];
 }
+
+class ProfileStatisticsLoading extends ProfileState {}
+
+// Loaded State for Statistics
+class ProfileStatisticsLoaded extends ProfileState {
+  final Map<String, dynamic> statistics;
+
+  const ProfileStatisticsLoaded(this.statistics);
+
+  @override
+  List<Object?> get props => [statistics];
+}
+
+// Error State for Statistics
+class ProfileStatisticsError extends ProfileState {
+  final String message;
+
+  const ProfileStatisticsError(this.message);
+
+  @override
+  List<Object?> get props => [message];
+}

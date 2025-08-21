@@ -73,5 +73,15 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         emit(ProfileError("Error fetching profile picture: $e"));
       }
     });
+
+    on<GetProfileStatisticsEvent>((event, emit) async {
+      emit(ProfileStatisticsLoading());
+      try {
+        final stats = await profileRepository.getProfileStatistics();
+        emit(ProfileStatisticsLoaded(stats));
+      } catch (e) {
+        emit(ProfileStatisticsError(e.toString()));
+      }
+    });
   }
 }

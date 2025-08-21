@@ -1,5 +1,3 @@
-// ignore_for_file: curly_braces_in_flow_control_structures
-
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -13,7 +11,6 @@ import '../../../../../resource/schema/texts.dart';
 
 class AdminReportsUsers extends StatefulWidget {
   const AdminReportsUsers({super.key, this.reportInfo});
-
   final IncidentReportModel? reportInfo;
 
   @override
@@ -40,13 +37,16 @@ class _AdminReportsUsersState extends State<AdminReportsUsers> {
 
   void _onSearchChanged() {
     final state = context.read<AdminBloc>().state;
-    if (state is UsersWithDataLoaded) {
-      final usersData = state.data;
+    if (state is DashboardLoaded) {
+      final usersData = state.users;
       final query = _searchController.text.toLowerCase();
 
       setState(() {
         _filteredUsers = usersData
-            .where((user) => user['username'].toLowerCase().contains(query))
+            .where((user) => (user['username'] ?? '')
+                .toString()
+                .toLowerCase()
+                .contains(query))
             .toList();
       });
     }
@@ -77,13 +77,16 @@ class _AdminReportsUsersState extends State<AdminReportsUsers> {
             child: BarChart(
               BarChartData(
                 alignment: BarChartAlignment.spaceAround,
-                barTouchData: BarTouchData(enabled: true),
                 titlesData: FlTitlesData(
                   show: true,
                   bottomTitles: AxisTitles(
                     sideTitles: SideTitles(
                       showTitles: true,
                       getTitlesWidget: (value, meta) {
+                        if (value.toInt() < 0 ||
+                            value.toInt() >= ageGroups.keys.length) {
+                          return const SizedBox();
+                        }
                         return Padding(
                           padding: const EdgeInsets.only(top: 8.0),
                           child: Text(
@@ -184,40 +187,6 @@ class _AdminReportsUsersState extends State<AdminReportsUsers> {
     }
   }
 
-  Map<String, dynamic> _processDemographics(List<dynamic> users) {
-    final ageGroups = {'<18': 0, '18-24': 0, '25-34': 0, '35-44': 0, '45+': 0};
-    final genderCount = {'Male': 0, 'Female': 0, 'Other': 0};
-    final locationCount = <String, int>{};
-
-    for (var user in users) {
-      final age = user['age'] ?? 0;
-      if (age < 18) {
-        ageGroups['<18'];
-      } else if (age <= 24)
-        ageGroups['18-24'];
-      else if (age <= 34)
-        ageGroups['25-34'];
-      else if (age <= 44)
-        ageGroups['35-44'];
-      else
-        ageGroups['45+'];
-
-      final gender = user['gender']?.toString() ?? 'Other';
-      if (gender.toLowerCase().contains('male')) {
-        genderCount['Male'];
-      } else if (gender.toLowerCase().contains('female'))
-        genderCount['Female'];
-      else
-        genderCount['Other'];
-    }
-
-    return {
-      'ageGroups': ageGroups,
-      'genderCount': genderCount,
-      'locationCount': locationCount,
-    };
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -226,8 +195,12 @@ class _AdminReportsUsersState extends State<AdminReportsUsers> {
         builder: (context, state) {
           if (state is AdminLoading) {
             return const Center(child: LoadingState());
-          } else if (state is UsersWithDataLoaded) {
-            final demographics = _processDemographics(state.data);
+          } else if (state is DashboardLoaded) {
+            final users = _filteredUsers.isEmpty ? state.users : _filteredUsers;
+            final ageGroups =
+                Map<String, int>.from(state.statistics['age_statistics'] ?? {});
+            final genderStats = Map<String, int>.from(
+                state.statistics['gender_statistics'] ?? {});
 
             return SingleChildScrollView(
               padding: const EdgeInsets.all(16),
@@ -235,35 +208,31 @@ class _AdminReportsUsersState extends State<AdminReportsUsers> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 20),
-
-                  _buildAgeChart(
-                      Map<String, int>.from(demographics['ageGroups'])),
-                  _buildGenderChart(
-                      Map<String, int>.from(demographics['genderCount'])),
-
+                  _buildAgeChart(ageGroups),
+                  _buildGenderChart(genderStats),
                   const SizedBox(height: 20),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       const CategoryText(text: 'User List'),
                       Text(
-                        'Total: ${_filteredUsers.isEmpty ? state.data.length : _filteredUsers.length}',
-                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                        'Total: ${users.length}',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 13,
+                        ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 20),
-
                   TextField(
                     controller: _searchController,
-                    style:
-                        const TextStyle(fontSize: 13),
+                    style: const TextStyle(fontSize: 13),
                     decoration: InputDecoration(
                       filled: true,
                       fillColor: Colors.white,
                       hintText: 'Search users...',
-                      hintStyle: const TextStyle(
-                          fontSize: 13), 
+                      hintStyle: const TextStyle(fontSize: 13),
                       prefixIcon: const Icon(Icons.search),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
@@ -272,10 +241,9 @@ class _AdminReportsUsersState extends State<AdminReportsUsers> {
                     ),
                   ),
                   const SizedBox(height: 20),
-
-                  ...(_filteredUsers.isEmpty ? state.data : _filteredUsers)
-                      .map((user) {
+                  ...users.map((user) {
                     return Container(
+                      margin: const EdgeInsets.only(bottom: 8),
                       child: Userinfomartion(
                         username: user['username'] ?? 'Unknown',
                         profileImage: user['profile_picture_url'] ?? '',

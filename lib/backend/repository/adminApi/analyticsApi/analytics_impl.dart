@@ -5,6 +5,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:safezone/backend/repository/adminApi/analyticsApi/analytics_repo.dart';
 
 final _apiUrl = "${dotenv.env['API_URL']}/admin";
+final String baseUrl = '${dotenv.env['API_URL']}/profile';
 
 class AdminRepositoryImpl implements AdminRepository {
   @override
@@ -49,6 +50,24 @@ class AdminRepositoryImpl implements AdminRepository {
       return jsonDecode(response.body);
     } else {
       throw Exception('Failed to load data: ${response.statusCode}');
+    }
+  }
+
+  @override
+  Future<Map<String, dynamic>> getProfileStatistics() async {
+    final response =
+        await http.get(Uri.parse('$baseUrl/get-profile-statistics'));
+
+    print("Raw response body: ${response.body}");
+
+    final data = _handleResponse(response);
+
+    print("Parsed data: $data");
+
+    if (data is Map<String, dynamic>) {
+      return data;
+    } else {
+      throw Exception("Unexpected response format for profile statistics.");
     }
   }
 }

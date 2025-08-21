@@ -133,4 +133,22 @@ class ProfileImplementation extends ProfileRepository {
       return null;
     }
   }
+
+  @override
+  Future<Map<String, dynamic>> getProfileStatistics() async {
+    final String url = '$baseUrl/get-profile-statistics';
+    try {
+      final response = await http.get(Uri.parse(url));
+
+      if (response.statusCode == 200) {
+        final jsonData = json.decode(response.body);
+        return jsonData;
+      } else {
+        throw Exception("Failed to get profile statistics.");
+      }
+    } catch (e) {
+      print("Error fetching profile statistics: $e");
+      return {};
+    }
+  }
 }

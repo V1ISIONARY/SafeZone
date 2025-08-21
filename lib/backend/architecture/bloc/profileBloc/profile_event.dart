@@ -18,6 +18,14 @@ class GetProfileEvent extends ProfileEvent {
   List<Object?> get props => [userId];
 }
 
+// Get Profile Event
+class GetProfileStatisticsEvent extends ProfileEvent {
+  const GetProfileStatisticsEvent();
+
+  @override
+  List<Object?> get props => [];
+}
+
 // Update Status Event
 class UpdateStatusEvent extends ProfileEvent {
   final int userId;

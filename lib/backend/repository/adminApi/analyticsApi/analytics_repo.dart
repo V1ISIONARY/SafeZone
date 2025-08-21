@@ -6,4 +6,5 @@ abstract class AdminRepository {
   Future<dynamic> getUsersWithIncidents();
   Future<dynamic> getSafeZones();
   Future<dynamic> getUsersWithSafeZones();
+  Future<Map<String, dynamic>> getProfileStatistics();
 }

@@ -24,3 +24,11 @@ class FetchSafeZones extends AdminEvent {}
 
 // Event to fetch users with safe zones
 class FetchUsersWithSafeZones extends AdminEvent {}
+
+// Get Profile Event
+class GetProfileStatisticsEvent extends AdminEvent {
+  const GetProfileStatisticsEvent();
+
+  @override
+  List<Object> get props => [];
+}

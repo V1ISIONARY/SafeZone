@@ -13,6 +13,7 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
     on<FetchUsersWithIncidents>(_onFetchUsersWithIncidents);
     on<FetchSafeZones>(_onFetchSafeZones);
     on<FetchUsersWithSafeZones>(_onFetchUsersWithSafeZones);
+    on<GetProfileStatisticsEvent>(_onGetProfileStatisticsEvent);
   }
 
   // Handler for FetchAllData event
@@ -29,11 +30,14 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
 
   // Handler for FetchUsersWithData event
   Future<void> _onFetchUsersWithData(
-      FetchUsersWithData event, Emitter<AdminState> emit) async {
+    FetchUsersWithData event,
+    Emitter<AdminState> emit,
+  ) async {
     emit(AdminLoading());
     try {
-      final data = await adminRepository.getUsersWithData();
-      emit(UsersWithDataLoaded(data));
+      final users = await adminRepository.getUsersWithData();
+      final statistics = await adminRepository.getProfileStatistics();
+      emit(DashboardLoaded(users: users, statistics: statistics));
     } catch (e) {
       emit(AdminError(e.toString()));
     }
@@ -84,6 +88,19 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
       emit(UsersWithSafeZonesLoaded(data));
     } catch (e) {
       emit(AdminError(e.toString()));
+    }
+  }
+
+  Future<void> _onGetProfileStatisticsEvent(
+    GetProfileStatisticsEvent event,
+    Emitter<AdminState> emit,
+  ) async {
+    emit(ProfileStatisticsLoading());
+    try {
+      final statistics = await adminRepository.getProfileStatistics();
+      emit(ProfileStatisticsLoaded(statistics));
+    } catch (e) {
+      emit(ProfileStatisticsError(e.toString()));
     }
   }
 }
