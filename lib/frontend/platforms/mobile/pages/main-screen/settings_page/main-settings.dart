@@ -84,6 +84,20 @@ class _SettingsState extends State<Settings> {
     });
   }
 
+  Future<void> _loadNotificationState() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool savedState = prefs.getBool('isPollingActive') ?? false;
+    setState(() {
+      isNotification = savedState;
+    });
+
+    // Resume polling if it was active
+    if (savedState) {
+      int userId = prefs.getInt('id') ?? 0;
+      NotificationPollingService().startPolling(userId, 10);
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -91,6 +105,7 @@ class _SettingsState extends State<Settings> {
     loadUserProfile();
     _loadAdminStatus();
     _loadSelectedMapType();
+    _loadNotificationState();
   }
 
   @override
@@ -459,10 +474,26 @@ class _SettingsState extends State<Settings> {
                                   ),
                                   const Spacer(),
                                   GestureDetector(
-                                    onTap: () {
+                                    onTap: () async {
                                       setState(() {
                                         isNotification = !isNotification;
                                       });
+
+                                      final SharedPreferences prefs =
+                                          await SharedPreferences.getInstance();
+                                      int userId = prefs.getInt('id') ?? 0;
+
+                                      if (isNotification) {
+                                        NotificationPollingService()
+                                            .startPolling(userId, 10);
+                                        await prefs.setBool(
+                                            'isPollingActive', true);
+                                      } else {
+                                        NotificationPollingService()
+                                            .stopPolling();
+                                        await prefs.setBool(
+                                            'isPollingActive', false);
+                                      }
                                     },
                                     child: Container(
                                       height: 20,
@@ -499,7 +530,7 @@ class _SettingsState extends State<Settings> {
                                         ),
                                       ),
                                     ),
-                                  ),
+                                  )
                                 ],
                               )),
                       widget.UserToken == 'guest'

@@ -18,13 +18,17 @@ class NotificationPollingService {
   final String baseUrl = '${dotenv.env['API_URL']}/notifications';
   Timer? timer;
 
-  void startPolling(int userId, int intervalInSeconds) {
+  /// Start polling and set a flag in SharedPreferences
+  void startPolling(int userId, int intervalInSeconds) async {
     if (timer != null) {
-      print("Polling already running or stopped.");
+      print("Polling already running.");
       return;
     }
 
     print("Polling started with interval: $intervalInSeconds seconds");
+
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool("isPollingActive", true);
 
     timer = Timer.periodic(Duration(seconds: intervalInSeconds), (_) async {
       print("Fetching notifications for userId: $userId");
@@ -42,14 +46,16 @@ class NotificationPollingService {
     timer = null;
     print("Polling stopped.");
 
-    // Clear SharedPreferences
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.clear();
-    print("SharedPreferences cleared.");
+    await prefs.setBool("isPollingActive", false);
+  }
+
+  Future<bool> isPollingActive() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getBool("isPollingActive") ?? false;
   }
 
   void enablePolling() {
-    // Enable polling again by setting stop to true
     print("Polling enabled.");
   }
 
@@ -57,21 +63,17 @@ class NotificationPollingService {
   Future<void> _fetchAndProcessNotifications(int userId) async {
     print("Fetching notifications for userId: $userId");
 
-    // Fetch all notifications where isDone and isRead are false
     List<NotificationModel> notifications = await getNotifications(userId);
 
     if (notifications.isNotEmpty) {
       for (var notification in notifications) {
-        // Only process notifications where isDone and isRead are false
         if (!notification.isDone && !notification.isRead) {
-          // Check if this notification has already been processed
           if (await _isNotificationProcessed(userId, notification.id)) {
             print(
                 "Skipping already processed notification: ${notification.id}");
             continue;
           }
 
-          // Create notification
           print(
               "Creating new notification - Title: ${notification.title}, Message: ${notification.message}");
           NotificationService.createNewNotification(
@@ -80,22 +82,16 @@ class NotificationPollingService {
             typeOfNotif: notification.type,
           );
 
-          // Mark the notification as processed
           await _markNotificationAsProcessed(userId, notification.id);
-
-          // Call the API to mark the notification as done
           await _markNotificationAsDone(notification.id);
         }
       }
-
-      // Optionally update lastChecked time after processing
       _updateLastChecked();
     } else {
       print("No new notifications to process.");
     }
   }
 
-  /// Fetch notifications from the API (same method you provided)
   Future<List<NotificationModel>> getNotifications(int userId) async {
     final String url = '$baseUrl/get_notif/$userId';
 
@@ -119,7 +115,6 @@ class NotificationPollingService {
     }
   }
 
-  // Check if the notification has already been processed
   Future<bool> _isNotificationProcessed(int userId, int notificationId) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     String processedNotificationsKey = 'processed_notifications_$userId';
@@ -129,7 +124,6 @@ class NotificationPollingService {
     return processedNotifications?.contains(notificationId.toString()) ?? false;
   }
 
-  // Mark the notification as processed by storing its ID
   Future<void> _markNotificationAsProcessed(
       int userId, int notificationId) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -145,18 +139,13 @@ class NotificationPollingService {
     }
   }
 
-  // Update lastChecked time in SharedPreferences without microseconds
   Future<void> _updateLastChecked() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    String currentTime =
-        DateTime.now().toIso8601String().split('.')[0]; // Exclude microseconds
-
+    String currentTime = DateTime.now().toIso8601String().split('.')[0];
     print("Updating lastChecked time: $currentTime");
-
     await prefs.setString('lastChecked', currentTime);
   }
 
-  /// Retrieve the lastChecked time from SharedPreferences
   Future<String> getLastChecked() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     String lastChecked =
@@ -165,7 +154,6 @@ class NotificationPollingService {
     return lastChecked;
   }
 
-  /// Call the API to mark the notification as done
   Future<void> _markNotificationAsDone(int notificationId) async {
     final String url = '$baseUrl/mark_done/$notificationId';
 
