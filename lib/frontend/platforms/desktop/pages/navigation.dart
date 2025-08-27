@@ -1,6 +1,13 @@
-import 'package:safezone/backend/properties/import.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:safezone/backend/properties/properties.dart';
 import 'package:safezone/frontend/platforms/desktop/pages/content/contact.dart';
+import 'package:safezone/frontend/platforms/desktop/pages/content/dashboard/admin_dangerzones.dart';
+import 'package:safezone/frontend/platforms/desktop/pages/content/dashboard/admin_initial_screen.dart';
+import 'package:safezone/frontend/platforms/desktop/pages/content/dashboard/admin_reports.dart';
+import 'package:safezone/frontend/platforms/desktop/pages/content/dashboard/admin_users.dart';
+import 'package:safezone/frontend/platforms/desktop/pages/content/dashboard/main_analytics.dart';
 import 'package:safezone/frontend/platforms/desktop/pages/content/map/content/createreport.dart';
 import 'package:safezone/frontend/platforms/desktop/pages/content/map/content/listofgroup.dart';
 import 'package:safezone/frontend/platforms/desktop/pages/content/map/content/marksafezone.dart';
@@ -8,6 +15,7 @@ import 'package:safezone/frontend/platforms/desktop/pages/content/map/map.dart';
 import 'package:safezone/frontend/platforms/desktop/pages/content/map/mapheader.dart';
 import 'package:safezone/frontend/platforms/desktop/pages/content/notification/notification.dart';
 import 'package:safezone/frontend/platforms/desktop/widget/button/sidenav.dart';
+import 'package:safezone/resource/schema/colors.dart';
 
 class NavigationDT extends StatefulWidget {
   final String userToken;
@@ -40,11 +48,7 @@ class _NavigationDTState extends State<NavigationDT> {
         pageContent = MapDT(UserToken: widget.userToken);
         break;
       case 1:
-        pageContent = Container(
-          width: double.infinity,
-          height: double.infinity,
-          color: Colors.white,
-        );
+        pageContent = AdminInitialScreen();
         break;
       case 2:
         pageContent = const Center(child: Text('Page 2 Content'));
@@ -128,7 +132,8 @@ class _NavigationDTState extends State<NavigationDT> {
               dropdown = false;
               Sidenav.selectedDropdownId.value = null;
             });
-          }, onOpenNotification: (String page) {
+          }, 
+          onOpenNotification: (String page) {
             setState(() {
               showit = true;
               selectedComs = 0;
@@ -140,6 +145,12 @@ class _NavigationDTState extends State<NavigationDT> {
               selectedPageNotifier.value = page;
             });
           });
+        case 3:
+          return AdminReportsUsers();
+        case 4: 
+          return AdminDangerzones();
+        case 5: 
+          return AdminReports();
         default:
           return const Center(child: Text('No Dropdown Content'));
       }
@@ -612,6 +623,7 @@ class _NavigationDTState extends State<NavigationDT> {
                                       Sidenav(
                                         icon: Icons.dashboard_outlined,
                                         label: 'Dashboard',
+                                        withDrop: true,
                                         hoverTrailing: const [
                                           Text(
                                             'Alt',
@@ -625,6 +637,53 @@ class _NavigationDTState extends State<NavigationDT> {
                                               style: TextStyle(
                                                   fontSize: 10,
                                                   color: Colors.black38)),
+                                        ],
+                                        dropdownItems: [
+                                          DropdownItem(
+                                            label: 'Users',
+                                            id: 'us',
+                                            onTap: () {
+                                              setState(() {
+                                                if (selectedDropdownIndex == 3) {
+                                                  dropdown = !dropdown;
+                                                } else {
+                                                  dropdown = true;
+                                                  selectedDropdownIndex = 3;
+                                                }
+                                                _selectedPageIndex = 1;
+                                              });
+                                            },
+                                          ),
+                                          DropdownItem(
+                                            label: 'Safe Zones',
+                                            id: 'sz',
+                                            onTap: () {
+                                              setState(() {
+                                                if (selectedDropdownIndex == 4) {
+                                                  dropdown = !dropdown;
+                                                } else {
+                                                  dropdown = true;
+                                                  selectedDropdownIndex = 4;
+                                                }
+                                                _selectedPageIndex = 1;
+                                              });
+                                            },
+                                          ),
+                                          DropdownItem(
+                                            label: 'Danger Zones',
+                                            id: 'dz',
+                                            onTap: () {
+                                              setState(() {
+                                                if (selectedDropdownIndex == 5) {
+                                                  dropdown = !dropdown;
+                                                } else {
+                                                  dropdown = true;
+                                                  selectedDropdownIndex = 5;
+                                                }
+                                                _selectedPageIndex = 1;
+                                              });
+                                            },
+                                          ),
                                         ],
                                         onTap: () {
                                           setState(() {

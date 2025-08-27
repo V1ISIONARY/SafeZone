@@ -563,13 +563,13 @@ class _MapDTState extends State<MapDT> with TickerProviderStateMixin {
       );
 
       customDangerZoneMarker = await MarkerUtils.resizeMarker(
-        'lib/resource/image/png/dangerzonee.png',
+        'lib/resource/image/png/dangerzone.png',
         48,
         66,
       );
 
       customSafeZoneMarker = await MarkerUtils.resizeMarker(
-        'lib/resource/image/png/marker_safezone.png',
+        'lib/resource/image/png/safezone.png',
         48,
         66,
       );
@@ -722,7 +722,7 @@ class _MapDTState extends State<MapDT> with TickerProviderStateMixin {
             center: LatLng(dangerZone.latitude!, dangerZone.longitude!),
             radius: dangerZone.radius!,
             strokeWidth: 1,
-            strokeColor: Colors.transparent,
+            strokeColor: Colors.red.withOpacity(0.5),
             fillColor: Colors.red.withOpacity(0.1),
           ),
         );
@@ -750,7 +750,7 @@ class _MapDTState extends State<MapDT> with TickerProviderStateMixin {
             center: LatLng(safeZone.latitude!, safeZone.longitude!),
             radius: safeZone.radius!,
             strokeWidth: 1,
-            strokeColor: Colors.transparent,
+            strokeColor: Colors.green.withOpacity(0.5),
             fillColor: Colors.green.withOpacity(0.1),
           ),
         );
