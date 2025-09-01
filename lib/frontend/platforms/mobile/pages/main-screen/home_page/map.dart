@@ -79,7 +79,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
   bool _isSafeZoneShown = false;
   bool _isDangerZoneShown = false;
 
-  BitmapDescriptor? customMarker;
+  BitmapDescriptor? customMyLocationMarker;
   BitmapDescriptor? customPendingDangerZoneMarker;
   BitmapDescriptor? customDangerZoneMarker;
   BitmapDescriptor? customSafeZoneMarker;
@@ -384,8 +384,8 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
           markers.add(Marker(
             markerId: const MarkerId("My Location"),
             position: _currentUserLocation!,
-            icon: customMarker != null
-                ? customMarker!
+            icon: customMyLocationMarker != null
+                ? customMyLocationMarker!
                 : BitmapDescriptor.defaultMarker,
             infoWindow: const InfoWindow(title: 'My Location'),
           ));
@@ -509,7 +509,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
           markers.add(Marker(
             markerId: const MarkerId("My Location"),
             position: _currentUserLocation!,
-            icon: customMarker ?? BitmapDescriptor.defaultMarker,
+            icon: customMyLocationMarker ?? BitmapDescriptor.defaultMarker,
             infoWindow: const InfoWindow(title: 'My Location'),
           ));
         });
@@ -595,8 +595,9 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
 
   Future<void> _createCustomMarker() async {
     try {
-      await MarkerUtils.createCustomMarker(
+      customMyLocationMarker = await MarkerUtils.createCustomMarker(
           context, widgetPricolor, profilePictureUrl);
+      print("User location marker loaded: $customMyLocationMarker");
 
       customPendingDangerZoneMarker = await MarkerUtils.resizeMarker(
         'lib/resource/image/png/marker_dangerzone.png',
@@ -663,14 +664,14 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
 
   Set<Marker> _createMarkers(MapState state) {
     Set<Marker> markers = {};
-   
+
     if (_currentUserLocation != null) {
       markers.add(
         Marker(
           markerId: const MarkerId("My Location"),
           position: _currentUserLocation!,
-          icon: customMarker != null
-              ? customMarker!
+          icon: customMyLocationMarker != null
+              ? customMyLocationMarker!
               : BitmapDescriptor.defaultMarker,
           infoWindow: const InfoWindow(title: 'My Location'),
         ),
