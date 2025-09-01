@@ -68,7 +68,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
   List<LatLng> _dangerZones = [];
   final locs.Location location = locs.Location();
   static const LatLng sourceLocation = LatLng(16.0433, 120.3333);
-  LatLng _initialPosition = const LatLng(37.7749, -122.4194); 
+  LatLng _initialPosition = const LatLng(37.7749, -122.4194);
   final apiKey = dotenv.env['GOOGLE_API_KEY'];
   final GlobalKey _safeKey = GlobalKey();
   final GlobalKey _searchKey = GlobalKey();
@@ -80,6 +80,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
   bool _isDangerZoneShown = false;
 
   BitmapDescriptor? customMarker;
+  BitmapDescriptor? customPendingDangerZoneMarker;
   BitmapDescriptor? customDangerZoneMarker;
   BitmapDescriptor? customSafeZoneMarker;
   BitmapDescriptor? customMemberMarker;
@@ -162,6 +163,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
 
     _createCustomMarker().then((_) {
       _fetchLocation();
+      setState(() {});
     });
 
     print("Members list before fetching: $members");
@@ -382,7 +384,9 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
           markers.add(Marker(
             markerId: const MarkerId("My Location"),
             position: _currentUserLocation!,
-            icon: customMarker ?? BitmapDescriptor.defaultMarker,
+            icon: customMarker != null
+                ? customMarker!
+                : BitmapDescriptor.defaultMarker,
             infoWindow: const InfoWindow(title: 'My Location'),
           ));
         });
@@ -593,14 +597,21 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
     try {
       await MarkerUtils.createCustomMarker(
           context, widgetPricolor, profilePictureUrl);
+
+      customPendingDangerZoneMarker = await MarkerUtils.resizeMarker(
+        'lib/resource/image/png/marker_dangerzone.png',
+        48,
+        66,
+      );
+
       customDangerZoneMarker = await MarkerUtils.resizeMarker(
-        'lib/resource/image/png/dangerzonee.png',
+        'lib/resource/image/png/dangerzone.png',
         48,
         66,
       );
 
       customSafeZoneMarker = await MarkerUtils.resizeMarker(
-        'lib/resource/image/png/marker_safezone.png',
+        'lib/resource/image/png/safezone.png',
         48,
         66,
       );
@@ -652,13 +663,15 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
 
   Set<Marker> _createMarkers(MapState state) {
     Set<Marker> markers = {};
-
+   
     if (_currentUserLocation != null) {
       markers.add(
         Marker(
           markerId: const MarkerId("My Location"),
           position: _currentUserLocation!,
-          icon: customMarker ?? BitmapDescriptor.defaultMarker,
+          icon: customMarker != null
+              ? customMarker!
+              : BitmapDescriptor.defaultMarker,
           infoWindow: const InfoWindow(title: 'My Location'),
         ),
       );
@@ -683,7 +696,9 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
           Marker(
             markerId: MarkerId(userId),
             position: LatLng(latitude, longitude),
-            icon: memberMarker ?? BitmapDescriptor.defaultMarker,
+            icon: memberMarker != null
+                ? memberMarker
+                : BitmapDescriptor.defaultMarker,
             infoWindow: InfoWindow(title: '$firstName $lastName'),
             onTap: () {
               showMemberBottomSheet(userId, firstName, lastName, longitude,
@@ -693,60 +708,63 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
         );
       }
 
-      _dangerZones = state.dangerZones
-          .map((dangerZone) =>
-              LatLng(dangerZone.latitude!, dangerZone.longitude!))
-          .toList();
-
       for (var dangerZone in state.dangerZones) {
+        final dangerZoneIcon = dangerZone.isVerified
+            ? (customDangerZoneMarker != null
+                ? customDangerZoneMarker
+                : BitmapDescriptor.defaultMarker)
+            : (customPendingDangerZoneMarker != null
+                ? customPendingDangerZoneMarker
+                : BitmapDescriptor.defaultMarker);
+
         markers.add(
           Marker(
             markerId: MarkerId(dangerZone.id.toString()),
-            icon: customDangerZoneMarker ?? BitmapDescriptor.defaultMarker,
+            icon: dangerZoneIcon!,
             position: LatLng(dangerZone.latitude!, dangerZone.longitude!),
-            infoWindow: InfoWindow(
-              title: dangerZone.name,
-            ),
+            infoWindow: InfoWindow(title: dangerZone.name),
             onTap: () {
               showDangerZoneBottomSheet(dangerZone, context);
             },
           ),
         );
+
+        final circleColor = dangerZone.isVerified
+            ? Colors.red.withOpacity(0.1)
+            : Colors.yellow.withOpacity(0.2);
+
         sharedController.circles.add(
           Circle(
-            circleId: CircleId(dangerZone.id.toString()),
+            circleId: CircleId('danger_${dangerZone.id}'),
             center: LatLng(dangerZone.latitude!, dangerZone.longitude!),
-            radius: dangerZone.radius!,
+            radius: dangerZone.radius ?? 100.0, // Default radius if null
             strokeWidth: 1,
             strokeColor: Colors.transparent,
-            fillColor: Colors.red.withOpacity(0.1),
+            fillColor: circleColor,
           ),
         );
       }
 
-      _safeZones = state.safeZones
-          .map((safeZone) => LatLng(safeZone.latitude!, safeZone.longitude!))
-          .toList();
-      policeStations = state.safeZones;
       for (var safeZone in state.safeZones) {
         markers.add(
           Marker(
             markerId: MarkerId(safeZone.id.toString()),
-            icon: customSafeZoneMarker ?? BitmapDescriptor.defaultMarker,
+            icon: customSafeZoneMarker != null
+                ? customSafeZoneMarker!
+                : BitmapDescriptor.defaultMarker,
             position: LatLng(safeZone.latitude!, safeZone.longitude!),
-            infoWindow: InfoWindow(
-              title: safeZone.name,
-            ),
+            infoWindow: InfoWindow(title: safeZone.name),
             onTap: () {
               showSafeZoneBottomSheet(safeZone, context);
             },
           ),
         );
+
         sharedController.circles.add(
           Circle(
-            circleId: CircleId(safeZone.id.toString()),
+            circleId: CircleId('safe_${safeZone.id}'),
             center: LatLng(safeZone.latitude!, safeZone.longitude!),
-            radius: safeZone.radius!,
+            radius: safeZone.radius ?? 100.0, // Default radius if null
             strokeWidth: 1,
             strokeColor: Colors.transparent,
             fillColor: Colors.green.withOpacity(0.1),
@@ -1041,10 +1059,10 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                       ),
                     );
                   } else if (state is MapDataLoaded) {
-                    () async {
+                    WidgetsBinding.instance.addPostFrameCallback((_) async {
                       await _preloadMemberMarkers(state.members);
-                      setState(() {}); // or update the markers on the map
-                    }();
+                      setState(() {});
+                    });
                   } else if (state is MapError) {
                     return Center(child: Text(state.message));
                   }

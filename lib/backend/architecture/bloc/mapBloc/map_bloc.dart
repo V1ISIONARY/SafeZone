@@ -1,25 +1,21 @@
 import 'dart:async';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:safezone/backend/architecture/bloc/mapBloc/map_event.dart';
 import 'package:safezone/backend/architecture/bloc/mapBloc/map_state.dart';
 import 'package:safezone/backend/repository/circleApi/circle_repo.dart';
-import 'package:safezone/backend/repository/dangerzoneApi/dangerzone_repo.dart';
-import 'package:safezone/backend/repository/safezoneApi/safezone_repo.dart';
+import 'package:safezone/backend/repository/mapApi/map_impl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class MapBloc extends Bloc<MapPageEvent, MapState> {
-  final SafeZoneRepository safeZoneRepository;
-  final DangerZoneRepository dangerZoneRepository;
+  final CombinedZonesRepository combinedZonesRepository;
   final CircleRepository circleRepository;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final Map<String, StreamSubscription<DocumentSnapshot>> _locationListeners =
       {};
 
   MapBloc({
-    required this.safeZoneRepository,
-    required this.dangerZoneRepository,
+    required this.combinedZonesRepository,
     required this.circleRepository,
   }) : super(MapInitial()) {
     on<FetchMapData>(_onFetchMapData);
@@ -30,17 +26,18 @@ class MapBloc extends Bloc<MapPageEvent, MapState> {
       FetchMapData event, Emitter<MapState> emit) async {
     emit(MapLoading());
     try {
-      final safeZones = await safeZoneRepository.getVerifiedSafeZones();
+      final combinedZones = await combinedZonesRepository.getCombinedZones();
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final int userId = prefs.getInt('circle') ?? 0;
 
-      final dangerZones = await dangerZoneRepository.getVerifiedDangerZones();
       final members = await circleRepository.viewMembers(userId);
 
       if (members.isNotEmpty) {
-        emit(MapDataLoaded(safeZones, dangerZones, members));
+        emit(MapDataLoaded(
+            combinedZones.safeZones, combinedZones.dangerZones, members));
       } else {
-        emit(MapDataLoaded(safeZones, dangerZones, const []));
+        emit(MapDataLoaded(
+            combinedZones.safeZones, combinedZones.dangerZones, const []));
       }
     } catch (e) {
       emit(MapError(e.toString()));
@@ -87,8 +84,7 @@ class MapBloc extends Bloc<MapPageEvent, MapState> {
               if (circleSharing != null) {
                 final SharedPreferences prefs =
                     await SharedPreferences.getInstance();
-                final currentCircleId =
-                    prefs.getInt('circle')?.toString(); // your circle
+                final currentCircleId = prefs.getInt('circle')?.toString();
 
                 if (currentCircleId != null &&
                     circleSharing[currentCircleId] == true) {
@@ -117,5 +113,14 @@ class MapBloc extends Bloc<MapPageEvent, MapState> {
       print("Error in _onListenForMemberLocations: $e");
       emit(MapError(e.toString()));
     }
+  }
+
+  @override
+  Future<void> close() {
+    for (var subscription in _locationListeners.values) {
+      subscription.cancel();
+    }
+    _locationListeners.clear();
+    return super.close();
   }
 }

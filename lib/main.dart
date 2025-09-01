@@ -25,6 +25,7 @@ import 'package:safezone/backend/repository/circleApi/circle_impl.dart';
 import 'package:safezone/backend/repository/contactApi/contact_impl.dart';
 import 'package:safezone/backend/repository/dangerzoneApi/dangerzone_impl.dart';
 import 'package:safezone/backend/repository/incident_reportApi/incident_report_impl.dart';
+import 'package:safezone/backend/repository/mapApi/map_impl.dart';
 import 'package:safezone/backend/repository/notificationApi/notification_impl.dart';
 import 'package:safezone/backend/repository/profileApi/profile_impl.dart';
 import 'package:safezone/backend/repository/safezoneApi/safezone_impl.dart';
@@ -170,8 +171,7 @@ class _MyAppState extends State<MyApp> {
                       safeZoneRepository: SafeZoneRepositoryImpl())),
               BlocProvider(
                   create: (_) => MapBloc(
-                      safeZoneRepository: SafeZoneRepositoryImpl(),
-                      dangerZoneRepository: DangerZoneRepositoryImpl(),
+                      combinedZonesRepository: CombinedZonesRepository(),
                       circleRepository: CircleImplementation())
                     ..add(FetchMapData())),
               BlocProvider(
