@@ -80,6 +80,7 @@ class DangerZoneModel {
   final double? longitude;
   final double? radius;
   final String? name;
+  final bool showMap;
 
   DangerZoneModel({
     required this.id,
@@ -88,33 +89,30 @@ class DangerZoneModel {
     required this.longitude,
     required this.radius,
     required this.name,
+    required this.showMap, 
   });
 
   factory DangerZoneModel.fromJson(Map<String, dynamic> json) {
     return DangerZoneModel(
       id: json['id'],
       isVerified: json['is_verified'],
-      latitude: json['latitude']?.toDouble(), // Handle null
-      longitude: json['longitude']?.toDouble(), // Handle null
-      radius: json['radius']?.toDouble(), // Handle null
+      latitude: json['latitude']?.toDouble(),
+      longitude: json['longitude']?.toDouble(),
+      radius: json['radius']?.toDouble(),
       name: json['name']?.toString(),
+      showMap: json['show_map'] ?? false, 
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'is_verified': isVerified,
+      'latitude': latitude,
+      'longitude': longitude,
+      'radius': radius,
+      'name': name,
+      'show_map': showMap, 
+    };
+  }
 }
-
-// class IncidentResponse {
-//   final IncidentReportModel incidentReport;
-//   final DangerZoneModel dangerZone;
-
-//   IncidentResponse({
-//     required this.incidentReport,
-//     required this.dangerZone,
-//   });
-
-//   factory IncidentResponse.fromJson(Map<String, dynamic> json) {
-//     return IncidentResponse(
-//       incidentReport: IncidentReportModel.fromJson(json['incident_report']),
-//       dangerZone: DangerZoneModel.fromJson(json['danger_zone']),
-//     );
-//   }
-// }
