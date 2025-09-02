@@ -3,9 +3,11 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:safezone/backend/architecture/bloc/adminBloc/analytics/analytics_admin_bloc.dart';
 import 'package:safezone/backend/architecture/bloc/adminBloc/analytics/analytics_admin_event.dart';
 import 'package:safezone/backend/architecture/bloc/adminBloc/analytics/analytics_admin_state.dart';
+import 'package:safezone/backend/properties/properties.dart';
 import 'package:safezone/frontend/platforms/mobile/widgets/loading/loadingstate.dart';
 import 'package:safezone/resource/schema/colors.dart';
 
@@ -175,6 +177,7 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final sharedController = SharedProperties();
     return Scaffold(
       backgroundColor: Colors.white,
       body: BlocBuilder<AdminBloc, AdminState>(
@@ -237,21 +240,121 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(
-                          'Dashboard Overview',
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black87,
-                          ),
-                        ),
-                        const SizedBox(height: 5),
-                        Text(
-                          'Last updated: ${DateTime.now().toString()}',
-                          style: TextStyle(
-                            fontSize: 9,
-                            color: Colors.grey[600],
-                          ),
+                        Row(
+                          children: [
+                            ValueListenableBuilder(
+                              valueListenable: sharedController.isSidebarCollapsed,
+                              builder: (context, value, child) {
+                                return value
+                                    ? Container(
+                                        margin: const EdgeInsets.only(right: 15),
+                                        child: Tooltip(
+                                          message: 'Open sidebar',
+                                          preferBelow: false,
+                                          decoration: BoxDecoration(
+                                            color: Colors.black,
+                                            borderRadius: BorderRadius.circular(4),
+                                          ),
+                                          textStyle: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 8,
+                                          ),
+                                          child: Material(
+                                            color: Colors.transparent,
+                                            child: InkWell(
+                                              borderRadius: BorderRadius.circular(5),
+                                              hoverColor: Colors.grey.shade300,
+                                              onTap: () {
+                                                sharedController.isSidebarCollapsed.value =
+                                                    !sharedController
+                                                        .isSidebarCollapsed.value;
+                                              },
+                                              child: Padding(
+                                                padding: const EdgeInsets.all(5),
+                                                child: SvgPicture.asset(
+                                                  'lib/resource/svg/open_sidebar.svg',
+                                                  color: Colors.black45,
+                                                  height: 18,
+                                                  width: 19,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      )
+                                    : ValueListenableBuilder(
+                                        valueListenable: sharedController.isSidebarTab,
+                                        builder: (context, tabvalue, child) {
+                                          return tabvalue
+                                            ? Container(
+                                                margin: const EdgeInsets.only(
+                                                 right: 15),
+                                                child: Tooltip(
+                                                  message: 'Open tab',
+                                                  preferBelow: false,
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.black,
+                                                    borderRadius:
+                                                        BorderRadius.circular(4),
+                                                  ),
+                                                  textStyle: const TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: 8,
+                                                  ),
+                                                  child: Material(
+                                                    color: Colors.transparent,
+                                                    child: InkWell(
+                                                      borderRadius:
+                                                          BorderRadius.circular(5),
+                                                      hoverColor: Colors.grey.shade300,
+                                                      onTap: () {
+                                                        sharedController
+                                                                .isSidebarTabUi.value =
+                                                            !sharedController
+                                                                .isSidebarTabUi.value;
+                                                      },
+                                                      child: Padding(
+                                                        padding: const EdgeInsets.all(5),
+                                                        child: SvgPicture.asset(
+                                                          'lib/resource/svg/navigation_tab.svg',
+                                                          color: Colors.black45,
+                                                          height: 18,
+                                                          width: 19,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              )
+                                            : Container(
+                                                margin: const EdgeInsets.only(left: 10),
+                                              );
+                                        });
+                              }
+                            ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  'Dashboard Overview',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black87,
+                                  ),
+                                ),
+                                const SizedBox(height: 5),
+                                Text(
+                                  'Last updated: ${DateTime.now().toString()}',
+                                  style: TextStyle(
+                                    fontSize: 9,
+                                    color: Colors.grey[600],
+                                  ),
+                                ),
+                              ],
+                            )
+                          ],
                         ),
                         Container(
                           color: Colors.transparent,
@@ -333,7 +436,7 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> {
                           )
                         )
                       ],
-                    ),
+                    )
                   ),
                   Container(
                     width: double.infinity,
@@ -354,40 +457,124 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> {
                       const SizedBox(height: 16),
                       LayoutBuilder(
                         builder: (context, constraints) {
-                          bool useColumn = constraints.maxWidth <=  900;
-                          double containerHeight = useColumn ? 500 : 350;
-                          print("Current width: ${constraints.maxWidth}, container height: $containerHeight");
-                          
+                          bool useColumn = constraints.maxWidth <= 855; // changed from 900
+                          print("Current width: ${constraints.maxWidth}, useColumn: $useColumn");
                           return Container(
-                            height: containerHeight,
+                            height: useColumn ? 520 : 350,
                             color: Colors.green.withOpacity(0.1),
-                            padding: EdgeInsets.symmetric(horizontal: 0),
+                            padding: const EdgeInsets.symmetric(horizontal: 0),
                             child: useColumn
-                              ? Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Transform.translate(
-                                      offset: Offset(0, 70),
-                                      child: Container(
+                                ? Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Expanded(
+                                        child: Container(
+                                          height: 200,
+                                          width: double.infinity,
+                                          child: PieChart(
+                                            PieChartData(
+                                              sections: pieChartData,
+                                              centerSpaceRadius: 70,
+                                              sectionsSpace: 2,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 20),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                                        child: LayoutBuilder(
+                                          builder: (context, innerConstraints) {
+                                            double itemWidth = (innerConstraints.maxWidth - 24) / 2;
+                                            if (innerConstraints.maxWidth < 150) {
+                                              itemWidth = innerConstraints.maxWidth - 16;
+                                            }
+
+                                            return Wrap(
+                                              spacing: 8,
+                                              runSpacing: 8,
+                                              children: _reportTypes.asMap().entries.map((entry) {
+                                                int index = entry.key;
+                                                String type = entry.value;
+                                                int count = reportCounts[type] ?? 0;
+                                                double percentage = totalIncidentReports == 0
+                                                    ? 0
+                                                    : (count / totalIncidentReports) * 100;
+
+                                                List<Color> colors = [
+                                                  Colors.blue,
+                                                  Colors.red,
+                                                  Colors.orange,
+                                                  Colors.green,
+                                                  Colors.purple,
+                                                  Colors.pink,
+                                                  Colors.brown,
+                                                  Colors.teal,
+                                                  Colors.grey,
+                                                ];
+
+                                                return SizedBox(
+                                                  width: itemWidth,
+                                                  child: Container(
+                                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                                    decoration: BoxDecoration(
+                                                      color: colors[index % colors.length].withOpacity(0.1),
+                                                      borderRadius: BorderRadius.circular(16),
+                                                      border: Border.all(
+                                                        color: colors[index % colors.length].withOpacity(0.3),
+                                                      ),
+                                                    ),
+                                                    child: Row(
+                                                      mainAxisSize: MainAxisSize.min,
+                                                      children: [
+                                                        Container(
+                                                          width: 12,
+                                                          height: 12,
+                                                          decoration: BoxDecoration(
+                                                            color: colors[index % colors.length],
+                                                            shape: BoxShape.circle,
+                                                          ),
+                                                        ),
+                                                        const SizedBox(width: 6),
+                                                        Flexible(
+                                                          child: Text(
+                                                            '$type: $count (${percentage.toStringAsFixed(1)}%)',
+                                                            style: TextStyle(
+                                                              fontSize: 10,
+                                                              color: Colors.grey[700],
+                                                              fontWeight: FontWeight.w500,
+                                                            ),
+                                                            overflow: TextOverflow.ellipsis,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                );
+                                              }).toList(),
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                      const SizedBox(height: 20),
+                                    ],
+                                  )
+                                : Row(
+                                    children: [
+                                      Container(
                                         height: 200,
-                                        width: double.infinity,
+                                        width: 500,
                                         child: PieChart(
                                           PieChartData(
                                             sections: pieChartData,
                                             centerSpaceRadius: 70,
                                             sectionsSpace: 2,
-                                          )
-                                        )
-                                      )
-                                    ),
-                                    const SizedBox(height: 40),
-                                    Expanded(
-                                      child: Transform.translate(
-                                        offset: Offset(0, 100),
-                                        child: Container(
-                                          padding: EdgeInsets.symmetric(
-                                            horizontal: 20
                                           ),
+                                        ),
+                                      ),
+                                      Expanded(
+                                        child: Container(
+                                          padding: const EdgeInsets.only(right: 30),
                                           child: LayoutBuilder(
                                             builder: (context, innerConstraints) {
                                               double itemWidth = (innerConstraints.maxWidth - 24) / 4;
@@ -459,109 +646,15 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> {
                                                 }).toList(),
                                               );
                                             },
-                                          )
-                                        )
-                                      )
-                                    ),
-                                  ],
-                                )
-                              : Row(
-                                  children: [
-                                    Container(
-                                      height: 200,
-                                      width: 500,
-                                      child: PieChart(
-                                        PieChartData(
-                                          sections: pieChartData,
-                                          centerSpaceRadius: 70,
-                                          sectionsSpace: 2,
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                    Expanded(
-                                      child: Container(
-                                        padding: EdgeInsets.only(
-                                          right: 30
-                                        ),
-                                        child: LayoutBuilder(
-                                          builder: (context, innerConstraints) {
-                                            double itemWidth = (innerConstraints.maxWidth - 24) / 4;
-                                            if (innerConstraints.maxWidth < 150) {
-                                              itemWidth = (innerConstraints.maxWidth - 16) / 3;
-                                            }
-
-                                            return Wrap(
-                                              spacing: 8,
-                                              runSpacing: 8,
-                                              children: _reportTypes.asMap().entries.map((entry) {
-                                                int index = entry.key;
-                                                String type = entry.value;
-                                                int count = reportCounts[type] ?? 0;
-                                                double percentage = totalIncidentReports == 0
-                                                    ? 0
-                                                    : (count / totalIncidentReports) * 100;
-
-                                                List<Color> colors = [
-                                                  Colors.blue,
-                                                  Colors.red,
-                                                  Colors.orange,
-                                                  Colors.green,
-                                                  Colors.purple,
-                                                  Colors.pink,
-                                                  Colors.brown,
-                                                  Colors.teal,
-                                                  Colors.grey,
-                                                ];
-
-                                                return SizedBox(
-                                                  width: itemWidth,
-                                                  child: Container(
-                                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                                                    decoration: BoxDecoration(
-                                                      color: colors[index % colors.length].withOpacity(0.1),
-                                                      borderRadius: BorderRadius.circular(16),
-                                                      border: Border.all(
-                                                        color: colors[index % colors.length].withOpacity(0.3),
-                                                      ),
-                                                    ),
-                                                    child: Row(
-                                                      mainAxisSize: MainAxisSize.min,
-                                                      children: [
-                                                        Container(
-                                                          width: 12,
-                                                          height: 12,
-                                                          decoration: BoxDecoration(
-                                                            color: colors[index % colors.length],
-                                                            shape: BoxShape.circle,
-                                                          ),
-                                                        ),
-                                                        const SizedBox(width: 6),
-                                                        Flexible(
-                                                          child: Text(
-                                                            '$type: $count (${percentage.toStringAsFixed(1)}%)',
-                                                            style: TextStyle(
-                                                              fontSize: 10,
-                                                              color: Colors.grey[700],
-                                                              fontWeight: FontWeight.w500,
-                                                            ),
-                                                            overflow: TextOverflow.ellipsis,
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                );
-                                              }).toList(),
-                                            );
-                                          }
-                                        )
-                                      )
-                                    ),
-                                  ],
-                                ),
+                                    ],
+                                  ),
                           );
                         },
                       )
+
                       ],
                     ),
                   ),
@@ -571,7 +664,6 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Container(
-                          height: 50,
                           padding: const EdgeInsets.symmetric(
                             horizontal: 10, vertical: 10
                           ),
@@ -580,136 +672,273 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> {
                             borderRadius: BorderRadius.circular(5),
                             color: const Color.fromARGB(10, 0, 0, 0),
                           ),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Analytics',
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              Spacer(),
-                              ...['Safe Zones', 'Incident Reports'].map((metric) {
-                                return Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 4),
-                                  child: ChoiceChip(
-                                    label: Text(metric,
-                                        style: const TextStyle(fontSize: 11)),
-                                    selected: selectedMetric == metric,
-                                    onSelected: (selected) => _updateMetric(metric),
-                                    selectedColor: widgetPricolor.withOpacity(0.2),
-                                    backgroundColor: Colors.white,
-                                    side: BorderSide.none,
-                                    labelStyle: TextStyle(
-                                      color: selectedMetric == metric
-                                          ? widgetPricolor
-                                          : Colors.black54,
-                                      fontWeight: selectedMetric == metric
-                                          ? FontWeight.bold
-                                          : FontWeight.normal,
-                                    ),
-                                  ),
-                                );
-                              }).toList(),
-                              SizedBox(width: 10),
-                              Builder(
-                                builder: (context) {
-                                  return Theme(
-                                    data: Theme.of(context).copyWith(
-                                      popupMenuTheme: PopupMenuThemeData(
-                                        color: const Color.fromARGB(255, 240, 240, 240), 
-                                        textStyle: const TextStyle(
-                                          color: Colors.black87,
-                                          fontSize: 12,
-                                        ),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(5),
-                                        ),
-                                        elevation: 0,
-                                      ),
-                                    ),
-                                    child: PopupMenuButton<String>(
-                                      tooltip: '',
-                                      offset: const Offset(0, 40),
-                                      child: Container(
-                                        height: 30,
-                                        width: 150,
-                                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                                        decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          borderRadius: BorderRadius.circular(20),
-                                          border: Border.all(
-                                            width: 0.5,
-                                            color: Colors.black38,
+                          child: LayoutBuilder(
+                            builder: (context, constraints) {
+                              bool isNarrow = constraints.maxWidth <= 473;
+
+                              return isNarrow
+                                  ? Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Analytics',
+                                          style: const TextStyle(
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.bold,
                                           ),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: Colors.black.withOpacity(0.1),
-                                              spreadRadius: 1,
-                                              blurRadius: 6,
-                                              offset: const Offset(0, 3),
-                                            ),
-                                          ],
                                         ),
-                                        child: Row(
-                                          children: [
-                                            Icon(
-                                              Icons.calendar_month,
-                                              size: 13,
-                                              color: Colors.black54,
-                                            ),
-                                            Expanded(
-                                              child: Center(
-                                                child: Text(
-                                                  selectedCategory,
-                                                  style: const TextStyle(
-                                                    color: Colors.black,
-                                                    fontWeight: FontWeight.w500,
-                                                    fontSize: 11,
+                                        const SizedBox(height: 8),
+                                        Wrap(
+                                          spacing: 4,
+                                          children: ['Safe Zones', 'Incident Reports'].map((metric) {
+                                            return ChoiceChip(
+                                              label: Text(metric,
+                                                  style: const TextStyle(fontSize: 11)),
+                                              selected: selectedMetric == metric,
+                                              onSelected: (selected) => _updateMetric(metric),
+                                              selectedColor: widgetPricolor.withOpacity(0.2),
+                                              backgroundColor: Colors.white,
+                                              side: BorderSide.none,
+                                              labelStyle: TextStyle(
+                                                color: selectedMetric == metric
+                                                    ? widgetPricolor
+                                                    : Colors.black54,
+                                                fontWeight: selectedMetric == metric
+                                                    ? FontWeight.bold
+                                                    : FontWeight.normal,
+                                              ),
+                                            );
+                                          }).toList(),
+                                        ),
+                                        const SizedBox(height: 8),
+                                        Builder(
+                                          builder: (context) {
+                                            return Theme(
+                                              data: Theme.of(context).copyWith(
+                                                popupMenuTheme: PopupMenuThemeData(
+                                                  color: const Color.fromARGB(255, 240, 240, 240),
+                                                  textStyle: const TextStyle(
+                                                    color: Colors.black87,
+                                                    fontSize: 12,
                                                   ),
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius: BorderRadius.circular(5),
+                                                  ),
+                                                  elevation: 0,
                                                 ),
                                               ),
-                                            ),
-                                            const Icon(
-                                              Icons.keyboard_arrow_down_sharp,
-                                              size: 16,
-                                              color: Colors.black54,
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      onSelected: (String category) {
-                                        _updateGraph(category);
-                                      },
-                                      itemBuilder: (BuildContext context) {
-                                        return ['Monthly', 'Weekly', 'Today'].map((category) {
-                                          return PopupMenuItem<String>(
-                                            value: category,
-                                            child: SizedBox(
-                                              width: 89,
-                                              child: Text(
-                                                category,
-                                                style: const TextStyle(
-                                                  color: Colors.black,
-                                                  fontWeight: FontWeight.w500,
-                                                  fontSize: 11,
+                                              child: PopupMenuButton<String>(
+                                                tooltip: '',
+                                                offset: const Offset(0, 40),
+                                                child: Container(
+                                                  height: 30,
+                                                  width: 150,
+                                                  padding: const EdgeInsets.symmetric(
+                                                      horizontal: 12, vertical: 6),
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.white,
+                                                    borderRadius: BorderRadius.circular(20),
+                                                    border: Border.all(
+                                                      width: 0.5,
+                                                      color: Colors.black38,
+                                                    ),
+                                                    boxShadow: [
+                                                      BoxShadow(
+                                                        color: Colors.black.withOpacity(0.1),
+                                                        spreadRadius: 1,
+                                                        blurRadius: 6,
+                                                        offset: const Offset(0, 3),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  child: Row(
+                                                    children: [
+                                                      const Icon(
+                                                        Icons.calendar_month,
+                                                        size: 13,
+                                                        color: Colors.black54,
+                                                      ),
+                                                      Expanded(
+                                                        child: Center(
+                                                          child: Text(
+                                                            selectedCategory,
+                                                            style: const TextStyle(
+                                                              color: Colors.black,
+                                                              fontWeight: FontWeight.w500,
+                                                              fontSize: 11,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      const Icon(
+                                                        Icons.keyboard_arrow_down_sharp,
+                                                        size: 16,
+                                                        color: Colors.black54,
+                                                      ),
+                                                    ],
+                                                  ),
                                                 ),
+                                                onSelected: (String category) {
+                                                  _updateGraph(category);
+                                                },
+                                                itemBuilder: (BuildContext context) {
+                                                  return ['Monthly', 'Weekly', 'Today']
+                                                      .map((category) {
+                                                    return PopupMenuItem<String>(
+                                                      value: category,
+                                                      child: SizedBox(
+                                                        width: 89,
+                                                        child: Text(
+                                                          category,
+                                                          style: const TextStyle(
+                                                            color: Colors.black,
+                                                            fontWeight: FontWeight.w500,
+                                                            fontSize: 11,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    );
+                                                  }).toList();
+                                                },
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                      ],
+                                    )
+                                  : Row(
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Analytics',
+                                          style: const TextStyle(
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        const Spacer(),
+                                        ...['Safe Zones', 'Incident Reports'].map((metric) {
+                                          return Padding(
+                                            padding: const EdgeInsets.symmetric(horizontal: 4),
+                                            child: ChoiceChip(
+                                              label: Text(metric,
+                                                  style: const TextStyle(fontSize: 11)),
+                                              selected: selectedMetric == metric,
+                                              onSelected: (selected) => _updateMetric(metric),
+                                              selectedColor: widgetPricolor.withOpacity(0.2),
+                                              backgroundColor: Colors.white,
+                                              side: BorderSide.none,
+                                              labelStyle: TextStyle(
+                                                color: selectedMetric == metric
+                                                    ? widgetPricolor
+                                                    : Colors.black54,
+                                                fontWeight: selectedMetric == metric
+                                                    ? FontWeight.bold
+                                                    : FontWeight.normal,
                                               ),
                                             ),
                                           );
-                                        }).toList();
-                                      },
-                                    ),
-                                  );
-                                },
-                              ),
-                            ],
-                          ),
+                                        }).toList(),
+                                        const SizedBox(width: 10),
+                                        Builder(
+                                          builder: (context) {
+                                            return Theme(
+                                              data: Theme.of(context).copyWith(
+                                                popupMenuTheme: PopupMenuThemeData(
+                                                  color: const Color.fromARGB(255, 240, 240, 240),
+                                                  textStyle: const TextStyle(
+                                                    color: Colors.black87,
+                                                    fontSize: 12,
+                                                  ),
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius: BorderRadius.circular(5),
+                                                  ),
+                                                  elevation: 0,
+                                                ),
+                                              ),
+                                              child: PopupMenuButton<String>(
+                                                tooltip: '',
+                                                offset: const Offset(0, 40),
+                                                child: Container(
+                                                  height: 30,
+                                                  width: 150,
+                                                  padding: const EdgeInsets.symmetric(
+                                                      horizontal: 12, vertical: 6),
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.white,
+                                                    borderRadius: BorderRadius.circular(20),
+                                                    border: Border.all(
+                                                      width: 0.5,
+                                                      color: Colors.black38,
+                                                    ),
+                                                    boxShadow: [
+                                                      BoxShadow(
+                                                        color: Colors.black.withOpacity(0.1),
+                                                        spreadRadius: 1,
+                                                        blurRadius: 6,
+                                                        offset: const Offset(0, 3),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  child: Row(
+                                                    children: [
+                                                      const Icon(
+                                                        Icons.calendar_month,
+                                                        size: 13,
+                                                        color: Colors.black54,
+                                                      ),
+                                                      Expanded(
+                                                        child: Center(
+                                                          child: Text(
+                                                            selectedCategory,
+                                                            style: const TextStyle(
+                                                              color: Colors.black,
+                                                              fontWeight: FontWeight.w500,
+                                                              fontSize: 11,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      const Icon(
+                                                        Icons.keyboard_arrow_down_sharp,
+                                                        size: 16,
+                                                        color: Colors.black54,
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                                onSelected: (String category) {
+                                                  _updateGraph(category);
+                                                },
+                                                itemBuilder: (BuildContext context) {
+                                                  return ['Monthly', 'Weekly', 'Today']
+                                                      .map((category) {
+                                                    return PopupMenuItem<String>(
+                                                      value: category,
+                                                      child: SizedBox(
+                                                        width: 89,
+                                                        child: Text(
+                                                          category,
+                                                          style: const TextStyle(
+                                                            color: Colors.black,
+                                                            fontWeight: FontWeight.w500,
+                                                            fontSize: 11,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    );
+                                                  }).toList();
+                                                },
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                      ],
+                                    );
+                            },
+                          )
                         ),
-                        const SizedBox(height: 20),
                         Container(
                           height: 300,
                           margin: const EdgeInsets.only(

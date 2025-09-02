@@ -10,7 +10,7 @@ import 'package:safezone/backend/architecture/bloc/safezoneBloc/safezone_event.d
 import 'package:safezone/backend/architecture/bloc/safezoneBloc/safezone_state.dart'
     show SafeZoneError, SafeZoneLoading, SafeZoneState, SafeZonesLoaded;
 import 'package:safezone/backend/models/safezoneModel/safezone_model.dart';
-import 'package:safezone/frontend/platforms/desktop/pages/content/dashboard/admin_safezone_details.dart';
+import 'package:safezone/frontend/platforms/desktop/pages/content/dashboard/content/admin_safezone_details.dart';
 import 'package:safezone/frontend/platforms/desktop/widget/button/admin_safezones_card.dart';
 import 'package:safezone/frontend/platforms/mobile/widgets/loading/loadingstate.dart';
 import 'package:safezone/resource/schema/colors.dart';
