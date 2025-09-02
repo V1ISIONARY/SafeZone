@@ -6,6 +6,7 @@ import 'package:safezone/frontend/platforms/desktop/pages/content/contact.dart';
 import 'package:safezone/frontend/platforms/desktop/pages/content/dashboard/admin_dangerzones.dart';
 import 'package:safezone/frontend/platforms/desktop/pages/content/dashboard/admin_initial_screen.dart';
 import 'package:safezone/frontend/platforms/desktop/pages/content/dashboard/admin_reports.dart';
+import 'package:safezone/frontend/platforms/desktop/pages/content/dashboard/admin_safezones.dart';
 import 'package:safezone/frontend/platforms/desktop/pages/content/dashboard/admin_users.dart';
 import 'package:safezone/frontend/platforms/desktop/pages/content/dashboard/main_analytics.dart';
 import 'package:safezone/frontend/platforms/desktop/pages/content/map/content/createreport.dart';
@@ -148,8 +149,10 @@ class _NavigationDTState extends State<NavigationDT> {
         case 3:
           return AdminReportsUsers();
         case 4: 
-          return AdminDangerzones();
+          return AdminSafezones();
         case 5: 
+          return AdminDangerzones();
+        case 6: 
           return AdminReports();
         default:
           return const Center(child: Text('No Dropdown Content'));

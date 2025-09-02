@@ -9,7 +9,9 @@ import 'package:safezone/backend/architecture/bloc/safezoneBloc/safezone_bloc.da
 import 'package:safezone/backend/architecture/bloc/safezoneBloc/safezone_event.dart';
 import 'package:safezone/backend/architecture/bloc/safezoneBloc/safezone_state.dart'
     show SafeZoneError, SafeZoneLoading, SafeZoneState, SafeZonesLoaded;
-import 'package:safezone/frontend/platforms/mobile/widgets/cards/admin_safezones_card.dart';
+import 'package:safezone/backend/models/safezoneModel/safezone_model.dart';
+import 'package:safezone/frontend/platforms/desktop/pages/content/dashboard/admin_safezone_details.dart';
+import 'package:safezone/frontend/platforms/desktop/widget/button/admin_safezones_card.dart';
 import 'package:safezone/frontend/platforms/mobile/widgets/loading/loadingstate.dart';
 import 'package:safezone/resource/schema/colors.dart';
 
@@ -25,6 +27,10 @@ class _AdminSafezonesState extends State<AdminSafezones> {
   bool _isAscending = false;
   String _selectedFilter = "All";
   final Map<int, String> _addresses = {};
+
+  String? _selectedPage;
+  SafeZoneModel? _selectedSafeZone;
+  String? _selectedAddress;
 
   final List<String> _categories = [
     'All',
@@ -51,39 +57,6 @@ class _AdminSafezonesState extends State<AdminSafezones> {
     }
   }
 
-  Future<void> _getAddress(int safeZoneId, double lat, double lng) async {
-    if (_addresses.containsKey(safeZoneId)) return; // Skip if already fetched
-
-    String apiKey = dotenv.env['GOOGLE_API_KEY'] ?? '';
-    String url =
-        "https://maps.googleapis.com/maps/api/geocode/json?latlng=$lat,$lng&key=$apiKey";
-
-    try {
-      final response = await http.get(Uri.parse(url));
-
-      if (response.statusCode == 200) {
-        var data = json.decode(response.body);
-        if (data["status"] == "OK") {
-          setState(() {
-            _addresses[safeZoneId] = data["results"][0]["formatted_address"];
-          });
-        } else {
-          setState(() {
-            _addresses[safeZoneId] = "Address not found";
-          });
-        }
-      } else {
-        setState(() {
-          _addresses[safeZoneId] = "Failed to fetch address";
-        });
-      }
-    } catch (e) {
-      setState(() {
-        _addresses[safeZoneId] = "Error fetching address";
-      });
-    }
-  }
-
   void _toggleSortOrder() {
     setState(() {
       _isAscending = !_isAscending;
@@ -92,86 +65,102 @@ class _AdminSafezonesState extends State<AdminSafezones> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                DropdownButton<String>(
-                  value: _selectedFilter,
-                  icon: const Icon(Icons.arrow_drop_down),
-                  dropdownColor: Colors.white,
-                  onChanged: (String? newValue) {
-                    if (newValue != null) {
-                      setState(() {
-                        _selectedFilter = newValue;
-                      });
-                    }
-                  },
-                  items: _categories
-                      .map<DropdownMenuItem<String>>(
-                        (String category) => DropdownMenuItem<String>(
-                          value: category,
-                          child: Align(
-                            alignment: Alignment.center,
-                            child: Text(
-                              category,
-                              style: const TextStyle(
-                                  color: textColor, fontSize: 11),
-                            ),
+    return _getPageForNavigation(_selectedPage);
+  }
+
+  Widget _getPageForNavigation(String? page) {
+    switch (page) {
+      case "details":
+        if (_selectedSafeZone == null) {
+          return const Center(child: Text("No SafeZone selected"));
+        }
+        return AdminSafezoneDetails(
+          safezonemodel: _selectedSafeZone!,
+          address: _selectedAddress ?? "Loading...",
+          onBack: () {
+            setState(() {
+              _selectedPage = null;
+              _selectedSafeZone = null;
+              _selectedAddress = null;
+            });
+          },
+        );
+      default:
+        return Scaffold(
+          backgroundColor: const Color.fromARGB(255, 240, 240, 240),
+          body: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    DropdownButton<String>(
+                      value: _selectedFilter,
+                      icon: const Icon(Icons.arrow_drop_down),
+                      dropdownColor: Colors.white,
+                      onChanged: (String? newValue) {
+                        if (newValue != null) {
+                          setState(() {
+                            _selectedFilter = newValue;
+                          });
+                        }
+                      },
+                      items: _categories
+                          .map((category) => DropdownMenuItem<String>(
+                                value: category,
+                                child: Align(
+                                  alignment: Alignment.center,
+                                  child: Text(
+                                    category,
+                                    style: const TextStyle(
+                                        color: textColor, fontSize: 11),
+                                  ),
+                                ),
+                              ))
+                          .toList(),
+                    ),
+                    const Spacer(),
+                    GestureDetector(
+                        onTap: _toggleSortOrder,
+                        child: Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                              color: const Color.fromARGB(10, 0, 0, 0),
+                              borderRadius: BorderRadius.circular(5)),
+                          child: Row(
+                            children: [
+                              Icon(
+                                _isAscending
+                                    ? Icons.arrow_upward
+                                    : Icons.arrow_downward,
+                                size: 15,
+                              ),
+                              const SizedBox(width: 10),
+                              const Text(
+                                "Sort by Date",
+                                style: TextStyle(
+                                    color: textColor, fontSize: 11),
+                              ),
+                            ],
                           ),
-                        ),
-                      )
-                      .toList(),
+                        )),
+                  ],
                 ),
-                const Spacer(),
-                GestureDetector(
-                    onTap: _toggleSortOrder,
-                    child: Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                          color: const Color.fromARGB(10, 0, 0, 0),
-                          borderRadius: BorderRadius.circular(5)),
-                      child: Row(
-                        children: [
-                          Icon(
-                            _isAscending
-                                ? Icons.arrow_upward
-                                : Icons.arrow_downward,
-                            size: 15,
-                          ),
-                          const SizedBox(
-                            width: 10,
-                          ),
-                          const Text(
-                            "Sort by Date",
-                            style: TextStyle(color: textColor, fontSize: 11),
-                          ),
-                        ],
-                      ),
-                    )),
-              ],
-            ),
+              ),
+              SizedBox(height: 20,),
+              Expanded(child: _buildFilteredList()),
+            ],
           ),
-          Expanded(child: _buildFilteredList()),
-        ],
-      ),
-    );
+        );
+    }
   }
 
   Widget _buildFilteredList() {
     return BlocBuilder<SafeZoneBloc, SafeZoneState>(
       builder: (context, state) {
         if (state is SafeZoneLoading) {
-          return Expanded(
-            child: Center(
-              child: Transform.translate(
-                  offset: const Offset(-20, -30), child: const LoadingState()),
-            ),
-          );
+          return const Center(child: LoadingState());
         } else if (state is SafeZonesLoaded) {
           List filteredZones = _selectedFilter == 'All'
               ? state.safeZones
@@ -181,7 +170,6 @@ class _AdminSafezonesState extends State<AdminSafezones> {
                       _selectedFilter.toLowerCase())
                   .toList();
 
-          // Sorting by date
           filteredZones.sort((a, b) => _isAscending
               ? DateTime.parse(a.reportTimestamp!)
                   .compareTo(DateTime.parse(b.reportTimestamp!))
@@ -189,25 +177,44 @@ class _AdminSafezonesState extends State<AdminSafezones> {
                   .compareTo(DateTime.parse(a.reportTimestamp!)));
 
           if (filteredZones.isEmpty) {
-            return Center(child: Text("No $_selectedFilter safe zones found."));
+            return Center(
+                child: Text("No $_selectedFilter safe zones found."));
           }
 
           return ListView.builder(
             itemCount: filteredZones.length,
             itemBuilder: (context, index) {
               var safeZone = filteredZones[index];
+              var address =
+                  _addresses[safeZone.id] ?? "Fetching address...";
 
-              // Fetch the address if not already fetched
-              if (!_addresses.containsKey(safeZone.id)) {
-                _getAddress(safeZone.id, safeZone.latitude, safeZone.longitude);
-              }
-              return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                // child: SafezoneHistoryCard(safeZone: filteredZones[index]),
+              return Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10.0,
+                  vertical: 10
+                ),
+                margin: EdgeInsets.only(
+                  bottom: 10,
+                  right: 10,
+                  left: 10
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(5)
+                ),
                 child: AdminSafeZonesCard(
-                    safeZone: safeZone,
-                    address: _addresses[safeZone.id] ?? "Fetching address...",
-                    onRefresh: _loadSafezones),
+                  safeZone: safeZone,
+                  address: address,
+                  onTap: () {
+                    setState(() {
+                      print('object');
+                      _selectedSafeZone = safeZone;
+                      _selectedAddress = address;
+                      _selectedPage = "details"; 
+                    });
+                  },
+                  onRefresh: _loadSafezones,
+                ),
               );
             },
           );
