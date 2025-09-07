@@ -144,7 +144,7 @@ class _AdminSafezoneDetailsState extends State<AdminSafezoneDetails> {
     super.initState();
     _safeZoneModel = widget.safezonemodel;
   }
-  
+
   Widget _getPageForNavigation(String? page) {
     switch (page) {
       case "details":
@@ -157,7 +157,8 @@ class _AdminSafezoneDetailsState extends State<AdminSafezoneDetails> {
           safezonemodel: widget.safezonemodel,
         );
       default:
-       final SafeZoneAdminBloc safeZoneAdminBloc = BlocProvider.of<SafeZoneAdminBloc>(context);
+        final SafeZoneAdminBloc safeZoneAdminBloc =
+            BlocProvider.of<SafeZoneAdminBloc>(context);
         return BlocListener<SafeZoneAdminBloc, SafeZoneAdminState>(
             listener: (context, state) {
               if (state is SafeZoneAdminLoading) {
@@ -193,9 +194,9 @@ class _AdminSafezoneDetailsState extends State<AdminSafezoneDetails> {
               }
             },
             child: Scaffold(
-              backgroundColor: const Color.fromARGB(255, 240, 240, 240),
+              backgroundColor: const Color.fromARGB(255, 250, 250, 250),
               appBar: AppBar(
-                backgroundColor: const Color.fromARGB(255, 240, 240, 240),
+                backgroundColor: const Color.fromARGB(255, 250, 250, 250),
                 automaticallyImplyLeading: false,
                 centerTitle: true,
                 title: Transform.translate(
@@ -220,7 +221,7 @@ class _AdminSafezoneDetailsState extends State<AdminSafezoneDetails> {
                 ),
               ),
               body: BlocBuilder<SafeZoneAdminBloc, SafeZoneAdminState>(
-                builder: (context, state) {
+                  builder: (context, state) {
                 if (_isLoading) {
                   return Expanded(
                     child: Center(
@@ -244,7 +245,8 @@ class _AdminSafezoneDetailsState extends State<AdminSafezoneDetails> {
                               width: double.infinity,
                               padding: const EdgeInsets.all(15),
                               decoration: BoxDecoration(
-                                gradient: statusGradient(widget.safezonemodel.status!),
+                                gradient: statusGradient(
+                                    widget.safezonemodel.status!),
                               ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -291,7 +293,8 @@ class _AdminSafezoneDetailsState extends State<AdminSafezoneDetails> {
                                       child: Image.asset(
                                         "lib/resource/image/png/updates.png",
                                         fit: BoxFit.contain,
-                                        color: const Color.fromARGB(179, 0, 0, 0),
+                                        color:
+                                            const Color.fromARGB(179, 0, 0, 0),
                                       ),
                                     ),
                                     const Expanded(
@@ -307,7 +310,8 @@ class _AdminSafezoneDetailsState extends State<AdminSafezoneDetails> {
                                     Container(
                                         height: 15,
                                         width: 15,
-                                        margin: const EdgeInsets.only(right: 17),
+                                        margin:
+                                            const EdgeInsets.only(right: 17),
                                         child: Icon(
                                           Icons.chevron_right_outlined,
                                           color: Colors.grey[500],
@@ -326,38 +330,38 @@ class _AdminSafezoneDetailsState extends State<AdminSafezoneDetails> {
                               child: Column(
                                 children: [
                                   ClipRRect(
-                                  borderRadius: BorderRadius.circular(3),
-                                  child: SizedBox(
-                                    height: 215,
-                                    width: double.infinity,
-                                    child: gmaps.GoogleMap(
-                                      initialCameraPosition:
-                                          const gmaps.CameraPosition(
-                                        target: gmaps.LatLng(
-                                            16.043859, 120.335182),
-                                        zoom: 14.0,
-                                      ),
-                                      markers: {
-                                        gmaps.Marker(
-                                          markerId: const gmaps.MarkerId(
-                                              "pinned location"),
-                                          position: gmaps.LatLng(
-                                            widget.safezonemodel.latitude ??
-                                                0.0,
-                                            widget.safezonemodel.longitude ??
-                                                0.0,
-                                          ),
-                                          infoWindow: const gmaps.InfoWindow(
-                                              title: "Pinned Location"),
+                                    borderRadius: BorderRadius.circular(3),
+                                    child: SizedBox(
+                                      height: 215,
+                                      width: double.infinity,
+                                      child: gmaps.GoogleMap(
+                                        initialCameraPosition:
+                                            const gmaps.CameraPosition(
+                                          target: gmaps.LatLng(
+                                              16.043859, 120.335182),
+                                          zoom: 14.0,
                                         ),
-                                      },
-                                      onMapCreated: (gmaps.GoogleMapController
-                                          controller) {
-                                        _mapController.complete(controller);
-                                      },
+                                        markers: {
+                                          gmaps.Marker(
+                                            markerId: const gmaps.MarkerId(
+                                                "pinned location"),
+                                            position: gmaps.LatLng(
+                                              widget.safezonemodel.latitude ??
+                                                  0.0,
+                                              widget.safezonemodel.longitude ??
+                                                  0.0,
+                                            ),
+                                            infoWindow: const gmaps.InfoWindow(
+                                                title: "Pinned Location"),
+                                          ),
+                                        },
+                                        onMapCreated: (gmaps.GoogleMapController
+                                            controller) {
+                                          _mapController.complete(controller);
+                                        },
+                                      ),
                                     ),
                                   ),
-                                ),
                                   Padding(
                                     padding: const EdgeInsets.symmetric(
                                         vertical: 40),
@@ -380,7 +384,8 @@ class _AdminSafezoneDetailsState extends State<AdminSafezoneDetails> {
                                         const SizedBox(
                                           height: 10,
                                         ),
-                                        CategoryDescripTextE(text: widget.address)
+                                        CategoryDescripTextE(
+                                            text: widget.address)
                                       ],
                                     ),
                                   ),
@@ -558,7 +563,8 @@ class _AdminSafezoneDetailsState extends State<AdminSafezoneDetails> {
                               ),
                               label: const Text(
                                 "Review",
-                                style: TextStyle(fontSize: 13, color: textColor),
+                                style:
+                                    TextStyle(fontSize: 13, color: textColor),
                               ),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor:
@@ -592,7 +598,8 @@ class _AdminSafezoneDetailsState extends State<AdminSafezoneDetails> {
                               ),
                               label: const Text(
                                 "Verify",
-                                style: TextStyle(fontSize: 13, color: textColor),
+                                style:
+                                    TextStyle(fontSize: 13, color: textColor),
                               ),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor:
@@ -626,7 +633,8 @@ class _AdminSafezoneDetailsState extends State<AdminSafezoneDetails> {
                               ),
                               label: const Text(
                                 "Reject",
-                                style: TextStyle(fontSize: 13, color: textColor),
+                                style:
+                                    TextStyle(fontSize: 13, color: textColor),
                               ),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor:
@@ -652,11 +660,8 @@ class _AdminSafezoneDetailsState extends State<AdminSafezoneDetails> {
                     ],
                   ),
                 );
-              }
-            ),
-          )
-        );
+              }),
+            ));
     }
   }
-
 }

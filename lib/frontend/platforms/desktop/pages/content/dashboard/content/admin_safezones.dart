@@ -87,7 +87,7 @@ class _AdminSafezonesState extends State<AdminSafezones> {
         );
       default:
         return Scaffold(
-          backgroundColor: const Color.fromARGB(255, 240, 240, 240),
+          backgroundColor: const Color.fromARGB(255, 250, 250, 250),
           body: Column(
             children: [
               Padding(
@@ -139,8 +139,8 @@ class _AdminSafezonesState extends State<AdminSafezones> {
                               const SizedBox(width: 10),
                               const Text(
                                 "Sort by Date",
-                                style: TextStyle(
-                                    color: textColor, fontSize: 11),
+                                style:
+                                    TextStyle(color: textColor, fontSize: 11),
                               ),
                             ],
                           ),
@@ -148,7 +148,9 @@ class _AdminSafezonesState extends State<AdminSafezones> {
                   ],
                 ),
               ),
-              SizedBox(height: 20,),
+              SizedBox(
+                height: 20,
+              ),
               Expanded(child: _buildFilteredList()),
             ],
           ),
@@ -177,31 +179,19 @@ class _AdminSafezonesState extends State<AdminSafezones> {
                   .compareTo(DateTime.parse(a.reportTimestamp!)));
 
           if (filteredZones.isEmpty) {
-            return Center(
-                child: Text("No $_selectedFilter safe zones found."));
+            return Center(child: Text("No $_selectedFilter safe zones found."));
           }
 
           return ListView.builder(
             itemCount: filteredZones.length,
             itemBuilder: (context, index) {
               var safeZone = filteredZones[index];
-              var address =
-                  _addresses[safeZone.id] ?? "Fetching address...";
+              var address = _addresses[safeZone.id] ?? "Fetching address...";
 
               return Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10.0,
-                  vertical: 10
-                ),
-                margin: EdgeInsets.only(
-                  bottom: 10,
-                  right: 10,
-                  left: 10
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(5)
-                ),
+                padding:
+                    const EdgeInsets.only(bottom: 10.0, right: 10, left: 10),
+                // margin: EdgeInsets.only(bottom: 10, right: 10, left: 10),
                 child: AdminSafeZonesCard(
                   safeZone: safeZone,
                   address: address,
@@ -210,7 +200,7 @@ class _AdminSafezonesState extends State<AdminSafezones> {
                       print('object');
                       _selectedSafeZone = safeZone;
                       _selectedAddress = address;
-                      _selectedPage = "details"; 
+                      _selectedPage = "details";
                     });
                   },
                   onRefresh: _loadSafezones,

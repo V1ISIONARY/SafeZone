@@ -75,9 +75,9 @@ class _SafeZoneStatusHistoryDTState extends State<SafeZoneStatusHistoryDT> {
         sortStatusHistory(widget.safezonemodel.statusHistory ?? []);
 
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 240, 240, 240),
+      backgroundColor: const Color.fromARGB(255, 250, 250, 250),
       appBar: AppBar(
-        backgroundColor: const Color.fromARGB(255, 240, 240, 240),
+        backgroundColor: const Color.fromARGB(255, 250, 250, 250),
         automaticallyImplyLeading: false,
         centerTitle: true,
         title: Transform.translate(
@@ -121,7 +121,8 @@ class _SafeZoneStatusHistoryDTState extends State<SafeZoneStatusHistoryDT> {
                         status is Map ? status['timestamp'] : status.timestamp;
 
                     DateTime dateTime = DateTime.parse(timestampText);
-                    String formattedTime = DateFormat("d, MMMM, y : hh:mma").format(dateTime);
+                    String formattedTime =
+                        DateFormat("d, MMMM, y : hh:mma").format(dateTime);
 
                     return TimelineTile(
                       alignment: TimelineAlign.start,

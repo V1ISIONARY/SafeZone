@@ -25,7 +25,10 @@ class NavigationDT extends StatefulWidget {
   State<NavigationDT> createState() => _NavigationDTState();
 }
 
-class _NavigationDTState extends State<NavigationDT> {
+class _NavigationDTState extends State<NavigationDT>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   int selectedDropdownIndex = 0;
@@ -132,8 +135,7 @@ class _NavigationDTState extends State<NavigationDT> {
               dropdown = false;
               Sidenav.selectedDropdownId.value = null;
             });
-          }, 
-          onOpenNotification: (String page) {
+          }, onOpenNotification: (String page) {
             setState(() {
               showit = true;
               selectedComs = 0;
@@ -147,11 +149,11 @@ class _NavigationDTState extends State<NavigationDT> {
           });
         case 3:
           return AdminReportsUsers();
-        case 4: 
+        case 4:
           return AdminSafezones();
-        case 5: 
+        case 5:
           return AdminDangerzones();
-        case 6: 
+        case 6:
           return AdminReports();
         default:
           return const Center(child: Text('No Dropdown Content'));
@@ -646,7 +648,8 @@ class _NavigationDTState extends State<NavigationDT> {
                                             id: 'us',
                                             onTap: () {
                                               setState(() {
-                                                if (selectedDropdownIndex == 3) {
+                                                if (selectedDropdownIndex ==
+                                                    3) {
                                                   dropdown = !dropdown;
                                                 } else {
                                                   dropdown = true;
@@ -661,7 +664,8 @@ class _NavigationDTState extends State<NavigationDT> {
                                             id: 'sz',
                                             onTap: () {
                                               setState(() {
-                                                if (selectedDropdownIndex == 4) {
+                                                if (selectedDropdownIndex ==
+                                                    4) {
                                                   dropdown = !dropdown;
                                                 } else {
                                                   dropdown = true;
@@ -676,7 +680,8 @@ class _NavigationDTState extends State<NavigationDT> {
                                             id: 'dz',
                                             onTap: () {
                                               setState(() {
-                                                if (selectedDropdownIndex == 5) {
+                                                if (selectedDropdownIndex ==
+                                                    5) {
                                                   dropdown = !dropdown;
                                                 } else {
                                                   dropdown = true;

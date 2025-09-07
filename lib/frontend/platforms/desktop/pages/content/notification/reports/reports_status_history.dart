@@ -74,9 +74,9 @@ class _ReportsStatusHistoryDTState extends State<ReportsStatusHistoryDT> {
         sortStatusHistory(widget.reportInfo.statusHistory ?? []);
 
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 240, 240, 240),
+      backgroundColor: const Color.fromARGB(255, 250, 250, 250),
       appBar: AppBar(
-        backgroundColor: const Color.fromARGB(255, 240, 240, 240),
+        backgroundColor: const Color.fromARGB(255, 250, 250, 250),
         automaticallyImplyLeading: false,
         centerTitle: true,
         title: Transform.translate(

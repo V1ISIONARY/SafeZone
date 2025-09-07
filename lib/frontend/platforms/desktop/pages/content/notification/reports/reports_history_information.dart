@@ -155,9 +155,9 @@ class _ReportsHistoryDetailsDTState extends State<ReportsHistoryDetailsDT> {
         );
       default:
         return Scaffold(
-          backgroundColor: const Color.fromARGB(255, 240, 240, 240),
+          backgroundColor: const Color.fromARGB(255, 250, 250, 250),
           appBar: AppBar(
-            backgroundColor: const Color.fromARGB(255, 240, 240, 240),
+            backgroundColor: const Color.fromARGB(255, 250, 250, 250),
             automaticallyImplyLeading: false,
             centerTitle: true,
             title: Transform.translate(
@@ -344,7 +344,8 @@ class _ReportsHistoryDetailsDTState extends State<ReportsHistoryDetailsDT> {
                               const SizedBox(height: 12),
                               HistoryInformationText(
                                 text: "Report Date",
-                                data: widget.reportInfo.reportDate!.split(' 00:00:00 GMT')[0],
+                                data: widget.reportInfo.reportDate!
+                                    .split(' 00:00:00 GMT')[0],
                               ),
                               const SizedBox(height: 20),
                               Theme(

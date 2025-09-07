@@ -21,10 +21,10 @@ class AdminSafeZonesCard extends StatelessWidget {
       onTap: onTap,
       child: Container(
         width: double.infinity,
-        height: 70,
         margin: const EdgeInsets.only(bottom: 10),
+        padding: EdgeInsets.only(top: 20, bottom: 20),
         decoration: BoxDecoration(
-          color: const Color.fromARGB(10, 0, 0, 0),
+          color: Colors.white,
           borderRadius: BorderRadius.circular(5),
         ),
         child: Row(
@@ -49,8 +49,7 @@ class AdminSafeZonesCard extends StatelessWidget {
                   CategoryText(text: safeZone.name ?? ""),
                   Row(
                     children: [
-                      const Icon(Icons.location_on,
-                          size: 12, color: btnColor),
+                      const Icon(Icons.location_on, size: 12, color: btnColor),
                       const SizedBox(width: 2),
                       Expanded(
                         child: CategoryDescripTextEllipsis(
@@ -62,8 +61,7 @@ class AdminSafeZonesCard extends StatelessWidget {
                   ),
                   if (safeZone.description != null &&
                       safeZone.description!.isNotEmpty)
-                    CategoryDescripTextEllipsis(
-                        text: safeZone.description!),
+                    CategoryDescripTextEllipsis(text: safeZone.description!),
                 ],
               ),
             )
