@@ -600,21 +600,21 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
       print("User location marker loaded: $customMyLocationMarker");
 
       customPendingDangerZoneMarker = await MarkerUtils.resizeMarker(
-        'lib/resource/image/png/marker_dangerzone.png',
-        48,
-        66,
+        'lib/resource/image/png/marker_danger_pending.png',
+        63,
+        90,
       );
 
       customDangerZoneMarker = await MarkerUtils.resizeMarker(
         'lib/resource/image/png/dangerzone.png',
-        48,
-        66,
+        65,
+        90,
       );
 
       customSafeZoneMarker = await MarkerUtils.resizeMarker(
         'lib/resource/image/png/safezone.png',
-        48,
-        66,
+        65,
+        90,
       );
 
       if (mounted) {
