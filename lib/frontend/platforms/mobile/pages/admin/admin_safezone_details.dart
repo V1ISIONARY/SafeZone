@@ -1,4 +1,6 @@
 import 'package:google_maps_flutter/google_maps_flutter.dart' as gmaps;
+import 'package:safezone/backend/architecture/bloc/mapBloc/map_bloc.dart';
+import 'package:safezone/backend/architecture/bloc/mapBloc/map_event.dart';
 
 import '../../../../../backend/architecture/bloc/adminBloc/safezone/safezone_admin_bloc.dart';
 import '../../../../../backend/architecture/bloc/adminBloc/safezone/safezone_admin_event.dart';
@@ -145,18 +147,18 @@ class _AdminSafezoneDetailsState extends State<AdminSafezoneDetails> {
               _isLoading = false;
             });
 
-            // Call the callback to update the parent state
             if (widget.onStatusChanged != null) {
               widget.onStatusChanged!(_safeZoneModel);
             }
 
+            context
+                .read<MapBloc>()
+                .add(const RefreshMapData(reason: 'admin_action'));
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
                   content: Text("Safe zone status updated successfully!")),
             );
-            print("Navigating back with shouldRefresh = true");
 
-            // Return true to indicate that the data should be refreshed
             context.pop(true);
           } else if (state is SafeZoneAdminFailure) {
             setState(() {

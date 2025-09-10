@@ -60,7 +60,6 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
 
   Map<String, BitmapDescriptor> memberMarkers = {};
   List<SafeZoneModel> policeStations = [];
-  List<Map<String, dynamic>> members = [];
   Set<Marker> markers = {};
   Set<Marker> membersMarkers = {};
 
@@ -110,6 +109,8 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
     'Police Station',
     'Municipal',
   ];
+
+  List<Map<String, dynamic>> _currentMembers = [];
 
   void _toggleExpand() {
     setState(() {
@@ -165,8 +166,6 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
       _fetchLocation();
       setState(() {});
     });
-
-    print("Members list before fetching: $members");
 
     _speech = stt.SpeechToText();
 
@@ -328,9 +327,13 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
       if (state is CircleMembersLoadedState) {
         context.read<MapBloc>().add(FetchMapData());
 
-        context
-            .read<MapBloc>()
-            .add(ListenForMemberLocations(state.members, _userId!));
+        Future.delayed(const Duration(milliseconds: 500), () {
+          if (mounted && _userId != null) {
+            context
+                .read<MapBloc>()
+                .add(ListenForMemberLocations(state.members, _userId!));
+          }
+        });
       }
       if (state is CircleLoadedState) {
         _circles = state.circles;
@@ -450,15 +453,10 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
 
       if (response.statusCode == 200) {
         print('Location updated successfully!');
-        print('$latitude');
-        print('$longitude');
       } else {
         print('Failed to update location');
       }
     } catch (e) {
-      print(_userId);
-      print('$latitude');
-      print('$longitude');
       print('Error updating location: $e');
     }
     findNearestSafezone();
@@ -533,9 +531,6 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
       bool wasInsideSafeZone = _prefs.getBool('wasInsideSafeZone') ?? false;
       bool wasInsideDangerZone = _prefs.getBool('wasInsideDangerZone') ?? false;
 
-      print("Safe Zone: $isInsideSafeZone");
-      print("Danger Zone: $isInsideDangerZone");
-
       if (isInsideSafeZone && !wasInsideSafeZone) {
         _showZoneDialog("Safe Zone", "You have entered a safe zone.");
         _sendBroadcastNotification(
@@ -597,7 +592,6 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
     try {
       customMyLocationMarker = await MarkerUtils.createCustomMarker(
           context, widgetPricolor, profilePictureUrl);
-      print("User location marker loaded: $customMyLocationMarker");
 
       customPendingDangerZoneMarker = await MarkerUtils.resizeMarker(
         'lib/resource/image/png/marker_danger_pending.png',
@@ -648,18 +642,47 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
       return;
     }
 
+    BitmapDescriptor? memberMarker = memberMarkers[userId];
+
+    var memberData = _currentMembers.firstWhere(
+      (member) => member['user_id'].toString() == userId,
+      orElse: () => {},
+    );
+
+    if (memberData.isEmpty) {
+      print("⚠️ Member data not found for user $userId");
+      return;
+    }
+
+    String firstName = memberData['first_name'] ?? 'User';
+    String lastName = memberData['last_name'] ?? '';
+    String profile = memberData['profile_picture'] ?? '';
+
     setState(() {
-      markers.removeWhere((marker) => marker.markerId.value == "user_$userId");
+      markers.removeWhere((marker) => marker.markerId.value == userId);
 
       markers.add(
         Marker(
-          markerId: MarkerId("user_$userId"),
+          markerId: MarkerId(userId),
           position: LatLng(latitude, longitude),
-          icon: customMemberMarker!,
-          infoWindow: InfoWindow(title: 'User $userId'),
+          icon: memberMarker ?? BitmapDescriptor.defaultMarker,
+          infoWindow: InfoWindow(title: '$firstName $lastName'),
+          onTap: () {
+            showMemberBottomSheet(
+              userId,
+              firstName,
+              lastName,
+              longitude,
+              latitude,
+              profile,
+              context,
+            );
+          },
         ),
       );
     });
+
+    print("Updated marker for user $userId to $latitude, $longitude");
   }
 
   Set<Marker> _createMarkers(MapState state) {
@@ -679,7 +702,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
     }
 
     if (state is MapDataLoaded) {
-      for (var member in state.members) {
+      for (var member in _currentMembers) {
         String userId = member['user_id'].toString();
         String firstName = member['first_name'];
         String lastName = member['last_name'];
@@ -697,9 +720,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
           Marker(
             markerId: MarkerId(userId),
             position: LatLng(latitude, longitude),
-            icon: memberMarker != null
-                ? memberMarker
-                : BitmapDescriptor.defaultMarker,
+            icon: memberMarker ?? BitmapDescriptor.defaultMarker,
             infoWindow: InfoWindow(title: '$firstName $lastName'),
             onTap: () {
               showMemberBottomSheet(userId, firstName, lastName, longitude,
@@ -738,7 +759,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
           Circle(
             circleId: CircleId('danger_${dangerZone.id}'),
             center: LatLng(dangerZone.latitude!, dangerZone.longitude!),
-            radius: dangerZone.radius ?? 100.0, // Default radius if null
+            radius: dangerZone.radius ?? 100.0,
             strokeWidth: 1,
             strokeColor: Colors.transparent,
             fillColor: circleColor,
@@ -765,7 +786,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
           Circle(
             circleId: CircleId('safe_${safeZone.id}'),
             center: LatLng(safeZone.latitude!, safeZone.longitude!),
-            radius: safeZone.radius ?? 100.0, // Default radius if null
+            radius: safeZone.radius ?? 100.0,
             strokeWidth: 1,
             strokeColor: Colors.transparent,
             fillColor: Colors.green.withOpacity(0.1),
@@ -804,8 +825,6 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
 
     if (nearest != null) {
       print("Nearest Police Station: ${nearest.name}");
-      print("Latitude: ${nearest.latitude}");
-      print("Longitude: ${nearest.longitude}");
     } else {
       print("No valid stations found.");
     }
@@ -943,7 +962,6 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
   Future<void> _getCurrentLocation() async {
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
-      // _showSnackBar("Location services are disabled.");
       return;
     }
 
@@ -951,13 +969,11 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
-        // _showSnackBar("Location permission denied.");
         return;
       }
     }
 
     if (permission == LocationPermission.deniedForever) {
-      // _showSnackBar("Location permission permanently denied.");
       return;
     }
 
@@ -999,17 +1015,13 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
             double lng = data["results"][0]["geometry"]["location"]["lng"];
 
             _updateMapPosition(LatLng(lat, lng));
-          } else {
-            // _showSnackBar("Location not found. Try another search.");
           }
-        } else {
-          // _showSnackBar("Error fetching location. Try again.");
         }
       } catch (e) {
-        // _showSnackBar("Network error: Unable to fetch location.");
+        _showSnackBar("Network error: Unable to fetch location.");
       }
     } else {
-      // _showSnackBar("Please enter a location to search.");
+      _showSnackBar("Please enter a location to search.");
     }
   }
 
@@ -1028,7 +1040,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                 BlocListener<MapBloc, MapState>(
                   listener: (context, state) {
                     if (state is MemberLocationUpdated) {
-                      print("iz changingggggg");
+                      print("Real-time update received for user ${state.userId}");
                       _updateMemberMarker(
                           state.userId, state.latitude, state.longitude);
                     }
@@ -1060,6 +1072,8 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                       ),
                     );
                   } else if (state is MapDataLoaded) {
+                    _currentMembers = state.members;
+
                     WidgetsBinding.instance.addPostFrameCallback((_) async {
                       await _preloadMemberMarkers(state.members);
                       setState(() {});
@@ -1149,7 +1163,6 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                         ''';
                       controller.setMapStyle(style);
                       sharedController.mapController.complete(controller);
-                      // _fetchLocation();
                     },
                     mapToolbarEnabled: false,
                     zoomControlsEnabled: false,

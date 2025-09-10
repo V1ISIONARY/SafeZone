@@ -1,4 +1,6 @@
 import 'package:google_maps_flutter/google_maps_flutter.dart' as gmaps;
+import 'package:safezone/backend/architecture/bloc/mapBloc/map_bloc.dart';
+import 'package:safezone/backend/architecture/bloc/mapBloc/map_event.dart';
 import 'package:safezone/backend/models/dangerzoneModel/incident_report_model.dart';
 
 import '../../../../../backend/architecture/bloc/adminBloc/incident_report/admin_incident_report_bloc.dart';
@@ -31,7 +33,7 @@ class _AdminReportsDetailsState extends State<AdminReportsDetails> {
       String action, Function onConfirm) async {
     return showDialog<void>(
       context: context,
-      barrierDismissible: false, // User must tap button to dismiss
+      barrierDismissible: false, 
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text('Confirm $action'),
@@ -42,15 +44,15 @@ class _AdminReportsDetailsState extends State<AdminReportsDetails> {
               style: TextButton.styleFrom(foregroundColor: Colors.black),
               child: const Text('Cancel'),
               onPressed: () {
-                Navigator.of(context).pop(); // Dismiss the dialog
+                Navigator.of(context).pop(); 
               },
             ),
             TextButton(
               style: TextButton.styleFrom(foregroundColor: Colors.black),
               child: Text(action[0].toUpperCase() + action.substring(1)),
               onPressed: () {
-                onConfirm(); // Call the action function
-                Navigator.of(context).pop(); // Dismiss the dialog
+                onConfirm(); 
+                Navigator.of(context).pop(); 
               },
             ),
           ],
@@ -145,19 +147,21 @@ class _AdminReportsDetailsState extends State<AdminReportsDetails> {
         } else if (state is IncidentReportUpdated) {
           setState(() {
             _isLoading = false;
-            _reportModel = state.reportModel; // Update the report model
+            _reportModel = state.reportModel; 
           });
 
-          // Call the callback to update the parent state
           if (widget.onStatusChanged != null) {
             widget.onStatusChanged!(_reportModel);
           }
+
+          context
+              .read<MapBloc>()
+              .add(const RefreshMapData(reason: 'admin_action'));
 
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(state.message)),
           );
 
-          // Return true to indicate that the data should be refreshed
           context.pop(true);
         } else if (state is IncidentReportError) {
           setState(() {

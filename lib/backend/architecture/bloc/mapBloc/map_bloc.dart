@@ -3,6 +3,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:safezone/backend/architecture/bloc/mapBloc/map_event.dart';
 import 'package:safezone/backend/architecture/bloc/mapBloc/map_state.dart';
+import 'package:safezone/backend/models/safezoneModel/safezone_model.dart';
+import 'package:safezone/backend/models/dangerzoneModel/incident_report_model.dart';
 import 'package:safezone/backend/repository/circleApi/circle_repo.dart';
 import 'package:safezone/backend/repository/mapApi/map_impl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -14,12 +16,17 @@ class MapBloc extends Bloc<MapPageEvent, MapState> {
   final Map<String, StreamSubscription<DocumentSnapshot>> _locationListeners =
       {};
 
+  List<SafeZoneModel> _currentSafeZones = [];
+  List<DangerZoneModel> _currentDangerZones = [];
+  List<Map<String, dynamic>> _currentMembers = [];
+
   MapBloc({
     required this.combinedZonesRepository,
     required this.circleRepository,
   }) : super(MapInitial()) {
     on<FetchMapData>(_onFetchMapData);
     on<ListenForMemberLocations>(_onListenForMemberLocations);
+    on<RefreshMapData>(_onRefreshMapData);
   }
 
   Future<void> _onFetchMapData(
@@ -115,12 +122,44 @@ class MapBloc extends Bloc<MapPageEvent, MapState> {
     }
   }
 
+  Future<void> _onRefreshMapData(
+      RefreshMapData event, Emitter<MapState> emit) async {
+    try {
+      final combinedZones = await combinedZonesRepository.getCombinedZones();
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final int circleId = prefs.getInt('circle') ?? 0;
+
+      final members = await circleRepository.viewMembers(circleId);
+
+      _currentSafeZones = combinedZones.safeZones;
+      _currentDangerZones = combinedZones.dangerZones;
+      _currentMembers = members;
+
+      emit(MapDataLoaded(
+          _currentSafeZones, _currentDangerZones, _currentMembers));
+      print("Map data refreshed successfully");
+    } catch (e) {
+      print("Error refreshing map data: $e");
+      emit(MapError("Failed to refresh map data: ${e.toString()}"));
+    }
+  }
+
+  bool isListeningToMember(String userId) {
+    return _locationListeners.containsKey(userId);
+  }
+
+  int get activeListenersCount => _locationListeners.length;
+
   @override
-  Future<void> close() {
+  Future<void> close() async {
+    print(
+        "Closing MapBloc - cleaning up ${_locationListeners.length} listeners");
+
     for (var subscription in _locationListeners.values) {
-      subscription.cancel();
+      await subscription.cancel();
     }
     _locationListeners.clear();
+
     return super.close();
   }
 }

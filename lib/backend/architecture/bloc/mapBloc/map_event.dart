@@ -17,3 +17,27 @@ class ListenForMemberLocations extends MapPageEvent {
   @override
   List<Object> get props => [members, userId];
 }
+
+class UpdateMemberLocation extends MapPageEvent {
+  final String userId;
+  final double latitude;
+  final double longitude;
+
+  const UpdateMemberLocation(this.userId, this.latitude, this.longitude);
+
+  @override
+  List<Object> get props => [userId, latitude, longitude];
+
+  @override
+  String toString() =>
+      'UpdateMemberLocation(userId: $userId, lat: $latitude, lng: $longitude)';
+}
+
+class RefreshMapData extends MapPageEvent {
+  final String reason; 
+
+  const RefreshMapData({this.reason = 'manual'});
+
+  @override
+  List<Object> get props => [reason];
+}
