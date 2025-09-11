@@ -1,6 +1,8 @@
 import 'package:equatable/equatable.dart';
 import 'dart:io';
 
+import 'package:safezone/backend/architecture/bloc/adminBloc/users/admin_users_event.dart';
+
 abstract class ProfileEvent extends Equatable {
   const ProfileEvent();
 
@@ -53,6 +55,14 @@ class GetProfilePictureEvent extends ProfileEvent {
   final int userId;
 
   const GetProfilePictureEvent(this.userId);
+
+  @override
+  List<Object?> get props => [userId];
+}
+
+class RequestAdminAccess extends ProfileEvent {
+  final int userId;
+  const RequestAdminAccess(this.userId);
 
   @override
   List<Object?> get props => [userId];

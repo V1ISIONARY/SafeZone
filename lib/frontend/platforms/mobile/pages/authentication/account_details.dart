@@ -450,6 +450,16 @@ class _AccountDetailsState extends State<AccountDetails> {
                         svgIcon: "lib/resource/svg/location.svg",
                         data: address,
                       ),
+                      const Divider(height: 0.5, color: Colors.white),
+                      AccountDisplay(
+                        title: "Access",
+                        svgIcon: "lib/resource/svg/location.svg",
+                        data: "Request Admin Access",
+                        onTap: () {
+                          context.push('/request-admin-access');
+                          print("Request Admin Access Tapped");
+                        },
+                      ),
                     ],
                   ),
                 ),

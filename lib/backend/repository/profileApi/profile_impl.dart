@@ -151,4 +151,16 @@ class ProfileImplementation extends ProfileRepository {
       return {};
     }
   }
+
+  @override
+  Future<void> requestAdminAccess(int userId) async {
+    final response = await http.patch(
+      Uri.parse('$baseUrl/request-admin-access'),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({"user_id": userId}),
+    );
+    if (response.statusCode != 200) {
+      throw Exception('Failed to request admin access: ${response.body}');
+    }
+  }
 }

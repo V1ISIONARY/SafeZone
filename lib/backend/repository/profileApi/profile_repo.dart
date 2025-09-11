@@ -8,4 +8,5 @@ abstract class ProfileRepository {
   Future<String?> getProfilePicture(int userId);
   Future<bool> updateAcivityStatus(int userId, String status);
   Future<Map<String, dynamic>> getProfileStatistics();
+  Future<void> requestAdminAccess(int userId);
 }

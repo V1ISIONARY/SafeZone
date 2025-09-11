@@ -4,6 +4,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../../backend/architecture/bloc/adminBloc/analytics/analytics_admin_bloc.dart';
 import '../../../../../backend/architecture/bloc/adminBloc/analytics/analytics_admin_event.dart';
 import '../../../../../backend/architecture/bloc/adminBloc/analytics/analytics_admin_state.dart';
+import '../../../../../backend/architecture/bloc/adminBloc/users/admin_users_bloc.dart';
+import '../../../../../backend/architecture/bloc/adminBloc/users/admin_users_event.dart';
+import '../../../../../backend/architecture/bloc/adminBloc/users/admin_users_state.dart';
 import '../../../../../backend/models/dangerzoneModel/incident_report_model.dart';
 import '../../../../../backend/properties/import.dart';
 import '../../../../../frontend/platforms/mobile/widgets/loading/loadingstate.dart';
@@ -20,11 +23,13 @@ class AdminReportsUsers extends StatefulWidget {
 class _AdminReportsUsersState extends State<AdminReportsUsers> {
   final TextEditingController _searchController = TextEditingController();
   List<dynamic> _filteredUsers = [];
+  int _currentTabIndex = 0;
 
   @override
   void initState() {
     super.initState();
     context.read<AdminBloc>().add(FetchUsersWithData());
+    context.read<AdminUserBloc>().add(LoadAdminRequests());
     _searchController.addListener(_onSearchChanged);
   }
 
@@ -187,6 +192,192 @@ class _AdminReportsUsersState extends State<AdminReportsUsers> {
     }
   }
 
+  Widget _buildTabBar() {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.2),
+            blurRadius: 5,
+            spreadRadius: 1,
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: _buildTabButton('Users', 0),
+          ),
+          Expanded(
+            child: _buildTabButton('Admin Requests', 1),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTabButton(String text, int index) {
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _currentTabIndex = index;
+        });
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+        decoration: BoxDecoration(
+          color: _currentTabIndex == index ? widgetPricolor : Colors.white,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Text(
+          text,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 13,
+            color: _currentTabIndex == index ? Colors.white : Colors.black,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildUsersTab(DashboardLoaded state) {
+    final users = _filteredUsers.isEmpty ? state.users : _filteredUsers;
+    final ageGroups =
+        Map<String, int>.from(state.statistics['age_statistics'] ?? {});
+    final genderStats =
+        Map<String, int>.from(state.statistics['gender_statistics'] ?? {});
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildAgeChart(ageGroups),
+        _buildGenderChart(genderStats),
+        const SizedBox(height: 20),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const CategoryText(text: 'User List'),
+            Text(
+              'Total: ${users.length}',
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 13,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 20),
+        TextField(
+          controller: _searchController,
+          style: const TextStyle(fontSize: 13),
+          decoration: InputDecoration(
+            filled: true,
+            fillColor: Colors.white,
+            hintText: 'Search users...',
+            hintStyle: const TextStyle(fontSize: 13),
+            prefixIcon: const Icon(Icons.search),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide.none,
+            ),
+          ),
+        ),
+        const SizedBox(height: 20),
+        ...users.map((user) {
+          return Container(
+            margin: const EdgeInsets.only(bottom: 8),
+            child: Userinfomartion(
+              username: user['username'] ?? 'Unknown',
+              profileImage: user['profile_picture_url'] ?? '',
+              safeZone: (user['safe_zones'] as List?)?.length ?? 0,
+              incidents: (user['incident_reports'] as List?)?.length ?? 0,
+            ),
+          );
+        }),
+      ],
+    );
+  }
+
+  Widget _buildRequestsTab() {
+    return BlocBuilder<AdminUserBloc, AdminUserState>(
+      builder: (context, state) {
+        if (state is AdminUserLoading) {
+          return const Center(child: LoadingState());
+        } else if (state is AdminRequestsLoaded) {
+          final requests = state.requests;
+
+          if (requests.isEmpty) {
+            return const Center(
+              child: Text(
+                'No pending admin requests',
+                style: TextStyle(fontSize: 13, color: labelFormFieldColor),
+              ),
+            );
+          }
+
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const CategoryText(text: 'Admin Requests'),
+                  Text(
+                    'Pending: ${requests.length}',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              ...requests.map((request) {
+                return Container(
+                  margin: const EdgeInsets.only(bottom: 8),
+                  child: AdminRequestCard(
+                    request: request,
+                    onApprove: () {
+                      final userId = request['id'];
+                      if (userId != null) {
+                        context.read<AdminUserBloc>().add(
+                              ApproveAdminUser(userId),
+                            );
+                      }
+                    },
+                  ),
+                );
+              }),
+            ],
+          );
+        } else if (state is AdminActionSuccess) {
+          // Refresh requests after successful action
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            context.read<AdminUserBloc>().add(LoadAdminRequests());
+          });
+          return Center(
+            child: Text(
+              state.message,
+              style: const TextStyle(color: Colors.green),
+            ),
+          );
+        } else if (state is AdminUserError) {
+          return Center(
+            child: Text(
+              state.error,
+              style: const TextStyle(color: Colors.red),
+            ),
+          );
+        }
+        return const Center(child: LoadingState());
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -196,63 +387,16 @@ class _AdminReportsUsersState extends State<AdminReportsUsers> {
           if (state is AdminLoading) {
             return const Center(child: LoadingState());
           } else if (state is DashboardLoaded) {
-            final users = _filteredUsers.isEmpty ? state.users : _filteredUsers;
-            final ageGroups =
-                Map<String, int>.from(state.statistics['age_statistics'] ?? {});
-            final genderStats = Map<String, int>.from(
-                state.statistics['gender_statistics'] ?? {});
-
             return SingleChildScrollView(
               padding: const EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 20),
-                  _buildAgeChart(ageGroups),
-                  _buildGenderChart(genderStats),
+                  _buildTabBar(),
                   const SizedBox(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const CategoryText(text: 'User List'),
-                      Text(
-                        'Total: ${users.length}',
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 13,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  TextField(
-                    controller: _searchController,
-                    style: const TextStyle(fontSize: 13),
-                    decoration: InputDecoration(
-                      filled: true,
-                      fillColor: Colors.white,
-                      hintText: 'Search users...',
-                      hintStyle: const TextStyle(fontSize: 13),
-                      prefixIcon: const Icon(Icons.search),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide.none,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  ...users.map((user) {
-                    return Container(
-                      margin: const EdgeInsets.only(bottom: 8),
-                      child: Userinfomartion(
-                        username: user['username'] ?? 'Unknown',
-                        profileImage: user['profile_picture_url'] ?? '',
-                        safeZone: (user['safe_zones'] as List?)?.length ?? 0,
-                        incidents:
-                            (user['incident_reports'] as List?)?.length ?? 0,
-                      ),
-                    );
-                  }),
+                  if (_currentTabIndex == 0) _buildUsersTab(state),
+                  if (_currentTabIndex == 1) _buildRequestsTab(),
                 ],
               ),
             );
@@ -264,4 +408,129 @@ class _AdminReportsUsersState extends State<AdminReportsUsers> {
       ),
     );
   }
+}
+
+class AdminRequestCard extends StatelessWidget {
+  final Map<String, dynamic> request;
+  final VoidCallback onApprove;
+
+  const AdminRequestCard({
+    super.key,
+    required this.request,
+    required this.onApprove,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    // Extract data from the request using the correct field names
+    final firstName = request['first_name'] ?? '';
+    final lastName = request['last_name'] ?? '';
+    final fullName = '$firstName $lastName'.trim();
+    final profileImage = request['profile_picture_url'];
+    final age = request['age'];
+    final address = request['address'];
+    final isGirl = request['is_girl'] ?? false;
+    final isVerified = request['is_verified'] ?? false;
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.2),
+            blurRadius: 5,
+            spreadRadius: 1,
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          CircleAvatar(
+            radius: 25,
+            backgroundImage: profileImage != null && profileImage.isNotEmpty
+                ? NetworkImage(profileImage as String)
+                : const AssetImage('assets/default_avatar.png')
+                    as ImageProvider,
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  fullName.isNotEmpty ? fullName : 'Unknown User',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 13,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                if (age != null)
+                  Text(
+                    'Age: $age',
+                    style: const TextStyle(
+                      fontSize: 11,
+                      color: Colors.grey,
+                    ),
+                  ),
+                if (age != null) const SizedBox(height: 2),
+                if (address != null && address.isNotEmpty)
+                  Text(
+                    'Address: $address',
+                    style: const TextStyle(
+                      fontSize: 11,
+                      color: Colors.grey,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                if (address != null && address.isNotEmpty)
+                  const SizedBox(height: 2),
+                Row(
+                  children: [
+                    if (isGirl)
+                      const Icon(Icons.female, size: 12, color: Colors.pink),
+                    if (!isGirl)
+                      const Icon(Icons.male, size: 12, color: Colors.blue),
+                    const SizedBox(width: 4),
+                    Text(
+                      isGirl ? 'Female' : 'Male',
+                      style: const TextStyle(
+                        fontSize: 11,
+                        color: Colors.grey,
+                      ),
+                    ),
+                   
+                  ],
+                ),
+              ],
+            ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.check_circle, color: Colors.green),
+            onPressed: onApprove,
+            tooltip: 'Approve as Admin',
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+String _formatDate(dynamic date) {
+  if (date == null) return 'Unknown date';
+  if (date is DateTime) {
+    return '${date.day}/${date.month}/${date.year}';
+  }
+  if (date is String) {
+    try {
+      final parsedDate = DateTime.parse(date);
+      return '${parsedDate.day}/${parsedDate.month}/${parsedDate.year}';
+    } catch (e) {
+      return date;
+    }
+  }
+  return date.toString();
 }

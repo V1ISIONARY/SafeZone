@@ -4,6 +4,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:safezone/backend/architecture/bloc/adminBloc/analytics/analytics_admin_bloc.dart';
 import 'package:safezone/backend/architecture/bloc/adminBloc/incident_report/admin_incident_report_bloc.dart';
 import 'package:safezone/backend/architecture/bloc/adminBloc/safezone/safezone_admin_bloc.dart';
+import 'package:safezone/backend/architecture/bloc/adminBloc/users/admin_users_bloc.dart';
 import 'package:safezone/backend/architecture/bloc/authBloc/auth_bloc.dart';
 import 'package:safezone/backend/architecture/bloc/circleBloc/circle_bloc.dart';
 import 'package:safezone/backend/architecture/bloc/contactBloc/contact_bloc.dart';
@@ -20,6 +21,7 @@ import 'package:safezone/backend/architecture/cubic/notification.dart';
 import 'package:safezone/backend/repository/adminApi/analyticsApi/analytics_impl.dart';
 import 'package:safezone/backend/repository/adminApi/incident_reportApi/admin_incident_impl.dart';
 import 'package:safezone/backend/repository/adminApi/safezoneApi/safezone_impl.dart';
+import 'package:safezone/backend/repository/adminApi/usersApi/admin_users_impl.dart';
 import 'package:safezone/backend/repository/authApi/auth_impl.dart';
 import 'package:safezone/backend/repository/circleApi/circle_impl.dart';
 import 'package:safezone/backend/repository/contactApi/contact_impl.dart';
@@ -114,7 +116,6 @@ class _MyAppState extends State<MyApp> {
     await dotenv.load(fileName: ".env");
   }
 
-
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
@@ -133,7 +134,6 @@ class _MyAppState extends State<MyApp> {
             ),
           );
         } else {
-
           return MultiBlocProvider(
             providers: [
               BlocProvider(
@@ -171,6 +171,9 @@ class _MyAppState extends State<MyApp> {
                 create: (_) => AdminIncidentReportBloc(
                   AdminIncidentRepositoryImpl(),
                 ),
+              ),
+               BlocProvider(
+                create: (_) => AdminUserBloc(AdminUserRepositoryImpl()),
               ),
             ],
             child: MaterialApp.router(

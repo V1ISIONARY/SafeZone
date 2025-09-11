@@ -1,3 +1,4 @@
+import 'package:safezone/backend/architecture/bloc/adminBloc/users/admin_users_state.dart';
 import 'package:safezone/backend/properties/import.dart';
 import 'package:safezone/backend/repository/profileApi/profile_repo.dart';
 import 'profile_event.dart';
@@ -81,6 +82,17 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         emit(ProfileStatisticsLoaded(stats));
       } catch (e) {
         emit(ProfileStatisticsError(e.toString()));
+      }
+    });
+
+    on<RequestAdminAccess>((event, emit) async {
+      emit(AdminAccessRequestLoading());
+      try {
+        await profileRepository.requestAdminAccess(event.userId);
+        emit(AdminAccessRequestSuccess('Admin access request submitted.'));
+      } catch (e) {
+        emit(AdminAccessRequestError(
+            'Failed to request admin access: ${e.toString()}'));
       }
     });
   }

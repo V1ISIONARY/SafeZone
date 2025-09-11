@@ -39,6 +39,7 @@ import 'package:safezone/frontend/platforms/mobile/pages/main-screen/settings_pa
 import 'package:safezone/frontend/platforms/mobile/pages/main-screen/settings_page/locationservice.dart';
 import 'package:safezone/frontend/platforms/mobile/pages/main-screen/settings_page/privacy.dart';
 import 'package:safezone/frontend/platforms/mobile/pages/main-screen/settings_page/privacy_security.dart';
+import 'package:safezone/frontend/platforms/mobile/pages/main-screen/settings_page/request_admin_access.dart';
 import 'package:safezone/frontend/platforms/mobile/pages/main-screen/settings_page/term-policy/main_terms_policy.dart';
 import 'package:safezone/frontend/platforms/mobile/pages/main-screen/settings_page/user_guide.dart';
 import 'package:safezone/frontend/platforms/mobile/pages/main-screen/sos_page/sos.dart';
@@ -218,6 +219,10 @@ GoRouter appRouter(bool isFirstRun, String? userToken) => GoRouter(
         GoRoute(
           path: '/accountDetails',
           builder: (context, state) => const AccountDetails(),
+        ),
+             GoRoute(
+          path: '/request-admin-access',
+          builder: (context, state) => const RequestAdminAccessPage(),
         ),
         GoRoute(
           path: '/privacySecurity',

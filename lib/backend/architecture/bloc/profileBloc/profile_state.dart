@@ -96,3 +96,19 @@ class ProfileStatisticsError extends ProfileState {
   @override
   List<Object?> get props => [message];
 }
+
+class AdminAccessRequestLoading extends ProfileState {}
+
+class AdminAccessRequestSuccess extends ProfileState {
+  final String message;
+  const AdminAccessRequestSuccess(this.message);
+  @override
+  List<Object?> get props => [message];
+}
+
+class AdminAccessRequestError extends ProfileState {
+  final String error;
+  const AdminAccessRequestError(this.error);
+  @override
+  List<Object?> get props => [error];
+}
