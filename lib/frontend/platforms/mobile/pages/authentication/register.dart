@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:email_otp/email_otp.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:go_router/go_router.dart';
@@ -28,6 +29,8 @@ class _RegisterMDState extends State<RegisterMD> {
   final TextEditingController codeController = TextEditingController();
   final TextEditingController firstNameController = TextEditingController();
   final TextEditingController lastNameController = TextEditingController();
+  final TextEditingController addressController = TextEditingController();
+  final TextEditingController ageController = TextEditingController(text: "18");
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confirmPasswordController =
@@ -67,6 +70,8 @@ class _RegisterMDState extends State<RegisterMD> {
     codeController.dispose();
     firstNameController.dispose();
     lastNameController.dispose();
+    addressController.dispose();
+    ageController.dispose();
     usernameController.dispose();
     passwordController.dispose();
     confirmPasswordController.dispose();
@@ -490,12 +495,14 @@ class _RegisterMDState extends State<RegisterMD> {
             const SizedBox(height: 30),
             TextField(
               controller: firstNameController,
+              maxLength: 20,
               style: const TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w200,
                 color: textColor,
               ),
               decoration: InputDecoration(
+                counterText: "",
                 hintText: "Enter First Name",
                 hintStyle: const TextStyle(
                     fontSize: 13,
@@ -514,13 +521,92 @@ class _RegisterMDState extends State<RegisterMD> {
             const SizedBox(height: 10),
             TextField(
               controller: lastNameController,
+              maxLength: 20,
               style: const TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w200,
                 color: textColor,
               ),
               decoration: InputDecoration(
+                counterText: "",
                 hintText: "Enter Last Name",
+                hintStyle: const TextStyle(
+                    fontSize: 13,
+                    color: labelFormFieldColor,
+                    fontWeight: FontWeight.w200),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: const BorderSide(color: widgetPricolor, width: 2),
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 15),
+              ),
+            ),
+            const SizedBox(height: 10),
+            TextField(
+              controller: ageController,
+              keyboardType: TextInputType.number,
+              style: const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w200,
+                color: textColor,
+              ),
+              inputFormatters: [
+                LengthLimitingTextInputFormatter(2),
+              ],
+              decoration: InputDecoration(
+                hintText: "Age",
+                hintStyle: const TextStyle(
+                    fontSize: 13,
+                    color: labelFormFieldColor,
+                    fontWeight: FontWeight.w200),
+                suffixIcon: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    GestureDetector(
+                      child: const Icon(Icons.arrow_drop_up),
+                      onTap: () {
+                        int currentAge = int.tryParse(ageController.text) ?? 18;
+                        if (currentAge < 99) {
+                          ageController.text = (currentAge + 1).toString();
+                        }
+                      },
+                    ),
+                    GestureDetector(
+                      child: const Icon(Icons.arrow_drop_down),
+                      onTap: () {
+                        int currentAge = int.tryParse(ageController.text) ?? 18;
+                        if (currentAge > 1) {
+                          ageController.text = (currentAge - 1).toString();
+                        }
+                      },
+                    ),
+                  ],
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: const BorderSide(color: widgetPricolor, width: 2),
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 15),
+              ),
+            ),
+            const SizedBox(height: 10),
+            TextField(
+              controller: addressController,
+              maxLength: 50,
+              style: const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w200,
+                color: textColor,
+              ),
+              decoration: InputDecoration(
+                counterText: "",
+                hintText: "Enter Address",
                 hintStyle: const TextStyle(
                     fontSize: 13,
                     color: labelFormFieldColor,
@@ -568,6 +654,7 @@ class _RegisterMDState extends State<RegisterMD> {
             const SizedBox(height: 10),
             TextField(
               controller: usernameController,
+              maxLength: 20,
               style: const TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w200,
@@ -592,6 +679,7 @@ class _RegisterMDState extends State<RegisterMD> {
             const SizedBox(height: 10),
             TextField(
                 controller: passwordController,
+                maxLength: 20,
                 obscureText: !_isPasswordVisible,
                 onChanged: _checkPasswordStrength,
                 style: const TextStyle(
@@ -647,6 +735,7 @@ class _RegisterMDState extends State<RegisterMD> {
                 children: [
                   TextField(
                     controller: confirmPasswordController,
+                    maxLength: 20,
                     obscureText: !_isPasswordVisible,
                     style: const TextStyle(
                       fontSize: 13,
@@ -693,20 +782,19 @@ class _RegisterMDState extends State<RegisterMD> {
 
                   // Dispatch event to trigger sign-up
                   signupBloc.add(UserSignUpEvent(
-                      username: usernameController.text,
-                      email: emailController.text,
-                      password: passwordController.text,
-                      address: 'Some address',
-                      firstname: firstNameController.text,
-                      lastname: lastNameController.text,
-                      isAdmin: false,
-                      isGirl: selectedGender == 'Female',
-                      isVerified: true,
-                      latitude: position.latitude,
-                      longitude: position.longitude,
-                      age:
-                          18 //temporary lang ito since wala pa sa sign up yung input age
-                      ));
+                    username: usernameController.text,
+                    email: emailController.text,
+                    password: passwordController.text,
+                    address: addressController.text,
+                    age: int.tryParse(ageController.text) ?? 18,
+                    firstname: firstNameController.text,
+                    lastname: lastNameController.text,
+                    isAdmin: false,
+                    isGirl: selectedGender == 'Female',
+                    isVerified: true,
+                    latitude: position.latitude,
+                    longitude: position.longitude,
+                  ));
                 } catch (e) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
