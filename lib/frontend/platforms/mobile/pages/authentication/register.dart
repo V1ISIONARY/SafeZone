@@ -38,7 +38,6 @@ class _RegisterMDState extends State<RegisterMD> {
 
   EmailOTP myauth = EmailOTP();
   String generatedOTP = "";
-  String? selectedGender;
   bool _isSendingOTP = false;
   bool _showTitle = false;
   double _appBarHeight = 0;
@@ -622,36 +621,6 @@ class _RegisterMDState extends State<RegisterMD> {
               ),
             ),
             const SizedBox(height: 10),
-            DropdownButtonFormField<String>(
-              value: selectedGender,
-              items: ['Male', 'Female'].map((gender) {
-                return DropdownMenuItem(
-                  value: gender,
-                  child: Text(gender),
-                );
-              }).toList(),
-              onChanged: (value) {
-                setState(() {
-                  selectedGender = value;
-                });
-              },
-              decoration: InputDecoration(
-                hintText: "Gender",
-                hintStyle: const TextStyle(
-                    fontSize: 13,
-                    color: labelFormFieldColor,
-                    fontWeight: FontWeight.w200),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  borderSide: const BorderSide(color: widgetPricolor, width: 2),
-                ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 15),
-              ),
-            ),
-            const SizedBox(height: 10),
             TextField(
               controller: usernameController,
               maxLength: 20,
@@ -790,7 +759,7 @@ class _RegisterMDState extends State<RegisterMD> {
                     firstname: firstNameController.text,
                     lastname: lastNameController.text,
                     isAdmin: false,
-                    isGirl: selectedGender == 'Female',
+                    isGirl: true,
                     isVerified: true,
                     latitude: position.latitude,
                     longitude: position.longitude,
