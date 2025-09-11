@@ -7,9 +7,6 @@ import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:google_places_flutter/google_places_flutter.dart';
-import 'package:google_places_flutter/model/place_type.dart';
-import 'package:google_places_flutter/model/prediction.dart';
 import 'package:http/http.dart' as http show get;
 import 'package:intl/intl.dart';
 import 'package:safezone/backend/models/dangerzoneModel/incident_report_request_model.dart';
@@ -34,6 +31,8 @@ class _CreateReportState extends State<CreateReport> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _searchController = TextEditingController();
+  bool _useCurrentLocation = false;
+  String _currentAddress = "Location will be automatically detected";
 
   final Completer<GoogleMapController> _mapController = Completer();
   LatLng? _pinnedLocation;
@@ -83,9 +82,11 @@ class _CreateReportState extends State<CreateReport> {
 
   final String apiKey = dotenv.env['GOOGLE_API_KEY'] ?? '';
   Future<void> _getCurrentLocation() async {
+    if (!_useCurrentLocation) return;
+
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
-      // _showSnackBar("Location services are disabled.");
+      _showSnackBar("Location services are disabled");
       return;
     }
 
@@ -93,19 +94,101 @@ class _CreateReportState extends State<CreateReport> {
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
-        // _showSnackBar("Location permission denied.");
+        _showSnackBar("Location permissions are denied");
         return;
       }
     }
 
     if (permission == LocationPermission.deniedForever) {
-      // _showSnackBar("Location permission permanently denied.");
+      _showSnackBar("Location permissions are permanently denied");
       return;
     }
 
-    Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
-    _updateMapPosition(LatLng(position.latitude, position.longitude));
+    setState(() {
+      _currentAddress = "Getting your location...";
+    });
+
+    try {
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+
+      LatLng currentLocation = LatLng(position.latitude, position.longitude);
+      _updateMapPosition(currentLocation);
+
+      setState(() {
+        _pinnedLocation = currentLocation;
+        _markers.clear();
+        _markers.add(
+          Marker(
+            markerId: const MarkerId("current_location"),
+            position: currentLocation,
+            infoWindow: const InfoWindow(title: "Current Location"),
+            icon: BitmapDescriptor.defaultMarkerWithHue(
+              BitmapDescriptor.hueGreen,
+            ),
+          ),
+        );
+        _updateCircle();
+      });
+
+      _getAddressFromLatLng(currentLocation);
+    } catch (e) {
+      _showSnackBar("Error getting location: $e");
+      setState(() {
+        _useCurrentLocation = false;
+        _currentAddress = "Could not get location";
+      });
+    }
+  }
+
+  Future<void> _getAddressFromLatLng(LatLng position) async {
+    setState(() {
+      _currentAddress = "Loading location...";
+    });
+
+    String url =
+        "https://maps.googleapis.com/maps/api/geocode/json?latlng=${position.latitude},${position.longitude}&key=$apiKey";
+
+    try {
+      final response = await http.get(Uri.parse(url));
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+
+        if (data["status"] == "OK") {
+          String buildingName = "";
+          String formattedAddress = data["results"][0]["formatted_address"];
+
+          for (var component in data["results"][0]["address_components"]) {
+            if (component["types"].contains("establishment") ||
+                component["types"].contains("point_of_interest") ||
+                component["types"].contains("premise")) {
+              buildingName = component["long_name"];
+              break;
+            }
+          }
+
+          String displayAddress = buildingName.isNotEmpty
+              ? "$buildingName, $formattedAddress"
+              : formattedAddress;
+
+          setState(() {
+            _currentAddress = displayAddress;
+           
+          });
+        } else {
+          setState(() {
+            _currentAddress =
+                "${position.latitude.toStringAsFixed(4)}, ${position.longitude.toStringAsFixed(4)}";
+          });
+        }
+      }
+    } catch (e) {
+      setState(() {
+        _currentAddress = "Couldn't get address";
+      });
+    }
   }
 
   void _updateMapPosition(LatLng newPosition) async {
@@ -408,7 +491,8 @@ class _CreateReportState extends State<CreateReport> {
                     ''';
                       controller.setMapStyle(style);
                     },
-                    onTap: (LatLng location) {
+                   onTap: (LatLng location) {
+                    if (!_useCurrentLocation) {
                       setState(() {
                         _pinnedLocation = location;
                         _markers.clear();
@@ -416,19 +500,55 @@ class _CreateReportState extends State<CreateReport> {
                           Marker(
                             markerId: const MarkerId("pinned_location"),
                             position: location,
-                            infoWindow:
-                                const InfoWindow(title: "Incident Location"),
+                            infoWindow: const InfoWindow(title: "Incident Location"),
+                            icon: BitmapDescriptor.defaultMarkerWithHue(
+                              BitmapDescriptor.hueGreen,
+                            ),
                           ),
                         );
                         _updateCircle();
                       });
-                    },
+                      _getAddressFromLatLng(location);
+                    }
+                  },
                     zoomGesturesEnabled: true,
                     scrollGesturesEnabled: true,
                     rotateGesturesEnabled: true,
                     tiltGesturesEnabled: true,
                   ),
                 ),
+              ),
+               Row(
+                children: [
+                  Checkbox(
+                    value: _useCurrentLocation,
+                    onChanged: (value) {
+                      setState(() {
+                        _useCurrentLocation = value!;
+                        if (_useCurrentLocation) {
+                          _getCurrentLocation();
+                        }
+                      });
+                    },
+                    side: const BorderSide(
+                      color: Color(0x99EF8D88),
+                      width: 2,
+                    ),
+                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    visualDensity: VisualDensity.compact,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(3),
+                    ),
+                    activeColor: widgetPricolor,
+                  ),
+                  Text(
+                    "Use current location",
+                    style: GoogleFonts.poppins(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
               ),
               Expanded(
                 child: SingleChildScrollView(
@@ -559,8 +679,7 @@ class _CreateReportState extends State<CreateReport> {
                                       : _selectedType,
                                   reportTime: DateFormat("HH:mm:ss")
                                       .format(DateTime.now()),
-                                  images:
-                                      selectedImages,
+                                  images: selectedImages,
                                   reportTimestamp: reportTimestamp,
                                   latitude: _pinnedLocation!.latitude,
                                   longitude: _pinnedLocation!.longitude,

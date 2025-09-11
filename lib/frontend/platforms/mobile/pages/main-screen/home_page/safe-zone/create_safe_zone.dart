@@ -32,6 +32,7 @@ class _MarkSafeZoneState extends State<MarkSafeZone> {
   int? userId;
   String reportTimestamp = "";
   String _currentAddress = "Location will be automatically detected";
+  bool _useCurrentLocation = false;
 
   final Completer<GoogleMapController> _mapController = Completer();
   LatLng? _pinnedLocation;
@@ -141,22 +142,64 @@ class _MarkSafeZoneState extends State<MarkSafeZone> {
   final String apiKey = dotenv.env['GOOGLE_API_KEY'] ?? '';
 
   Future<void> _getCurrentLocation() async {
+    if (!_useCurrentLocation) return;
+
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) return;
+    if (!serviceEnabled) {
+      _showSnackBar("Location services are disabled");
+      return;
+    }
 
     LocationPermission permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) return;
+      if (permission == LocationPermission.denied) {
+        _showSnackBar("Location permissions are denied");
+        return;
+      }
     }
 
-    if (permission == LocationPermission.deniedForever) return;
+    if (permission == LocationPermission.deniedForever) {
+      _showSnackBar("Location permissions are permanently denied");
+      return;
+    }
 
-    Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
-    LatLng currentLocation = LatLng(position.latitude, position.longitude);
-    _updateMapPosition(currentLocation);
-    _getAddressFromLatLng(currentLocation);
+    setState(() {
+      _currentAddress = "Getting your location...";
+    });
+
+    try {
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+
+      LatLng currentLocation = LatLng(position.latitude, position.longitude);
+      _updateMapPosition(currentLocation);
+
+      setState(() {
+        _pinnedLocation = currentLocation;
+        _markers.clear();
+        _markers.add(
+          Marker(
+            markerId: const MarkerId("current_location"),
+            position: currentLocation,
+            infoWindow: const InfoWindow(title: "Current Location"),
+            icon: BitmapDescriptor.defaultMarkerWithHue(
+              BitmapDescriptor.hueGreen,
+            ),
+          ),
+        );
+        _updateCircle();
+      });
+
+      _getAddressFromLatLng(currentLocation);
+    } catch (e) {
+      _showSnackBar("Error getting location: $e");
+      setState(() {
+        _useCurrentLocation = false;
+        _currentAddress = "Could not get location";
+      });
+    }
   }
 
   void _updateMapPosition(LatLng newPosition) async {
@@ -372,9 +415,10 @@ class _MarkSafeZoneState extends State<MarkSafeZone> {
                 ],
               ),
             ),
+          
             Container(
               height: 215,
-              margin: const EdgeInsets.only(top: 15, bottom: 20),
+              margin: const EdgeInsets.only(top: 15, bottom: 15),
               decoration: BoxDecoration(
                 color: const Color.fromARGB(54, 96, 125, 139),
                 borderRadius: BorderRadius.circular(8),
@@ -403,21 +447,24 @@ class _MarkSafeZoneState extends State<MarkSafeZone> {
                     ]''');
                   },
                   onTap: (LatLng location) {
-                    setState(() {
-                      _pinnedLocation = location;
-                      _markers.clear();
-                      _markers.add(
-                        Marker(
+                    if (!_useCurrentLocation) {
+                      setState(() {
+                        _pinnedLocation = location;
+                        _markers.clear();
+                        _markers.add(
+                          Marker(
                             markerId: const MarkerId("pinned_location"),
                             position: location,
                             infoWindow: const InfoWindow(title: "Safe Zone"),
                             icon: BitmapDescriptor.defaultMarkerWithHue(
                               BitmapDescriptor.hueGreen,
-                            )),
-                      );
-                      _updateCircle();
-                    });
-                    _getAddressFromLatLng(location);
+                            ),
+                          ),
+                        );
+                        _updateCircle();
+                      });
+                      _getAddressFromLatLng(location);
+                    }
                   },
                   zoomGesturesEnabled: true,
                   scrollGesturesEnabled: true,
@@ -425,6 +472,38 @@ class _MarkSafeZoneState extends State<MarkSafeZone> {
                   tiltGesturesEnabled: true,
                 ),
               ),
+            ),
+            Row(
+              children: [
+                Checkbox(
+                  value: _useCurrentLocation,
+                  onChanged: (value) {
+                    setState(() {
+                      _useCurrentLocation = value!;
+                      if (_useCurrentLocation) {
+                        _getCurrentLocation();
+                      }
+                    });
+                  },
+                  side: const BorderSide(
+                    color: Color(0x99EF8D88),
+                    width: 2,
+                  ),
+                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  visualDensity: VisualDensity.compact,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(3),
+                  ),
+                  activeColor: widgetPricolor,
+                ),
+                Text(
+                  "Use current location",
+                  style: GoogleFonts.poppins(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
             ),
             Expanded(
               child: SingleChildScrollView(
