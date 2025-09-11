@@ -114,23 +114,6 @@ class _MyAppState extends State<MyApp> {
     await dotenv.load(fileName: ".env");
   }
 
-  Future<void> _sendTestNotification() async {
-    bool isAllowed = await AwesomeNotifications().isNotificationAllowed();
-
-    if (!isAllowed) {
-      await AwesomeNotifications().requestPermissionToSendNotifications();
-    }
-
-    await AwesomeNotifications().createNotification(
-      content: NotificationContent(
-        id: 10,
-        channelKey: 'alerts',
-        title: 'Welcome to SafeZone!',
-        body: 'This is a test notification.',
-        notificationLayout: NotificationLayout.Default,
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -150,7 +133,6 @@ class _MyAppState extends State<MyApp> {
             ),
           );
         } else {
-          _sendTestNotification();
 
           return MultiBlocProvider(
             providers: [
