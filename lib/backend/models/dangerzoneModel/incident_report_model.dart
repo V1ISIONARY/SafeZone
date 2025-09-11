@@ -81,6 +81,8 @@ class DangerZoneModel {
   final double? radius;
   final String? name;
   final bool showMap;
+  final String? status;             // ✅ added
+  final String? reportTimestamp;    // ✅ added
 
   DangerZoneModel({
     required this.id,
@@ -89,7 +91,9 @@ class DangerZoneModel {
     required this.longitude,
     required this.radius,
     required this.name,
-    required this.showMap, 
+    required this.showMap,
+    this.status,
+    this.reportTimestamp,
   });
 
   factory DangerZoneModel.fromJson(Map<String, dynamic> json) {
@@ -100,7 +104,9 @@ class DangerZoneModel {
       longitude: json['longitude']?.toDouble(),
       radius: json['radius']?.toDouble(),
       name: json['name']?.toString(),
-      showMap: json['show_map'] ?? false, 
+      showMap: json['show_map'] ?? false,
+      status: json['status']?.toString(),               // ✅ added
+      reportTimestamp: json['report_timestamp']?.toString(), // ✅ added
     );
   }
 
@@ -112,7 +118,9 @@ class DangerZoneModel {
       'longitude': longitude,
       'radius': radius,
       'name': name,
-      'show_map': showMap, 
+      'show_map': showMap,
+      'status': status,
+      'report_timestamp': reportTimestamp,
     };
   }
 }

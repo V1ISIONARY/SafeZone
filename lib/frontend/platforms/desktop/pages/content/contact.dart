@@ -77,9 +77,9 @@ class _ContactDTState extends State<ContactDT>
         padding: const EdgeInsets.symmetric(horizontal: 15),
         child: Stack(children: [
           Scaffold(
-              backgroundColor: Colors.white54,
+              backgroundColor: Colors.white,
               appBar: AppBar(
-                backgroundColor: Colors.white54,
+                backgroundColor: Colors.white,
                 automaticallyImplyLeading: false,
                 centerTitle: false,
                 title: Transform.translate(

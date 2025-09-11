@@ -15,10 +15,12 @@ class AdminReportsDetails extends StatefulWidget {
     required this.reportInfo,
     required this.address,
     this.onStatusChanged,
+    this.onBack,
   });
 
   final IncidentReportModel reportInfo;
   final String address;
+  final VoidCallback? onBack;
   final Function(IncidentReportModel)? onStatusChanged;
 
   @override

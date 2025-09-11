@@ -13,7 +13,7 @@ class MapHeader extends StatefulWidget {
 
 class _MapHeaderState extends State<MapHeader> {
   bool isMapSelected = true;
-  final sharedController = SharedProperties(); // your singleton or controller
+  final sharedController = SharedProperties();
 
   final TextEditingController searchController = TextEditingController();
 

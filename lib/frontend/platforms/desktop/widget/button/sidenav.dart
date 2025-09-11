@@ -9,9 +9,13 @@ class Sidenav extends StatefulWidget {
   final VoidCallback? onTap;
   final List<Widget>? hoverTrailing;
   final List<DropdownItem>? dropdownItems;
+  final bool? dropleftPage;
+  final VoidCallback? onDropleftSelected;
 
-  static final ValueNotifier<String?> selectedLabel = ValueNotifier("Zones");
+  static final ValueNotifier<String?> selectedNormalParent = ValueNotifier("Zones");
+  static final ValueNotifier<int?> selectedDropleftParent = ValueNotifier(null);
   static final ValueNotifier<String?> selectedDropdownId = ValueNotifier(null);
+  static final ValueNotifier<String?> selectedDropleftId = ValueNotifier(null);
   static final ValueNotifier<int?> selectedComsNotifier = ValueNotifier(null);
 
   const Sidenav({
@@ -21,7 +25,9 @@ class Sidenav extends StatefulWidget {
     this.hoverTrailing,
     this.withDrop,
     this.onTap,
+    this.dropleftPage,
     this.dropdownItems,
+    this.onDropleftSelected,
   });
 
   @override
@@ -33,11 +39,7 @@ class DropdownItem {
   final VoidCallback onTap;
   final String id;
 
-  DropdownItem({
-    required this.label,
-    required this.onTap,
-    required this.id,
-  });
+  DropdownItem({required this.label, required this.onTap, required this.id});
 }
 
 final sharedController = SharedProperties();
@@ -45,53 +47,67 @@ final sharedController = SharedProperties();
 class _SidenavState extends State<Sidenav> {
   bool _hovering = false;
   bool _showDropdown = false;
+  String? _hoveredDropdownLabel;
 
   @override
   void initState() {
     super.initState();
-    Sidenav.selectedLabel.addListener(_onSelectedLabelChanged);
+    Sidenav.selectedNormalParent.addListener(_onSelectedChanged);
+    Sidenav.selectedDropleftParent.addListener(_onSelectedChanged);
+    Sidenav.selectedDropdownId.addListener(_onSelectedChanged);
+    Sidenav.selectedDropleftId.addListener(_onSelectedChanged);
   }
 
   @override
   void dispose() {
-    Sidenav.selectedLabel.removeListener(_onSelectedLabelChanged);
+    Sidenav.selectedNormalParent.removeListener(_onSelectedChanged);
+    Sidenav.selectedDropleftParent.removeListener(_onSelectedChanged);
+    Sidenav.selectedDropdownId.removeListener(_onSelectedChanged);
+    Sidenav.selectedDropleftId.removeListener(_onSelectedChanged);
     super.dispose();
   }
 
-  void _onSelectedLabelChanged() {
-    setState(() {});
-  }
+  void _onSelectedChanged() => setState(() {});
 
   void _handleTap() {
-    if (widget.label != 'Notification' && widget.label != 'Contact') {
-      Sidenav.selectedLabel.value = widget.label;
+    final isCollapsed = sharedController.isSidebarCollapsed.value;
 
-      if (!(widget.withDrop ?? false)) {
-        Sidenav.selectedDropdownId.value = null;
+    if (widget.label == 'Notification') {
+      Sidenav.selectedDropleftParent.value =
+          Sidenav.selectedDropleftParent.value == 0 ? null : 0;
+      Sidenav.selectedDropleftId.value = null;
+    } else if (widget.label == 'Contact') {
+      Sidenav.selectedDropleftParent.value =
+          Sidenav.selectedDropleftParent.value == 1 ? null : 1;
+      Sidenav.selectedDropleftId.value = null;
+    } else if (widget.dropleftPage == true) {
+      if (!isCollapsed) {
+        setState(() => _showDropdown = !_showDropdown);
       }
+    } else {
+      Sidenav.selectedDropdownId.value = null;
+      Sidenav.selectedNormalParent.value = widget.label;
     }
+
     widget.onTap?.call();
   }
 
   @override
   Widget build(BuildContext context) {
     final bool isDropdown = widget.withDrop == true;
-
-    final bool isMainSelected = Sidenav.selectedLabel.value == widget.label;
-    final bool isComsSelected = (widget.label == 'Notification' &&
-            Sidenav.selectedComsNotifier.value == 0) ||
-        (widget.label == 'Contact' && Sidenav.selectedComsNotifier.value == 1);
-    final bool isSelected = isMainSelected || isComsSelected;
-
-    final Color backgroundColor = (widget.label == 'Notification' &&
-                Sidenav.selectedComsNotifier.value == 0) ||
-            (widget.label == 'Contact' &&
-                Sidenav.selectedComsNotifier.value == 1)
-        ? btnColor.withOpacity(0.3)
-        : (Sidenav.selectedLabel.value == widget.label
-            ? Colors.grey.shade300
-            : (_hovering ? Colors.grey.shade50 : Colors.transparent));
-
+    final bool isNormalSelected =
+        widget.dropleftPage != true && Sidenav.selectedNormalParent.value == widget.label;
+    final bool isDropleftSelected = widget.dropleftPage == true &&
+        ((widget.label == 'Notification' && Sidenav.selectedDropleftParent.value == 0) ||
+        (widget.label == 'Contact' && Sidenav.selectedDropleftParent.value == 1) ||
+        (widget.label != 'Notification' &&
+        widget.label != 'Contact' &&
+        Sidenav.selectedDropleftParent.value == 2));
+    final bool hasDropdownSelected =
+        isDropdown && Sidenav.selectedNormalParent.value == widget.label && Sidenav.selectedDropdownId.value != null;
+    final Color backgroundColor = (isNormalSelected || isDropleftSelected || hasDropdownSelected)
+        ? Colors.grey.shade300
+        : (_hovering ? Colors.grey.shade50 : Colors.transparent);
     const Color iconColor = Colors.black54;
     const Color textColor = Colors.black54;
 
@@ -111,21 +127,13 @@ class _SidenavState extends State<Sidenav> {
                       color: Colors.black,
                       borderRadius: BorderRadius.circular(4),
                     ),
-                    textStyle: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 8,
-                    ),
+                    textStyle: const TextStyle(color: Colors.white, fontSize: 8),
                     child: InkWell(
                       borderRadius: BorderRadius.circular(5),
                       onTap: _handleTap,
-                      onHover: (hovering) {
-                        setState(() {
-                          _hovering = hovering;
-                        });
-                      },
+                      onHover: (hovering) => setState(() => _hovering = hovering),
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 8, horizontal: 8),
+                        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
                         child: Icon(widget.icon, color: iconColor, size: 15),
                       ),
                     ),
@@ -133,74 +141,53 @@ class _SidenavState extends State<Sidenav> {
                 : InkWell(
                     borderRadius: BorderRadius.circular(5),
                     onTap: _handleTap,
-                    onHover: (hovering) {
-                      setState(() {
-                        _hovering = hovering;
-                      });
-                    },
+                    onHover: (hovering) => setState(() => _hovering = hovering),
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 8, horizontal: 8),
+                      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           Icon(widget.icon, color: iconColor, size: 15),
                           const SizedBox(width: 5),
-                          Text(
-                            widget.label,
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
-                              color: textColor,
-                            ),
-                          ),
+                          Text(widget.label,
+                              style: const TextStyle(
+                                  fontSize: 12, fontWeight: FontWeight.w500, color: textColor)),
                           const Spacer(),
                           if (_hovering && widget.hoverTrailing != null)
                             Row(
-                              children: widget.hoverTrailing!.map((child) {
-                                if (child is Text) {
-                                  return Text(
-                                    child.data ?? '',
-                                    style: child.style?.copyWith(
-                                          color: Colors.black38,
-                                        ) ??
-                                        const TextStyle(
-                                            color: Colors.black38,
-                                            fontSize: 10),
-                                  );
-                                } else if (child is Icon) {
-                                  return Icon(
-                                    child.icon,
-                                    color: Colors.black38,
-                                    size: child.size,
-                                  );
-                                } else {
-                                  return child;
-                                }
-                              }).toList(),
-                            ),
+                                children: widget.hoverTrailing!.map((child) {
+                              if (child is Text) {
+                                return Text(
+                                  child.data ?? '',
+                                  style: child.style?.copyWith(color: Colors.black38) ??
+                                      const TextStyle(color: Colors.black38, fontSize: 10),
+                                );
+                              } else if (child is Icon) {
+                                return Icon(child.icon, color: Colors.black38, size: child.size);
+                              } else {
+                                return child;
+                              }
+                            }).toList()),
                           if (isDropdown)
                             GestureDetector(
                               onTap: () {
-                                if (!sharedController
-                                    .isSidebarCollapsed.value) {
+                                if (!sharedController.isSidebarCollapsed.value) {
                                   setState(() {
                                     _showDropdown = !_showDropdown;
                                   });
-                                  Sidenav.selectedLabel.value = widget.label;
                                 }
                               },
                               child: Container(
                                 margin: const EdgeInsets.only(left: 5),
                                 child: Icon(
-                                  _showDropdown
-                                      ? Icons.keyboard_arrow_up
-                                      : Icons.keyboard_arrow_down,
+                                  _showDropdown ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
                                   color: Colors.black,
                                   size: 12,
                                 ),
                               ),
                             )
+
+
                         ],
                       ),
                     ),
@@ -209,47 +196,71 @@ class _SidenavState extends State<Sidenav> {
         ),
         if (_showDropdown && widget.dropdownItems != null)
           ValueListenableBuilder<String?>(
-            valueListenable: Sidenav.selectedDropdownId,
-            builder: (context, selectedId, _) {
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: widget.dropdownItems!
-                    .map((item) => _buildDropdownButton(context, item))
-                    .toList(),
-              );
-            },
+            valueListenable: widget.dropleftPage == true
+                ? Sidenav.selectedDropleftId
+                : Sidenav.selectedDropdownId,
+            builder: (context, _, __) => Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: widget.dropdownItems!.map((item) => _buildDropdownButton(context, item)).toList(),
+            ),
           ),
       ],
     );
   }
 
-  String? _hoveredDropdownLabel;
-  String? _selectedDropdownLabel;
   Widget _buildDropdownButton(BuildContext context, DropdownItem item) {
     final bool isHovered = _hoveredDropdownLabel == item.label;
-    final bool isSelected = Sidenav.selectedDropdownId.value == item.id;
+
+    final bool isSelected = widget.dropleftPage == true
+      ? Sidenav.selectedDropleftId.value == item.id ||
+          (Sidenav.selectedComsNotifier.value != null &&
+              Sidenav.selectedComsNotifier.value == _getComsId(item.id))
+      : Sidenav.selectedDropdownId.value == item.id;
+
+    final Color backgroundColor = isSelected
+      ? (widget.dropleftPage == true
+          ? btnColor.withOpacity(0.3)
+          : Colors.grey.shade200)
+      : (isHovered ? Colors.grey.shade100 : Colors.transparent);
 
     return Container(
       margin: const EdgeInsets.only(left: 20, bottom: 5),
       child: Material(
-        color: isSelected
-            ? Colors.grey.shade200
-            : isHovered
-                ? Colors.grey.shade100
-                : Colors.transparent,
+        color: backgroundColor,
         borderRadius: BorderRadius.circular(5),
         child: InkWell(
           borderRadius: BorderRadius.circular(5),
           onTap: () {
-            Sidenav.selectedDropdownId.value = item.id;
-            Sidenav.selectedLabel.value = widget.label;
+            if (widget.dropleftPage == true) {
+              int comsId = _getComsId(item.id);
+
+              if (comsId == 2 || comsId == 3) {
+                bool isActive = Sidenav.selectedDropleftParent.value == 2 &&
+                    Sidenav.selectedDropleftId.value == item.id;
+
+                if (isActive) {
+                  Sidenav.selectedDropleftParent.value = null;
+                  Sidenav.selectedDropleftId.value = null;
+                } else {
+                  Sidenav.selectedDropleftParent.value = 2;
+                  Sidenav.selectedDropleftId.value = item.id;
+                }
+              }
+
+              widget.onDropleftSelected?.call();
+            } else {
+              if (Sidenav.selectedDropdownId.value == item.id) {
+                Sidenav.selectedDropdownId.value = null;
+              } else {
+                Sidenav.selectedDropdownId.value = item.id;
+                Sidenav.selectedNormalParent.value = widget.label;
+              }
+            }
+
             item.onTap();
           },
-          onHover: (hovering) {
-            setState(() {
-              _hoveredDropdownLabel = hovering ? item.label : null;
-            });
-          },
+          onHover: (hovering) =>
+              setState(() => _hoveredDropdownLabel = hovering ? item.label : null),
           child: Container(
             padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
             child: Row(
@@ -257,10 +268,7 @@ class _SidenavState extends State<Sidenav> {
                 Text(
                   item.label,
                   style: const TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.black54,
-                  ),
+                      fontSize: 10, fontWeight: FontWeight.w500, color: Colors.black54),
                 ),
               ],
             ),
@@ -268,6 +276,17 @@ class _SidenavState extends State<Sidenav> {
         ),
       ),
     );
+  }
+}
+
+int _getComsId(String id) {
+  switch (id) {
+    case 'account_details':
+      return 2;
+    case 'privacy':
+      return 3;
+    default:
+      return 0;
   }
 }
 
@@ -306,9 +325,7 @@ class _ShiftedTooltipState extends State<ShiftedTooltip> {
 
   OverlayEntry _createOverlayEntry() {
     RenderBox renderBox = context.findRenderObject() as RenderBox;
-    var size = renderBox.size;
     var offset = renderBox.localToGlobal(Offset.zero);
-
     return OverlayEntry(
       builder: (context) => Positioned(
         top: offset.dy + 5,
@@ -318,15 +335,10 @@ class _ShiftedTooltipState extends State<ShiftedTooltip> {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: widget.decoration ??
-                BoxDecoration(
-                  color: Colors.black,
-                  borderRadius: BorderRadius.circular(4),
-                ),
-            child: Text(
-              widget.message,
-              style: widget.textStyle ??
-                  const TextStyle(color: Colors.white, fontSize: 10),
-            ),
+                BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(4)),
+            child: Text(widget.message,
+                style: widget.textStyle ??
+                    const TextStyle(color: Colors.white, fontSize: 10)),
           ),
         ),
       ),
@@ -339,12 +351,7 @@ class _ShiftedTooltipState extends State<ShiftedTooltip> {
       onEnter: (_) => _showTooltip(),
       onExit: (_) => _hideTooltip(),
       child: GestureDetector(
-        behavior: HitTestBehavior.translucent,
-        onTap: () {
-          _hideTooltip();
-        },
-        child: widget.child,
-      ),
+          behavior: HitTestBehavior.translucent, onTap: () => _hideTooltip(), child: widget.child),
     );
   }
 }

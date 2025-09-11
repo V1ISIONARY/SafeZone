@@ -8,12 +8,17 @@ import 'package:safezone/frontend/platforms/desktop/pages/content/dashboard/admi
 import 'package:safezone/frontend/platforms/desktop/pages/content/dashboard/content/admin_reports.dart';
 import 'package:safezone/frontend/platforms/desktop/pages/content/dashboard/content/admin_safezones.dart';
 import 'package:safezone/frontend/platforms/desktop/pages/content/dashboard/content/admin_users.dart';
+import 'package:safezone/frontend/platforms/desktop/pages/content/dashboard/initial_header.dart';
+import 'package:safezone/frontend/platforms/desktop/pages/content/help/help-center.dart';
+import 'package:safezone/frontend/platforms/desktop/pages/content/help/helpheader.dart';
 import 'package:safezone/frontend/platforms/desktop/pages/content/map/content/createreport.dart';
 import 'package:safezone/frontend/platforms/desktop/pages/content/map/content/listofgroup.dart';
 import 'package:safezone/frontend/platforms/desktop/pages/content/map/content/marksafezone.dart';
 import 'package:safezone/frontend/platforms/desktop/pages/content/map/map.dart';
 import 'package:safezone/frontend/platforms/desktop/pages/content/map/mapheader.dart';
 import 'package:safezone/frontend/platforms/desktop/pages/content/notification/notification.dart';
+import 'package:safezone/frontend/platforms/desktop/pages/content/settings/account_details.dart';
+import 'package:safezone/frontend/platforms/desktop/pages/content/settings/privacy.dart';
 import 'package:safezone/frontend/platforms/desktop/widget/button/sidenav.dart';
 import 'package:safezone/resource/schema/colors.dart';
 
@@ -54,16 +59,10 @@ class _NavigationDTState extends State<NavigationDT>
         pageContent = AdminInitialScreen();
         break;
       case 2:
-        pageContent = const Center(child: Text('Page 2 Content'));
+        pageContent = HelpCenter();
         break;
       case 3:
-        pageContent = const Center(child: Text('Page 3 Content'));
-        break;
-      case 4:
-        pageContent = const Center(child: Text('Page 4 Content'));
-        break;
-      case 6:
-        pageContent = const Center(child: Text('Page 6 Content'));
+        pageContent = const Center(child: HelpCenter());
         break;
       default:
         pageContent = const Center(child: Text('Default Page'));
@@ -88,6 +87,24 @@ class _NavigationDTState extends State<NavigationDT>
         case 1:
           return ContactDT(
             UserToken: widget.userToken,
+            onClose: () {
+              setState(() {
+                showit = false;
+                Sidenav.selectedComsNotifier.value = null;
+              });
+            },
+          );
+        case 2:
+          return AccountDetails(
+            onClose: () {
+              setState(() {
+                showit = false;
+                Sidenav.selectedComsNotifier.value = null;
+              });
+            },
+          );
+        case 3:
+          return Privacy(
             onClose: () {
               setState(() {
                 showit = false;
@@ -163,6 +180,8 @@ class _NavigationDTState extends State<NavigationDT>
     return Column(
       children: [
         if (_selectedPageIndex == 0) const MapHeader(),
+        if (_selectedPageIndex == 1) const InitialHeader(),
+        if (_selectedPageIndex == 2 || _selectedPageIndex == 3) const HelpHeader(),
         Expanded(
           child: LayoutBuilder(
             builder: (context, constraints) {
@@ -722,21 +741,22 @@ class _NavigationDTState extends State<NavigationDT>
                                                   ),
                                                   SizedBox(height: 10)
                                                 ]),
-                                      Sidenav(
-                                        icon:
-                                            Icons.private_connectivity_outlined,
-                                        label: 'Privacy and Security',
-                                        onTap: () {
-                                          setState(() {
-                                            dropdown = false;
-                                            _selectedPageIndex = 2;
-                                          });
-                                        },
-                                      ),
+                                      // Sidenav(
+                                      //   icon:
+                                      //       Icons.private_connectivity_outlined,
+                                      //   label: 'Privacy and Security',
+                                      //   onTap: () {
+                                      //     setState(() {
+                                      //       dropdown = false;
+                                      //       _selectedPageIndex = 2;
+                                      //     });
+                                      //   },
+                                      // ),
                                       Sidenav(
                                         icon: Icons.settings_outlined,
                                         label: 'Settings',
                                         withDrop: true,
+                                        dropleftPage: true,
                                         hoverTrailing: const [
                                           Text(
                                             'Alt',
@@ -753,18 +773,37 @@ class _NavigationDTState extends State<NavigationDT>
                                         ],
                                         dropdownItems: [
                                           DropdownItem(
-                                              label: 'Privacy and Security',
-                                              id: 'privacy_security',
-                                              onTap: () => print('Controls')),
+                                            label: 'Account Details',
+                                            id: 'account_details',
+                                            onTap: () {
+                                              setState(() {
+                                                if (selectedComs == 2) {
+                                                  showit = !showit;
+                                                  Sidenav.selectedComsNotifier.value = showit ? 2 : null;
+                                                } else {
+                                                  showit = true;
+                                                  selectedComs = 2;
+                                                  Sidenav.selectedComsNotifier.value = 2;
+                                                }
+                                              });
+                                            },
+                                          ),
                                           DropdownItem(
-                                              label: 'Permission Controls',
-                                              id: 'permission_controls',
-                                              onTap: () => print('Controls')),
-                                          DropdownItem(
-                                              label:
-                                                  'Local Data Storage Options',
-                                              id: 'ldso',
-                                              onTap: () => print('Security')),
+                                              label: 'Privacy',
+                                              id: 'privacy',
+                                              onTap: () {
+                                              setState(() {
+                                                if (selectedComs == 3) {
+                                                  showit = !showit;
+                                                  Sidenav.selectedComsNotifier.value = showit ? 3 : null;
+                                                } else {
+                                                  showit = true;
+                                                  selectedComs = 3;
+                                                  Sidenav.selectedComsNotifier.value = 3;
+                                                }
+                                              });
+                                            },
+                                          ),
                                         ],
                                       ),
                                       sharedController.isSidebarCollapsed.value
@@ -793,6 +832,7 @@ class _NavigationDTState extends State<NavigationDT>
                                       Sidenav(
                                         icon: Icons.notifications_outlined,
                                         label: 'Notification',
+                                        dropleftPage: true,
                                         hoverTrailing: const [
                                           Text(
                                             'Alt',
@@ -831,6 +871,7 @@ class _NavigationDTState extends State<NavigationDT>
                                       ),
                                       Sidenav(
                                         icon: Icons.phone_outlined,
+                                        dropleftPage: true,
                                         label: 'Contact',
                                         onTap: () {
                                           setState(() {
@@ -878,6 +919,7 @@ class _NavigationDTState extends State<NavigationDT>
                                       Sidenav(
                                         icon: Icons.help_outline_outlined,
                                         label: 'Help Center',
+                                        withDrop: false,
                                         hoverTrailing: const [
                                           Text(
                                             'Shift',
@@ -895,40 +937,31 @@ class _NavigationDTState extends State<NavigationDT>
                                         onTap: () {
                                           setState(() {
                                             dropdown = false;
-                                            _selectedPageIndex = 6;
+                                            _selectedPageIndex = 2;
                                           });
                                         },
                                       ),
                                       Sidenav(
                                         icon: Icons.support_agent,
-                                        label: 'Chat Support',
+                                        label: 'Terms & Policy',
+                                        withDrop: false,
                                         onTap: () {
                                           setState(() {
                                             dropdown = false;
-                                            _selectedPageIndex = 7;
-                                          });
-                                        },
-                                      ),
-                                      Sidenav(
-                                        icon: Icons.source_outlined,
-                                        label: 'Safety Tips & Resources',
-                                        onTap: () {
-                                          setState(() {
-                                            dropdown = false;
-                                            _selectedPageIndex = 8;
+                                            _selectedPageIndex = 3;
                                           });
                                         },
                                       ),
                                     ]),
                                 const Spacer(),
-                                Container(
-                                  height: 200,
-                                  margin: const EdgeInsets.only(bottom: 20),
-                                  width: double.infinity,
-                                  decoration: BoxDecoration(
-                                      color: Colors.grey.shade300,
-                                      borderRadius: BorderRadius.circular(5)),
-                                ),
+                                // Container(
+                                //   height: 200,
+                                //   margin: const EdgeInsets.only(bottom: 20),
+                                //   width: double.infinity,
+                                //   decoration: BoxDecoration(
+                                //       color: Colors.grey.shade300,
+                                //       borderRadius: BorderRadius.circular(5)),
+                                // ),
                               ],
                             )))));
               }));

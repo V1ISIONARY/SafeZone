@@ -1,15 +1,15 @@
-import 'package:safezone/backend/models/safezoneModel/safezone_model.dart';
+import 'package:safezone/backend/models/dangerzoneModel/incident_report_model.dart';
 import '../../../../../backend/properties/import.dart';
 
-class AdminSafeZonesCard extends StatelessWidget {
-  final SafeZoneModel safeZone;
+class AdminDangerzonesCard extends StatelessWidget {
+  final DangerZoneModel dangerzone;
   final String address;
   final VoidCallback? onTap;
   final VoidCallback? onRefresh;
 
-  const AdminSafeZonesCard({
+  const AdminDangerzonesCard({
     super.key,
-    required this.safeZone,
+    required this.dangerzone,
     required this.address,
     this.onTap,
     this.onRefresh,
@@ -17,7 +17,7 @@ class AdminSafeZonesCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final _StatusData statusData = _getStatusData(safeZone.status);
+    final _StatusData statusData = _getStatusData(dangerzone.status);
 
     return GestureDetector(
       onTap: onTap,
@@ -32,13 +32,18 @@ class AdminSafeZonesCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // ✅ name is non-nullable
             Text(
-              safeZone.name ?? "",
+              dangerzone.name ?? "",
               style: const TextStyle(fontSize: 13, color: textColor),
             ),
             const SizedBox(height: 5),
+
+            // ✅ use report_timestamp from model
             Text(
-              safeZone.reportTimestamp?.split(' 00:00:00 GMT')[0] ?? "",
+              dangerzone.reportTimestamp != null
+                  ? dangerzone.reportTimestamp!.split(' ')[0]
+                  : "",
               style: const TextStyle(fontSize: 11, color: Colors.black45),
             ),
 
@@ -84,7 +89,7 @@ class AdminSafeZonesCard extends StatelessWidget {
     switch (status?.toLowerCase()) {
       case "verified":
         return _StatusData(
-          text: "Verified - Safe Zone",
+          text: "Verified - Danger Zone",
           color: greenStatusColor,
         );
       case "under review":

@@ -8,7 +8,9 @@ import 'package:lottie/lottie.dart';
 import 'package:safezone/backend/architecture/bloc/incident_report/incident_report_bloc.dart';
 import 'package:safezone/backend/architecture/bloc/incident_report/incident_report_event.dart';
 import 'package:safezone/backend/architecture/bloc/incident_report/incident_report_state.dart';
-import 'package:safezone/frontend/platforms/mobile/widgets/cards/admin_reports_card.dart';
+import 'package:safezone/backend/models/dangerzoneModel/incident_report_model.dart';
+import 'package:safezone/frontend/platforms/desktop/pages/content/dashboard/content/admin_reports_details.dart';
+import 'package:safezone/frontend/platforms/desktop/widget/button/admin_reports.dart';
 import 'package:safezone/frontend/platforms/mobile/widgets/loading/loadingstate.dart';
 import 'package:safezone/resource/schema/colors.dart';
 
@@ -89,78 +91,104 @@ class _AdminReportsState extends State<AdminReports> {
     });
   }
 
+  String? _selectedPage;
+  IncidentReportModel? _selectedDangerZone;
+  String? _selectedAddress;
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Color.fromARGB(255, 240, 240, 240),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                DropdownButton<String>(
-                  value: _selectedFilter,
-                  icon: const Icon(Icons.arrow_drop_down),
-                  dropdownColor: Colors.white,
-                  onChanged: (String? newValue) {
-                    if (newValue != null) {
-                      setState(() {
-                        _selectedFilter = newValue;
-                      });
-                    }
-                  },
-                  items: _categories
-                      .map<DropdownMenuItem<String>>(
-                        (String category) => DropdownMenuItem<String>(
-                          value: category,
-                          child: Align(
-                            alignment: Alignment.center,
-                            child: Text(
-                              category,
-                              style: const TextStyle(
-                                  color: textColor, fontSize: 11),
+    return _getPageForNavigation(_selectedPage);
+  }
+
+  Widget _getPageForNavigation(String? page) {
+    switch (page) {
+      case "details":
+        if (_selectedDangerZone == null) {
+          return const Center(child: Text("No SafeZone selected"));
+        }
+        return AdminReportsDetails(
+          reportInfo: _selectedDangerZone!,
+          address: _selectedAddress ?? "Loading...",
+          onBack: () {
+            setState(() {
+              _selectedPage = null;
+              _selectedDangerZone = null;
+              _selectedAddress = null;
+            });
+          },
+        );
+      default:
+        return Scaffold(
+          backgroundColor: Color.fromARGB(255, 240, 240, 240),
+          body: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    DropdownButton<String>(
+                      value: _selectedFilter,
+                      icon: const Icon(Icons.arrow_drop_down),
+                      dropdownColor: Colors.white,
+                      onChanged: (String? newValue) {
+                        if (newValue != null) {
+                          setState(() {
+                            _selectedFilter = newValue;
+                          });
+                        }
+                      },
+                      items: _categories
+                          .map<DropdownMenuItem<String>>(
+                            (String category) => DropdownMenuItem<String>(
+                              value: category,
+                              child: Align(
+                                alignment: Alignment.center,
+                                child: Text(
+                                  category,
+                                  style: const TextStyle(
+                                      color: textColor, fontSize: 11),
+                                ),
+                              ),
                             ),
+                          )
+                          .toList(),
+                    ),
+                    const Spacer(),
+                    // Sort Button
+                    GestureDetector(
+                        onTap: _toggleSortOrder,
+                        child: Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                              color: const Color.fromARGB(10, 0, 0, 0),
+                              borderRadius: BorderRadius.circular(5)),
+                          child: Row(
+                            children: [
+                              Icon(
+                                _isAscending
+                                    ? Icons.arrow_upward
+                                    : Icons.arrow_downward,
+                                size: 15,
+                              ),
+                              const SizedBox(
+                                width: 10,
+                              ),
+                              const Text(
+                                "Sort by Date",
+                                style: TextStyle(color: textColor, fontSize: 11),
+                              ),
+                            ],
                           ),
-                        ),
-                      )
-                      .toList(),
+                        )),
+                  ],
                 ),
-                const Spacer(),
-                // Sort Button
-                GestureDetector(
-                    onTap: _toggleSortOrder,
-                    child: Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                          color: const Color.fromARGB(10, 0, 0, 0),
-                          borderRadius: BorderRadius.circular(5)),
-                      child: Row(
-                        children: [
-                          Icon(
-                            _isAscending
-                                ? Icons.arrow_upward
-                                : Icons.arrow_downward,
-                            size: 15,
-                          ),
-                          const SizedBox(
-                            width: 10,
-                          ),
-                          const Text(
-                            "Sort by Date",
-                            style: TextStyle(color: textColor, fontSize: 11),
-                          ),
-                        ],
-                      ),
-                    )),
-              ],
-            ),
+              ),
+              Expanded(child: _buildFilteredList()),
+            ],
           ),
-          Expanded(child: _buildFilteredList()),
-        ],
-      ),
-    );
+        );
+    }
   }
 
   Widget _buildFilteredList() {
@@ -206,6 +234,13 @@ class _AdminReportsState extends State<AdminReports> {
                 child: AdminReportsCard(
                   reportModel: report,
                   address: _addresses[report.id] ?? "Fetching address...",
+                  onTap: () {
+                    setState(() {
+                      _selectedDangerZone = report;
+                      _selectedAddress = _addresses[report.id] ?? "Fetching address...";
+                      _selectedPage = "details";
+                    });
+                  },
                   onRefresh: _loadReports,
                 ),
               );

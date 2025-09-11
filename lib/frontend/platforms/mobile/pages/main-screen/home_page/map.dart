@@ -288,7 +288,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
     _focusNode.dispose();
     _focusNodeCircles.dispose();
     _focusNodeText.dispose();
-    sharedController.mapSearchTE.dispose();
+    // sharedController.mapSearchTE.dispose();
     _locationSubscription?.cancel();
     super.dispose();
   }

@@ -236,7 +236,7 @@ class _AdminSafezoneDetailsState extends State<AdminSafezoneDetails> {
                     children: [
                       Container(
                         decoration: const BoxDecoration(
-                          color: Color.fromARGB(41, 168, 168, 168),
+                          color: Color.fromARGB(255, 250, 250, 250),
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,

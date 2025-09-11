@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:intl/intl.dart';
 import 'package:safezone/backend/architecture/bloc/adminBloc/analytics/analytics_admin_bloc.dart';
 import 'package:safezone/backend/architecture/bloc/adminBloc/analytics/analytics_admin_event.dart';
 import 'package:safezone/backend/architecture/bloc/adminBloc/analytics/analytics_admin_state.dart';
@@ -128,6 +129,13 @@ class _AdminInitialScreenState extends State<AdminInitialScreen>
     });
   }
 
+  String _getWeekLabel(double x) {
+  // Treat x as "week index since Jan 1, 2025"
+  final baseDate = DateTime(2025, 1, 1);
+  final weekDate = baseDate.add(Duration(days: (x.toInt() * 7)));
+  return DateFormat("d MMM, yyyy").format(weekDate);
+}
+
   Widget _bottomTitleWidgets(double value, TitleMeta meta) {
     const List<String> days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
     const List<String> months = [
@@ -241,144 +249,11 @@ class _AdminInitialScreenState extends State<AdminInitialScreen>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Row(
-                        children: [
-                          ValueListenableBuilder(
-                              valueListenable:
-                                  sharedController.isSidebarCollapsed,
-                              builder: (context, value, child) {
-                                return value
-                                    ? Container(
-                                        margin:
-                                            const EdgeInsets.only(right: 15),
-                                        child: Tooltip(
-                                          message: 'Open sidebar',
-                                          preferBelow: false,
-                                          decoration: BoxDecoration(
-                                            color: Colors.black,
-                                            borderRadius:
-                                                BorderRadius.circular(4),
-                                          ),
-                                          textStyle: const TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 8,
-                                          ),
-                                          child: Material(
-                                            color: Colors.transparent,
-                                            child: InkWell(
-                                              borderRadius:
-                                                  BorderRadius.circular(5),
-                                              hoverColor: Colors.grey.shade300,
-                                              onTap: () {
-                                                sharedController
-                                                        .isSidebarCollapsed
-                                                        .value =
-                                                    !sharedController
-                                                        .isSidebarCollapsed
-                                                        .value;
-                                              },
-                                              child: Padding(
-                                                padding:
-                                                    const EdgeInsets.all(5),
-                                                child: SvgPicture.asset(
-                                                  'lib/resource/svg/open_sidebar.svg',
-                                                  color: Colors.black45,
-                                                  height: 18,
-                                                  width: 19,
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      )
-                                    : ValueListenableBuilder(
-                                        valueListenable:
-                                            sharedController.isSidebarTab,
-                                        builder: (context, tabvalue, child) {
-                                          return tabvalue
-                                              ? Container(
-                                                  margin: const EdgeInsets.only(
-                                                      right: 15),
-                                                  child: Tooltip(
-                                                    message: 'Open tab',
-                                                    preferBelow: false,
-                                                    decoration: BoxDecoration(
-                                                      color: Colors.black,
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              4),
-                                                    ),
-                                                    textStyle: const TextStyle(
-                                                      color: Colors.white,
-                                                      fontSize: 8,
-                                                    ),
-                                                    child: Material(
-                                                      color: Colors.transparent,
-                                                      child: InkWell(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(5),
-                                                        hoverColor: Colors
-                                                            .grey.shade300,
-                                                        onTap: () {
-                                                          sharedController
-                                                                  .isSidebarTabUi
-                                                                  .value =
-                                                              !sharedController
-                                                                  .isSidebarTabUi
-                                                                  .value;
-                                                        },
-                                                        child: Padding(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .all(5),
-                                                          child:
-                                                              SvgPicture.asset(
-                                                            'lib/resource/svg/navigation_tab.svg',
-                                                            color:
-                                                                Colors.black45,
-                                                            height: 18,
-                                                            width: 19,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                )
-                                              : Container(
-                                                  margin: const EdgeInsets.only(
-                                                      left: 10),
-                                                );
-                                        });
-                              }),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                'Dashboard Overview',
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black87,
-                                ),
-                              ),
-                              const SizedBox(height: 5),
-                              Text(
-                                'Last updated: ${DateTime.now().toString()}',
-                                style: TextStyle(
-                                  fontSize: 9,
-                                  color: Colors.grey[600],
-                                ),
-                              ),
-                            ],
-                          )
-                        ],
-                      ),
                       Container(
                           color: Colors.transparent,
-                          padding: EdgeInsets.symmetric(vertical: 10),
-                          margin: EdgeInsets.only(top: 10),
+                          margin: EdgeInsets.only(
+                            bottom: 5
+                          ),
                           child: SingleChildScrollView(
                             scrollDirection: Axis.horizontal,
                             child: Row(
@@ -462,14 +337,14 @@ class _AdminInitialScreenState extends State<AdminInitialScreen>
                           'Incident Reports by Type',
                           style: TextStyle(
                             fontSize: 13,
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
                         const SizedBox(height: 16),
                         LayoutBuilder(
                           builder: (context, constraints) {
                             bool useColumn =
-                                constraints.maxWidth <= 855; // changed from 900
+                                constraints.maxWidth <= 855;
                             print(
                                 "Current width: ${constraints.maxWidth}, useColumn: $useColumn");
                             return Container(
@@ -752,32 +627,25 @@ class _AdminInitialScreenState extends State<AdminInitialScreen>
                     ),
                   ),
                   Container(
-                      child: Column(
+                    child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 10, vertical: 10),
-                          margin: EdgeInsets.only(top: 5),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(5),
-                            color: const Color.fromARGB(10, 0, 0, 0),
-                          ),
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          margin: EdgeInsets.only(bottom: 5),
                           child: LayoutBuilder(
                             builder: (context, constraints) {
                               bool isNarrow = constraints.maxWidth <= 473;
-
                               return isNarrow
                                   ? Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         Text(
                                           'Analytics',
                                           style: const TextStyle(
                                             fontSize: 13,
-                                            fontWeight: FontWeight.bold,
+                                            fontWeight: FontWeight.w600,
                                           ),
                                         ),
                                         const SizedBox(height: 8),
@@ -816,80 +684,63 @@ class _AdminInitialScreenState extends State<AdminInitialScreen>
                                           builder: (context) {
                                             return Theme(
                                               data: Theme.of(context).copyWith(
-                                                popupMenuTheme:
-                                                    PopupMenuThemeData(
-                                                  color: const Color.fromARGB(
-                                                      255, 240, 240, 240),
+                                                popupMenuTheme: PopupMenuThemeData(
+                                                  color: Colors.white,
                                                   textStyle: const TextStyle(
                                                     color: Colors.black87,
                                                     fontSize: 12,
                                                   ),
                                                   shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            5),
+                                                    borderRadius: BorderRadius.circular(5),
                                                   ),
                                                   elevation: 0,
                                                 ),
                                               ),
                                               child: PopupMenuButton<String>(
                                                 tooltip: '',
-                                                offset: const Offset(0, 40),
+                                                offset: const Offset(-10, 40),
                                                 child: Container(
                                                   height: 30,
-                                                  width: 150,
-                                                  padding: const EdgeInsets
-                                                      .symmetric(
-                                                      horizontal: 12,
-                                                      vertical: 6),
+                                                  width: 130,
+                                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                                                   decoration: BoxDecoration(
                                                     color: Colors.white,
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            20),
+                                                    borderRadius: BorderRadius.circular(10),
                                                     border: Border.all(
                                                       width: 0.5,
                                                       color: Colors.black38,
                                                     ),
-                                                    boxShadow: [
-                                                      BoxShadow(
-                                                        color: Colors.black
-                                                            .withOpacity(0.1),
-                                                        spreadRadius: 1,
-                                                        blurRadius: 6,
-                                                        offset:
-                                                            const Offset(0, 3),
-                                                      ),
-                                                    ],
                                                   ),
                                                   child: Row(
                                                     children: [
-                                                      const Icon(
-                                                        Icons.calendar_month,
-                                                        size: 13,
-                                                        color: Colors.black54,
-                                                      ),
-                                                      Expanded(
-                                                        child: Center(
-                                                          child: Text(
-                                                            selectedCategory,
-                                                            style:
-                                                                const TextStyle(
-                                                              color:
-                                                                  Colors.black,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w500,
-                                                              fontSize: 11,
-                                                            ),
-                                                          ),
+                                                      Container(
+                                                        margin: const EdgeInsets.only(right: 5),
+                                                        child: const Icon(
+                                                          Icons.calendar_month,
+                                                          size: 13,
+                                                          color: Colors.black54,
                                                         ),
                                                       ),
-                                                      const Icon(
-                                                        Icons
-                                                            .keyboard_arrow_down_sharp,
-                                                        size: 16,
-                                                        color: Colors.black54,
+                                                      Expanded(
+                                                        child: Text(
+                                                          selectedCategory,
+                                                          textAlign: TextAlign.center,
+                                                          style: const TextStyle(
+                                                            color: Colors.black,
+                                                            fontWeight: FontWeight.w500,
+                                                            fontSize: 11,
+                                                          ),
+                                                          overflow: TextOverflow.ellipsis,
+                                                          maxLines: 1,
+                                                        ),
+                                                      ),
+                                                      Container(
+                                                        margin: const EdgeInsets.only(left: 5),
+                                                        child: const Icon(
+                                                          Icons.keyboard_arrow_down_sharp,
+                                                          size: 16,
+                                                          color: Colors.black54,
+                                                        ),
                                                       ),
                                                     ],
                                                   ),
@@ -897,26 +748,23 @@ class _AdminInitialScreenState extends State<AdminInitialScreen>
                                                 onSelected: (String category) {
                                                   _updateGraph(category);
                                                 },
-                                                itemBuilder:
-                                                    (BuildContext context) {
-                                                  return [
-                                                    'Monthly',
-                                                    'Weekly',
-                                                    'Today'
-                                                  ].map((category) {
-                                                    return PopupMenuItem<
-                                                        String>(
+                                                itemBuilder: (BuildContext context) {
+                                                  return ['Monthly', 'Weekly', 'Today'].map((category) {
+                                                    return PopupMenuItem<String>(
                                                       value: category,
+                                                      padding: EdgeInsets.zero,
                                                       child: SizedBox(
-                                                        width: 89,
-                                                        child: Text(
-                                                          category,
-                                                          style:
-                                                              const TextStyle(
-                                                            color: Colors.black,
-                                                            fontWeight:
-                                                                FontWeight.w500,
-                                                            fontSize: 11,
+                                                        width: 110,
+                                                        child: Padding(
+                                                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                                          child: Text(
+                                                            category,
+                                                            overflow: TextOverflow.ellipsis,
+                                                            style: const TextStyle(
+                                                              color: Colors.black,
+                                                              fontWeight: FontWeight.w500,
+                                                              fontSize: 11,
+                                                            ),
                                                           ),
                                                         ),
                                                       ),
@@ -926,7 +774,7 @@ class _AdminInitialScreenState extends State<AdminInitialScreen>
                                               ),
                                             );
                                           },
-                                        ),
+                                        )
                                       ],
                                     )
                                   : Row(
@@ -939,7 +787,7 @@ class _AdminInitialScreenState extends State<AdminInitialScreen>
                                           'Analytics',
                                           style: const TextStyle(
                                             fontSize: 13,
-                                            fontWeight: FontWeight.bold,
+                                            fontWeight: FontWeight.w600,
                                           ),
                                         ),
                                         const Spacer(),
@@ -977,80 +825,63 @@ class _AdminInitialScreenState extends State<AdminInitialScreen>
                                           builder: (context) {
                                             return Theme(
                                               data: Theme.of(context).copyWith(
-                                                popupMenuTheme:
-                                                    PopupMenuThemeData(
-                                                  color: const Color.fromARGB(
-                                                      255, 240, 240, 240),
+                                                popupMenuTheme: PopupMenuThemeData(
+                                                  color: Colors.white,
                                                   textStyle: const TextStyle(
                                                     color: Colors.black87,
                                                     fontSize: 12,
                                                   ),
                                                   shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            5),
+                                                    borderRadius: BorderRadius.circular(5),
                                                   ),
                                                   elevation: 0,
                                                 ),
                                               ),
                                               child: PopupMenuButton<String>(
                                                 tooltip: '',
-                                                offset: const Offset(0, 40),
+                                                offset: const Offset(-10, 40),
                                                 child: Container(
                                                   height: 30,
-                                                  width: 150,
-                                                  padding: const EdgeInsets
-                                                      .symmetric(
-                                                      horizontal: 12,
-                                                      vertical: 6),
+                                                  width: 130,
+                                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                                                   decoration: BoxDecoration(
                                                     color: Colors.white,
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            20),
+                                                    borderRadius: BorderRadius.circular(10),
                                                     border: Border.all(
                                                       width: 0.5,
                                                       color: Colors.black38,
                                                     ),
-                                                    boxShadow: [
-                                                      BoxShadow(
-                                                        color: Colors.black
-                                                            .withOpacity(0.1),
-                                                        spreadRadius: 1,
-                                                        blurRadius: 6,
-                                                        offset:
-                                                            const Offset(0, 3),
-                                                      ),
-                                                    ],
                                                   ),
                                                   child: Row(
                                                     children: [
-                                                      const Icon(
-                                                        Icons.calendar_month,
-                                                        size: 13,
-                                                        color: Colors.black54,
-                                                      ),
-                                                      Expanded(
-                                                        child: Center(
-                                                          child: Text(
-                                                            selectedCategory,
-                                                            style:
-                                                                const TextStyle(
-                                                              color:
-                                                                  Colors.black,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w500,
-                                                              fontSize: 11,
-                                                            ),
-                                                          ),
+                                                      Container(
+                                                        margin: const EdgeInsets.only(right: 5),
+                                                        child: const Icon(
+                                                          Icons.calendar_month,
+                                                          size: 13,
+                                                          color: Colors.black54,
                                                         ),
                                                       ),
-                                                      const Icon(
-                                                        Icons
-                                                            .keyboard_arrow_down_sharp,
-                                                        size: 16,
-                                                        color: Colors.black54,
+                                                      Expanded(
+                                                        child: Text(
+                                                          selectedCategory,
+                                                          textAlign: TextAlign.center,
+                                                          style: const TextStyle(
+                                                            color: Colors.black,
+                                                            fontWeight: FontWeight.w500,
+                                                            fontSize: 11,
+                                                          ),
+                                                          overflow: TextOverflow.ellipsis,
+                                                          maxLines: 1,
+                                                        ),
+                                                      ),
+                                                      Container(
+                                                        margin: const EdgeInsets.only(left: 5),
+                                                        child: const Icon(
+                                                          Icons.keyboard_arrow_down_sharp,
+                                                          size: 16,
+                                                          color: Colors.black54,
+                                                        ),
                                                       ),
                                                     ],
                                                   ),
@@ -1058,26 +889,23 @@ class _AdminInitialScreenState extends State<AdminInitialScreen>
                                                 onSelected: (String category) {
                                                   _updateGraph(category);
                                                 },
-                                                itemBuilder:
-                                                    (BuildContext context) {
-                                                  return [
-                                                    'Monthly',
-                                                    'Weekly',
-                                                    'Today'
-                                                  ].map((category) {
-                                                    return PopupMenuItem<
-                                                        String>(
+                                                itemBuilder: (BuildContext context) {
+                                                  return ['Monthly', 'Weekly', 'Today'].map((category) {
+                                                    return PopupMenuItem<String>(
                                                       value: category,
+                                                      padding: EdgeInsets.zero,
                                                       child: SizedBox(
-                                                        width: 89,
-                                                        child: Text(
-                                                          category,
-                                                          style:
-                                                              const TextStyle(
-                                                            color: Colors.black,
-                                                            fontWeight:
-                                                                FontWeight.w500,
-                                                            fontSize: 11,
+                                                        width: 110,
+                                                        child: Padding(
+                                                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                                          child: Text(
+                                                            category,
+                                                            overflow: TextOverflow.ellipsis,
+                                                            style: const TextStyle(
+                                                              color: Colors.black,
+                                                              fontWeight: FontWeight.w500,
+                                                              fontSize: 11,
+                                                            ),
                                                           ),
                                                         ),
                                                       ),
@@ -1087,186 +915,298 @@ class _AdminInitialScreenState extends State<AdminInitialScreen>
                                               ),
                                             );
                                           },
-                                        ),
+                                        )
                                       ],
                                     );
                             },
                           )),
                       Container(
-                        height: 300,
-                        margin: const EdgeInsets.only(
-                          bottom: 15,
-                        ),
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 10),
+                        height: 310,
+                        margin: const EdgeInsets.only(bottom: 15),
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 30),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(5),
-                          color: const Color.fromARGB(10, 0, 0, 0),
+                          color: Color.fromARGB(255, 250, 250, 250)
                         ),
                         child: Column(
                           children: [
                             Expanded(
-                              child: Container(
-                                  padding: EdgeInsets.only(right: 30),
-                                  child: LineChart(
-                                    LineChartData(
-                                      titlesData: FlTitlesData(
-                                        leftTitles: AxisTitles(
-                                          sideTitles: SideTitles(
-                                            showTitles: true,
-                                            getTitlesWidget: _leftTitleWidgets,
-                                            reservedSize: 30,
-                                          ),
-                                        ),
-                                        bottomTitles: AxisTitles(
-                                          sideTitles: SideTitles(
-                                            showTitles: true,
-                                            getTitlesWidget:
-                                                _bottomTitleWidgets,
-                                            reservedSize: 22,
-                                            interval:
-                                                selectedCategory == 'Today'
-                                                    ? 4
-                                                    : 1,
-                                          ),
-                                        ),
-                                        topTitles: const AxisTitles(
-                                            sideTitles:
-                                                SideTitles(showTitles: false)),
-                                        rightTitles: const AxisTitles(
-                                            sideTitles:
-                                                SideTitles(showTitles: false)),
-                                      ),
-                                      borderData: FlBorderData(
-                                        show: true,
-                                        border: Border.all(
-                                          color: Colors.grey.withOpacity(0.2),
-                                          width: 1,
+                              child: Padding(
+                                padding: const EdgeInsets.only(right: 30),
+                                child: LineChart(
+                                  LineChartData(
+                                    titlesData: FlTitlesData(
+                                      leftTitles: AxisTitles(
+                                        sideTitles: SideTitles(
+                                          showTitles: true,
+                                          getTitlesWidget: _leftTitleWidgets,
+                                          reservedSize: 30,
                                         ),
                                       ),
-                                      gridData: FlGridData(
-                                        show: true,
-                                        drawVerticalLine: true,
-                                        horizontalInterval: 1,
-                                        verticalInterval:
-                                            selectedCategory == 'Today' ? 4 : 1,
-                                        getDrawingHorizontalLine: (value) {
-                                          return FlLine(
-                                            color: Colors.grey.withOpacity(0.1),
-                                            strokeWidth: 1,
-                                          );
-                                        },
-                                        getDrawingVerticalLine: (value) {
-                                          return FlLine(
-                                            color: Colors.grey.withOpacity(0.1),
-                                            strokeWidth: 1,
-                                          );
-                                        },
-                                      ),
-                                      lineBarsData: [
-                                        LineChartBarData(
-                                          spots: graphData[selectedCategory]!,
-                                          isCurved: true,
-                                          color:
-                                              widgetPricolor.withOpacity(0.6),
-                                          barWidth: 3,
-                                          isStrokeCapRound: true,
-                                          belowBarData: BarAreaData(
-                                            show: true,
-                                            color:
-                                                widgetPricolor.withOpacity(0.1),
-                                          ),
-                                          dotData: FlDotData(show: true),
+                                      bottomTitles: AxisTitles(
+                                        sideTitles: SideTitles(
+                                          showTitles: true,
+                                          getTitlesWidget: _bottomTitleWidgets,
+                                          reservedSize: 22,
                                         ),
-                                      ],
-                                      minX: 0,
-                                      maxX: selectedCategory == 'Monthly'
-                                          ? 30
-                                          : selectedCategory == 'Weekly'
-                                              ? 6
-                                              : 23,
-                                      minY: 0,
-                                      maxY: graphData[selectedCategory]!.isEmpty
-                                          ? 10
-                                          : graphData[selectedCategory]!
-                                                  .map((spot) => spot.y)
-                                                  .reduce(max) *
-                                              1.2,
+                                      ),
+                                      topTitles: const AxisTitles(
+                                          sideTitles: SideTitles(showTitles: false)),
+                                      rightTitles: const AxisTitles(
+                                          sideTitles: SideTitles(showTitles: false)),
                                     ),
-                                  )),
+                                    borderData: FlBorderData(
+                                      show: true,
+                                      border: Border.all(
+                                        color: Colors.grey.withOpacity(0.2),
+                                        width: 1,
+                                      ),
+                                    ),
+                                    gridData: FlGridData(
+                                      show: true,
+                                      drawVerticalLine: true,
+                                      horizontalInterval: 5,
+                                      verticalInterval: 1,
+                                      getDrawingHorizontalLine: (value) => FlLine(
+                                        color: Colors.grey.withOpacity(0.1),
+                                        strokeWidth: 1,
+                                      ),
+                                      getDrawingVerticalLine: (value) => FlLine(
+                                        color: Colors.grey.withOpacity(0.1),
+                                        strokeWidth: 1,
+                                      ),
+                                    ),
+                                    lineTouchData: LineTouchData(
+                                      enabled: true,
+                                      touchTooltipData: LineTouchTooltipData(
+                                        tooltipBgColor: Colors.white,
+                                        tooltipRoundedRadius: 5,
+                                        tooltipBorder: BorderSide(
+                                          color: Colors.black38,
+                                          width: 0.2
+                                        ),
+                                        getTooltipItems: (touchedSpots) {
+                                          return touchedSpots.map((spot) {
+                                            final weekDate = _getWeekLabel(spot.x);
+                                            final commits = spot.y.toInt();
+                                            return LineTooltipItem(
+                                              "Week of $weekDate\n",
+                                              const TextStyle(
+                                                fontSize: 10,
+                                                color: Colors.black38,
+                                                fontWeight: FontWeight.w500
+                                              ),
+                                              children: [
+                                                const TextSpan(
+                                                  text: "Numeroes  ",
+                                                  style: TextStyle(
+                                                    color: Colors.black,
+                                                    fontSize: 10,
+                                                  ),
+                                                ),
+                                                const TextSpan(
+                                                  text: "samplu  ",
+                                                  style: TextStyle(
+                                                    color: Colors.black,
+                                                    fontSize: 10,
+                                                  ),
+                                                ),
+                                              ],
+                                            );
+                                          }).toList();
+                                        },
+                                      ),
+                                      getTouchedSpotIndicator: (barData, spotIndexes) {
+                                        return spotIndexes.map((index) {
+                                          return TouchedSpotIndicatorData(
+                                            FlLine(color: Colors.transparent),
+                                            FlDotData(
+                                              show: true,
+                                              getDotPainter: (spot, percent, barData, index) {
+                                                return FlDotCirclePainter(
+                                                  radius: 5,
+                                                  color: widgetPricolor,
+                                                  strokeWidth: 2,
+                                                  strokeColor: Colors.white,
+                                                );
+                                              },
+                                            ),
+                                          );
+                                        }).toList();
+                                      },
+                                    ),
+
+                                    lineBarsData: [
+                                      LineChartBarData(
+                                        spots: graphData[selectedCategory]!,
+                                        isCurved: true,
+                                        color: widgetPricolor.withOpacity(0.8),
+                                        barWidth: 2.5,
+                                        isStrokeCapRound: true,
+                                        belowBarData: BarAreaData(
+                                          show: true,
+                                          gradient: LinearGradient(
+                                            begin: Alignment.topCenter,
+                                            end: Alignment.bottomCenter,
+                                            colors: [
+                                              widgetPricolor.withOpacity(0.3),
+                                              widgetPricolor.withOpacity(0.0),
+                                            ],
+                                          ),
+                                        ),
+                                        dotData: FlDotData(show: false),
+                                      ),
+                                    ],
+                                    minX: 0,
+                                    maxX: selectedCategory == 'Monthly'
+                                        ? 30
+                                        : selectedCategory == 'Weekly'
+                                            ? 6
+                                            : 23,
+                                    minY: 0,
+                                    maxY: graphData[selectedCategory]!.isEmpty
+                                        ? 10
+                                        : graphData[selectedCategory]!
+                                                .map((spot) => spot.y)
+                                                .reduce(max) *
+                                            1.2,
+                                  ),
+                                ),
+                              ),
                             ),
                           ],
                         ),
-                      ),
+                      )
                     ],
                   )),
-                  const SizedBox(height: 30),
+                  const SizedBox(height: 5),
                   const Text(
                     'Detailed Metrics',
                     style: TextStyle(
                       fontSize: 13,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
-                  const SizedBox(height: 16),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: MetricTile(
-                          title: 'Verified Safe Zones',
-                          value: totalVerifiedSafeZones,
-                          total: totalSafeZones,
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: MetricTile(
-                          title: 'Pending Verification',
-                          value: totalSafeZones - totalVerifiedSafeZones,
-                          total: totalSafeZones,
-                        ),
-                      ),
-                    ],
-                  ),
                   const SizedBox(height: 20),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: MetricTile(
-                          title: 'Verified Reports',
-                          value: verifiedIncidentReports,
-                          total: totalIncidentReports,
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: MetricTile(
-                          title: 'Pending Reports',
-                          value: pendingIncidentReports,
-                          total: totalIncidentReports,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: MetricTile(
-                          title: 'Female Users',
-                          value: femaleUsers,
-                          total: totalUsers,
-                        ),
-                      ),
-                      const SizedBox(width: 20),
-                      Expanded(
-                        child: MetricTile(
-                          title: 'Male Users',
-                          value: maleUsers,
-                          total: totalUsers,
-                        ),
-                      ),
-                    ],
+                  LayoutBuilder(
+                    builder: (context, constraints) {
+                      bool isNarrow = constraints.maxWidth <= 473;
+                      return isNarrow
+                          ? Column(
+                              children: [
+                                MetricTile(
+                                  title: 'Verified Safe Zones',
+                                  value: totalVerifiedSafeZones,
+                                  total: totalSafeZones,
+                                  color: Colors.lightBlue,
+                                ),
+                                const SizedBox(height: 16),
+                                MetricTile(
+                                  title: 'Pending Verification',
+                                  value: totalSafeZones - totalVerifiedSafeZones,
+                                  total: totalSafeZones,
+                                  color: Colors.orange,
+                                ),
+                                const SizedBox(height: 20),
+                                MetricTile(
+                                  title: 'Verified Reports',
+                                  value: verifiedIncidentReports,
+                                  total: totalIncidentReports,
+                                  color: Colors.green,
+                                ),
+                                const SizedBox(height: 16),
+                                MetricTile(
+                                  title: 'Pending Reports',
+                                  value: pendingIncidentReports,
+                                  total: totalIncidentReports,
+                                  color: Colors.red,
+                                ),
+                                const SizedBox(height: 20),
+                                MetricTile(
+                                  title: 'Female Users',
+                                  value: femaleUsers,
+                                  total: totalUsers,
+                                  color: Colors.pink,
+                                ),
+                                const SizedBox(height: 16),
+                                MetricTile(
+                                  title: 'Male Users',
+                                  value: maleUsers,
+                                  total: totalUsers,
+                                  color: Colors.blue,
+                                ),
+                              ],
+                            )
+                        : Column(
+                            children: [
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: MetricTile(
+                                      title: 'Verified Safe Zones',
+                                      value: totalVerifiedSafeZones,
+                                      total: totalSafeZones,
+                                      color: Colors.lightBlue,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 16),
+                                  Expanded(
+                                    child: MetricTile(
+                                      title: 'Pending Verification',
+                                      value: totalSafeZones - totalVerifiedSafeZones,
+                                      total: totalSafeZones,
+                                      color: Colors.orange,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 20),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: MetricTile(
+                                      title: 'Verified Reports',
+                                      value: verifiedIncidentReports,
+                                      total: totalIncidentReports,
+                                      color: Colors.green,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 16),
+                                  Expanded(
+                                    child: MetricTile(
+                                      title: 'Pending Reports',
+                                      value: pendingIncidentReports,
+                                      total: totalIncidentReports,
+                                      color: Colors.red,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 20),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: MetricTile(
+                                      title: 'Female Users',
+                                      value: femaleUsers,
+                                      total: totalUsers,
+                                      color: Colors.pink,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 20),
+                                  Expanded(
+                                    child: MetricTile(
+                                      title: 'Male Users',
+                                      value: maleUsers,
+                                      total: totalUsers,
+                                      color: Colors.blue,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          );
+                    }
                   ),
                   const SizedBox(height: 30),
                 ],
@@ -1332,7 +1272,7 @@ class SummaryCard extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(5),
-          color: const Color.fromARGB(10, 0, 0, 0),
+          color: Color.fromARGB(255, 250, 250, 250)
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -1389,69 +1329,76 @@ class MetricTile extends StatelessWidget {
   final String title;
   final int value;
   final int total;
+  final Color color;
 
   const MetricTile({
     super.key,
     required this.title,
     required this.value,
     required this.total,
+    required this.color,
   });
 
   @override
   Widget build(BuildContext context) {
     double percentage = total == 0 ? 0 : (value / total * 100);
-    double progressWidth = total == 0 ? 0 : (value / total * 100);
 
-    return GestureDetector(
-      child: Container(
-        height: 90,
-        margin: const EdgeInsets.only(bottom: 15),
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(5),
-          color: const Color.fromARGB(10, 0, 0, 0),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
           children: [
             Text(
-              title,
-              style: TextStyle(
-                color: Colors.black,
+              title.toUpperCase(),
+              style: const TextStyle(
                 fontSize: 11,
+                fontWeight: FontWeight.w600,
+                color: Colors.black54,
               ),
             ),
             Spacer(),
             Text(
-              '$value / $total (${percentage.toStringAsFixed(1)}%)',
-              style: TextStyle(
-                fontSize: 20,
-                color: Colors.grey[600],
+              "$value / $total",
+              style: const TextStyle(
+                fontSize: 12,
+                color: Colors.grey,
+                fontWeight: FontWeight.w500,
               ),
             ),
-            const Spacer(),
+          ]
+        ),
+        const SizedBox(height: 6),
+        Stack(
+          children: [
             Container(
-              height: 10,
+              height: 22,
               width: double.infinity,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(2),
                 color: Colors.black12,
+                borderRadius: BorderRadius.circular(5),
               ),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Container(
-                  width: progressWidth,
-                  height: double.infinity,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(2),
-                    color: widgetPricolor,
-                  ),
+            ),
+            Container(
+              height: 22,
+              width: (percentage / 100) * MediaQuery.of(context).size.width * 0.35,
+              decoration: BoxDecoration(
+                color: color,
+                borderRadius: BorderRadius.circular(5),
+              ),
+              alignment: Alignment.centerRight,
+              padding: const EdgeInsets.only(right: 8),
+              child: Text(
+                "${percentage.toStringAsFixed(0)}%",
+                style: const TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
                 ),
               ),
             ),
           ],
         ),
-      ),
+      ],
     );
   }
 }
