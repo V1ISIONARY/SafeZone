@@ -8,6 +8,7 @@ import 'package:safezone/backend/architecture/bloc/authBloc/auth_event.dart';
 import 'package:safezone/backend/architecture/bloc/authBloc/auth_state.dart';
 import 'package:safezone/backend/architecture/bloc/notificationBloc/notification_polling.dart';
 import 'package:safezone/backend/properties/properties.dart';
+import 'package:safezone/frontend/platforms/mobile/widgets/Dialogs/login_error_dialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../../backend/properties/import.dart';
@@ -382,6 +383,14 @@ class _LoginMDState extends State<LoginMD> {
 
                         print(state);
                       } else if (state is LoginError) {
+                        showDialog(
+                          context: context,
+                          barrierDismissible:
+                              false, 
+                          builder: (BuildContext context) {
+                            return LoginErrorDialog(message: state.message);
+                          },
+                        );
                         print(state.message);
                       }
                     },
