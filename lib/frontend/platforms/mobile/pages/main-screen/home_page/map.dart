@@ -1282,18 +1282,13 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                                       horizontal: 15),
                                               child: Row(children: [
                                                 _circles.isEmpty
-                                                    ? Center(
+                                                    ? const Center(
                                                         child: SizedBox(
-                                                          width: 20,
-                                                          height: 20,
+                                                          
                                                           child:
-                                                              const CircularProgressIndicator(
-                                                            strokeWidth: 0.8,
-                                                            color:
-                                                                widgetPricolor,
-                                                          ),
+                                                              Text("No Circle", style: TextStyle(fontSize: 11, color: Colors.black54)
                                                         ),
-                                                      )
+                                                      ))
                                                     : Column(
                                                         mainAxisAlignment:
                                                             MainAxisAlignment
