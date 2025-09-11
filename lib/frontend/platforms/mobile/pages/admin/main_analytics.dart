@@ -28,7 +28,6 @@ class _MainAnalyticsState extends State<MainAnalytics>
       const AdminInitialScreen(),
       const AdminReportsUsers(),
       const AdminSafezones(),
-      const AdminDangerzones(),
       const AdminReports(),
     ];
 
@@ -76,8 +75,7 @@ class _MainAnalyticsState extends State<MainAnalytics>
         _bottomAppBarItem("Overview", 0),
         _bottomAppBarItem("Users", 1),
         _bottomAppBarItem("Safezone", 2),
-        _bottomAppBarItem("Dangerzone", 3),
-        _bottomAppBarItem("Incidents", 4),
+        _bottomAppBarItem("Incidents", 3),
       ]),
     );
   }

@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 import 'package:lottie/lottie.dart';
 import 'package:safezone/backend/architecture/bloc/safezoneBloc/safezone_state.dart'
     show SafeZoneError, SafeZoneLoading, SafeZoneState, SafeZonesLoaded;
+import 'package:safezone/frontend/platforms/mobile/widgets/cards/safe_zone_history_card.dart';
 
 import '../../../../../backend/architecture/bloc/safezoneBloc/safezone_bloc.dart'
     show SafeZoneBloc;
@@ -206,7 +207,6 @@ class _AdminSafezonesState extends State<AdminSafezones> {
               }
               return Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                // child: SafezoneHistoryCard(safeZone: filteredZones[index]),
                 child: AdminSafeZonesCard(
                     safeZone: safeZone,
                     address: _addresses[safeZone.id] ?? "Fetching address...",

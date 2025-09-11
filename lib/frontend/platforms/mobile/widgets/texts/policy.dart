@@ -4,10 +4,12 @@ class PolicyText extends StatelessWidget {
 
   final String title;
   final String description; 
+  final bool? webText;
   const PolicyText({
     super.key,
     required this.title,
-    required this.description
+    required this.description,
+    this.webText = false,
   });
 
   @override
@@ -30,9 +32,13 @@ class PolicyText extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  CategoryText(text: title),
+                  CategoryText(
+                    text: title,
+                    webText: webText
+                  ),
                   CategoryDescripText(
                     text: description,
+                    webText: webText
                   ),
                 ],
               ),

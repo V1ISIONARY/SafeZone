@@ -134,7 +134,6 @@ class _SafeZoneHistoryDetailsDTState extends State<SafeZoneHistoryDetailsDT> {
   }
 
   String? selectedInternalPage;
-
   @override
   Widget build(BuildContext context) {
     return _getPageForNavigation(selectedInternalPage);
@@ -153,9 +152,9 @@ class _SafeZoneHistoryDetailsDTState extends State<SafeZoneHistoryDetailsDT> {
         );
       default:
         return Scaffold(
-            backgroundColor: const Color.fromARGB(255, 250, 250, 250),
+            backgroundColor: Colors.white,
             appBar: AppBar(
-              backgroundColor: const Color.fromARGB(255, 250, 250, 250),
+              backgroundColor: Colors.white,
               automaticallyImplyLeading: false,
               centerTitle: true,
               title: Transform.translate(
@@ -188,7 +187,7 @@ class _SafeZoneHistoryDetailsDTState extends State<SafeZoneHistoryDetailsDT> {
                   children: [
                     Container(
                       decoration: const BoxDecoration(
-                        color: Color.fromARGB(255, 240, 240, 240),
+                        color: Colors.white
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -233,7 +232,7 @@ class _SafeZoneHistoryDetailsDTState extends State<SafeZoneHistoryDetailsDT> {
                               margin: const EdgeInsets.only(bottom: 15),
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 16, vertical: 16),
-                              color: Colors.white,
+                              color: const Color.fromARGB(255, 250, 250, 250),
                               child: Row(
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 mainAxisAlignment: MainAxisAlignment.start,
@@ -273,7 +272,8 @@ class _SafeZoneHistoryDetailsDTState extends State<SafeZoneHistoryDetailsDT> {
                           Container(
                               width: double.infinity,
                               padding: const EdgeInsets.symmetric(
-                                  horizontal: 16, vertical: 16),
+                                horizontal: 16, vertical: 16
+                              ),
                               child: Column(
                                 children: [
                                   ClipRRect(
@@ -347,8 +347,7 @@ class _SafeZoneHistoryDetailsDTState extends State<SafeZoneHistoryDetailsDT> {
                                         width: 50,
                                         height: 40,
                                         decoration: BoxDecoration(
-                                          color: widget.safezonemodel.scale ==
-                                                  ratingValue
+                                          color: widget.safezonemodel.scale == ratingValue
                                               ? btnColor.withOpacity(0.1)
                                               : bgColor,
                                           border: Border.all(

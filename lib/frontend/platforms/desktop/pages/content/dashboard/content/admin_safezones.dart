@@ -28,10 +28,6 @@ class _AdminSafezonesState extends State<AdminSafezones> {
   String _selectedFilter = "All";
   final Map<int, String> _addresses = {};
 
-  String? _selectedPage;
-  SafeZoneModel? _selectedSafeZone;
-  String? _selectedAddress;
-
   final List<String> _categories = [
     'All',
     'Verified',
@@ -62,6 +58,10 @@ class _AdminSafezonesState extends State<AdminSafezones> {
       _isAscending = !_isAscending;
     });
   }
+
+  SafeZoneModel? _selectedSafeZone;
+  String? _selectedAddress;
+  String? _selectedPage;
 
   @override
   Widget build(BuildContext context) {

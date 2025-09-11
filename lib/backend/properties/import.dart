@@ -51,7 +51,6 @@ export 'package:safezone/frontend/platforms/mobile/widgets/cards/admin_safezones
 
 export 'package:safezone/frontend/platforms/mobile/widgets/buttons/userinfomartion.dart';
 
-export 'package:safezone/frontend/platforms/mobile/pages/admin/admin_dangerzones.dart';
 export 'package:safezone/frontend/platforms/mobile/pages/admin/admin_initial_screen.dart';
 export 'package:safezone/frontend/platforms/mobile/pages/admin/admin_reports.dart';
 export 'package:safezone/frontend/platforms/mobile/pages/admin/admin_users.dart';

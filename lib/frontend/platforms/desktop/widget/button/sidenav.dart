@@ -64,6 +64,13 @@ class _SidenavState extends State<Sidenav> {
     Sidenav.selectedDropleftParent.removeListener(_onSelectedChanged);
     Sidenav.selectedDropdownId.removeListener(_onSelectedChanged);
     Sidenav.selectedDropleftId.removeListener(_onSelectedChanged);
+    Sidenav.selectedComsNotifier.removeListener(_onSelectedChanged);
+
+    Sidenav.selectedNormalParent.value = "Zones";
+    Sidenav.selectedDropleftParent.value = null;
+    Sidenav.selectedDropdownId.value = null;
+    Sidenav.selectedDropleftId.value = null;
+    Sidenav.selectedComsNotifier.value = null;
     super.dispose();
   }
 

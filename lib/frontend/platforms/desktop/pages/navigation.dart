@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
+import 'package:safezone/backend/architecture/bloc/notificationBloc/notification_polling.dart';
 import 'package:safezone/backend/properties/properties.dart';
 import 'package:safezone/frontend/platforms/desktop/pages/content/contact.dart';
-import 'package:safezone/frontend/platforms/desktop/pages/content/dashboard/content/admin_dangerzones.dart';
 import 'package:safezone/frontend/platforms/desktop/pages/content/dashboard/admin_initial_screen.dart';
 import 'package:safezone/frontend/platforms/desktop/pages/content/dashboard/content/admin_reports.dart';
 import 'package:safezone/frontend/platforms/desktop/pages/content/dashboard/content/admin_safezones.dart';
@@ -21,6 +23,7 @@ import 'package:safezone/frontend/platforms/desktop/pages/content/settings/accou
 import 'package:safezone/frontend/platforms/desktop/pages/content/settings/privacy.dart';
 import 'package:safezone/frontend/platforms/desktop/widget/button/sidenav.dart';
 import 'package:safezone/resource/schema/colors.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class NavigationDT extends StatefulWidget {
   final String userToken;
@@ -48,24 +51,20 @@ class _NavigationDTState extends State<NavigationDT>
 
   ValueNotifier<String?> selectedPageNotifier = ValueNotifier(null);
 
-  Widget _getSelectedPage() {
-    Widget pageContent;
-
-    switch (_selectedPageIndex) {
-      case 0:
-        pageContent = MapDT(UserToken: widget.userToken);
-        break;
-      case 1:
-        pageContent = AdminInitialScreen();
-        break;
-      case 2:
-        pageContent = HelpCenter();
-        break;
-      case 3:
-        pageContent = const Center(child: HelpCenter());
-        break;
-      default:
-        pageContent = const Center(child: Text('Default Page'));
+    Widget _getSelectedPage() {
+      Widget pageContent;
+      switch (_selectedPageIndex) {
+        case 0:
+          pageContent = MapDT(UserToken: widget.userToken);
+          break;
+        case 1:
+          pageContent = AdminInitialScreen();
+          break;
+        case 2:
+          pageContent = HelpCenter();
+          break;
+        default:
+          pageContent = const Center(child: Text('Default Page'));
     }
 
     Widget getComsPage() {
@@ -167,11 +166,9 @@ class _NavigationDTState extends State<NavigationDT>
         case 3:
           return AdminReportsUsers();
         case 4:
-          return AdminSafezones();
-        case 5:
-          return AdminDangerzones();
-        case 6:
           return AdminReports();
+        case 5:
+          return AdminSafezones();
         default:
           return const Center(child: Text('No Dropdown Content'));
       }
@@ -679,12 +676,11 @@ class _NavigationDTState extends State<NavigationDT>
                                             },
                                           ),
                                           DropdownItem(
-                                            label: 'Safe Zones',
-                                            id: 'sz',
+                                            label: 'Incidents',
+                                            id: 'in',
                                             onTap: () {
                                               setState(() {
-                                                if (selectedDropdownIndex ==
-                                                    4) {
+                                                if (selectedDropdownIndex == 4) {
                                                   dropdown = !dropdown;
                                                 } else {
                                                   dropdown = true;
@@ -695,12 +691,11 @@ class _NavigationDTState extends State<NavigationDT>
                                             },
                                           ),
                                           DropdownItem(
-                                            label: 'Danger Zones',
-                                            id: 'dz',
+                                            label: 'Safe Zones',
+                                            id: 'sz',
                                             onTap: () {
                                               setState(() {
-                                                if (selectedDropdownIndex ==
-                                                    5) {
+                                                if (selectedDropdownIndex == 5) {
                                                   dropdown = !dropdown;
                                                 } else {
                                                   dropdown = true;
@@ -941,112 +936,218 @@ class _NavigationDTState extends State<NavigationDT>
                                           });
                                         },
                                       ),
-                                      Sidenav(
-                                        icon: Icons.support_agent,
-                                        label: 'Terms & Policy',
-                                        withDrop: false,
-                                        onTap: () {
-                                          setState(() {
-                                            dropdown = false;
-                                            _selectedPageIndex = 3;
-                                          });
-                                        },
-                                      ),
                                     ]),
                                 const Spacer(),
-                                // Container(
-                                //   height: 200,
-                                //   margin: const EdgeInsets.only(bottom: 20),
-                                //   width: double.infinity,
-                                //   decoration: BoxDecoration(
-                                //       color: Colors.grey.shade300,
-                                //       borderRadius: BorderRadius.circular(5)),
-                                // ),
+                                GestureDetector(
+                                  onTap: () async {
+                                    NotificationPollingService().stopPolling();
+                                    final SharedPreferences prefs = await SharedPreferences.getInstance();
+                                    Map<String, bool> firstRunFlags = {};
+                                    for (String key in prefs.getKeys()) {
+                                      if (key.startsWith('isFirstRunFlag_')) {
+                                        firstRunFlags[key] = prefs.getBool(key) ?? true;
+                                      }
+                                    }
+
+                                    await prefs.clear();
+
+                                    for (var entry in firstRunFlags.entries) {
+                                      await prefs.setBool(entry.key, entry.value);
+                                    }
+                                    sharedController.emailController.text = "";
+                                    sharedController.passwordController.text = "";
+                                    context.push('/login');
+                                  },
+                                  child: Container(
+                                    height: 40,
+                                    margin: const EdgeInsets.only(bottom: 20),
+                                    padding: EdgeInsets.all(5),
+                                    width: double.infinity,
+                                    decoration: BoxDecoration(
+                                      color: Colors.red.withOpacity(0.8),
+                                      borderRadius: BorderRadius.circular(5)
+                                    ),
+                                    child: Row(
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      children: [
+                                        SizedBox(width: 10),
+                                        Transform(
+                                          alignment: Alignment.center,
+                                          transform: Matrix4.rotationY(3.1416),
+                                          child: const Icon(
+                                            Icons.logout_sharp,
+                                            size: 14,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                        SizedBox(width: 10),
+                                        Text(
+                                          'Logout',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 12
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                )
                               ],
                             )))));
               }));
         });
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final double pageContentWidth = constraints.maxWidth;
-        final bool isSmallScreen = pageContentWidth <= 900;
-
-        if (_wasSmallScreen != isSmallScreen) {
-          _wasSmallScreen = isSmallScreen;
-
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (isSmallScreen) {
-              if (!sharedController.isSidebarTab.value) {
-                sharedController.isSidebarTab.value = true;
-                if (sharedController.isSidebarCollapsed.value) {
-                  sharedController.isSidebarCollapsed.value = false;
-                }
-              }
+  final FocusNode _focusNode = FocusNode();
+  void _handleKey(RawKeyEvent event) {
+    if (event is RawKeyDownEvent && event.isAltPressed) {
+      switch (event.logicalKey.keyLabel.toLowerCase()) {
+        case "q":
+          setState(() {
+            dropdown = false;
+            _selectedPageIndex = 0;
+            Sidenav.selectedNormalParent.value = "Zones";
+            Sidenav.selectedDropdownId.value = null; 
+            Sidenav.selectedDropleftParent.value = null;
+            Sidenav.selectedDropleftId.value = null;
+          });
+          break;
+        case "w":
+          setState(() {
+            dropdown = false;
+            _selectedPageIndex = 1;
+            Sidenav.selectedNormalParent.value = "Dashboard";
+            Sidenav.selectedDropleftParent.value = null;
+            Sidenav.selectedDropleftId.value = null;
+          });
+          break;
+        case "a": 
+          setState(() {
+            if (Sidenav.selectedDropleftParent.value == 0) {
+              Sidenav.selectedDropleftParent.value = null;
+              Sidenav.selectedDropleftId.value = null;
+              Sidenav.selectedComsNotifier.value = null;
+              showit = false;
             } else {
-              if (sharedController.isSidebarTab.value) {
-                sharedController.isSidebarTabUi.value = false;
-                sharedController.isSidebarTab.value = false;
-              }
+              Sidenav.selectedDropleftParent.value = 0;
+              Sidenav.selectedDropleftId.value = null;
+              Sidenav.selectedComsNotifier.value = 0;
+              showit = true;
             }
           });
-        }
+          break;
+        case "s":
+          setState(() {
+            dropdown = false;
+            _selectedPageIndex = 2;
+            Sidenav.selectedNormalParent.value = "Settings";
+            Sidenav.selectedDropdownId.value = null;
+            Sidenav.selectedDropleftParent.value = 2;
+            Sidenav.selectedDropleftId.value = null;
+          });
+          break;
+      }
+    }
+  }
 
-        return Scaffold(
-          key: _scaffoldKey,
-          body: Container(
-            width: double.infinity,
-            height: double.infinity,
-            color: const Color.fromARGB(255, 250, 250, 250),
-            padding: EdgeInsets.only(
-              left: !isSmallScreen ? 10 : 0,
-            ),
-            child: Row(
-              children: [
-                if (pageContentWidth > 900) _buildDrawer(),
-                Expanded(
-                  flex: 6,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: ValueListenableBuilder(
-                      valueListenable: sharedController.isSidebarTabUi,
-                      builder: (context, isVisible, _) {
-                        return Stack(
-                          children: [
-                            _getSelectedPage(),
-                            if (isSmallScreen)
-                              AnimatedPositioned(
-                                duration: const Duration(milliseconds: 300),
-                                curve: Curves.easeInOut,
-                                left: isVisible ? 0 : -247,
-                                top: 0,
-                                bottom: 0,
-                                child: Container(
-                                  width: 247,
-                                  height: double.infinity,
-                                  padding: const EdgeInsets.only(left: 10),
-                                  color:
-                                      const Color.fromARGB(250, 250, 250, 250),
-                                  child: _buildDrawer(),
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    // selectedDropdownIndex = 0;
+    // _selectedPageIndex = 0;
+    // selectedComs = 0;
+
+    // dropdown = false;
+    // showit = false;
+    super.dispose();
+  }
+  
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
+    return RawKeyboardListener(
+      focusNode: _focusNode,
+      autofocus: true,
+      onKey: _handleKey,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final double pageContentWidth = constraints.maxWidth;
+          final bool isSmallScreen = pageContentWidth <= 900;
+
+          if (_wasSmallScreen != isSmallScreen) {
+            _wasSmallScreen = isSmallScreen;
+
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (isSmallScreen) {
+                if (!sharedController.isSidebarTab.value) {
+                  sharedController.isSidebarTab.value = true;
+                  if (sharedController.isSidebarCollapsed.value) {
+                    sharedController.isSidebarCollapsed.value = false;
+                  }
+                }
+              } else {
+                if (sharedController.isSidebarTab.value) {
+                  sharedController.isSidebarTabUi.value = false;
+                  sharedController.isSidebarTab.value = false;
+                }
+              }
+            });
+          }
+
+          return Scaffold(
+            key: _scaffoldKey,
+            body: Container(
+              width: double.infinity,
+              height: double.infinity,
+              color: const Color.fromARGB(255, 250, 250, 250),
+              padding: EdgeInsets.only(
+                left: !isSmallScreen ? 10 : 0,
+              ),
+              child: Row(
+                children: [
+                  if (pageContentWidth > 900) _buildDrawer(),
+                  Expanded(
+                    flex: 6,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: ValueListenableBuilder(
+                        valueListenable: sharedController.isSidebarTabUi,
+                        builder: (context, isVisible, _) {
+                          return Stack(
+                            children: [
+                              _getSelectedPage(),
+                              if (isSmallScreen)
+                                AnimatedPositioned(
+                                  duration: const Duration(milliseconds: 300),
+                                  curve: Curves.easeInOut,
+                                  left: isVisible ? 0 : -247,
+                                  top: 0,
+                                  bottom: 0,
+                                  child: Container(
+                                    width: 247,
+                                    height: double.infinity,
+                                    padding: const EdgeInsets.only(left: 10),
+                                    color:
+                                        const Color.fromARGB(250, 250, 250, 250),
+                                    child: _buildDrawer(),
+                                  ),
                                 ),
-                              ),
-                          ],
-                        );
-                      },
+                            ],
+                          );
+                        },
+                      ),
                     ),
-                  ),
-                )
-              ],
+                  )
+                ],
+              ),
             ),
-          ),
-        );
-      },
+          );
+        },
+      )
     );
   }
 }

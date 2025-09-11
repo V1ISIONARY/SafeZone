@@ -13,6 +13,7 @@ import 'package:http/http.dart' as http show get;
 import 'package:intl/intl.dart';
 import 'package:safezone/backend/models/safezoneModel/safezone_model.dart';
 import 'package:safezone/frontend/platforms/desktop/pages/content/map/content/safe-zone/review_safe_zone.dart';
+import 'package:safezone/frontend/platforms/desktop/widget/button/sidenav.dart';
 import 'package:safezone/frontend/platforms/mobile/widgets/buttons/custom_button.dart';
 import 'package:safezone/frontend/platforms/mobile/widgets/buttons/custom_radio_button.dart';
 import 'package:safezone/frontend/platforms/mobile/widgets/text_field_widget.dart';
@@ -241,7 +242,12 @@ class _MarkSafeZoneDTState extends State<MarkSafeZoneDT> {
 
   @override
   Widget build(BuildContext context) {
-    return _getPageForNavigation(selectedInternalPage);
+    return ValueListenableBuilder<int?>(
+      valueListenable: Sidenav.selectedComsNotifier,
+      builder: (context, _, __) {
+        return _getPageForNavigation(selectedInternalPage);
+      },
+    );
   }
 
   Widget _getPageForNavigation(String? page) {
@@ -258,6 +264,8 @@ class _MarkSafeZoneDTState extends State<MarkSafeZoneDT> {
             });
           },
           onGoToSZ: () {
+            Sidenav.selectedComsNotifier.value = 0;
+            Sidenav.selectedDropleftParent.value = 0;
             widget.onOpenNotification?.call("Safezone");
           },
           onClose: () {

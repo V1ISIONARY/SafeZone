@@ -15,70 +15,110 @@ class AdminReportsCard extends StatelessWidget {
     required this.address,
     required this.onTap
   });
+
   @override
   Widget build(BuildContext context) {
+    final _StatusData statusData = _getStatusData(reportModel.status);
     return GestureDetector(
-        onTap: onTap,
-        child: Container(
-          width: double.infinity,
-          height: 70,
-          margin: const EdgeInsets.only(bottom: 10),
-          decoration: BoxDecoration(
-            color: const Color.fromARGB(10, 0, 0, 0),
-            borderRadius: BorderRadius.circular(5),
-          ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Container(
-                width: 40,
-                height: 40,
-                margin: const EdgeInsets.only(left: 15),
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: dangerStatusColor,
+      onTap: onTap,
+      child: Container(
+        width: double.infinity,
+        margin: const EdgeInsets.symmetric(vertical: 5),
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.all(Radius.circular(10)),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(
+              height: 3,
+            ),
+            Text(
+              reportModel.dangerZone?.name ?? "Incident",
+              style: const TextStyle(fontSize: 13, color: textColor),
+            ),
+            const SizedBox(
+              height: 5,
+            ),
+            Text(
+              reportModel.reportDate!.split(' 00:00:00 GMT')[0],
+              style: const TextStyle(fontSize: 11, color: Colors.black45),
+            ),
+            Row(
+              children: [
+                Container(
+                  width: 8,
+                  height: 8,
+                  margin: const EdgeInsets.only(right: 6, top: 8),
+                  decoration: BoxDecoration(
+                    color: statusData.color, 
+                    shape: BoxShape.circle,
+                  ),
                 ),
-                child: const Icon(
-                  Icons.warning,
-                  color: Colors.white,
-                  size: 24,
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    CategoryText(text: reportModel.dangerZone!.name!),
-                    Row(
-                      children: [
-                        const Icon(Icons.location_on,
-                            size: 12, color: btnColor),
-                        const SizedBox(width: 1),
-                        Expanded(
-                          child: CategoryDescripTextEllipsis(
-                            text: address,
-                            maxlines: 1,
-                          ),
-                        ),
-                      ],
+                Container(
+                  padding: const EdgeInsets.all(5),
+                  margin: const EdgeInsets.only(top: 8),
+                  decoration: BoxDecoration(
+                    color: const Color(0xffB5B5B5).withOpacity(0.15),
+                    borderRadius: const BorderRadius.all(Radius.circular(10)),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 5),
+                    child: Text(
+                      statusData.text,
+                      style: const TextStyle(
+                          fontSize: 11,
+                          color: textColor),
                     ),
-                    reportModel.description == null ||
-                            reportModel.description!.isEmpty
-                        ? Container()
-                        : Padding(
-                            padding: const EdgeInsets.only(top: 1),
-                            child: CategoryDescripTextEllipsis(
-                                text: reportModel.description!),
-                          )
-                  ],
+                  ),
                 ),
-              ),
-            ],
-          ),
-        )
-      );
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+    
   }
+
+  _StatusData _getStatusData(String? status) {
+    switch (status?.toLowerCase()) {
+      case "verified":
+        return _StatusData(
+          text: "Verified - Danger Zones",
+          color: greenStatusColor,
+        );
+      case "under review":
+        return _StatusData(
+          text: "Under Review",
+          color: pendingStatusColor,
+        );
+      case "rejected":
+        return _StatusData(
+          text: "Rejected",
+          color: dangerStatusColor,
+        );
+      case "pending":
+        return _StatusData(
+          text: "Pending Verification",
+          color: pendingStatusColor,
+        );
+      default:
+        return _StatusData(
+          text: "Unknown Status",
+          color: Colors.grey,
+        );
+    }
+  }
+
+}
+
+class _StatusData {
+  final String text;
+  final Color color;
+
+  _StatusData({required this.text, required this.color});
 }

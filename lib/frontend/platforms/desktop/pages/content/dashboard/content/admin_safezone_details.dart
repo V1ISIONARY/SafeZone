@@ -149,6 +149,7 @@ class _AdminSafezoneDetailsState extends State<AdminSafezoneDetails> {
     switch (page) {
       case "details":
         return SafeZoneStatusHistoryDT(
+          fromAdmin: true,
           onBack: () {
             setState(() {
               selectedInternalPage = null;
@@ -373,6 +374,7 @@ class _AdminSafezoneDetailsState extends State<AdminSafezoneDetails> {
                                     ),
                                   ),
                                   Container(
+                                    width: double.infinity,
                                     padding: const EdgeInsets.all(8),
                                     decoration: const BoxDecoration(
                                         color: Color.fromARGB(5, 0, 0, 0)),

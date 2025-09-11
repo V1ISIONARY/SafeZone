@@ -14,6 +14,7 @@ import 'package:http/http.dart' as http show get;
 import 'package:intl/intl.dart';
 import 'package:safezone/backend/models/dangerzoneModel/incident_report_request_model.dart';
 import 'package:safezone/frontend/platforms/desktop/pages/content/map/content/report-incident/review_report.dart';
+import 'package:safezone/frontend/platforms/desktop/widget/button/sidenav.dart';
 import 'package:safezone/frontend/platforms/mobile/widgets/buttons/custom_button.dart';
 import 'package:safezone/frontend/platforms/mobile/widgets/report-danger-zone/multiple_images.dart';
 import 'package:safezone/frontend/platforms/mobile/widgets/text_field_widget.dart';
@@ -236,7 +237,12 @@ class _CreateReportDTState extends State<CreateReportDT> {
 
   @override
   Widget build(BuildContext context) {
-    return _getPageForNavigation(selectedInternalPage);
+    return ValueListenableBuilder<int?>(
+      valueListenable: Sidenav.selectedComsNotifier,
+      builder: (context, _, __) {
+        return _getPageForNavigation(selectedInternalPage);
+      },
+    );
   }
 
   Widget _getPageForNavigation(String? page) {
@@ -253,6 +259,8 @@ class _CreateReportDTState extends State<CreateReportDT> {
             });
           },
           onGoToReports: () {
+            Sidenav.selectedComsNotifier.value = 0;
+            Sidenav.selectedDropleftParent.value = 0;
             widget.onOpenNotification?.call("Reports");
           },
           onClose: () {

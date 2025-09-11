@@ -6,10 +6,15 @@ import 'package:timeline_tile/timeline_tile.dart';
 import '../../../../../../../backend/properties/import.dart';
 
 class ReportsStatusHistoryDT extends StatefulWidget {
+  final bool fromAdmin;
   final VoidCallback? onBack;
   final IncidentReportModel reportInfo;
-  const ReportsStatusHistoryDT(
-      {super.key, this.onBack, required this.reportInfo});
+  const ReportsStatusHistoryDT({
+    super.key, 
+    this.onBack,
+    this.fromAdmin = false, 
+    required this.reportInfo
+  });
 
   @override
   State<ReportsStatusHistoryDT> createState() => _ReportsStatusHistoryDTState();
@@ -74,9 +79,9 @@ class _ReportsStatusHistoryDTState extends State<ReportsStatusHistoryDT> {
         sortStatusHistory(widget.reportInfo.statusHistory ?? []);
 
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 250, 250, 250),
+      backgroundColor: widget.fromAdmin ? const Color.fromARGB(255, 250, 250, 250) : Colors.white,
       appBar: AppBar(
-        backgroundColor: const Color.fromARGB(255, 250, 250, 250),
+        backgroundColor: widget.fromAdmin ? const Color.fromARGB(255, 250, 250, 250) : Colors.white,
         automaticallyImplyLeading: false,
         centerTitle: true,
         title: Transform.translate(
@@ -142,7 +147,7 @@ class _ReportsStatusHistoryDTState extends State<ReportsStatusHistoryDT> {
                             top: 10, bottom: 10, left: 10),
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: widget.fromAdmin ? Colors.white : const Color.fromARGB(255, 250, 250, 250),
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: Column(

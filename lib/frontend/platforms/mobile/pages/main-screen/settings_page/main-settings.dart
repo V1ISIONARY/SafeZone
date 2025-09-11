@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:safezone/backend/architecture/bloc/notificationBloc/notification_polling.dart';
 import 'package:safezone/backend/architecture/bloc/profileBloc/profile_bloc.dart';
+import 'package:safezone/backend/properties/properties.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../../../backend/architecture/bloc/profileBloc/profile_state.dart';
@@ -688,6 +689,8 @@ class _SettingsState extends State<Settings> {
                               navigateTo: 'login',
                               replace: true,
                               onTap: () async {
+                                SharedProperties().emailController.text = "";
+                                SharedProperties().passwordController.text = "";
                                 NotificationPollingService().stopPolling();
                                 final SharedPreferences prefs =
                                     await SharedPreferences.getInstance();

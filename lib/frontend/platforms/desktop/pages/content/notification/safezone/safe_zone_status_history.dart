@@ -6,10 +6,15 @@ import 'package:timeline_tile/timeline_tile.dart';
 import 'package:safezone/backend/models/safezoneModel/safezone_model.dart';
 
 class SafeZoneStatusHistoryDT extends StatefulWidget {
+  final bool fromAdmin;
   final VoidCallback? onBack;
   final SafeZoneModel safezonemodel;
-  const SafeZoneStatusHistoryDT(
-      {super.key, this.onBack, required this.safezonemodel});
+  const SafeZoneStatusHistoryDT({
+    super.key, 
+    this.onBack,
+    this.fromAdmin = false, 
+    required this.safezonemodel
+  });
 
   @override
   State<SafeZoneStatusHistoryDT> createState() =>
@@ -75,9 +80,9 @@ class _SafeZoneStatusHistoryDTState extends State<SafeZoneStatusHistoryDT> {
         sortStatusHistory(widget.safezonemodel.statusHistory ?? []);
 
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 250, 250, 250),
+      backgroundColor: widget.fromAdmin ? const Color.fromARGB(255, 250, 250, 250) : Colors.white,
       appBar: AppBar(
-        backgroundColor: const Color.fromARGB(255, 250, 250, 250),
+        backgroundColor: widget.fromAdmin ? const Color.fromARGB(255, 250, 250, 250) : Colors.white,
         automaticallyImplyLeading: false,
         centerTitle: true,
         title: Transform.translate(
@@ -145,7 +150,7 @@ class _SafeZoneStatusHistoryDTState extends State<SafeZoneStatusHistoryDT> {
                             top: 10, bottom: 10, left: 10),
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: widget.fromAdmin ? Colors.white : const Color.fromARGB(255, 250, 250, 250),
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: Column(

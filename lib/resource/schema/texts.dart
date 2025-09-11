@@ -6,18 +6,25 @@ class CategoryText extends StatelessWidget {
   final String text;
   final String? alignment;
   final Color? color;
+  final bool? webText;
 
-  const CategoryText(
-      {super.key, required this.text, this.alignment, this.color});
+  const CategoryText({
+    super.key, 
+    required this.text, 
+    this.alignment, 
+    this.color,
+    this.webText = false
+  });
 
   @override
   Widget build(BuildContext context) {
     return (Text(
       text,
       style: GoogleFonts.inter(
-          fontSize: 13,
-          fontWeight: FontWeight.w500,
-          color: color ?? Colors.black),
+        fontSize: webText! ? 12 : 11,
+        fontWeight: FontWeight.w500,
+        color: color ?? Colors.black
+      ),
       textAlign: _getTextAlignment(),
     ));
   }
@@ -40,12 +47,14 @@ class CategoryDescripText extends StatelessWidget {
   final String text;
   final String? alignment;
   final Color? color;
+  final bool? webText;
 
   const CategoryDescripText({
     super.key,
     required this.text,
     this.alignment,
     this.color,
+    this.webText = false
   });
 
   @override
@@ -53,7 +62,7 @@ class CategoryDescripText extends StatelessWidget {
     return Text(
       text,
       style: GoogleFonts.inter(
-        fontSize: 9,
+        fontSize: webText! ? 11 : 9,
         fontWeight: FontWeight.w500,
         color: color ?? Colors.black45,
       ),

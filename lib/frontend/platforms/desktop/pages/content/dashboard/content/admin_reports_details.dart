@@ -8,6 +8,7 @@ import 'package:safezone/backend/architecture/bloc/adminBloc/incident_report/adm
 import 'package:safezone/backend/architecture/bloc/adminBloc/incident_report/admin_incident_report_state.dart' show AdminIncidentReportState, IncidentReportLoading, IncidentReportUpdated, IncidentReportError;
 import 'package:safezone/backend/models/dangerzoneModel/incident_report_model.dart';
 import 'package:safezone/backend/properties/import.dart';
+import 'package:safezone/frontend/platforms/desktop/pages/content/notification/reports/reports_status_history.dart';
 
 class AdminReportsDetails extends StatefulWidget {
   const AdminReportsDetails({
@@ -130,439 +131,472 @@ class _AdminReportsDetailsState extends State<AdminReportsDetails> {
     }
   }
 
+  String? selectedInternalPage;
+
+  @override
+  Widget build(BuildContext context) {
+    return _getPageForNavigation(selectedInternalPage);
+  }
+
   @override
   void initState() {
     super.initState();
     _reportModel = widget.reportInfo;
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final AdminIncidentReportBloc adminIncidentReportBloc =
-        BlocProvider.of<AdminIncidentReportBloc>(context);
+  Widget _getPageForNavigation(String? page) {
+    switch (page) {
+      case "details":
+        return ReportsStatusHistoryDT(
+          fromAdmin: true,
+          onBack: () {
+            setState(() {
+              selectedInternalPage = null;
+            });
+          },
+          reportInfo: widget.reportInfo,
+        );
+      default:
+        final AdminIncidentReportBloc adminIncidentReportBloc = BlocProvider.of<AdminIncidentReportBloc>(context);
+        return BlocListener<AdminIncidentReportBloc, AdminIncidentReportState>(
+          listener: (context, state) {
+            if (state is IncidentReportLoading) {
+              setState(() {
+                _isLoading = true;
+              });
+            } else if (state is IncidentReportUpdated) {
+              setState(() {
+                _isLoading = false;
+                _reportModel = state.reportModel; // Update the report model
+              });
 
-    return BlocListener<AdminIncidentReportBloc, AdminIncidentReportState>(
-      listener: (context, state) {
-        if (state is IncidentReportLoading) {
-          setState(() {
-            _isLoading = true;
-          });
-        } else if (state is IncidentReportUpdated) {
-          setState(() {
-            _isLoading = false;
-            _reportModel = state.reportModel; // Update the report model
-          });
+              // Call the callback to update the parent state
+              if (widget.onStatusChanged != null) {
+                widget.onStatusChanged!(_reportModel);
+              }
 
-          // Call the callback to update the parent state
-          if (widget.onStatusChanged != null) {
-            widget.onStatusChanged!(_reportModel);
-          }
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(state.message)),
+              );
 
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.message)),
-          );
-
-          // Return true to indicate that the data should be refreshed
-          context.pop(true);
-        } else if (state is IncidentReportError) {
-          setState(() {
-            _isLoading = false;
-          });
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.error)),
-          );
-        }
-      },
-      child: Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.white,
-          centerTitle: true,
-          title: const CategoryText(text: "Report Details"),
-        ),
-        body: BlocBuilder<AdminIncidentReportBloc, AdminIncidentReportState>(
-          builder: (context, state) {
-            if (_isLoading) {
-              return Expanded(
-                child: Center(
-                  child: Transform.translate(
-                      offset: const Offset(-20, -30),
-                      child: const LoadingState()),
-                ),
+              // Return true to indicate that the data should be refreshed
+              context.pop(true);
+            } else if (state is IncidentReportError) {
+              setState(() {
+                _isLoading = false;
+              });
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(state.error)),
               );
             }
-            return SingleChildScrollView(
-              child: Column(
-                children: [
-                  Container(
-                    decoration: const BoxDecoration(
-                      color: Color.fromARGB(41, 168, 168, 168),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.all(15),
-                          decoration: BoxDecoration(
-                            gradient: statusGradient(
-                                _reportModel.status ?? 'pending'),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Text(
-                                _reportModel.status ?? 'pending',
-                                style: const TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.white),
-                              ),
-                              const SizedBox(height: 10),
-                              Text(
-                                reportStatusMessage(
-                                    _reportModel.status ?? 'pending'),
-                                style: const TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w200,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            GoRouter.of(context).push('/reports-status-history',
-                                extra: _reportModel);
-                          },
-                          child: Container(
-                            width: double.infinity,
-                            margin: const EdgeInsets.only(bottom: 15),
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 16, vertical: 16),
-                            decoration: const BoxDecoration(
-                              color: Colors.white,
-                            ),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Container(
-                                  height: 25,
-                                  width: 25,
-                                  margin: const EdgeInsets.only(right: 17),
-                                  child: Image.asset(
-                                    "lib/resource/image/png/updates.png",
-                                    fit: BoxFit.contain,
-                                  ),
-                                ),
-                                const Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        "Check status history",
-                                        style: TextStyle(
-                                            color: primaryTextColor,
-                                            fontSize: 13,
-                                            fontWeight: FontWeight.w200),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                SizedBox(
-                                  height: 20,
-                                  width: 20,
-                                  child: SvgPicture.asset(
-                                    'lib/resource/svg/proceed.svg',
-                                    color: const Color.fromARGB(179, 0, 0, 0),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        Container(
-                          width: double.infinity,
-                          margin: const EdgeInsets.only(bottom: 15),
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 16),
-                          decoration: const BoxDecoration(
-                            color: Colors.white,
-                          ),
-                          child: Column(
-                            children: [
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(3),
-                                child: SizedBox(
-                                  height: 215,
-                                  width: double.infinity,
-                                  child: gmaps.GoogleMap(
-                                    initialCameraPosition:
-                                        const gmaps.CameraPosition(
-                                      target:
-                                          gmaps.LatLng(16.043859, 120.335182),
-                                      zoom: 14.0,
-                                    ),
-                                    markers: {
-                                      gmaps.Marker(
-                                        markerId: const gmaps.MarkerId(
-                                            "pinned location"),
-                                        position: gmaps.LatLng(
-                                          _reportModel.dangerZone?.latitude ??
-                                              0.0,
-                                          _reportModel.dangerZone?.longitude ??
-                                              0.0,
-                                        ),
-                                        infoWindow: const gmaps.InfoWindow(
-                                            title: "Pinned Location"),
-                                      ),
-                                    },
-                                    onMapCreated:
-                                        (gmaps.GoogleMapController controller) {
-                                      _mapController.complete(controller);
-                                    },
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 20),
-                              Text(
-                                _reportModel.dangerZone?.name ??
-                                    "Incident Report",
-                                style: const TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w700,
-                                    color: textColor),
-                              ),
-                              const SizedBox(height: 10),
-                              Container(
-                                padding: const EdgeInsets.all(8),
-                                decoration: const BoxDecoration(
-                                    color: Color.fromARGB(5, 0, 0, 0)),
-                                child: Wrap(
-                                  children: [
-                                    const Text("Location: ",
-                                        style: TextStyle(
-                                            fontSize: 13,
-                                            fontWeight: FontWeight.w400,
-                                            color: Colors.black87)),
-                                    Container(
-                                      height: 10,
-                                    ),
-                                    Text(
-                                      widget.address,
-                                      style: const TextStyle(
-                                          fontSize: 13,
-                                          fontWeight: FontWeight.w400,
-                                          color: Colors.black87),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              const SizedBox(height: 20),
-                              Align(
-                                alignment: Alignment.centerLeft,
-                                child: Text(
-                                  _reportModel.description ?? "No description",
-                                  style: const TextStyle(
-                                      fontSize: 13, color: textColor),
-                                ),
-                              ),
-                              const SizedBox(height: 12),
-                              HistoryInformationText(
-                                text: "Report Date",
-                                data: _reportModel.reportDate ?? "No date",
-                              ),
-                              const SizedBox(height: 20),
-                              Theme(
-                                data: Theme.of(context).copyWith(
-                                  dividerColor: Colors.transparent,
-                                ),
-                                child: ExpansionTile(
-                                  backgroundColor:
-                                      const Color.fromARGB(5, 0, 0, 0),
-                                  title: const Text(
-                                    "View photos",
-                                    style: TextStyle(
-                                        color: textColor, fontSize: 13),
-                                  ),
-                                  children: [
-                                    if (_reportModel.images != null &&
-                                        _reportModel.images!.isNotEmpty)
-                                      Padding(
-                                        padding: const EdgeInsets.all(10.0),
-                                        child: GridView.builder(
-                                          shrinkWrap: true,
-                                          physics:
-                                              const NeverScrollableScrollPhysics(),
-                                          gridDelegate:
-                                              const SliverGridDelegateWithFixedCrossAxisCount(
-                                                  crossAxisCount: 2,
-                                                  crossAxisSpacing: 10,
-                                                  mainAxisSpacing: 10,
-                                                  childAspectRatio: 1.5),
-                                          itemCount:
-                                              _reportModel.images!.length,
-                                          itemBuilder: (context, index) {
-                                            return ClipRRect(
-                                              borderRadius:
-                                                  BorderRadius.circular(3),
-                                              child: InstaImageViewer(
-                                                child: Image.network(
-                                                  _reportModel.images![index],
-                                                  fit: BoxFit.cover,
-                                                  loadingBuilder:
-                                                      (BuildContext context,
-                                                          Widget child,
-                                                          ImageChunkEvent?
-                                                              loadingProgress) {
-                                                    if (loadingProgress ==
-                                                        null) {
-                                                      return child;
-                                                    }
-                                                    return Center(
-                                                      child: Lottie.asset(
-                                                        'lib/resource/lottie/loading.json',
-                                                        width: 50,
-                                                        height: 50,
-                                                      ),
-                                                    );
-                                                  },
-                                                ),
-                                              ),
-                                            );
-                                          },
-                                        ),
-                                      )
-                                    else
-                                      const Padding(
-                                        padding: EdgeInsets.all(10.0),
-                                        child: Text(
-                                          "No images available",
-                                          style:
-                                              TextStyle(color: Colors.black54),
-                                        ),
-                                      ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
+          },
+          child: Scaffold(
+            backgroundColor: const Color.fromARGB(255, 250, 250, 250),
+            appBar: AppBar(
+              backgroundColor: const Color.fromARGB(255, 250, 250, 250),
+              automaticallyImplyLeading: false,
+              centerTitle: true,
+              title: Transform.translate(
+                offset: const Offset(-15, 0),
+                child: Row(children: [
+                  GestureDetector(
+                    onTap: widget.onBack ?? () => Navigator.pop(context),
+                    child: Container(
+                      margin: const EdgeInsets.all(10),
+                      height: 20,
+                      width: 20,
+                      decoration: BoxDecoration(
+                        border: Border.all(width: 1, color: Colors.black),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.arrow_back,
+                          color: Colors.black, size: 10),
                     ),
                   ),
-                  const SizedBox(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  const CategoryText(text: "Report Details")
+                ]),
+              ),
+            ),
+            body: BlocBuilder<AdminIncidentReportBloc, AdminIncidentReportState>(
+              builder: (context, state) {
+                if (_isLoading) {
+                  return Expanded(
+                    child: Center(
+                      child: Transform.translate(
+                          offset: const Offset(-20, -30),
+                          child: const LoadingState()),
+                    ),
+                  );
+                }
+                return SingleChildScrollView(
+                  child: Column(
                     children: [
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: ElevatedButton.icon(
-                          onPressed: () {
-                            _showConfirmationDialog('review', () {
-                              adminIncidentReportBloc
-                                  .add(ReviewIncidentReport(_reportModel.id!));
-                            });
-                          },
-                          icon: const Icon(
-                            Icons.timelapse,
-                            color: Color.fromARGB(171, 73, 87, 124),
-                          ),
-                          label: const Text(
-                            "Review",
-                            style: TextStyle(fontSize: 13, color: textColor),
-                          ),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor:
-                                const Color.fromARGB(37, 94, 98, 117),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(7),
-                              side: const BorderSide(
-                                color: Color.fromARGB(126, 94, 100, 117),
-                                width: 1,
+                      Container(
+                        decoration: const BoxDecoration(
+                          color: Colors.transparent,
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.all(15),
+                              decoration: BoxDecoration(
+                                gradient: statusGradient(_reportModel.status ?? 'pending'),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    _reportModel.status ?? 'pending',
+                                    style: const TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.white),
+                                  ),
+                                  const SizedBox(
+                                    height: 5,
+                                  ),
+                                  CategoryDescripText(
+                                    color: Colors.white,
+                                    text: reportStatusMessage(_reportModel.status ?? 'pending'),
+                                  ),
+                                ],
                               ),
                             ),
-                            padding: const EdgeInsets.all(15),
-                            alignment: Alignment.centerLeft,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: ElevatedButton.icon(
-                          onPressed: () {
-                            _showConfirmationDialog('verify', () {
-                              adminIncidentReportBloc
-                                  .add(VerifyIncidentReport(_reportModel.id!));
-                            });
-                          },
-                          icon: const Icon(
-                            Icons.check_circle,
-                            color: Color.fromARGB(179, 81, 116, 99),
-                          ),
-                          label: const Text(
-                            "Verify",
-                            style: TextStyle(fontSize: 13, color: textColor),
-                          ),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor:
-                                const Color.fromARGB(38, 94, 117, 106),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(7),
-                              side: const BorderSide(
-                                color: Color.fromARGB(127, 94, 117, 106),
-                                width: 1,
+                            GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  selectedInternalPage = 'details';
+                                });
+                              },
+                              child: Container(
+                                width: double.infinity,
+                                margin: const EdgeInsets.only(bottom: 15),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 16, vertical: 16),
+                                color: Colors.white,
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Container(
+                                      height: 25,
+                                      width: 25,
+                                      margin: const EdgeInsets.only(right: 17),
+                                      child: Image.asset(
+                                        "lib/resource/image/png/updates.png",
+                                        fit: BoxFit.contain,
+                                        color:
+                                            const Color.fromARGB(179, 0, 0, 0),
+                                      ),
+                                    ),
+                                    const Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          PrimaryText(
+                                              text: "Check status history")
+                                        ],
+                                      ),
+                                    ),
+                                    Container(
+                                        height: 15,
+                                        width: 15,
+                                        margin:
+                                            const EdgeInsets.only(right: 17),
+                                        child: Icon(
+                                          Icons.chevron_right_outlined,
+                                          color: Colors.grey[500],
+                                        )),
+                                  ],
+                                ),
                               ),
                             ),
-                            padding: const EdgeInsets.all(15),
-                            alignment: Alignment.centerLeft,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: ElevatedButton.icon(
-                          onPressed: () {
-                            _showConfirmationDialog('reject', () {
-                              adminIncidentReportBloc
-                                  .add(RejectIncidentReport(_reportModel.id!));
-                            });
-                          },
-                          icon: const Icon(
-                            Icons.cancel,
-                            color: Color.fromARGB(197, 133, 97, 94),
-                          ),
-                          label: const Text(
-                            "Reject",
-                            style: TextStyle(fontSize: 13, color: textColor),
-                          ),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor:
-                                const Color.fromARGB(37, 117, 94, 94),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(7),
-                              side: const BorderSide(
-                                color: Color.fromARGB(126, 117, 96, 94),
-                                width: 1,
+                            Container(
+                              width: double.infinity,
+                              margin: const EdgeInsets.only(bottom: 15),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: 16),
+                              decoration: const BoxDecoration(
+                                color: Colors.white,
+                              ),
+                              child: Column(
+                                children: [
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(3),
+                                    child: SizedBox(
+                                      height: 215,
+                                      width: double.infinity,
+                                      child: gmaps.GoogleMap(
+                                        initialCameraPosition:
+                                            const gmaps.CameraPosition(
+                                          target:
+                                              gmaps.LatLng(16.043859, 120.335182),
+                                          zoom: 14.0,
+                                        ),
+                                        markers: {
+                                          gmaps.Marker(
+                                            markerId: const gmaps.MarkerId(
+                                                "pinned location"),
+                                            position: gmaps.LatLng(
+                                              _reportModel.dangerZone?.latitude ??
+                                                  0.0,
+                                              _reportModel.dangerZone?.longitude ??
+                                                  0.0,
+                                            ),
+                                            infoWindow: const gmaps.InfoWindow(
+                                                title: "Pinned Location"),
+                                          ),
+                                        },
+                                        onMapCreated:
+                                            (gmaps.GoogleMapController controller) {
+                                          _mapController.complete(controller);
+                                        },
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 20),
+                                  Text(
+                                    _reportModel.dangerZone?.name ??
+                                        "Incident Report",
+                                    style: const TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w700,
+                                        color: textColor),
+                                  ),
+                                  const SizedBox(height: 10),
+                                  Container(
+                                    width: double.infinity,
+                                    padding: const EdgeInsets.all(8),
+                                    decoration: const BoxDecoration(
+                                        color: Color.fromARGB(5, 0, 0, 0)),
+                                    child: Wrap(
+                                      children: [
+                                        const Text("Location: ",
+                                            style: TextStyle(
+                                                fontSize: 13,
+                                                fontWeight: FontWeight.w400,
+                                                color: Colors.black87)),
+                                        Container(
+                                          height: 10,
+                                        ),
+                                        Text(
+                                          widget.address,
+                                          style: const TextStyle(
+                                              fontSize: 13,
+                                              fontWeight: FontWeight.w400,
+                                              color: Colors.black87),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(height: 20),
+                                  Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: Text(
+                                      _reportModel.description ?? "No description",
+                                      style: const TextStyle(
+                                          fontSize: 13, color: textColor),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 12),
+                                  HistoryInformationText(
+                                    text: "Report Date",
+                                    data: _reportModel.reportDate ?? "No date",
+                                  ),
+                                  const SizedBox(height: 20),
+                                  Theme(
+                                    data: Theme.of(context).copyWith(
+                                      dividerColor: Colors.white,
+                                    ),
+                                    child: ExpansionTile(
+                                      backgroundColor:
+                                          const Color.fromARGB(5, 0, 0, 0),
+                                      title: const Text(
+                                        "View photos",
+                                        style: TextStyle(
+                                            color: textColor, fontSize: 13),
+                                      ),
+                                      children: [
+                                        if (_reportModel.images != null &&
+                                            _reportModel.images!.isNotEmpty)
+                                          Padding(
+                                            padding: const EdgeInsets.all(10.0),
+                                            child: GridView.builder(
+                                              shrinkWrap: true,
+                                              physics:
+                                                  const NeverScrollableScrollPhysics(),
+                                              gridDelegate:
+                                                  const SliverGridDelegateWithFixedCrossAxisCount(
+                                                      crossAxisCount: 2,
+                                                      crossAxisSpacing: 10,
+                                                      mainAxisSpacing: 10,
+                                                      childAspectRatio: 1.5),
+                                              itemCount:
+                                                  _reportModel.images!.length,
+                                              itemBuilder: (context, index) {
+                                                return ClipRRect(
+                                                  borderRadius:
+                                                      BorderRadius.circular(3),
+                                                  child: InstaImageViewer(
+                                                    child: Image.network(
+                                                      _reportModel.images![index],
+                                                      fit: BoxFit.cover,
+                                                      loadingBuilder:
+                                                          (BuildContext context,
+                                                              Widget child,
+                                                              ImageChunkEvent?
+                                                                  loadingProgress) {
+                                                        if (loadingProgress ==
+                                                            null) {
+                                                          return child;
+                                                        }
+                                                        return Center(
+                                                          child: Lottie.asset(
+                                                            'lib/resource/lottie/loading.json',
+                                                            width: 50,
+                                                            height: 50,
+                                                          ),
+                                                        );
+                                                      },
+                                                    ),
+                                                  ),
+                                                );
+                                              },
+                                            ),
+                                          )
+                                        else
+                                          const Padding(
+                                            padding: EdgeInsets.all(10.0),
+                                            child: Text(
+                                              "No images available",
+                                              style:
+                                                  TextStyle(color: Colors.black54),
+                                            ),
+                                          ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                            padding: const EdgeInsets.all(15),
-                            alignment: Alignment.centerLeft,
-                          ),
+                          ],
                         ),
                       ),
-                      const SizedBox(width: 10),
+                      const SizedBox(height: 20),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: ElevatedButton.icon(
+                              onPressed: () {
+                                _showConfirmationDialog('review', () {
+                                  adminIncidentReportBloc
+                                      .add(ReviewIncidentReport(_reportModel.id!));
+                                });
+                              },
+                              icon: const Icon(
+                                Icons.timelapse,
+                                color: Color.fromARGB(171, 73, 87, 124),
+                              ),
+                              label: const Text(
+                                "Review",
+                                style: TextStyle(fontSize: 13, color: textColor),
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor:
+                                    const Color.fromARGB(37, 94, 98, 117),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(7),
+                                  side: const BorderSide(
+                                    color: Color.fromARGB(126, 94, 100, 117),
+                                    width: 1,
+                                  ),
+                                ),
+                                padding: const EdgeInsets.all(15),
+                                alignment: Alignment.centerLeft,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: ElevatedButton.icon(
+                              onPressed: () {
+                                _showConfirmationDialog('verify', () {
+                                  adminIncidentReportBloc
+                                      .add(VerifyIncidentReport(_reportModel.id!));
+                                });
+                              },
+                              icon: const Icon(
+                                Icons.check_circle,
+                                color: Color.fromARGB(179, 81, 116, 99),
+                              ),
+                              label: const Text(
+                                "Verify",
+                                style: TextStyle(fontSize: 13, color: textColor),
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor:
+                                    const Color.fromARGB(38, 94, 117, 106),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(7),
+                                  side: const BorderSide(
+                                    color: Color.fromARGB(127, 94, 117, 106),
+                                    width: 1,
+                                  ),
+                                ),
+                                padding: const EdgeInsets.all(15),
+                                alignment: Alignment.centerLeft,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: ElevatedButton.icon(
+                              onPressed: () {
+                                _showConfirmationDialog('reject', () {
+                                  adminIncidentReportBloc
+                                      .add(RejectIncidentReport(_reportModel.id!));
+                                });
+                              },
+                              icon: const Icon(
+                                Icons.cancel,
+                                color: Color.fromARGB(197, 133, 97, 94),
+                              ),
+                              label: const Text(
+                                "Reject",
+                                style: TextStyle(fontSize: 13, color: textColor),
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor:
+                                    const Color.fromARGB(37, 117, 94, 94),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(7),
+                                  side: const BorderSide(
+                                    color: Color.fromARGB(126, 117, 96, 94),
+                                    width: 1,
+                                  ),
+                                ),
+                                padding: const EdgeInsets.all(15),
+                                alignment: Alignment.centerLeft,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                        ],
+                      ),
                     ],
                   ),
-                  const SizedBox(height: 50),
-                ],
-              ),
-            );
-          },
-        ),
-      ),
-    );
+                );
+              },
+            ),
+          ),
+        );
+    }
   }
+  
 }

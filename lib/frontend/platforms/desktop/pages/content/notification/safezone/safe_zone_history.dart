@@ -104,9 +104,9 @@ class _SafezoneHistoryDTState extends State<SafezoneHistoryDT>
             return false;
           },
           child: Scaffold(
-            backgroundColor: const Color.fromARGB(255, 250, 250, 250),
+            backgroundColor: Colors.white,
             appBar: AppBar(
-              backgroundColor: const Color.fromARGB(255, 250, 250, 250),
+              backgroundColor: Colors.white,
               automaticallyImplyLeading: false,
               centerTitle: true,
               title: Transform.translate(

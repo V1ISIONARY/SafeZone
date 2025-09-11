@@ -3,7 +3,6 @@ import 'package:safezone/backend/models/dangerzoneModel/incident_report_request_
 import 'package:safezone/backend/models/safezoneModel/safezone_model.dart';
 import 'package:safezone/backend/models/userModel/circle_model.dart';
 import 'package:safezone/backend/models/userModel/notifications_model.dart';
-import 'package:safezone/frontend/platforms/mobile/pages/admin/admin_dangerzones_details.dart';
 import 'package:safezone/frontend/platforms/mobile/pages/admin/admin_initial_screen.dart';
 import 'package:safezone/frontend/platforms/mobile/pages/admin/admin_reports.dart';
 import 'package:safezone/frontend/platforms/mobile/pages/admin/admin_reports_details.dart';
@@ -46,6 +45,7 @@ import 'package:safezone/frontend/platforms/mobile/pages/main-screen/sos_page/so
 import 'package:safezone/frontend/platforms/mobile/pages/main-screen/sos_page/sos_cancel.dart';
 import 'package:safezone/frontend/platforms/mobile/pages/main-screen/sos_page/sos_countdown.dart';
 import 'package:safezone/frontend/platforms/mobile/pages/main-screen/sos_page/sos_success.dart';
+import 'package:safezone/frontend/root/authentication/login.dart';
 import 'package:safezone/frontend/root/authentication/starter.dart';
 import 'package:safezone/main.dart';
 
@@ -76,10 +76,10 @@ GoRouter appRouter(bool isFirstRun, String? userToken) => GoRouter(
           path: '/register',
           builder: (context, state) => const RegisterMD(),
         ),
-        GoRoute(
-          path: '/login',
-          builder: (context, state) => const LoginMD(),
-        ),
+        // GoRoute(
+        //   path: '/login',
+        //   builder: (context, state) => const LoginMD(),
+        // ),
         GoRoute(
           path: '/create-report',
           builder: (context, state) => const CreateReport(),
@@ -261,7 +261,7 @@ GoRouter appRouter(bool isFirstRun, String? userToken) => GoRouter(
         ),
         GoRoute(
           path: '/login',
-          builder: (context, state) => const LoginMD(),
+          builder: (context, state) => const LoginRT(),
         ),
         GoRoute(
           path: '/admin-initial-screen',
@@ -286,14 +286,6 @@ GoRouter appRouter(bool isFirstRun, String? userToken) => GoRouter(
                 reportInfo: reportModel, address: address);
           },
         ),
-        GoRoute(
-          path: '/admin-danger-zone-details',
-          builder: (context, state) {
-            final dangerzone = state.extra as DangerZoneModel;
-            return AdminDangerZoneDetails(dangerZone: dangerzone);
-          },
-        ),
-
         GoRoute(
           path: '/admin-safezone-details',
           builder: (context, state) {
