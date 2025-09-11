@@ -93,7 +93,7 @@ class _SafeZoneStatusHistoryState extends State<SafeZoneStatusHistory> {
       ),
       body: Container(
         decoration: const BoxDecoration(
-          color: Color.fromARGB(41, 168, 168, 168),
+          color: Color.fromARGB(255, 250, 250, 250),
         ),
         child: sortedStatusHistory.isNotEmpty
             ? ListView.builder(
@@ -128,7 +128,8 @@ class _SafeZoneStatusHistoryState extends State<SafeZoneStatusHistory> {
                       thickness: 2,
                     ),
                     endChild: Container(
-                      margin: const EdgeInsets.symmetric(vertical: 10),
+                      margin: const EdgeInsets.only(
+                            top: 10, bottom: 10, left: 10),
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
                         color: Colors.white,
@@ -141,20 +142,21 @@ class _SafeZoneStatusHistoryState extends State<SafeZoneStatusHistory> {
                             "Status: $statusText",
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
-                              fontSize: 16,
+                              fontSize: 14,
                               color: getStatusColor(statusText),
                             ),
                           ),
-                          const SizedBox(height: 4),
+                          const SizedBox(height: 2),
                           Text(
                             "Remarks: $remarksText",
-                            style: const TextStyle(fontSize: 13, color: labelFormFieldColor),
+                            style: const TextStyle(
+                                fontSize: 11, color: Colors.black45),
                           ),
-                          const SizedBox(height: 4),
+                          const SizedBox(height: 2),
                           Text(
                             "Timestamp: $formatted",
                             style: const TextStyle(
-                                fontSize: 11, color: labelFormFieldColor),
+                                fontSize: 11, color: Colors.black45),
                           ),
                         ],
                       ),

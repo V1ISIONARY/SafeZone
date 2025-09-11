@@ -1065,11 +1065,15 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                 builder: (context, state) {
                   if (state is MapLoading) {
                     return Expanded(
-                      child: Center(
-                        child: Transform.translate(
+                      child: Container(
+                        color: ui.Color.fromARGB(199, 250, 250, 250),
+                        child: Center(
+                          child: Transform.translate(
                             offset: const Offset(-40, 0),
-                            child: const LoadingState()),
-                      ),
+                            child: const LoadingState()
+                          ),
+                        ),
+                      )
                     );
                   } else if (state is MapDataLoaded) {
                     _currentMembers = state.members;

@@ -130,11 +130,10 @@ class _AdminInitialScreenState extends State<AdminInitialScreen>
   }
 
   String _getWeekLabel(double x) {
-  // Treat x as "week index since Jan 1, 2025"
-  final baseDate = DateTime(2025, 1, 1);
-  final weekDate = baseDate.add(Duration(days: (x.toInt() * 7)));
-  return DateFormat("d MMM, yyyy").format(weekDate);
-}
+    final baseDate = DateTime(2025, 1, 1);
+    final weekDate = baseDate.add(Duration(days: (x.toInt() * 7)));
+    return DateFormat("d MMM, yyyy").format(weekDate);
+  }
 
   Widget _bottomTitleWidgets(double value, TitleMeta meta) {
     const List<String> days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];

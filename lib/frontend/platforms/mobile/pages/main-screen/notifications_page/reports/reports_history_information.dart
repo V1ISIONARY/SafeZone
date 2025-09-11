@@ -159,7 +159,7 @@ class _ReportsHistoryDetailsState extends State<ReportsHistoryDetails> {
           children: [
             Container(
               decoration: const BoxDecoration(
-                color: Color.fromARGB(41, 168, 168, 168),
+                color: Color.fromARGB(255, 250, 250, 250),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -177,17 +177,17 @@ class _ReportsHistoryDetailsState extends State<ReportsHistoryDetails> {
                         Text(
                           widget.reportInfo.status!,
                           style: const TextStyle(
-                              fontSize: 15,
+                              fontSize: 14,
                               fontWeight: FontWeight.w600,
                               color: Colors.white),
                         ),
                         const SizedBox(
-                          height: 10,
+                          height: 5,
                         ),
                         Text(
                           reportStatusMessage(widget.reportInfo.status!),
                           style: const TextStyle(
-                            fontSize: 13,
+                            fontSize: 11,
                             fontWeight: FontWeight.w200,
                             color: Colors.white,
                           ),
@@ -214,7 +214,7 @@ class _ReportsHistoryDetailsState extends State<ReportsHistoryDetails> {
                           Container(
                             height: 25,
                             width: 25,
-                            margin: const EdgeInsets.only(right: 17),
+                            margin: const EdgeInsets.only(right: 15),
                             child: Image.asset(
                               "lib/resource/image/png/updates.png",
                               fit: BoxFit.contain,
@@ -234,13 +234,13 @@ class _ReportsHistoryDetailsState extends State<ReportsHistoryDetails> {
                               ],
                             ),
                           ),
-                          SizedBox(
+                          Container(
                             height: 20,
                             width: 20,
-                            child: SvgPicture.asset(
-                              'lib/resource/svg/proceed.svg',
-                              color: const Color.fromARGB(179, 0, 0, 0),
-                            ),
+                            child: Icon(
+                              Icons.chevron_right_outlined,
+                              color: Colors.grey[500],
+                            )
                           ),
                         ],
                       ),

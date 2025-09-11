@@ -99,35 +99,97 @@ class _AdminReportsState extends State<AdminReports> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                DropdownButton<String>(
-                  value: _selectedFilter,
-                  icon: const Icon(Icons.arrow_drop_down),
-                  dropdownColor: Colors.white,
-                  onChanged: (String? newValue) {
-                    if (newValue != null) {
-                      setState(() {
-                        _selectedFilter = newValue;
-                      });
-                    }
-                  },
-                  items: _categories
-                      .map<DropdownMenuItem<String>>(
-                        (String category) => DropdownMenuItem<String>(
-                          value: category,
-                          child: Align(
-                            alignment: Alignment.center,
-                            child: Text(
-                              category,
-                              style: const TextStyle(
-                                  color: textColor, fontSize: 11),
-                            ),
+                Builder(
+                  builder: (context) {
+                    return Theme(
+                      data: Theme.of(context).copyWith(
+                        popupMenuTheme: PopupMenuThemeData(
+                          color: const Color.fromARGB(255, 240, 240, 240),
+                          textStyle: const TextStyle(
+                            color: Colors.black87,
+                            fontSize: 12,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(0),
+                          ),
+                          elevation: 0,
+                        ),
+                      ),
+                      child: PopupMenuButton<String>(
+                        tooltip: '',
+                        offset: const Offset(0, 40),
+                        child: Container(
+                          height: 30,
+                          width: 110,
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          child: Row(
+                            children: [
+                              Container(
+                                margin: EdgeInsets.only(right: 5),
+                                child: Icon(
+                                  Icons.filter_list,
+                                  size: 13,
+                                  color: Colors.black54,
+                                )
+                              ),
+                              Expanded(
+                                child: Center(
+                                  child: Text(
+                                    _selectedFilter,
+                                    style: const TextStyle(
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 11,
+                                    ),
+                                    overflow: TextOverflow.ellipsis, 
+                                    maxLines: 1,
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                margin: EdgeInsets.only(left: 5),
+                                child: Icon(
+                                  Icons.keyboard_arrow_down_sharp,
+                                  size: 16,
+                                  color: Colors.black54,
+                                ),
+                              )
+                            ],
                           ),
                         ),
-                      )
-                      .toList(),
+                        onSelected: (String category) {
+                          setState(() {
+                            _selectedFilter = category;
+                          });
+                        },
+                        itemBuilder: (BuildContext context) {
+                          return _categories.map((category) {
+                            return PopupMenuItem<String>(
+                              value: category,
+                              padding: EdgeInsets.zero,
+                              child: SizedBox(
+                                width: 100,
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                  child: Text(
+                                    category,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 11,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            );
+                          }).toList();
+                        },
+                      ),
+                    );
+                  },
                 ),
                 const Spacer(),
-                // Sort Button
                 GestureDetector(
                     onTap: _toggleSortOrder,
                     child: Container(
@@ -166,11 +228,14 @@ class _AdminReportsState extends State<AdminReports> {
     return BlocBuilder<IncidentReportBloc, IncidentReportState>(
       builder: (context, state) {
         if (state is IncidentReportLoading) {
-          return Expanded(
+          return Container(
+            color: Colors.white,
             child: Center(
               child: Transform.translate(
-                  offset: const Offset(-20, -30), child: const LoadingState()),
-            ),
+                offset: Offset(-25, -25),
+                child: LoadingState()
+              ),
+            )
           );
         } else if (state is IncidentReportLoaded) {
           List filteredZones = _selectedFilter == 'All'
@@ -188,7 +253,18 @@ class _AdminReportsState extends State<AdminReports> {
                   .compareTo(DateTime.parse(a.reportTimestamp!)));
 
           if (filteredZones.isEmpty) {
-            return Center(child: Text("No $_selectedFilter reports found."));
+            return Transform.translate(
+              offset: Offset(0, -30),
+                child: Center(
+                  child: Text(
+                    "No $_selectedFilter safe zones found.",
+                    style: TextStyle(
+                      color: Colors.black38,
+                      fontSize: 13
+                    ),
+                  )
+                )
+              );
           }
 
           return ListView.builder(

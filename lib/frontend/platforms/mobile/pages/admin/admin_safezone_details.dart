@@ -225,16 +225,16 @@ class _AdminSafezoneDetailsState extends State<AdminSafezoneDetails> {
                               Text(
                                 _safeZoneModel.status ?? 'pending',
                                 style: const TextStyle(
-                                    fontSize: 15,
+                                    fontSize: 14,
                                     fontWeight: FontWeight.w600,
                                     color: Colors.white),
                               ),
-                              const SizedBox(height: 10),
+                              const SizedBox(height: 5),
                               Text(
                                 reportStatusMessage(
                                     _safeZoneModel.status ?? 'pending'),
                                 style: const TextStyle(
-                                  fontSize: 13,
+                                  fontSize: 11,
                                   fontWeight: FontWeight.w200,
                                   color: Colors.white,
                                 ),
@@ -262,7 +262,7 @@ class _AdminSafezoneDetailsState extends State<AdminSafezoneDetails> {
                                 Container(
                                   height: 25,
                                   width: 25,
-                                  margin: const EdgeInsets.only(right: 17),
+                                  margin: const EdgeInsets.only(right: 15),
                                   child: Image.asset(
                                     "lib/resource/image/png/updates.png",
                                     fit: BoxFit.contain,
@@ -283,13 +283,13 @@ class _AdminSafezoneDetailsState extends State<AdminSafezoneDetails> {
                                     ],
                                   ),
                                 ),
-                                SizedBox(
+                                Container(
                                   height: 20,
                                   width: 20,
-                                  child: SvgPicture.asset(
-                                    'lib/resource/svg/proceed.svg',
-                                    color: const Color.fromARGB(179, 0, 0, 0),
-                                  ),
+                                  child: Icon(
+                                    Icons.chevron_right_outlined,
+                                    color: Colors.grey[500],
+                                  )
                                 ),
                               ],
                             ),

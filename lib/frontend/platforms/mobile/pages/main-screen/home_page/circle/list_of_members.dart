@@ -88,7 +88,7 @@ class _ListOfMembersState extends State<ListOfMembers> {
       barrierDismissible: true,
       builder: (context) {
         return AlertDialog(
-          backgroundColor: Colors.white,
+          backgroundColor: Color.fromARGB(255, 250, 250, 250),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
           ),
@@ -270,6 +270,7 @@ class _ListOfMembersState extends State<ListOfMembers> {
         }
       },
       child: Scaffold(
+        backgroundColor: Color.fromARGB(255, 250, 250, 250),
           body: Column(children: [
         AppBar(
           toolbarHeight: 0,
@@ -277,21 +278,53 @@ class _ListOfMembersState extends State<ListOfMembers> {
         ),
         if (_isSharingLocation != null)
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text(
                   "Share my location with this circle",
-                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
                 ),
-                Switch(
-                  value: _isSharingLocation!,
-                  onChanged: _isToggling
+                GestureDetector(
+                  onTap: _isToggling
                       ? null
-                      : (value) {
-                          _toggleSharing(value);
+                      : () {
+                          _toggleSharing(!_isSharingLocation!);
                         },
+                  child: Container(
+                    height: 20,
+                    width: 35,
+                    padding: const EdgeInsets.symmetric(horizontal: 2),
+                    decoration: BoxDecoration(
+                      color: _isSharingLocation!
+                          ? Colors.green.shade300
+                          : Colors.black26,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: AnimatedAlign(
+                      duration: const Duration(milliseconds: 200),
+                      alignment: _isSharingLocation!
+                          ? Alignment.centerRight
+                          : Alignment.centerLeft,
+                      child: Container(
+                        height: 16,
+                        width: 16,
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black26,
+                              spreadRadius: 0.5,
+                              blurRadius: 4,
+                              offset: Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -310,7 +343,7 @@ class _ListOfMembersState extends State<ListOfMembers> {
               : null,
         ),
         AppBar(
-          backgroundColor: Colors.white,
+          backgroundColor: Color.fromARGB(255, 250, 250, 250),
           automaticallyImplyLeading: false,
           centerTitle: true,
           leading: GestureDetector(
@@ -354,8 +387,7 @@ class _ListOfMembersState extends State<ListOfMembers> {
                         children: [
                           Theme(
                               data: Theme.of(context).copyWith(
-                                  dividerColor:
-                                      const Color.fromARGB(6, 92, 92, 92)),
+                                  dividerColor: Colors.white),
                               child: ExpansionTile(
                                 title: const Text(
                                   "Invite Members",
@@ -369,8 +401,7 @@ class _ListOfMembersState extends State<ListOfMembers> {
                                           0.9,
                                       padding: const EdgeInsets.all(12),
                                       decoration: BoxDecoration(
-                                        color: const Color.fromARGB(
-                                            29, 151, 163, 175),
+                                        color: Colors.white,
                                         borderRadius: BorderRadius.circular(8),
                                       ),
                                       child: Column(
@@ -436,7 +467,7 @@ class _ListOfMembersState extends State<ListOfMembers> {
                                                       backgroundColor:
                                                           widgetPricolor,
                                                       foregroundColor:
-                                                          Colors.white,
+                                                          Color.fromARGB(255, 250, 250, 250),
                                                       padding: const EdgeInsets
                                                           .symmetric(
                                                           vertical: 12),
@@ -481,7 +512,7 @@ class _ListOfMembersState extends State<ListOfMembers> {
                                                       backgroundColor:
                                                           widgetPricolor,
                                                       foregroundColor:
-                                                          Colors.white,
+                                                          Color.fromARGB(255, 250, 250, 250),
                                                       padding: const EdgeInsets
                                                           .symmetric(
                                                           vertical: 12),

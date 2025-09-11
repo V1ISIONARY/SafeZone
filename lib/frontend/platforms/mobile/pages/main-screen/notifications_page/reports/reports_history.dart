@@ -81,9 +81,9 @@ class _ReportsHistoryState extends State<ReportsHistory>
         return false;
       },
       child: Scaffold(
-        backgroundColor: const Color.fromARGB(255, 240, 240, 240),
+        backgroundColor: Colors.white,
         appBar: AppBar(
-          backgroundColor: const Color.fromARGB(255, 240, 240, 240),
+          backgroundColor: Colors.white,
           automaticallyImplyLeading: false,
           centerTitle: false,
           title: Transform.translate(

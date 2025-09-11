@@ -78,7 +78,7 @@ class _AccountDetailsState extends State<AccountDetails> {
         return StatefulBuilder(
           builder: (context, setState) {
             return AlertDialog(
-              backgroundColor: Colors.white,
+              backgroundColor: Color.fromARGB(255, 250, 250, 250),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10),
               ),
@@ -256,9 +256,9 @@ class _AccountDetailsState extends State<AccountDetails> {
         }
       },
       child: Scaffold(
-        backgroundColor: const Color.fromARGB(255, 240, 240, 240),
+        backgroundColor: Color.fromARGB(255, 250, 250, 250),
         appBar: AppBar(
-          backgroundColor: const Color.fromARGB(255, 240, 240, 240),
+          backgroundColor: Color.fromARGB(255, 250, 250, 250),
           automaticallyImplyLeading: false,
           centerTitle: true,
           leading: GestureDetector(
@@ -285,7 +285,7 @@ class _AccountDetailsState extends State<AccountDetails> {
                 width: double.infinity,
                 height: 250,
                 decoration: BoxDecoration(
-                  color: const Color.fromARGB(255, 240, 240, 240),
+                  color: Colors.white,
                   borderRadius: BorderRadius.circular(5),
                 ),
                 child: Center(
@@ -419,7 +419,7 @@ class _AccountDetailsState extends State<AccountDetails> {
               Container(
                 width: double.infinity,
                 decoration: BoxDecoration(
-                  color: const Color.fromARGB(255, 245, 245, 245),
+                  color: Colors.white,
                   borderRadius: BorderRadius.circular(5),
                 ),
                 child: Container(

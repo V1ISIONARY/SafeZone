@@ -15,9 +15,9 @@ class _PrivacyState extends State<Privacy> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: const Color.fromARGB(255, 240, 240, 240),
+        backgroundColor: Color.fromARGB(255, 250, 250, 250),
         appBar: AppBar(
-          backgroundColor: const Color.fromARGB(255, 240, 240, 240),
+          backgroundColor: Color.fromARGB(255, 250, 250, 250),
           automaticallyImplyLeading: false,
           centerTitle: true,
           title: const CategoryText(text: "Privacy", color: Colors.black),

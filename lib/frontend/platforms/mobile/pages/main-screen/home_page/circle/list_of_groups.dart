@@ -255,9 +255,9 @@ class _ListOfGroupsState extends State<ListOfGroups> {
         return true;
       },
       child: Scaffold(
-        backgroundColor: const Color.fromARGB(255, 240, 240, 240),
+        backgroundColor: Color.fromARGB(255, 250, 250, 250),
         appBar: AppBar(
-          backgroundColor: const Color.fromARGB(255, 240, 240, 240),
+          backgroundColor: Color.fromARGB(255, 250, 250, 250),
           automaticallyImplyLeading: false,
           centerTitle: true,
           title: Transform.translate(
@@ -441,8 +441,10 @@ class _ListOfGroupsState extends State<ListOfGroups> {
                                 },
                                 child: Container(
                                   width: double.infinity,
-                                  margin: const EdgeInsets.symmetric(
-                                      horizontal: 10, vertical: 5),
+                                  margin: const EdgeInsets.only(
+                                    left: 10, 
+                                    right: 10,
+                                    bottom: 10),
                                   padding:
                                       const EdgeInsets.symmetric(vertical: 10),
                                   decoration: BoxDecoration(

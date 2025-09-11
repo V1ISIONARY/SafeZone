@@ -1041,9 +1041,8 @@ class _NavigationDTState extends State<NavigationDT>
           setState(() {
             dropdown = false;
             _selectedPageIndex = 2;
-            Sidenav.selectedNormalParent.value = "Settings";
+            Sidenav.selectedNormalParent.value = "Help Center";
             Sidenav.selectedDropdownId.value = null;
-            Sidenav.selectedDropleftParent.value = 2;
             Sidenav.selectedDropleftId.value = null;
           });
           break;

@@ -88,7 +88,7 @@ class _UnreadState extends State<Unread> {
                 width: double.infinity,
                 margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                 decoration: BoxDecoration(
-                  color: const Color.fromARGB(10, 0, 0, 0),
+                  color: Color.fromARGB(255, 250, 250, 250),
                   borderRadius: BorderRadius.circular(5),
                 ),
                 child: Padding(
@@ -118,7 +118,7 @@ class _UnreadState extends State<Unread> {
                               style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 color: textColor,
-                                fontSize: 15,
+                                fontSize: 14,
                               ),
                             ),
                             const SizedBox(height: 4),
@@ -126,7 +126,7 @@ class _UnreadState extends State<Unread> {
                               notification.message,
                               style: const TextStyle(
                                 color: labelFormFieldColor,
-                                fontSize: 13,
+                                fontSize: 11,
                               ),
                             ),
                             const SizedBox(height: 4),

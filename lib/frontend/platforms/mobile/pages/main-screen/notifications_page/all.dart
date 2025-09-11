@@ -97,7 +97,7 @@ class _AllState extends State<All> {
               decoration: BoxDecoration(
                 color: notification.isRead
                     ? Colors.transparent
-                    : const Color.fromARGB(10, 0, 0, 0),
+                    : Color.fromARGB(255, 250, 250, 250),
                 borderRadius: BorderRadius.circular(5),
               ),
               child: Padding(
@@ -134,7 +134,7 @@ class _AllState extends State<All> {
                             style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               color: textColor,
-                              fontSize: 15,
+                              fontSize: 14,
                             ),
                           ),
                           const SizedBox(height: 4),
@@ -142,7 +142,7 @@ class _AllState extends State<All> {
                             notification.message,
                             style: const TextStyle(
                               color: labelFormFieldColor,
-                              fontSize: 13,
+                              fontSize: 11,
                             ),
                           ),
                           const SizedBox(height: 4),

@@ -20,7 +20,7 @@ class Userinfomartion extends StatelessWidget {
         height: 70,
         margin: const EdgeInsets.only(bottom: 10),
         decoration: BoxDecoration(
-            color: const Color.fromARGB(10, 0, 0, 0),
+            color: Color.fromARGB(255, 250, 250, 250),
             borderRadius: BorderRadius.circular(5)),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -37,7 +37,7 @@ class Userinfomartion extends StatelessWidget {
                 child: profileImage.isEmpty
                     ? Container(
                         decoration: BoxDecoration(
-                          color: Colors.grey[200],
+                          color: Colors.white,
                           shape: BoxShape.circle,
                         ),
                         child: const Icon(

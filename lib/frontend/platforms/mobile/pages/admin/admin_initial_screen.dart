@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 import 'package:safezone/backend/architecture/bloc/adminBloc/analytics/analytics_admin_bloc.dart';
 import 'package:safezone/backend/architecture/bloc/adminBloc/analytics/analytics_admin_event.dart';
 import 'package:safezone/backend/architecture/bloc/adminBloc/analytics/analytics_admin_state.dart';
@@ -173,6 +174,12 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> {
     );
   }
 
+  String _getWeekLabel(double x) {
+    final baseDate = DateTime(2025, 1, 1);
+    final weekDate = baseDate.add(Duration(days: (x.toInt() * 7)));
+    return DateFormat("d MMM, yyyy").format(weekDate);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -180,7 +187,15 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> {
       body: BlocBuilder<AdminBloc, AdminState>(
         builder: (context, state) {
           if (state is AdminLoading) {
-            return const Center(child: LoadingState());
+            return Container(
+              color: Colors.white,
+              child: Center(
+                child: Transform.translate(
+                  offset: Offset(-25, -25),
+                  child: LoadingState()
+                ),
+              )
+            );
           } else if (state is AdminError) {
             return Center(
                 child: Text('Error: ${state.message}',
@@ -225,11 +240,15 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> {
                 _generatePieChartData(reportCounts, totalIncidentReports);
 
             return SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.only(
+                left: 15,
+                right: 15,
+                bottom: 15
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 15),
                   const Text(
                     'Dashboard Overview',
                     style: TextStyle(
@@ -290,7 +309,7 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 30),
+                  const SizedBox(height: 5),
                   const Text(
                     'Analytics',
                     style: TextStyle(
@@ -305,7 +324,7 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> {
                         horizontal: 10, vertical: 10),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(5),
-                      color: const Color.fromARGB(10, 0, 0, 0),
+                      color: Color.fromARGB(255, 250, 250, 250),
                     ),
                     child: Row(
                       children: [
@@ -347,7 +366,7 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> {
                         horizontal: 10, vertical: 10),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(5),
-                      color: const Color.fromARGB(10, 0, 0, 0),
+                      color: Color.fromARGB(255, 250, 250, 250),
                     ),
                     child: Row(
                       children: [
@@ -390,7 +409,7 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> {
                         horizontal: 10, vertical: 10),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(5),
-                      color: const Color.fromARGB(10, 0, 0, 0),
+                      color: Color.fromARGB(255, 250, 250, 250),
                     ),
                     child: Column(
                       children: [
@@ -418,8 +437,6 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> {
                                     showTitles: true,
                                     getTitlesWidget: _bottomTitleWidgets,
                                     reservedSize: 22,
-                                    interval:
-                                        selectedCategory == 'Today' ? 4 : 1,
                                   ),
                                 ),
                                 topTitles: const AxisTitles(
@@ -437,34 +454,96 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> {
                               gridData: FlGridData(
                                 show: true,
                                 drawVerticalLine: true,
-                                horizontalInterval: 1,
-                                verticalInterval:
-                                    selectedCategory == 'Today' ? 4 : 1,
-                                getDrawingHorizontalLine: (value) {
-                                  return FlLine(
-                                    color: Colors.grey.withOpacity(0.1),
-                                    strokeWidth: 1,
-                                  );
-                                },
-                                getDrawingVerticalLine: (value) {
-                                  return FlLine(
-                                    color: Colors.grey.withOpacity(0.1),
-                                    strokeWidth: 1,
-                                  );
+                                horizontalInterval: 5,
+                                verticalInterval: 1,
+                                getDrawingHorizontalLine: (value) => FlLine(
+                                  color: Colors.grey.withOpacity(0.1),
+                                  strokeWidth: 1,
+                                ),
+                                getDrawingVerticalLine: (value) => FlLine(
+                                  color: Colors.grey.withOpacity(0.1),
+                                  strokeWidth: 1,
+                                ),
+                              ),
+                              lineTouchData: LineTouchData(
+                                enabled: true,
+                                touchTooltipData: LineTouchTooltipData(
+                                  tooltipBgColor: Colors.white,
+                                  tooltipRoundedRadius: 5,
+                                  tooltipBorder: BorderSide(
+                                    color: Colors.black38,
+                                    width: 0.2
+                                  ),
+                                  getTooltipItems: (touchedSpots) {
+                                    return touchedSpots.map((spot) {
+                                      final weekDate = _getWeekLabel(spot.x);
+                                      final commits = spot.y.toInt();
+                                      return LineTooltipItem(
+                                        "Week of $weekDate\n",
+                                        const TextStyle(
+                                          fontSize: 10,
+                                          color: Colors.black38,
+                                          fontWeight: FontWeight.w500
+                                        ),
+                                        children: [
+                                          const TextSpan(
+                                            text: "Numeroes  ",
+                                            style: TextStyle(
+                                              color: Colors.black,
+                                              fontSize: 10,
+                                            ),
+                                          ),
+                                          const TextSpan(
+                                            text: "samplu  ",
+                                            style: TextStyle(
+                                              color: Colors.black,
+                                              fontSize: 10,
+                                            ),
+                                          ),
+                                        ],
+                                      );
+                                    }).toList();
+                                  },
+                                ),
+                                getTouchedSpotIndicator: (barData, spotIndexes) {
+                                  return spotIndexes.map((index) {
+                                    return TouchedSpotIndicatorData(
+                                      FlLine(color: Colors.transparent),
+                                      FlDotData(
+                                        show: true,
+                                        getDotPainter: (spot, percent, barData, index) {
+                                          return FlDotCirclePainter(
+                                            radius: 5,
+                                            color: widgetPricolor,
+                                            strokeWidth: 2,
+                                            strokeColor: Colors.white,
+                                          );
+                                        },
+                                      ),
+                                    );
+                                  }).toList();
                                 },
                               ),
+
                               lineBarsData: [
                                 LineChartBarData(
                                   spots: graphData[selectedCategory]!,
                                   isCurved: true,
-                                  color: widgetPricolor,
-                                  barWidth: 3,
+                                  color: widgetPricolor.withOpacity(0.8),
+                                  barWidth: 2.5,
                                   isStrokeCapRound: true,
                                   belowBarData: BarAreaData(
                                     show: true,
-                                    color: widgetPricolor.withOpacity(0.1),
+                                    gradient: LinearGradient(
+                                      begin: Alignment.topCenter,
+                                      end: Alignment.bottomCenter,
+                                      colors: [
+                                        widgetPricolor.withOpacity(0.3),
+                                        widgetPricolor.withOpacity(0.0),
+                                      ],
+                                    ),
                                   ),
-                                  dotData: FlDotData(show: true),
+                                  dotData: FlDotData(show: false),
                                 ),
                               ],
                               minX: 0,
@@ -486,75 +565,7 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 30),
-                  const Text(
-                    'Detailed Metrics',
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: MetricTile(
-                          title: 'Verified Safe Zones',
-                          value: totalVerifiedSafeZones,
-                          total: totalSafeZones,
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: MetricTile(
-                          title: 'Pending Verification',
-                          value: totalSafeZones - totalVerifiedSafeZones,
-                          total: totalSafeZones,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: MetricTile(
-                          title: 'Verified Reports',
-                          value: verifiedIncidentReports,
-                          total: totalIncidentReports,
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: MetricTile(
-                          title: 'Pending Reports',
-                          value: pendingIncidentReports,
-                          total: totalIncidentReports,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: MetricTile(
-                          title: 'Female Users',
-                          value: femaleUsers,
-                          total: totalUsers,
-                        ),
-                      ),
-                      const SizedBox(width: 20),
-                      Expanded(
-                        child: MetricTile(
-                          title: 'Male Users',
-                          value: maleUsers,
-                          total: totalUsers,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 30),
+                  const SizedBox(height: 5),
                   const Text(
                     'Incident Reports by Type',
                     style: TextStyle(
@@ -562,24 +573,20 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 15),
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10),
-                      color: Colors.white,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey.withOpacity(0.2),
-                          blurRadius: 5,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
+                      color: Color.fromARGB(255, 250, 250, 250),
                     ),
                     child: Column(
                       children: [
-                        SizedBox(
+                        Container(
                           height: 200,
+                          margin: EdgeInsets.symmetric(
+                            vertical: 20
+                          ),
                           child: PieChart(
                             PieChartData(
                               sections: pieChartData,
@@ -588,7 +595,7 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> {
                             ),
                           ),
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 20),
                         Wrap(
                           spacing: 8,
                           runSpacing: 8,
@@ -651,7 +658,85 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 30),
+                  const SizedBox(height: 15),
+                  const Text(
+                    'Detailed Metrics',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 15),
+                  Column(
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: MetricTile(
+                              title: 'Verified Safe Zones',
+                              value: totalVerifiedSafeZones,
+                              total: totalSafeZones,
+                              color: Colors.lightBlue,
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: MetricTile(
+                              title: 'Pending Verification',
+                              value: totalSafeZones - totalVerifiedSafeZones,
+                              total: totalSafeZones,
+                              color: Colors.orange,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: MetricTile(
+                              title: 'Verified Reports',
+                              value: verifiedIncidentReports,
+                              total: totalIncidentReports,
+                              color: Colors.green,
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: MetricTile(
+                              title: 'Pending Reports',
+                              value: pendingIncidentReports,
+                              total: totalIncidentReports,
+                              color: Colors.red,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: MetricTile(
+                              title: 'Female Users',
+                              value: femaleUsers,
+                              total: totalUsers,
+                              color: Colors.pink,
+                            ),
+                          ),
+                          const SizedBox(width: 20),
+                          Expanded(
+                            child: MetricTile(
+                              title: 'Male Users',
+                              value: maleUsers,
+                              total: totalUsers,
+                              color: Colors.blue,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 15),
                 ],
               ),
             );
@@ -716,7 +801,7 @@ class SummaryCard extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(5),
-          color: const Color.fromARGB(10, 0, 0, 0),
+          color: Color.fromARGB(255, 250, 250, 250),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -773,69 +858,76 @@ class MetricTile extends StatelessWidget {
   final String title;
   final int value;
   final int total;
+  final Color color;
 
   const MetricTile({
     super.key,
     required this.title,
     required this.value,
     required this.total,
+    required this.color,
   });
 
   @override
   Widget build(BuildContext context) {
     double percentage = total == 0 ? 0 : (value / total * 100);
-    double progressWidth = total == 0 ? 0 : (value / total * 100);
 
-    return GestureDetector(
-      child: Container(
-        height: 90,
-        margin: const EdgeInsets.only(bottom: 15),
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(5),
-          color: const Color.fromARGB(10, 0, 0, 0),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
           children: [
             Text(
-              title,
-              style: TextStyle(
-                color: Colors.black,
+              title.toUpperCase(),
+              style: const TextStyle(
                 fontSize: 11,
+                fontWeight: FontWeight.w600,
+                color: Colors.black54,
               ),
             ),
             Spacer(),
             Text(
-              '$value / $total (${percentage.toStringAsFixed(1)}%)',
-              style: TextStyle(
-                fontSize: 20,
-                color: Colors.grey[600],
+              "$value / $total",
+              style: const TextStyle(
+                fontSize: 12,
+                color: Colors.grey,
+                fontWeight: FontWeight.w500,
               ),
             ),
-            const Spacer(),
+          ]
+        ),
+        const SizedBox(height: 6),
+        Stack(
+          children: [
             Container(
-              height: 10,
+              height: 22,
               width: double.infinity,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(2),
-                color: Colors.black12,
+                color: Color.fromARGB(255, 250, 250, 250),
+                borderRadius: BorderRadius.circular(5),
               ),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Container(
-                  width: progressWidth,
-                  height: double.infinity,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(2),
-                    color: widgetPricolor,
-                  ),
+            ),
+            Container(
+              height: 22,
+              width: (percentage / 100) * MediaQuery.of(context).size.width * 0.35,
+              decoration: BoxDecoration(
+                color: color,
+                borderRadius: BorderRadius.circular(5),
+              ),
+              alignment: Alignment.centerRight,
+              padding: const EdgeInsets.only(right: 8),
+              child: Text(
+                "${percentage.toStringAsFixed(0)}%",
+                style: const TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
                 ),
               ),
             ),
           ],
         ),
-      ),
+      ],
     );
   }
 }

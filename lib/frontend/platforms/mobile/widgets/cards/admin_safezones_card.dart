@@ -42,7 +42,7 @@ class AdminSafeZonesCard extends StatelessWidget {
         margin: const EdgeInsets.symmetric(vertical: 5),
         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
         decoration: const BoxDecoration(
-          color: Colors.white,
+          color: Color.fromARGB(255, 250, 250, 250),
           borderRadius: BorderRadius.all(Radius.circular(10)),
         ),
         child: Column(
@@ -74,7 +74,7 @@ class AdminSafeZonesCard extends StatelessWidget {
                     padding: const EdgeInsets.all(5),
                     margin: const EdgeInsets.only(top: 8),
                     decoration: BoxDecoration(
-                      color: const Color(0xffB5B5B5).withOpacity(0.15),
+                      color: Colors.white,
                       borderRadius: const BorderRadius.all(Radius.circular(10)),
                     ),
                     child: Padding(

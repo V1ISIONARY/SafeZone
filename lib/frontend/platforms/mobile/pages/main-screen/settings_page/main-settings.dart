@@ -621,34 +621,35 @@ class _SettingsState extends State<Settings> {
                                   ))),
                       widget.UserToken == 'gueguestss'
                           ? const SizedBox()
-                          : Settingsbtn(
-                              title: 'Security & permission',
-                              svgIcon: 'lib/resource/svg/privacy_security.svg',
-                              navigateTo: '',
-                              description:
-                                  'Control access, app permissions, and secure your account.',
-                              onTap: () {},
-                            ),
+                          : SizedBox.shrink(),
+                          // Settingsbtn(
+                          //     title: 'Security & permission',
+                          //     svgIcon: 'lib/resource/svg/privacy_security.svg',
+                          //     navigateTo: '',
+                          //     description:
+                          //         'Control access, app permissions, and secure your account.',
+                          //     onTap: () {},
+                          //   ),
                       const SizedBox(height: 10),
-                      const CategoryText(text: "Cache & Cellular"),
-                      const SizedBox(height: 10),
-                      Settingsbtn(
-                        title: 'Offline Map & Zones',
-                        svgIcon: 'lib/resource/svg/cloud-download.svg',
-                        navigateTo: '',
-                        description:
-                            'Download maps and access zones without internet.',
-                        onTap: () {},
-                      ),
-                      Settingsbtn(
-                        title: 'Free up space',
-                        svgIcon: 'lib/resource/svg/recycling.svg',
-                        navigateTo: 'freespace',
-                        description:
-                            'Manage unused data to maintain your personal storage.',
-                        onTap: () {},
-                      ),
-                      const SizedBox(height: 10),
+                      // const CategoryText(text: "Cache & Cellular"),
+                      // const SizedBox(height: 10),
+                      // Settingsbtn(
+                      //   title: 'Offline Map & Zones',
+                      //   svgIcon: 'lib/resource/svg/cloud-download.svg',
+                      //   navigateTo: '',
+                      //   description:
+                      //       'Download maps and access zones without internet.',
+                      //   onTap: () {},
+                      // ),
+                      // Settingsbtn(
+                      //   title: 'Free up space',
+                      //   svgIcon: 'lib/resource/svg/recycling.svg',
+                      //   navigateTo: 'freespace',
+                      //   description:
+                      //       'Manage unused data to maintain your personal storage.',
+                      //   onTap: () {},
+                      // ),
+                      // const SizedBox(height: 10),
                       const CategoryText(text: "Help & Support Hub"),
                       const SizedBox(height: 10),
                       Settingsbtn(
@@ -667,13 +668,13 @@ class _SettingsState extends State<Settings> {
                             'Outlines rules and user responsibilities.',
                         onTap: () {},
                       ),
-                      Settingsbtn(
-                        title: 'Report a problem',
-                        svgIcon: 'lib/resource/svg/bug.svg',
-                        navigateTo: '',
-                        description: 'your concern is our priority.',
-                        onTap: () {},
-                      ),
+                      // Settingsbtn(
+                      //   title: 'Report a problem',
+                      //   svgIcon: 'lib/resource/svg/bug.svg',
+                      //   navigateTo: '',
+                      //   description: 'your concern is our priority.',
+                      //   onTap: () {},
+                      // ),
                       widget.UserToken == 'guest'
                           ? Settingsbtn(
                               title: 'Sign In',

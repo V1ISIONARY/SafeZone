@@ -63,15 +63,8 @@ class _AdminReportsUsersState extends State<AdminReportsUsers> {
       padding: const EdgeInsets.all(16),
       margin: const EdgeInsets.only(bottom: 20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color:Color.fromARGB(255, 250, 250, 250),
         borderRadius: BorderRadius.circular(10),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.2),
-            blurRadius: 5,
-            spreadRadius: 1,
-          ),
-        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -140,15 +133,8 @@ class _AdminReportsUsersState extends State<AdminReportsUsers> {
       padding: const EdgeInsets.all(16),
       margin: const EdgeInsets.only(bottom: 20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Color.fromARGB(255, 250, 250, 250),
         borderRadius: BorderRadius.circular(10),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.2),
-            blurRadius: 5,
-            spreadRadius: 1,
-          ),
-        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -276,7 +262,7 @@ class _AdminReportsUsersState extends State<AdminReportsUsers> {
           style: const TextStyle(fontSize: 13),
           decoration: InputDecoration(
             filled: true,
-            fillColor: Colors.white,
+            fillColor: Color.fromARGB(255, 250, 250, 250),
             hintText: 'Search users...',
             hintStyle: const TextStyle(fontSize: 13),
             prefixIcon: const Icon(Icons.search),
@@ -381,7 +367,7 @@ class _AdminReportsUsersState extends State<AdminReportsUsers> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: Colors.white,
       body: BlocBuilder<AdminBloc, AdminState>(
         builder: (context, state) {
           if (state is AdminLoading) {
