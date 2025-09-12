@@ -458,8 +458,8 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'user_id': _userId.toString(),
-          'latitude': latitude.toString(),
-          'longitude': longitude.toString(),
+          'latitude': latitude,
+          'longitude': longitude,
         }),
       );
 
@@ -1091,7 +1091,10 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
 
   void _updateMemberMarker(
       String userId, double latitude, double longitude) async {
-    if (userId == _userId.toString()) return;
+    if (userId == _userId.toString()) {
+      print("⏩ Skipped updating own marker for userId: $userId");
+      return;
+    }
 
     BitmapDescriptor? memberMarker = memberMarkers[userId];
 
@@ -1100,18 +1103,33 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
       orElse: () => {},
     );
 
-    if (memberData.isEmpty) return;
+    if (memberData.isEmpty) {
+      print("⚠️ No member data found for userId: $userId");
+      return;
+    }
 
     setState(() {
+      int before = markers.length;
       markers.removeWhere((marker) => marker.markerId.value == userId);
+      int afterRemove = markers.length;
+
+      if (before != afterRemove) {
+        print("🗑 Removed old marker for $userId");
+      } else {
+        print("ℹ️ No existing marker found for $userId (adding new one)");
+      }
+
       markers.add(
         Marker(
           markerId: MarkerId(userId),
           position: LatLng(latitude, longitude),
           icon: memberMarker ?? BitmapDescriptor.defaultMarker,
           infoWindow: InfoWindow(
-              title: '${memberData['first_name']} ${memberData['last_name']}'),
+            title: '${memberData['first_name']} ${memberData['last_name']}',
+          ),
           onTap: () {
+            print("👆 Marker tapped for $userId: "
+                "${memberData['first_name']} ${memberData['last_name']}");
             showMemberBottomSheet(
               userId,
               memberData['first_name'],
@@ -1124,6 +1142,10 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
           },
         ),
       );
+
+      print("✅ Added/Updated marker for $userId "
+          "(${memberData['first_name']} ${memberData['last_name']}) "
+          "@ ($latitude, $longitude) | Total markers: ${markers.length}");
     });
   }
 
