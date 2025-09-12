@@ -11,7 +11,7 @@ class FetchMapData extends MapPageEvent {}
 
 class ListenForMemberLocations extends MapPageEvent {
   final List<Map<String, dynamic>> members;
-  final int userId; 
+  final int userId;
   const ListenForMemberLocations(this.members, this.userId);
 
   @override
@@ -34,7 +34,7 @@ class UpdateMemberLocation extends MapPageEvent {
 }
 
 class RefreshMapData extends MapPageEvent {
-  final String reason; 
+  final String reason;
 
   const RefreshMapData({this.reason = 'manual'});
 

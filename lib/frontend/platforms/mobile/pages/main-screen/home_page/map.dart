@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:ui' as ui;
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_places_flutter/model/prediction.dart';
@@ -142,6 +143,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
   LatLng? _currentUserLocation;
   StreamSubscription? _locationSubscription;
   StreamSubscription<Position>? _positionStreamSubscription;
+  StreamSubscription? _membersSubscription;
 
   @override
   void didChangeDependencies() {
@@ -322,18 +324,29 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
         context.read<CircleBloc>().add(FetchMembersEvent(circleId: circleId));
       }
     }
+    if (_userId != null && circleId != null) {
+      _listenForMembers(circleId);
+    }
 
     context.read<CircleBloc>().stream.listen((state) {
       if (state is CircleMembersLoadedState) {
         context.read<MapBloc>().add(FetchMapData());
-
-        Future.delayed(const Duration(milliseconds: 500), () {
-          if (mounted && _userId != null) {
-            context
-                .read<MapBloc>()
-                .add(ListenForMemberLocations(state.members, _userId!));
-          }
-        });
+        print("CIRCLEMEMBERLOADEDSTATE IS CALLED");
+        print("CIRCLEMEMBERLOADEDSTATE IS CALLED");
+        print("CIRCLEMEMBERLOADEDSTATE IS CALLED");
+        print("CIRCLEMEMBERLOADEDSTATE IS CALLED");
+        print("CIRCLEMEMBERLOADEDSTATE IS CALLED");
+        print("CIRCLEMEMBERLOADEDSTATE IS CALLED");
+        print("CIRCLEMEMBERLOADEDSTATE IS CALLED");
+        print("CIRCLEMEMBERLOADEDSTATE IS CALLED");
+        print("CIRCLEMEMBERLOADEDSTATE IS CALLED");
+        print("CIRCLEMEMBERLOADEDSTATE IS CALLED");
+        if (mounted && _userId != null) {}
+        context
+            .read<MapBloc>()
+            .add(ListenForMemberLocations(state.members, _userId!));
+        print(
+            "🚀 ListenForMemberLocations dispatched with ${state.members.length} members");
       }
       if (state is CircleLoadedState) {
         _circles = state.circles;
@@ -439,11 +452,10 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
 
   Future<void> updateLocation(double latitude, double longitude) async {
     try {
+      // ✅ Update to your API (already existing)
       var response = await http.post(
         Uri.parse('${dotenv.env['API_URL']}/profile/update-location'),
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'user_id': _userId.toString(),
           'latitude': latitude.toString(),
@@ -452,13 +464,26 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
       );
 
       if (response.statusCode == 200) {
-        print('Location updated successfully!');
+        print('✅ Location updated successfully to API!');
       } else {
-        print('Failed to update location');
+        print('❌ Failed to update location to API');
       }
+
+      // ✅ Also update Firestore
+      await FirebaseFirestore.instance
+          .collection("locations")
+          .doc(_userId.toString())
+          .set({
+        "latitude": latitude,
+        "longitude": longitude,
+        "updatedAt": FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
+
+      print("📍 Firestore location updated: $latitude, $longitude");
     } catch (e) {
       print('Error updating location: $e');
     }
+
     findNearestSafezone();
   }
 
@@ -617,72 +642,6 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
     } catch (e) {
       print("Error loading markers: $e");
     }
-  }
-
-  Future<void> _preloadMemberMarkers(List<Map<String, dynamic>> members) async {
-    for (var member in members) {
-      String userId = member['user_id'].toString();
-      String name = member['first_name'];
-      String firstLetter = name.isNotEmpty ? name[0] : '';
-      String? profileUrl = member['profile_picture'];
-
-      if (userId == _userId.toString()) {
-        continue;
-      }
-
-      BitmapDescriptor marker =
-          await MarkerUtils.loadMemberProfileMarker(profileUrl);
-      memberMarkers[userId] = marker;
-    }
-  }
-
-  void _updateMemberMarker(
-      String userId, double latitude, double longitude) async {
-    if (userId == _userId.toString()) {
-      return;
-    }
-
-    BitmapDescriptor? memberMarker = memberMarkers[userId];
-
-    var memberData = _currentMembers.firstWhere(
-      (member) => member['user_id'].toString() == userId,
-      orElse: () => {},
-    );
-
-    if (memberData.isEmpty) {
-      print("⚠️ Member data not found for user $userId");
-      return;
-    }
-
-    String firstName = memberData['first_name'] ?? 'User';
-    String lastName = memberData['last_name'] ?? '';
-    String profile = memberData['profile_picture'] ?? '';
-
-    setState(() {
-      markers.removeWhere((marker) => marker.markerId.value == userId);
-
-      markers.add(
-        Marker(
-          markerId: MarkerId(userId),
-          position: LatLng(latitude, longitude),
-          icon: memberMarker ?? BitmapDescriptor.defaultMarker,
-          infoWindow: InfoWindow(title: '$firstName $lastName'),
-          onTap: () {
-            showMemberBottomSheet(
-              userId,
-              firstName,
-              lastName,
-              longitude,
-              latitude,
-              profile,
-              context,
-            );
-          },
-        ),
-      );
-    });
-
-    print("Updated marker for user $userId to $latitude, $longitude");
   }
 
   Set<Marker> _createMarkers(MapState state) {
@@ -1025,6 +984,164 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
     }
   }
 
+  void _listenForMembers(int circleId) {
+    // Cancel any existing subscription
+    _membersSubscription?.cancel();
+    print("🔔 Starting Firestore listener for circle $circleId");
+
+    // Listen to members in this circle who are sharing their location
+    _membersSubscription = FirebaseFirestore.instance
+        .collection("locations")
+        .where("circleSharing.$circleId", isEqualTo: true)
+        .snapshots()
+        .listen((snapshot) async {
+      print("📄 Firestore snapshot received: ${snapshot.docs.length} docs");
+
+      List<Map<String, dynamic>> members = [];
+
+      for (var doc in snapshot.docs) {
+        var data = doc.data();
+
+        // Directly get latitude and longitude from top-level fields
+        double? lat = (data['latitude'] != null)
+            ? (data['latitude'] as num).toDouble()
+            : null;
+        double? lng = (data['longitude'] != null)
+            ? (data['longitude'] as num).toDouble()
+            : null;
+
+        if (lat != null && lng != null) {
+          members.add({
+            'user_id': doc.id,
+            'first_name': data['first_name'] ?? 'User',
+            'last_name': data['last_name'] ?? '',
+            'profile_picture': data['profile_picture'] ?? '',
+            'latitude': lat,
+            'longitude': lng,
+          });
+
+          print(
+              "👤 Member added: ${data['first_name']} ${data['last_name']} at ($lat, $lng)");
+        } else {
+          print("⚠️ Member ${doc.id} skipped: no valid location");
+        }
+      }
+      context.read<MapBloc>().add(ListenForMemberLocations(members, _userId!));
+
+      print("✅ Total valid members fetched: ${members.length}");
+      _currentMembers = members;
+
+      print("⏳ Preloading custom member markers...");
+      await _preloadMemberMarkers(members);
+
+      print("🗺 Updating member markers on map...");
+      _updateMemberMarkersOnMap();
+    });
+  }
+
+  void _updateMemberMarkersOnMap() {
+    if (!mounted) return;
+
+    setState(() {
+      // Remove old member markers
+      markers.removeWhere((marker) => _currentMembers
+          .any((member) => member['user_id'] == marker.markerId.value));
+
+      // Add updated member markers
+      markers.addAll(_createMemberMarkers(_currentMembers));
+      print("Member markers updated on map: ${_currentMembers.length}");
+    });
+  }
+
+  Set<Marker> _createMemberMarkers(List<Map<String, dynamic>> members) {
+    Set<Marker> memberMarkersSet = {};
+
+    for (var member in members) {
+      String userId = member['user_id'].toString();
+      String firstName = member['first_name'] ?? 'User';
+      String lastName = member['last_name'] ?? '';
+      double latitude = member['latitude'];
+      double longitude = member['longitude'];
+      String profile = member['profile_picture'] ?? '';
+
+      if (userId == _userId.toString()) continue;
+
+      BitmapDescriptor? markerIcon = memberMarkers[userId];
+
+      print(
+          "📌 Creating marker for $firstName $lastName at ($latitude, $longitude) with icon ${markerIcon != null ? 'custom' : 'default'}");
+
+      memberMarkersSet.add(
+        Marker(
+          markerId: MarkerId(userId),
+          position: LatLng(latitude, longitude),
+          icon: markerIcon ?? BitmapDescriptor.defaultMarker,
+          infoWindow: InfoWindow(title: '$firstName $lastName'),
+          onTap: () {
+            showMemberBottomSheet(userId, firstName, lastName, longitude,
+                latitude, profile, context);
+          },
+        ),
+      );
+    }
+
+    print("🎯 Total member markers created: ${memberMarkersSet.length}");
+    return memberMarkersSet;
+  }
+
+  void _updateMemberMarker(
+      String userId, double latitude, double longitude) async {
+    if (userId == _userId.toString()) return;
+
+    BitmapDescriptor? memberMarker = memberMarkers[userId];
+
+    var memberData = _currentMembers.firstWhere(
+      (member) => member['user_id'] == userId,
+      orElse: () => {},
+    );
+
+    if (memberData.isEmpty) return;
+
+    setState(() {
+      markers.removeWhere((marker) => marker.markerId.value == userId);
+      markers.add(
+        Marker(
+          markerId: MarkerId(userId),
+          position: LatLng(latitude, longitude),
+          icon: memberMarker ?? BitmapDescriptor.defaultMarker,
+          infoWindow: InfoWindow(
+              title: '${memberData['first_name']} ${memberData['last_name']}'),
+          onTap: () {
+            showMemberBottomSheet(
+              userId,
+              memberData['first_name'],
+              memberData['last_name'],
+              longitude,
+              latitude,
+              memberData['profile_picture'],
+              context,
+            );
+          },
+        ),
+      );
+    });
+  }
+
+  Future<void> _preloadMemberMarkers(List<Map<String, dynamic>> members) async {
+    for (var member in members) {
+      String userId = member['user_id'];
+      if (userId == _userId.toString()) continue;
+
+      String? profileUrl = member['profile_picture'];
+      if (!memberMarkers.containsKey(userId)) {
+        BitmapDescriptor marker =
+            await MarkerUtils.loadMemberProfileMarker(profileUrl);
+        memberMarkers[userId] = marker;
+        print("🖼 Marker preloaded for member $userId (profile: $profileUrl)");
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -1040,9 +1157,18 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                 BlocListener<MapBloc, MapState>(
                   listener: (context, state) {
                     if (state is MemberLocationUpdated) {
-                      print("Real-time update received for user ${state.userId}");
+                      print(
+                          "}}}}}}}}}}}}}}}}}}}}}}}}}}MemberLocationUpdated received for user: ${state.userId}");
                       _updateMemberMarker(
-                          state.userId, state.latitude, state.longitude);
+                        state.userId,
+                        state.latitude,
+                        state.longitude,
+                      );
+                      print(state.userId);
+                      print(
+                        state.latitude,
+                      );
+                      print(state.longitude);
                     }
                   },
                 ),
@@ -1065,23 +1191,21 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                 builder: (context, state) {
                   if (state is MapLoading) {
                     return Expanded(
-                      child: Container(
-                        color: ui.Color.fromARGB(199, 250, 250, 250),
-                        child: Center(
-                          child: Transform.translate(
+                        child: Container(
+                      color: ui.Color.fromARGB(199, 250, 250, 250),
+                      child: Center(
+                        child: Transform.translate(
                             offset: const Offset(-40, 0),
-                            child: const LoadingState()
-                          ),
-                        ),
-                      )
-                    );
+                            child: const LoadingState()),
+                      ),
+                    ));
                   } else if (state is MapDataLoaded) {
-                    _currentMembers = state.members;
+                    //_currentMembers = state.members;
 
-                    WidgetsBinding.instance.addPostFrameCallback((_) async {
-                      await _preloadMemberMarkers(state.members);
-                      setState(() {});
-                    });
+                    // WidgetsBinding.instance.addPostFrameCallback((_) async {
+                    //   await _preloadMemberMarkers(state.members);
+                    //   setState(() {});
+                    // });
                   } else if (state is MapError) {
                     return Center(child: Text(state.message));
                   }
@@ -1288,10 +1412,11 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                                 _circles.isEmpty
                                                     ? const Center(
                                                         child: SizedBox(
-                                                          
-                                                          child:
-                                                              Text("No Circle", style: TextStyle(fontSize: 11, color: Colors.black54)
-                                                        ),
+                                                        child: Text("No Circle",
+                                                            style: TextStyle(
+                                                                fontSize: 11,
+                                                                color: Colors
+                                                                    .black54)),
                                                       ))
                                                     : Column(
                                                         mainAxisAlignment:
