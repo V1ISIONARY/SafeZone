@@ -26,6 +26,7 @@ class MapBloc extends Bloc<MapPageEvent, MapState> {
   }) : super(MapInitial()) {
     on<FetchMapData>(_onFetchMapData);
     on<ListenForMemberLocations>(_onListenForMemberLocations);
+    on<UpdateMemberLocation>(_onUpdateMemberLocation); // ✅ FIXED
     on<RefreshMapData>(_onRefreshMapData);
   }
 
@@ -35,17 +36,16 @@ class MapBloc extends Bloc<MapPageEvent, MapState> {
     try {
       final combinedZones = await combinedZonesRepository.getCombinedZones();
       final SharedPreferences prefs = await SharedPreferences.getInstance();
-      final int userId = prefs.getInt('circle') ?? 0;
+      final int circleId = prefs.getInt('circle') ?? 0;
 
-      final members = await circleRepository.viewMembers(userId);
+      final members = await circleRepository.viewMembers(circleId);
 
-      if (members.isNotEmpty) {
-        emit(MapDataLoaded(
-            combinedZones.safeZones, combinedZones.dangerZones, members));
-      } else {
-        emit(MapDataLoaded(
-            combinedZones.safeZones, combinedZones.dangerZones, const []));
-      }
+      _currentSafeZones = combinedZones.safeZones;
+      _currentDangerZones = combinedZones.dangerZones;
+      _currentMembers = members;
+
+      emit(MapDataLoaded(
+          _currentSafeZones, _currentDangerZones, _currentMembers));
     } catch (e) {
       emit(MapError(e.toString()));
     }
@@ -98,7 +98,9 @@ class MapBloc extends Bloc<MapPageEvent, MapState> {
                   double latitude = double.parse(data['latitude'].toString());
                   double longitude = double.parse(data['longitude'].toString());
                   print("Location shared for circle $currentCircleId");
-                  emit(MemberLocationUpdated(userId, latitude, longitude));
+
+                  // ✅ FIXED - now dispatches UpdateMemberLocation
+                  add(UpdateMemberLocation(userId, latitude, longitude));
                 } else {
                   print(
                       "User $userId is NOT sharing location with circle $currentCircleId");
@@ -119,6 +121,43 @@ class MapBloc extends Bloc<MapPageEvent, MapState> {
     } catch (e) {
       print("Error in _onListenForMemberLocations: $e");
       emit(MapError(e.toString()));
+    }
+  }
+
+  void _onUpdateMemberLocation(
+    UpdateMemberLocation event,
+    Emitter<MapState> emit,
+  ) {
+    print("⚡ _onUpdateMemberLocation triggered for user: ${event.userId}");
+    print("Incoming coordinates: (${event.latitude}, ${event.longitude})");
+
+    if (state is MapDataLoaded) {
+      final current = state as MapDataLoaded;
+      print(
+          "Current MapDataLoaded state found with ${current.members.length} members");
+
+      // Update member list with new coordinates
+      final updatedMembers = current.members.map((m) {
+        if (m['user_id'].toString() == event.userId) {
+          print("Updating coordinates for member: ${event.userId}");
+          return {
+            ...m,
+            'latitude': event.latitude,
+            'longitude': event.longitude,
+          };
+        }
+        return m;
+      }).toList();
+
+      print("Emitting MemberLocationUpdated for UI listener");
+      emit(
+          MemberLocationUpdated(event.userId, event.latitude, event.longitude));
+
+      print("Emitting updated MapDataLoaded with members updated");
+      emit(MapDataLoaded(
+          current.safeZones, current.dangerZones, updatedMembers));
+    } else {
+      print("⚠️ State is not MapDataLoaded, current state: $state");
     }
   }
 
