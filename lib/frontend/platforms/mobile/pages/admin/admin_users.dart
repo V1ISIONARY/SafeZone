@@ -63,7 +63,7 @@ class _AdminReportsUsersState extends State<AdminReportsUsers> {
       padding: const EdgeInsets.all(16),
       margin: const EdgeInsets.only(bottom: 20),
       decoration: BoxDecoration(
-        color:Color.fromARGB(255, 250, 250, 250),
+        color: Color.fromARGB(255, 250, 250, 250),
         borderRadius: BorderRadius.circular(10),
       ),
       child: Column(
@@ -488,7 +488,6 @@ class AdminRequestCard extends StatelessWidget {
                         color: Colors.grey,
                       ),
                     ),
-                   
                   ],
                 ),
               ],

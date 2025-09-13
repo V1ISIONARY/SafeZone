@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
@@ -19,12 +20,67 @@ class ListOfGroups extends StatefulWidget {
 
 class _ListOfGroupsState extends State<ListOfGroups> {
   List<CircleModel> _circles = [];
+  final Map<int, int> _sharingCounts = {};
+  final Map<int, int> _memberCounts = {};
   int? _userId;
+
+  StreamSubscription? _subscription;
 
   @override
   void initState() {
     super.initState();
     _loadUserId();
+  }
+
+  @override
+  void dispose() {
+    _subscription?.cancel();
+    super.dispose();
+  }
+
+  void _listenForCounts() {
+    _subscription?.cancel();
+
+    _subscription = FirebaseFirestore.instance
+        .collection("locations")
+        .snapshots()
+        .listen((snapshot) {
+      if (_circles.isEmpty) return;
+
+      final newSharingCounts = <int, int>{};
+      final newMemberCounts = <int, int>{};
+
+      for (var circle in _circles) {
+        int sharing = 0;
+        int members = 0;
+
+        for (var doc in snapshot.docs) {
+          final data = doc.data() as Map<String, dynamic>;
+          final circleSharing = data["circleSharing"] as Map<String, dynamic>?;
+
+          if (circleSharing != null &&
+              circleSharing.containsKey("${circle.id}")) {
+            members++;
+            if (circleSharing["${circle.id}"] == true) {
+              sharing++;
+            }
+          }
+        }
+
+        newSharingCounts[circle.id] = sharing;
+        newMemberCounts[circle.id] = members;
+      }
+
+      setState(() {
+        _sharingCounts
+          ..clear()
+          ..addAll(newSharingCounts);
+
+        _memberCounts
+          ..clear()
+          ..addAll(newMemberCounts);
+      });
+    });
   }
 
   Future<void> _loadUserId() async {
@@ -397,6 +453,7 @@ class _ListOfGroupsState extends State<ListOfGroups> {
                     setState(() {
                       _circles = state.circles;
                     });
+                    _listenForCounts();
                   }
                 },
                 child: BlocBuilder<CircleBloc, CircleState>(
@@ -442,9 +499,7 @@ class _ListOfGroupsState extends State<ListOfGroups> {
                                 child: Container(
                                   width: double.infinity,
                                   margin: const EdgeInsets.only(
-                                    left: 10, 
-                                    right: 10,
-                                    bottom: 10),
+                                      left: 10, right: 10, bottom: 10),
                                   padding:
                                       const EdgeInsets.symmetric(vertical: 10),
                                   decoration: BoxDecoration(
@@ -477,9 +532,9 @@ class _ListOfGroupsState extends State<ListOfGroups> {
                                               MainAxisAlignment.center,
                                           children: [
                                             CategoryText(text: group.name),
-                                            const Text(
-                                              "3 active · 5 members",
-                                              style: TextStyle(
+                                            Text(
+                                              "${_sharingCounts[group.id] ?? 0} sharing · ${_memberCounts[group.id] ?? 0} members",
+                                              style: const TextStyle(
                                                   fontSize: 10,
                                                   color: Colors.black38),
                                             )

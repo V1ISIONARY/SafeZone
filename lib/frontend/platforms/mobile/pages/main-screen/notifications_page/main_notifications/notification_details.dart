@@ -15,18 +15,31 @@ class NotificationDetails extends StatefulWidget {
 class _NotificationDetailsState extends State<NotificationDetails> {
   @override
   Widget build(BuildContext context) {
+    final notification = widget.notificationModel;
+    final bool isSOS = notification.type.toUpperCase() == "SOS";
+
+    final String backgroundImage = isSOS
+        ? 'lib/resource/image/png/notif_sos5.png'
+        : 'lib/resource/image/png/notif_info.png';
+
+    String? location;
+    if (isSOS && notification.message.contains("- Location:")) {
+      final parts = notification.message.split("- Location:");
+      if (parts.length > 1) {
+        location = parts[1].trim();
+      }
+    }
+
     return Scaffold(
       body: Stack(
         children: [
-          // TODO: add conditional statement to check notif's type and display the correct image
           SizedBox(
             width: double.infinity,
             child: Image.asset(
-              'lib/resource/image/png/notif_sos5.png',
+              backgroundImage,
               fit: BoxFit.cover,
             ),
           ),
-
           Column(
             children: [
               SafeArea(
@@ -50,7 +63,7 @@ class _NotificationDetailsState extends State<NotificationDetails> {
                         ),
                       ),
                       const Spacer(),
-                      CategoryText(text: widget.notificationModel.title),
+                      CategoryText(text: notification.title),
                       const Spacer(),
                       const SizedBox(width: 44),
                     ],
@@ -74,17 +87,29 @@ class _NotificationDetailsState extends State<NotificationDetails> {
                 ),
                 child: RichText(
                   textAlign: TextAlign.center,
-                  text: const TextSpan(
-                    text: 'widget.notificationModel.name',
-                    style: TextStyle(color: Color(0xffDA5C56), fontSize: 13),
-                    children: [
-                      TextSpan(
-                        text: ", has triggered the SOS!!",
-                        style: TextStyle(
-                          color: Colors.black,
-                        ),
-                      ),
-                    ],
+                  text: TextSpan(
+                    children: isSOS
+                        ? [
+                            TextSpan(
+                              text: notification.message
+                                  .split("- Location:")
+                                  .first
+                                  .trim(),
+                              style: const TextStyle(
+                                color: Colors.black,
+                                fontSize: 13,
+                              ),
+                            ),
+                          ]
+                        : [
+                            TextSpan(
+                              text: notification.message,
+                              style: const TextStyle(
+                                color: Colors.black,
+                                fontSize: 13,
+                              ),
+                            ),
+                          ],
                   ),
                 ),
               ),
@@ -103,32 +128,37 @@ class _NotificationDetailsState extends State<NotificationDetails> {
                       ),
                     ],
                   ),
-                  child: const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 20),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Padding(
+                        const Padding(
                           padding: EdgeInsets.only(left: 8.0),
                           child: Text(
                             'Details',
                             style: TextStyle(fontSize: 13),
                           ),
                         ),
-                        Padding(
+                        const Padding(
                           padding: EdgeInsets.only(right: 8, left: 8, top: 8),
                           child: Divider(
                             color: labelFormFieldColor,
                             thickness: 0.1,
                           ),
                         ),
+                        RowText(title: "Message", text: notification.message),
+                        RowText(title: "Type", text: notification.type),
                         RowText(
-                            title: "Location",
-                            text: "widget.notificationModel.location"),
-                        RowText(title: "Contact", text: "09123454345"),
+                            title: "Created At", text: notification.createdAt),
                         RowText(
-                            title: "Remarks", text: "remarksremarksremarks"),
-                        RowText(title: "Otherother", text: "asdfasdfasdf"),
+                            title: "Status",
+                            text: notification.isDone ? "Resolved" : "Ongoing"),
+
+                        // Show Location only if SOS
+                        if (isSOS && location != null)
+                          RowText(title: "Location", text: location),
                       ],
                     ),
                   ),

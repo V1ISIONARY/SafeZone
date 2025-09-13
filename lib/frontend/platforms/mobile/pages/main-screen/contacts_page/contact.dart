@@ -5,6 +5,7 @@ import 'package:safezone/backend/models/userModel/contacts_model.dart';
 import 'package:safezone/frontend/platforms/mobile/widgets/loading/shimmer_loading.dart';
 
 import '../../../../../../backend/properties/import.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class Contact extends StatefulWidget {
   final String UserToken;
@@ -20,6 +21,17 @@ class _ContactState extends State<Contact> with SingleTickerProviderStateMixin {
   List<ContactsModel> localContacts = [];
   late AnimationController _controller;
   late Animation<double> _animation;
+
+  Future<void> _makePhoneCall(String phoneNumber) async {
+    final cleaned = phoneNumber.replaceAll(RegExp(r'[^0-9+]'), '');
+    final Uri uri = Uri(scheme: 'tel', path: cleaned);
+
+    if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("No dialer found for $cleaned")),
+      );
+    }
+  }
 
   Future<void> loadUserId() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -116,9 +128,13 @@ class _ContactState extends State<Contact> with SingleTickerProviderStateMixin {
                             itemCount: localContacts.length,
                             itemBuilder: (context, index) {
                               final contact = localContacts[index];
-                              return Contactinfo(
-                                name: contact.name,
-                                phone: contact.phoneNumber,
+                              return GestureDetector(
+                                onTap: () =>
+                                    _makePhoneCall(contact.phoneNumber),
+                                child: Contactinfo(
+                                  name: contact.name,
+                                  phone: contact.phoneNumber,
+                                ),
                               );
                             },
                           ),
