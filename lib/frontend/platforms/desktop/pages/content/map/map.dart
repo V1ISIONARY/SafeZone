@@ -613,9 +613,8 @@ class _MapDTState extends State<MapDT> with TickerProviderStateMixin {
 
   Future<void> _createCustomMarker() async {
     try {
-      customMyLocationMarker = await MarkerUtils.createCustomMarker(
-        context, widgetPricolor, profilePictureUrl
-      );
+      customMyLocationMarker = await MarkerUtils.createCustomUserMarker(
+          context, widgetPricolor, profilePictureUrl);
 
       customPendingDangerZoneMarker = await MarkerUtils.resizeMarker(
         'lib/resource/image/png/marker_danger_pending.png',

@@ -113,6 +113,13 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
 
   List<Map<String, dynamic>> _currentMembers = [];
 
+  bool get _areCustomMarkersLoaded {
+    return customMyLocationMarker != null &&
+        customDangerZoneMarker != null &&
+        customPendingDangerZoneMarker != null &&
+        customSafeZoneMarker != null;
+  }
+
   void _toggleExpand() {
     setState(() {
       _isExpanded = !_isExpanded;
@@ -163,11 +170,6 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
 
     _initSharedPreferences();
     _runInitLogicOnce();
-
-    _createCustomMarker().then((_) {
-      _fetchLocation();
-      setState(() {});
-    });
 
     _speech = stt.SpeechToText();
 
@@ -227,10 +229,10 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
     final prefs = await SharedPreferences.getInstance();
 
     bool hasRunBefore = prefs.getBool('mapsHasInitialized') ?? false;
+    context.read<MapBloc>().add(FetchMapData());
+    context.read<DangerZoneBloc>().add(FetchDangerZones());
 
     if (!hasRunBefore) {
-      context.read<MapBloc>().add(FetchMapData());
-      context.read<DangerZoneBloc>().add(FetchDangerZones());
       await prefs.setBool('mapsHasInitialized', true);
       print("✅ Maps init logic executed");
     } else {
@@ -314,6 +316,10 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
     int? circleId = prefs.getInt('circle');
     profilePictureUrl = prefs.getString('profile_picture_url') ??
         'https://storage.googleapis.com/safezone-11724.firebasestorage.app/profile_pictures/2.jpg';
+
+    await _createCustomMarker();
+
+    _fetchLocation();
 
     if (userId != null) {
       setState(() {
@@ -615,31 +621,33 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
 
   Future<void> _createCustomMarker() async {
     try {
-      customMyLocationMarker = await MarkerUtils.createCustomMarker(
-        context, widgetPricolor, profilePictureUrl
-      );
+      customMyLocationMarker = await MarkerUtils.createCustomUserMarker(
+          context, widgetPricolor, profilePictureUrl);
 
       customPendingDangerZoneMarker = await MarkerUtils.resizeMarker(
         'lib/resource/image/png/marker_danger_pending.png',
-        55,
-        60,
+        70,
+        77,
       );
 
       customDangerZoneMarker = await MarkerUtils.resizeMarker(
         'lib/resource/image/png/dangerzone.png',
-        55,
-        60,
+        70,
+        77,
       );
 
       customSafeZoneMarker = await MarkerUtils.resizeMarker(
         'lib/resource/image/png/safezone.png',
-        55,
-        60,
+        70,
+        77,
       );
 
       if (mounted) {
-        setState(() {});
+        setState(() {
+        });
       }
+
+      print("✅ All custom markers loaded successfully");
     } catch (e) {
       print("Error loading markers: $e");
     }
@@ -648,14 +656,27 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
   Set<Marker> _createMarkers(MapState state) {
     Set<Marker> markers = {};
 
+    if (!_areCustomMarkersLoaded) {
+      print("Custom markers not yet loaded, showing minimal markers");
+      if (_currentUserLocation != null) {
+        markers.add(
+          Marker(
+            markerId: const MarkerId("My Location"),
+            position: _currentUserLocation!,
+            icon: BitmapDescriptor.defaultMarker,
+            infoWindow: const InfoWindow(title: 'My Location'),
+          ),
+        );
+      }
+      return markers;
+    }
+
     if (_currentUserLocation != null) {
       markers.add(
         Marker(
           markerId: const MarkerId("My Location"),
           position: _currentUserLocation!,
-          icon: customMyLocationMarker != null
-              ? customMyLocationMarker!
-              : BitmapDescriptor.defaultMarker,
+          icon: customMyLocationMarker!,
           infoWindow: const InfoWindow(title: 'My Location'),
         ),
       );
@@ -692,17 +713,13 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
 
       for (var dangerZone in state.dangerZones) {
         final dangerZoneIcon = dangerZone.isVerified
-            ? (customDangerZoneMarker != null
-                ? customDangerZoneMarker
-                : BitmapDescriptor.defaultMarker)
-            : (customPendingDangerZoneMarker != null
-                ? customPendingDangerZoneMarker
-                : BitmapDescriptor.defaultMarker);
+            ? customDangerZoneMarker!
+            : customPendingDangerZoneMarker!;
 
         markers.add(
           Marker(
             markerId: MarkerId(dangerZone.id.toString()),
-            icon: dangerZoneIcon!,
+            icon: dangerZoneIcon,
             position: LatLng(dangerZone.latitude!, dangerZone.longitude!),
             infoWindow: InfoWindow(title: dangerZone.name),
             onTap: () {
@@ -731,9 +748,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
         markers.add(
           Marker(
             markerId: MarkerId(safeZone.id.toString()),
-            icon: customSafeZoneMarker != null
-                ? customSafeZoneMarker!
-                : BitmapDescriptor.defaultMarker,
+            icon: customSafeZoneMarker!,
             position: LatLng(safeZone.latitude!, safeZone.longitude!),
             infoWindow: InfoWindow(title: safeZone.name),
             onTap: () {

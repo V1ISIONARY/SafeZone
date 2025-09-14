@@ -22,7 +22,7 @@ class MarkerUtils {
     return BitmapDescriptor.fromBytes(resizedData);
   }
 
-  static Future<BitmapDescriptor> createCustomMarker(
+  static Future<BitmapDescriptor> createCustomUserMarker(
     BuildContext context,
     Color widgetColor,
     String profilePictureUrl,
@@ -36,6 +36,7 @@ class MarkerUtils {
       const double imageSize = 80;
       final Offset imageCenter = Offset(pinWidth / 2, pinHeight / 3);
 
+      // Draw the pin shape
       final Paint pinPaint = Paint()..color = widgetColor;
       final Path pinPath = Path()
         ..moveTo(pinWidth / 2, pinHeight)
@@ -49,14 +50,7 @@ class MarkerUtils {
         ..close();
       canvas.drawPath(pinPath, pinPaint);
 
-      final Paint bgPaint = Paint()..color = const Color(0xFFF0EEEE);
-      final Rect bgRect = Rect.fromCenter(
-        center: imageCenter,
-        width: imageSize,
-        height: imageSize,
-      );
-      canvas.drawRect(bgRect, bgPaint);
-
+      // Load profile image
       ui.Image profileImage;
       try {
         final Completer<ui.Image> completer = Completer();
@@ -82,24 +76,41 @@ class MarkerUtils {
         profileImage = frame.image;
       }
 
-      // 🔑 Adjust corner radius here
-      final RRect roundedRect = RRect.fromRectAndRadius(
-        bgRect,
-        const Radius.circular(12), // change this value for more/less roundness
+      // Create circular clipping path for the profile image
+      final double radius = imageSize / 2;
+      final Rect imageRect = Rect.fromCenter(
+        center: imageCenter,
+        width: imageSize,
+        height: imageSize,
       );
 
+      // Draw white background circle (optional, for better contrast)
+      final Paint bgPaint = Paint()..color = const Color(0xFFF0EEEE);
+      canvas.drawCircle(imageCenter, radius + 2, bgPaint);
+
+      // Clip to circular shape and draw profile image
       canvas.save();
-      canvas.clipRRect(roundedRect);
+      canvas.clipPath(
+        Path()..addOval(imageRect),
+      );
       paintImage(
         canvas: canvas,
         image: profileImage,
-        rect: bgRect,
+        rect: imageRect,
         fit: BoxFit.cover,
       );
       canvas.restore();
 
-      final ui.Image finalImage =
-          await pictureRecorder.endRecording().toImage(pinWidth.toInt(), pinHeight.toInt());
+      // Optional: Add circular border
+      final Paint borderPaint = Paint()
+        ..color = Colors.white
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 3;
+      canvas.drawCircle(imageCenter, radius, borderPaint);
+
+      final ui.Image finalImage = await pictureRecorder
+          .endRecording()
+          .toImage(pinWidth.toInt(), pinHeight.toInt());
       final ByteData? byteData =
           await finalImage.toByteData(format: ui.ImageByteFormat.png);
       return BitmapDescriptor.fromBytes(byteData!.buffer.asUint8List());
@@ -129,8 +140,8 @@ class MarkerUtils {
         final response = await request.close();
         if (response.statusCode == 200) {
           final bytes = await consolidateHttpClientResponseBytes(response);
-          final codec = await ui.instantiateImageCodec(
-              bytes, targetWidth: 100, targetHeight: 114);
+          final codec = await ui.instantiateImageCodec(bytes,
+              targetWidth: 100, targetHeight: 114);
           final frame = await codec.getNextFrame();
           profileImage = frame.image;
         } else {
@@ -160,7 +171,8 @@ class MarkerUtils {
     final double top = ((114 - profileSize) / 2) - 7;
     final Rect imageRect = Rect.fromLTWH(left, top, profileSize, profileSize);
 
-    final RRect roundedRect = RRect.fromRectAndRadius(imageRect, const Radius.circular(15));
+    final RRect roundedRect =
+        RRect.fromRectAndRadius(imageRect, const Radius.circular(15));
 
     canvas.save();
     canvas.clipRRect(roundedRect);
