@@ -5,7 +5,6 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:geocoding/geocoding.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:url_launcher/url_launcher.dart';
 
 Future<bool> hasStreetViewImagery(double lat, double lng, String apiKey) async {
   final url = Uri.parse(
@@ -57,8 +56,14 @@ void showDangerZoneBottomSheet(
     builder: (context) {
       return SingleChildScrollView(
         child: Container(
-          color: Colors.white,
           padding: const EdgeInsets.all(16.0),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(10),
+              topRight: Radius.circular(10)
+            )
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
@@ -117,7 +122,7 @@ void showDangerZoneBottomSheet(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Icon(Icons.location_on, color: widgetPricolor, size: 20),
-                  const SizedBox(width: 4),
+                  const SizedBox(width: 10),
                   Expanded(
                     child: Text(
                       readableAddress,
@@ -126,24 +131,24 @@ void showDangerZoneBottomSheet(
                   ),
                 ],
               ),
-              const SizedBox(height: 10.0),
-              ElevatedButton.icon(
-                onPressed: () {
-                  final googleMapsUrl =
-                      'https://www.google.com/maps/search/?api=1&query=$lat,$lng';
-                  launchUrl(Uri.parse(googleMapsUrl),
-                      mode: LaunchMode.externalApplication);
-                },
-                icon: const Icon(
-                  Icons.map,
-                  color: widgetPricolor,
-                ),
-                label: const Text('Open in Maps'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  foregroundColor: textColor,
-                ),
-              ),
+              // const SizedBox(height: 10.0),
+              // ElevatedButton.icon(
+              //   onPressed: () {
+              //     final googleMapsUrl =
+              //         'https://www.google.com/maps/search/?api=1&query=$lat,$lng';
+              //     launchUrl(Uri.parse(googleMapsUrl),
+              //         mode: LaunchMode.externalApplication);
+              //   },
+              //   icon: const Icon(
+              //     Icons.map,
+              //     color: widgetPricolor,
+              //   ),
+              //   label: const Text('Open in Maps'),
+              //   style: ElevatedButton.styleFrom(
+              //     backgroundColor: Colors.white,
+              //     foregroundColor: textColor,
+              //   ),
+              // ),
               const SizedBox(height: 25.0),
             ],
           ),

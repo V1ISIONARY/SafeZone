@@ -69,7 +69,7 @@ void showMemberBottomSheet(
               Container(
                 padding: const EdgeInsets.all(8.0),
                 decoration: const BoxDecoration(
-                  color: Color.fromARGB(255, 245, 245, 245),
+                  color: const Color.fromARGB(255, 250, 250, 250),
                   borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(30),
                     topRight: Radius.circular(5),
@@ -82,7 +82,10 @@ void showMemberBottomSheet(
                     Row(
                       children: [
                         Padding(
-                          padding: const EdgeInsets.all(8.0),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8.0,
+                            vertical: 15
+                          ),
                           child: CircleAvatar(
                             radius: 20.0,
                             backgroundImage: profile.isNotEmpty
@@ -92,7 +95,7 @@ void showMemberBottomSheet(
                                     as ImageProvider,
                           ),
                         ),
-                        const SizedBox(width: 5.0),
+                        const SizedBox(width: 10),
                         Text('$firstName $lastName',
                             style: const TextStyle(
                                 fontSize: 18,

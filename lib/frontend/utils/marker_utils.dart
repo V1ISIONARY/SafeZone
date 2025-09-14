@@ -19,7 +19,6 @@ class MarkerUtils {
     ByteData? byteData =
         await frameInfo.image.toByteData(format: ui.ImageByteFormat.png);
     Uint8List resizedData = byteData!.buffer.asUint8List();
-
     return BitmapDescriptor.fromBytes(resizedData);
   }
 
@@ -34,15 +33,15 @@ class MarkerUtils {
 
       const double pinWidth = 100;
       const double pinHeight = 160;
-      const double circleRadius = 40;
-      const Offset circleCenter = Offset(pinWidth / 2, pinHeight / 3);
+      const double imageSize = 80;
+      final Offset imageCenter = Offset(pinWidth / 2, pinHeight / 3);
 
       final Paint pinPaint = Paint()..color = widgetColor;
       final Path pinPath = Path()
         ..moveTo(pinWidth / 2, pinHeight)
         ..quadraticBezierTo(0, pinHeight * 0.75, 0, pinHeight / 3)
         ..arcToPoint(
-          const Offset(pinWidth, pinHeight / 3),
+          Offset(pinWidth, pinHeight / 3),
           radius: const Radius.circular(pinWidth / 4),
           clockwise: true,
         )
@@ -50,31 +49,31 @@ class MarkerUtils {
         ..close();
       canvas.drawPath(pinPath, pinPaint);
 
-      final Paint circlePaint = Paint()..color = const Color(0xFFF0EEEE);
-      canvas.drawCircle(circleCenter, circleRadius, circlePaint);
+      final Paint bgPaint = Paint()..color = const Color(0xFFF0EEEE);
+      final Rect bgRect = Rect.fromCenter(
+        center: imageCenter,
+        width: imageSize,
+        height: imageSize,
+      );
+      canvas.drawRect(bgRect, bgPaint);
 
       ui.Image profileImage;
-
       try {
         final Completer<ui.Image> completer = Completer();
         final ImageStream stream =
             NetworkImage(profilePictureUrl).resolve(const ImageConfiguration());
-
         final listener = ImageStreamListener((info, _) {
           completer.complete(info.image);
         }, onError: (error, stackTrace) {
           completer.completeError(error);
         });
-
         stream.addListener(listener);
         profileImage = await completer.future.timeout(
           const Duration(seconds: 5),
           onTimeout: () => throw Exception("Network image timeout"),
         );
         stream.removeListener(listener);
-      } catch (e) {
-        print('dis should show the url $profilePictureUrl');
-        print('⚠️ Failed to load network image, using local asset. $e');
+      } catch (_) {
         final ByteData bytes =
             await rootBundle.load('lib/resource/image/jpg/profile.jpg');
         final codec =
@@ -83,37 +82,34 @@ class MarkerUtils {
         profileImage = frame.image;
       }
 
-      final Path clipPath = Path()
-        ..addOval(Rect.fromCircle(center: circleCenter, radius: circleRadius));
+      // 🔑 Adjust corner radius here
+      final RRect roundedRect = RRect.fromRectAndRadius(
+        bgRect,
+        const Radius.circular(12), // change this value for more/less roundness
+      );
 
       canvas.save();
-      canvas.clipPath(clipPath);
-
+      canvas.clipRRect(roundedRect);
       paintImage(
         canvas: canvas,
         image: profileImage,
-        rect: Rect.fromCircle(center: circleCenter, radius: circleRadius),
+        rect: bgRect,
         fit: BoxFit.cover,
       );
-
       canvas.restore();
 
-      final ui.Image finalImage = await pictureRecorder
-          .endRecording()
-          .toImage(pinWidth.toInt(), pinHeight.toInt());
+      final ui.Image finalImage =
+          await pictureRecorder.endRecording().toImage(pinWidth.toInt(), pinHeight.toInt());
       final ByteData? byteData =
           await finalImage.toByteData(format: ui.ImageByteFormat.png);
-
       return BitmapDescriptor.fromBytes(byteData!.buffer.asUint8List());
-    } catch (e) {
-      print('❌ Error creating marker: $e');
+    } catch (_) {
       return BitmapDescriptor.defaultMarker;
     }
   }
 
   static Future<BitmapDescriptor> loadMemberProfileMarker(
       String? imageUrl) async {
-    // Load marker background
     ByteData baseData =
         await rootBundle.load('lib/resource/image/png/marker_member.png');
     ui.Codec baseCodec = await ui.instantiateImageCodec(
@@ -124,7 +120,6 @@ class MarkerUtils {
     ui.FrameInfo baseFrame = await baseCodec.getNextFrame();
     ui.Image baseImage = baseFrame.image;
 
-    // Load profile picture
     ui.Image profileImage;
     try {
       final Uri? uri = Uri.tryParse(imageUrl ?? '');
@@ -132,11 +127,10 @@ class MarkerUtils {
         final httpClient = HttpClient();
         final request = await httpClient.getUrl(uri);
         final response = await request.close();
-
         if (response.statusCode == 200) {
           final bytes = await consolidateHttpClientResponseBytes(response);
-          final codec = await ui.instantiateImageCodec(bytes,
-              targetWidth: 95, targetHeight: 95);
+          final codec = await ui.instantiateImageCodec(
+              bytes, targetWidth: 100, targetHeight: 114);
           final frame = await codec.getNextFrame();
           profileImage = frame.image;
         } else {
@@ -150,27 +144,26 @@ class MarkerUtils {
           await rootBundle.load('lib/resource/image/jpg/profile.jpg');
       final codec = await ui.instantiateImageCodec(
           fallback.buffer.asUint8List(),
-          targetWidth: 95,
-          targetHeight: 95);
+          targetWidth: 100,
+          targetHeight: 114);
       final frame = await codec.getNextFrame();
       profileImage = frame.image;
     }
 
-    // Draw marker with profile image
     final recorder = ui.PictureRecorder();
     final canvas = Canvas(recorder);
     final paint = Paint();
-
-    // Draw the marker background
     canvas.drawImage(baseImage, Offset.zero, paint);
 
-    const Rect imageRect = Rect.fromLTWH(10, 10, 80, 70); // position and size
-    final RRect roundedRect =
-        RRect.fromRectAndRadius(imageRect, const Radius.circular(10));
+    const double profileSize = 85;
+    final double left = (100 - profileSize) / 2;
+    final double top = ((114 - profileSize) / 2) - 7;
+    final Rect imageRect = Rect.fromLTWH(left, top, profileSize, profileSize);
+
+    final RRect roundedRect = RRect.fromRectAndRadius(imageRect, const Radius.circular(15));
 
     canvas.save();
     canvas.clipRRect(roundedRect);
-
     paintImage(
       canvas: canvas,
       image: profileImage,
@@ -179,9 +172,8 @@ class MarkerUtils {
     );
     canvas.restore();
 
-    final image = await recorder.endRecording().toImage(100, 110);
+    final image = await recorder.endRecording().toImage(100, 114);
     final bytes = await image.toByteData(format: ui.ImageByteFormat.png);
-
     return BitmapDescriptor.fromBytes(bytes!.buffer.asUint8List());
   }
 }

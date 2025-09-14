@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:ui' as ui;
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_places_flutter/model/prediction.dart';
@@ -26,8 +27,12 @@ import 'package:safezone/backend/architecture/bloc/notificationBloc/notification
 import 'package:safezone/backend/models/safezoneModel/safezone_model.dart';
 import 'package:safezone/backend/models/userModel/circle_model.dart';
 import 'package:safezone/backend/properties/properties.dart';
+import 'package:safezone/backend/services/first_run_service.dart';
 import 'package:safezone/frontend/platforms/mobile/pages/authentication/account_details.dart';
 import 'package:safezone/frontend/platforms/mobile/widgets/Dialogs/dialogs.dart';
+import 'package:safezone/frontend/platforms/mobile/widgets/bottomsheet/map/dangerzone_bottom_sheet.dart';
+import 'package:safezone/frontend/platforms/mobile/widgets/bottomsheet/map/member_bottom_sheet.dart';
+import 'package:safezone/frontend/platforms/mobile/widgets/bottomsheet/map/safezone_bottom_sheet.dart';
 import 'package:safezone/frontend/platforms/mobile/widgets/loading/loadingstate.dart';
 import 'package:safezone/frontend/utils/marker_utils.dart';
 import 'package:safezone/frontend/utils/safezone_navigator.dart';
@@ -54,15 +59,14 @@ class _MapDTState extends State<MapDT> with TickerProviderStateMixin {
 
   Map<String, BitmapDescriptor> memberMarkers = {};
   List<SafeZoneModel> policeStations = [];
-  List<Map<String, dynamic>> members = [];
   Set<Marker> markers = {};
   Set<Marker> membersMarkers = {};
 
   List<LatLng> _safeZones = [];
   List<LatLng> _dangerZones = [];
   final locs.Location location = locs.Location();
-  static const LatLng sourceLocation = LatLng(16.0471, 120.3425);
-  LatLng _initialPosition = const LatLng(37.7749, -122.4194); // Default: SF
+  static const LatLng sourceLocation = LatLng(16.0433, 120.3333);
+  LatLng _initialPosition = const LatLng(37.7749, -122.4194);
   final apiKey = dotenv.env['GOOGLE_API_KEY'];
   final GlobalKey _safeKey = GlobalKey();
   final GlobalKey _searchKey = GlobalKey();
@@ -73,7 +77,8 @@ class _MapDTState extends State<MapDT> with TickerProviderStateMixin {
   bool _isSafeZoneShown = false;
   bool _isDangerZoneShown = false;
 
-  BitmapDescriptor? customMarker;
+  BitmapDescriptor? customMyLocationMarker;
+  BitmapDescriptor? customPendingDangerZoneMarker;
   BitmapDescriptor? customDangerZoneMarker;
   BitmapDescriptor? customSafeZoneMarker;
   BitmapDescriptor? customMemberMarker;
@@ -83,7 +88,7 @@ class _MapDTState extends State<MapDT> with TickerProviderStateMixin {
   late FocusNode _focusNodeCircles;
   late stt.SpeechToText _speech;
 
-  final bool _isListening = false;
+  bool _isListening = false;
   bool _isExpanded = false;
   bool _circleHeight = false;
 
@@ -104,6 +109,8 @@ class _MapDTState extends State<MapDT> with TickerProviderStateMixin {
     'Municipal',
   ];
 
+  List<Map<String, dynamic>> _currentMembers = [];
+
   void _toggleExpand() {
     setState(() {
       _isExpanded = !_isExpanded;
@@ -123,16 +130,18 @@ class _MapDTState extends State<MapDT> with TickerProviderStateMixin {
     });
   }
 
-  final bool _showTitle = false;
-  final double _appBarHeight = 0;
-  final Color _appBarColor = Colors.transparent;
+  bool _showTitle = false;
+  double _appBarHeight = 0;
+  Color _appBarColor = Colors.transparent;
 
   List<CircleModel> _circles = [];
   int? _userId;
+  String profilePictureUrl = '';
   int _currentHintIndex = 0;
   LatLng? _currentUserLocation;
   StreamSubscription? _locationSubscription;
   StreamSubscription<Position>? _positionStreamSubscription;
+  StreamSubscription? _membersSubscription;
 
   @override
   void didChangeDependencies() {
@@ -144,19 +153,19 @@ class _MapDTState extends State<MapDT> with TickerProviderStateMixin {
   void initState() {
     super.initState();
 
-    _runInitLogicOnce();
-
     _loadUserId();
     _loadMapType();
+    _checkIfShown();
+    _checkFirstRun();
     _getCurrentLocation();
 
     _initSharedPreferences();
+    _runInitLogicOnce();
 
     _createCustomMarker().then((_) {
       _fetchLocation();
+      setState(() {});
     });
-
-    print("Members list before fetching: $members");
 
     _speech = stt.SpeechToText();
 
@@ -227,6 +236,34 @@ class _MapDTState extends State<MapDT> with TickerProviderStateMixin {
     }
   }
 
+  Future<void> _checkIfShown() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool hasShownBefore = prefs.getBool('appBarShown') ?? false;
+
+    if (widget.UserToken != 'guest' && !hasShownBefore) {
+      prefs.setBool('appBarShown', true);
+      Future.delayed(const Duration(milliseconds: 200), () {
+        if (mounted) {
+          setState(() {
+            _appBarHeight = 40;
+            _appBarColor = Colors.green;
+            _showTitle = true;
+          });
+        }
+
+        Future.delayed(const Duration(seconds: 5), () {
+          if (mounted) {
+            setState(() {
+              _appBarHeight = 0;
+              _appBarColor = Colors.transparent;
+              _showTitle = false;
+            });
+          }
+        });
+      });
+    }
+  }
+
   Future<void> _initSharedPreferences() async {
     _prefs = await SharedPreferences.getInstance();
   }
@@ -251,6 +288,7 @@ class _MapDTState extends State<MapDT> with TickerProviderStateMixin {
     _focusNode.dispose();
     _focusNodeCircles.dispose();
     _focusNodeText.dispose();
+    // sharedController.mapSearchTE.dispose();
     _locationSubscription?.cancel();
     super.dispose();
   }
@@ -272,6 +310,8 @@ class _MapDTState extends State<MapDT> with TickerProviderStateMixin {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     int? userId = prefs.getInt('id');
     int? circleId = prefs.getInt('circle');
+    profilePictureUrl = prefs.getString('profile_picture_url') ??
+        'https://storage.googleapis.com/safezone-11724.firebasestorage.app/profile_pictures/2.jpg';
 
     if (userId != null) {
       setState(() {
@@ -282,14 +322,29 @@ class _MapDTState extends State<MapDT> with TickerProviderStateMixin {
         context.read<CircleBloc>().add(FetchMembersEvent(circleId: circleId));
       }
     }
+    if (_userId != null && circleId != null) {
+      _listenForMembers(circleId);
+    }
 
     context.read<CircleBloc>().stream.listen((state) {
       if (state is CircleMembersLoadedState) {
         context.read<MapBloc>().add(FetchMapData());
-
+        print("CIRCLEMEMBERLOADEDSTATE IS CALLED");
+        print("CIRCLEMEMBERLOADEDSTATE IS CALLED");
+        print("CIRCLEMEMBERLOADEDSTATE IS CALLED");
+        print("CIRCLEMEMBERLOADEDSTATE IS CALLED");
+        print("CIRCLEMEMBERLOADEDSTATE IS CALLED");
+        print("CIRCLEMEMBERLOADEDSTATE IS CALLED");
+        print("CIRCLEMEMBERLOADEDSTATE IS CALLED");
+        print("CIRCLEMEMBERLOADEDSTATE IS CALLED");
+        print("CIRCLEMEMBERLOADEDSTATE IS CALLED");
+        print("CIRCLEMEMBERLOADEDSTATE IS CALLED");
+        if (mounted && _userId != null) {}
         context
             .read<MapBloc>()
             .add(ListenForMemberLocations(state.members, _userId!));
+        print(
+            "🚀 ListenForMemberLocations dispatched with ${state.members.length} members");
       }
       if (state is CircleLoadedState) {
         _circles = state.circles;
@@ -315,6 +370,16 @@ class _MapDTState extends State<MapDT> with TickerProviderStateMixin {
     });
   }
 
+  Future<void> _checkFirstRun() async {
+    final prefs = await SharedPreferences.getInstance();
+    int userId = prefs.getInt('id') ?? 0;
+
+    if (await FirstRunService.getFirstRunFlag(userId)) {
+      await _createTutorial();
+      await FirstRunService.setFirstRunFlag(userId, false);
+    }
+  }
+
   Future<void> _fetchLocation() async {
     try {
       Position position = await getCurrentLocation();
@@ -333,7 +398,9 @@ class _MapDTState extends State<MapDT> with TickerProviderStateMixin {
           markers.add(Marker(
             markerId: const MarkerId("My Location"),
             position: _currentUserLocation!,
-            icon: customMarker ?? BitmapDescriptor.defaultMarker,
+            icon: customMyLocationMarker != null
+                ? customMyLocationMarker!
+                : BitmapDescriptor.defaultMarker,
             infoWindow: const InfoWindow(title: 'My Location'),
           ));
         });
@@ -383,31 +450,38 @@ class _MapDTState extends State<MapDT> with TickerProviderStateMixin {
 
   Future<void> updateLocation(double latitude, double longitude) async {
     try {
+      // ✅ Update to your API (already existing)
       var response = await http.post(
         Uri.parse('${dotenv.env['API_URL']}/profile/update-location'),
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'user_id': _userId.toString(),
-          'latitude': latitude.toString(),
-          'longitude': longitude.toString(),
+          'latitude': latitude,
+          'longitude': longitude,
         }),
       );
 
       if (response.statusCode == 200) {
-        print('Location updated successfully!');
-        print('$latitude');
-        print('$longitude');
+        print('✅ Location updated successfully to API!');
       } else {
-        print('Failed to update location');
+        print('❌ Failed to update location to API');
       }
+
+      // ✅ Also update Firestore
+      await FirebaseFirestore.instance
+          .collection("locations")
+          .doc(_userId.toString())
+          .set({
+        "latitude": latitude,
+        "longitude": longitude,
+        "updatedAt": FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
+
+      print("📍 Firestore location updated: $latitude, $longitude");
     } catch (e) {
-      print(_userId);
-      print('$latitude');
-      print('$longitude');
       print('Error updating location: $e');
     }
+
     findNearestSafezone();
   }
 
@@ -456,7 +530,7 @@ class _MapDTState extends State<MapDT> with TickerProviderStateMixin {
           markers.add(Marker(
             markerId: const MarkerId("My Location"),
             position: _currentUserLocation!,
-            icon: customMarker ?? BitmapDescriptor.defaultMarker,
+            icon: customMyLocationMarker ?? BitmapDescriptor.defaultMarker,
             infoWindow: const InfoWindow(title: 'My Location'),
           ));
         });
@@ -480,18 +554,15 @@ class _MapDTState extends State<MapDT> with TickerProviderStateMixin {
       bool wasInsideSafeZone = _prefs.getBool('wasInsideSafeZone') ?? false;
       bool wasInsideDangerZone = _prefs.getBool('wasInsideDangerZone') ?? false;
 
-      print("Safe Zone: $isInsideSafeZone");
-      print("Danger Zone: $isInsideDangerZone");
-
       if (isInsideSafeZone && !wasInsideSafeZone) {
         _showZoneDialog("Safe Zone", "You have entered a safe zone.");
         _sendBroadcastNotification(
-            "Group member - Safe Zone", "has entered a safe zone.", "Safe");
+            "Group member - Safe Zone", "has entered a safe zone.");
         await _prefs.setBool('wasInsideSafeZone', true);
       } else if (!isInsideSafeZone && wasInsideSafeZone) {
         _showZoneDialog("Safe Zone", "You have exited the safe zone.");
         _sendBroadcastNotification(
-            "Group member - Safe Zone", "has exited the safe zone.", "Safe");
+            "Group member - Safe Zone", "has exited the safe zone.");
         await _prefs.setBool('wasInsideSafeZone', false);
       }
 
@@ -499,19 +570,18 @@ class _MapDTState extends State<MapDT> with TickerProviderStateMixin {
         _showZoneDialog("Danger Zone",
             "You have entered a danger zone. Please be cautious.");
         _sendBroadcastNotification("Group member - Danger Zone",
-            "has entered a danger zone. Please be cautious.", "Danger");
+            "has entered a danger zone. Please be cautious.");
         await _prefs.setBool('wasInsideDangerZone', true);
       } else if (!isInsideDangerZone && wasInsideDangerZone) {
         _showZoneDialog("Danger Zone", "You have exited the danger zone.");
-        _sendBroadcastNotification("Group member - Danger Zone",
-            "has exited the danger zone.", "Danger");
+        _sendBroadcastNotification(
+            "Group member - Danger Zone", "has exited the danger zone.");
         await _prefs.setBool('wasInsideDangerZone', false);
       }
     });
   }
 
-  Future<void> _sendBroadcastNotification(
-      String title, String message, String zone) async {
+  Future<void> _sendBroadcastNotification(String title, String message) async {
     final prefs = await SharedPreferences.getInstance();
     int userId = prefs.getInt('id') ?? 0;
     String firstName = prefs.getString('first_name') ?? "User";
@@ -525,22 +595,13 @@ class _MapDTState extends State<MapDT> with TickerProviderStateMixin {
         : '';
     String fullName = "$formattedFirstName $formattedLastName".trim();
 
-    if (userId != 0 && zone == "Safe") {
+    if (userId != 0) {
       context.read<NotificationBloc>().add(
             BroadcastNotification(
               userId,
               title,
               "$fullName $message",
-              "Safe",
-            ),
-          );
-    } else if (userId != 0 && zone == "Danger") {
-      context.read<NotificationBloc>().add(
-            BroadcastNotification(
-              userId,
-              title,
-              "$fullName $message",
-              "Danger",
+              "Zone Alert",
             ),
           );
     } else {
@@ -552,25 +613,26 @@ class _MapDTState extends State<MapDT> with TickerProviderStateMixin {
 
   Future<void> _createCustomMarker() async {
     try {
-      const String defaultProfileUrl =
-          'https://example.com/default.jpg'; // Replace with a real URL
+      customMyLocationMarker = await MarkerUtils.createCustomMarker(
+        context, widgetPricolor, profilePictureUrl
+      );
 
-      customMarker = await MarkerUtils.createCustomMarker(
-        context,
-        widgetPricolor,
-        defaultProfileUrl,
+      customPendingDangerZoneMarker = await MarkerUtils.resizeMarker(
+        'lib/resource/image/png/marker_danger_pending.png',
+        55,
+        60,
       );
 
       customDangerZoneMarker = await MarkerUtils.resizeMarker(
         'lib/resource/image/png/dangerzone.png',
-        48,
-        66,
+        55,
+        60,
       );
 
       customSafeZoneMarker = await MarkerUtils.resizeMarker(
         'lib/resource/image/png/safezone.png',
-        48,
-        66,
+        55,
+        60,
       );
 
       if (mounted) {
@@ -581,86 +643,6 @@ class _MapDTState extends State<MapDT> with TickerProviderStateMixin {
     }
   }
 
-  Future<void> _preloadMemberMarkers(List<Map<String, dynamic>> members) async {
-    for (var member in members) {
-      String userId = member['user_id'].toString();
-      String name = member['first_name'];
-      String firstLetter = name.isNotEmpty ? name[0] : '';
-
-      if (userId == _userId.toString()) {
-        continue;
-      }
-
-      BitmapDescriptor marker = await _loadCustomMemberMarker(firstLetter);
-      memberMarkers[userId] = marker;
-    }
-  }
-
-  void _updateMemberMarker(
-      String userId, double latitude, double longitude) async {
-    if (userId == _userId.toString()) {
-      return;
-    }
-
-    setState(() {
-      markers.removeWhere((marker) => marker.markerId.value == "user_$userId");
-
-      markers.add(
-        Marker(
-          markerId: MarkerId("user_$userId"),
-          position: LatLng(latitude, longitude),
-          icon: customMemberMarker!,
-          infoWindow: InfoWindow(title: 'User $userId'),
-        ),
-      );
-    });
-  }
-
-  Future<BitmapDescriptor> _loadCustomMemberMarker(String letter) async {
-    ByteData data =
-        await rootBundle.load('lib/resource/image/png/marker_member.png');
-    ui.Codec codec = await ui.instantiateImageCodec(
-      data.buffer.asUint8List(),
-      targetWidth: 100,
-      targetHeight: 110,
-    );
-    ui.FrameInfo frameInfo = await codec.getNextFrame();
-    ui.Image originalImage = frameInfo.image;
-
-    final ui.PictureRecorder pictureRecorder = ui.PictureRecorder();
-    final Canvas canvas = Canvas(pictureRecorder);
-    final Paint paint = Paint();
-
-    canvas.drawImage(originalImage, const Offset(0, 0), paint);
-
-    final TextPainter textPainter = TextPainter(
-      text: TextSpan(
-        text: letter,
-        style: const TextStyle(
-          color: ui.Color.fromARGB(255, 71, 71, 71),
-          fontSize: 100 * 0.35,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-      textDirection: TextDirection.ltr,
-    );
-    textPainter.layout();
-
-    double dx = (100 - textPainter.width) / 2;
-    double dy = (110 - textPainter.height) / 2 - (110 * 0.1);
-
-    textPainter.paint(canvas, Offset(dx, dy));
-
-    final ui.Image finalImage =
-        await pictureRecorder.endRecording().toImage(100, 110);
-
-    ByteData? byteData =
-        await finalImage.toByteData(format: ui.ImageByteFormat.png);
-    Uint8List resizedData = byteData!.buffer.asUint8List();
-
-    return BitmapDescriptor.fromBytes(resizedData);
-  }
-
   Set<Marker> _createMarkers(MapState state) {
     Set<Marker> markers = {};
 
@@ -669,19 +651,22 @@ class _MapDTState extends State<MapDT> with TickerProviderStateMixin {
         Marker(
           markerId: const MarkerId("My Location"),
           position: _currentUserLocation!,
-          icon: customMarker ?? BitmapDescriptor.defaultMarker,
+          icon: customMyLocationMarker != null
+              ? customMyLocationMarker!
+              : BitmapDescriptor.defaultMarker,
           infoWindow: const InfoWindow(title: 'My Location'),
         ),
       );
     }
 
     if (state is MapDataLoaded) {
-      for (var member in state.members) {
+      for (var member in _currentMembers) {
         String userId = member['user_id'].toString();
         String firstName = member['first_name'];
         String lastName = member['last_name'];
         double latitude = member['latitude'];
         double longitude = member['longitude'];
+        String profile = member['profile_picture'];
 
         BitmapDescriptor? memberMarker = memberMarkers[userId];
 
@@ -695,61 +680,73 @@ class _MapDTState extends State<MapDT> with TickerProviderStateMixin {
             position: LatLng(latitude, longitude),
             icon: memberMarker ?? BitmapDescriptor.defaultMarker,
             infoWindow: InfoWindow(title: '$firstName $lastName'),
+            onTap: () {
+              showMemberBottomSheet(userId, firstName, lastName, longitude,
+                  latitude, profile, context);
+            },
           ),
         );
       }
 
-      _dangerZones = state.dangerZones
-          .map((dangerZone) =>
-              LatLng(dangerZone.latitude!, dangerZone.longitude!))
-          .toList();
-
       for (var dangerZone in state.dangerZones) {
+        final dangerZoneIcon = dangerZone.isVerified
+            ? (customDangerZoneMarker != null
+                ? customDangerZoneMarker
+                : BitmapDescriptor.defaultMarker)
+            : (customPendingDangerZoneMarker != null
+                ? customPendingDangerZoneMarker
+                : BitmapDescriptor.defaultMarker);
+
         markers.add(
           Marker(
             markerId: MarkerId(dangerZone.id.toString()),
-            icon: customDangerZoneMarker ?? BitmapDescriptor.defaultMarker,
+            icon: dangerZoneIcon!,
             position: LatLng(dangerZone.latitude!, dangerZone.longitude!),
-            infoWindow: InfoWindow(
-              title: dangerZone.name,
-            ),
+            infoWindow: InfoWindow(title: dangerZone.name),
+            onTap: () {
+              showDangerZoneBottomSheet(dangerZone, context);
+            },
           ),
         );
+
+        final circleColor = dangerZone.isVerified
+            ? Colors.red.withOpacity(0.1)
+            : Colors.yellow.withOpacity(0.2);
+
         sharedController.circles.add(
           Circle(
-            circleId: CircleId(dangerZone.id.toString()),
+            circleId: CircleId('danger_${dangerZone.id}'),
             center: LatLng(dangerZone.latitude!, dangerZone.longitude!),
-            radius: dangerZone.radius!,
+            radius: dangerZone.radius ?? 100.0,
             strokeWidth: 1,
-            strokeColor: Colors.red.withOpacity(0.5),
-            fillColor: Colors.red.withOpacity(0.1),
+            strokeColor: circleColor.withOpacity(0.6),
+            fillColor: circleColor,
           ),
         );
       }
 
-      _safeZones = state.safeZones
-          .map((safeZone) => LatLng(safeZone.latitude!, safeZone.longitude!))
-          .toList();
-      policeStations = state.safeZones;
       for (var safeZone in state.safeZones) {
         markers.add(
           Marker(
             markerId: MarkerId(safeZone.id.toString()),
-            icon: customSafeZoneMarker ?? BitmapDescriptor.defaultMarker,
+            icon: customSafeZoneMarker != null
+                ? customSafeZoneMarker!
+                : BitmapDescriptor.defaultMarker,
             position: LatLng(safeZone.latitude!, safeZone.longitude!),
-            infoWindow: InfoWindow(
-              title: safeZone.name,
-              snippet: safeZone.description,
-            ),
+            infoWindow: InfoWindow(title: safeZone.name),
+            onTap: () {
+              showSafeZoneBottomSheet(safeZone, context);
+            },
           ),
         );
+
         sharedController.circles.add(
           Circle(
-            circleId: CircleId(safeZone.id.toString()),
+            circleId: CircleId('safe_${safeZone.id}'),
             center: LatLng(safeZone.latitude!, safeZone.longitude!),
-            radius: safeZone.radius!,
+            radius: safeZone.radius ?? 100.0,
             strokeWidth: 1,
-            strokeColor: Colors.green.withOpacity(0.5),
+            strokeColor: Colors.green.withOpacity(0.6),
             fillColor: Colors.green.withOpacity(0.1),
           ),
         );
@@ -786,8 +783,6 @@ class _MapDTState extends State<MapDT> with TickerProviderStateMixin {
 
     if (nearest != null) {
       print("Nearest Police Station: ${nearest.name}");
-      print("Latitude: ${nearest.latitude}");
-      print("Longitude: ${nearest.longitude}");
     } else {
       print("No valid stations found.");
     }
@@ -925,7 +920,6 @@ class _MapDTState extends State<MapDT> with TickerProviderStateMixin {
   Future<void> _getCurrentLocation() async {
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
-      // _showSnackBar("Location services are disabled.");
       return;
     }
 
@@ -933,13 +927,11 @@ class _MapDTState extends State<MapDT> with TickerProviderStateMixin {
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
-        // _showSnackBar("Location permission denied.");
         return;
       }
     }
 
     if (permission == LocationPermission.deniedForever) {
-      // _showSnackBar("Location permission permanently denied.");
       return;
     }
 
@@ -981,17 +973,193 @@ class _MapDTState extends State<MapDT> with TickerProviderStateMixin {
             double lng = data["results"][0]["geometry"]["location"]["lng"];
 
             _updateMapPosition(LatLng(lat, lng));
-          } else {
-            // _showSnackBar("Location not found. Try another search.");
           }
-        } else {
-          // _showSnackBar("Error fetching location. Try again.");
         }
       } catch (e) {
-        // _showSnackBar("Network error: Unable to fetch location.");
+        _showSnackBar("Network error: Unable to fetch location.");
       }
     } else {
-      // _showSnackBar("Please enter a location to search.");
+      _showSnackBar("Please enter a location to search.");
+    }
+  }
+
+  void _listenForMembers(int circleId) {
+    // Cancel any existing subscription
+    _membersSubscription?.cancel();
+    print("🔔 Starting Firestore listener for circle $circleId");
+
+    // Listen to members in this circle who are sharing their location
+    _membersSubscription = FirebaseFirestore.instance
+        .collection("locations")
+        .where("circleSharing.$circleId", isEqualTo: true)
+        .snapshots()
+        .listen((snapshot) async {
+      print("📄 Firestore snapshot received: ${snapshot.docs.length} docs");
+
+      List<Map<String, dynamic>> members = [];
+
+      for (var doc in snapshot.docs) {
+        var data = doc.data();
+
+        // Directly get latitude and longitude from top-level fields
+        double? lat = (data['latitude'] != null)
+            ? (data['latitude'] as num).toDouble()
+            : null;
+        double? lng = (data['longitude'] != null)
+            ? (data['longitude'] as num).toDouble()
+            : null;
+
+        if (lat != null && lng != null) {
+          members.add({
+            'user_id': doc.id,
+            'first_name': data['first_name'] ?? 'User',
+            'last_name': data['last_name'] ?? '',
+            'profile_picture': data['profile_picture'] ?? '',
+            'latitude': lat,
+            'longitude': lng,
+          });
+
+          print(
+              "👤 Member added: ${data['first_name']} ${data['last_name']} at ($lat, $lng)");
+        } else {
+          print("⚠️ Member ${doc.id} skipped: no valid location");
+        }
+      }
+      context.read<MapBloc>().add(ListenForMemberLocations(members, _userId!));
+
+      print("✅ Total valid members fetched: ${members.length}");
+      _currentMembers = members;
+
+      print("⏳ Preloading custom member markers...");
+      await _preloadMemberMarkers(members);
+
+      print("🗺 Updating member markers on map...");
+      _updateMemberMarkersOnMap();
+    });
+  }
+
+  void _updateMemberMarkersOnMap() {
+    if (!mounted) return;
+
+    setState(() {
+      // Remove old member markers
+      markers.removeWhere((marker) => _currentMembers
+          .any((member) => member['user_id'] == marker.markerId.value));
+
+      // Add updated member markers
+      markers.addAll(_createMemberMarkers(_currentMembers));
+      print("Member markers updated on map: ${_currentMembers.length}");
+    });
+  }
+
+  Set<Marker> _createMemberMarkers(List<Map<String, dynamic>> members) {
+    Set<Marker> memberMarkersSet = {};
+
+    for (var member in members) {
+      String userId = member['user_id'].toString();
+      String firstName = member['first_name'] ?? 'User';
+      String lastName = member['last_name'] ?? '';
+      double latitude = member['latitude'];
+      double longitude = member['longitude'];
+      String profile = member['profile_picture'] ?? '';
+
+      if (userId == _userId.toString()) continue;
+
+      BitmapDescriptor? markerIcon = memberMarkers[userId];
+
+      print(
+          "📌 Creating marker for $firstName $lastName at ($latitude, $longitude) with icon ${markerIcon != null ? 'custom' : 'default'}");
+
+      memberMarkersSet.add(
+        Marker(
+          markerId: MarkerId(userId),
+          position: LatLng(latitude, longitude),
+          icon: markerIcon ?? BitmapDescriptor.defaultMarker,
+          infoWindow: InfoWindow(title: '$firstName $lastName'),
+          onTap: () {
+            showMemberBottomSheet(userId, firstName, lastName, longitude,
+                latitude, profile, context);
+          },
+        ),
+      );
+    }
+
+    print("🎯 Total member markers created: ${memberMarkersSet.length}");
+    return memberMarkersSet;
+  }
+
+  void _updateMemberMarker(
+      String userId, double latitude, double longitude) async {
+    if (userId == _userId.toString()) {
+      print("⏩ Skipped updating own marker for userId: $userId");
+      return;
+    }
+
+    BitmapDescriptor? memberMarker = memberMarkers[userId];
+
+    var memberData = _currentMembers.firstWhere(
+      (member) => member['user_id'] == userId,
+      orElse: () => {},
+    );
+
+    if (memberData.isEmpty) {
+      print("⚠️ No member data found for userId: $userId");
+      return;
+    }
+
+    setState(() {
+      int before = markers.length;
+      markers.removeWhere((marker) => marker.markerId.value == userId);
+      int afterRemove = markers.length;
+
+      if (before != afterRemove) {
+        print("🗑 Removed old marker for $userId");
+      } else {
+        print("ℹ️ No existing marker found for $userId (adding new one)");
+      }
+
+      markers.add(
+        Marker(
+          markerId: MarkerId(userId),
+          position: LatLng(latitude, longitude),
+          icon: memberMarker ?? BitmapDescriptor.defaultMarker,
+          infoWindow: InfoWindow(
+            title: '${memberData['first_name']} ${memberData['last_name']}',
+          ),
+          onTap: () {
+            print("👆 Marker tapped for $userId: "
+                "${memberData['first_name']} ${memberData['last_name']}");
+            showMemberBottomSheet(
+              userId,
+              memberData['first_name'],
+              memberData['last_name'],
+              longitude,
+              latitude,
+              memberData['profile_picture'],
+              context,
+            );
+          },
+        ),
+      );
+
+      print("✅ Added/Updated marker for $userId "
+          "(${memberData['first_name']} ${memberData['last_name']}) "
+          "@ ($latitude, $longitude) | Total markers: ${markers.length}");
+    });
+  }
+
+  Future<void> _preloadMemberMarkers(List<Map<String, dynamic>> members) async {
+    for (var member in members) {
+      String userId = member['user_id'];
+      if (userId == _userId.toString()) continue;
+
+      String? profileUrl = member['profile_picture'];
+      if (!memberMarkers.containsKey(userId)) {
+        BitmapDescriptor marker =
+            await MarkerUtils.loadMemberProfileMarker(profileUrl);
+        memberMarkers[userId] = marker;
+        print("🖼 Marker preloaded for member $userId (profile: $profileUrl)");
+      }
     }
   }
 
@@ -1049,7 +1217,7 @@ class _MapDTState extends State<MapDT> with TickerProviderStateMixin {
                   return GoogleMap(
                     initialCameraPosition: const CameraPosition(
                       target: sourceLocation,
-                      zoom: 16.0,
+                      zoom: 14.0,
                     ),
                     mapType: sharedController.currentMapType,
                     markers: sharedController.showMarkers
@@ -1128,7 +1296,6 @@ class _MapDTState extends State<MapDT> with TickerProviderStateMixin {
                         ''';
                       controller.setMapStyle(style);
                       sharedController.mapController.complete(controller);
-                      // _fetchLocation();
                     },
                     mapToolbarEnabled: false,
                     zoomControlsEnabled: false,

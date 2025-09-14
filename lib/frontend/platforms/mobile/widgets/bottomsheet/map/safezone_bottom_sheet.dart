@@ -31,9 +31,15 @@ Future<void> showSafeZoneBottomSheet(
     builder: (context) {
       return SingleChildScrollView(
         child: Container(
-          color: Colors.white,
           width: double.infinity,
           padding: const EdgeInsets.all(16.0),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(10),
+              topRight: Radius.circular(10)
+            )
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
@@ -77,25 +83,28 @@ Future<void> showSafeZoneBottomSheet(
               Text(
                 safeZone.name ?? 'Safe Zone Name',
                 style: const TextStyle(
-                    fontSize: 18,
+                    fontSize: 15,
                     color: textColor,
                     fontWeight: FontWeight.w600),
               ),
-              const SizedBox(height: 10.0),
+              const SizedBox(height: 5.0),
               Text(
                 'Description: ${safeZone.description ?? "No description provided"}',
-                style: const TextStyle(fontSize: 13, color: textColor),
+                style: const TextStyle(fontSize: 10, color: Colors.black45),
               ),
               const SizedBox(height: 20),
               Container(
                 decoration: BoxDecoration(
-                  color: const Color.fromARGB(255, 245, 245, 245),
+                  color: const Color.fromARGB(255, 250, 250, 250),
                   borderRadius: BorderRadius.circular(5),
                 ),
                 child: Column(
                   children: [
                     Padding(
-                      padding: const EdgeInsets.all(8.0),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8.0,
+                        vertical: 15
+                      ),
                       child: Row(
                         children: [
                           const Icon(
@@ -103,7 +112,7 @@ Future<void> showSafeZoneBottomSheet(
                             color: widgetPricolor,
                             size: 20,
                           ),
-                          const SizedBox(width: 5),
+                          const SizedBox(width: 10),
                           Expanded(
                             child: Text(
                               readableAddress,
@@ -119,7 +128,10 @@ Future<void> showSafeZoneBottomSheet(
                       child: Divider(height: 0.5, color: Colors.white),
                     ),
                     Padding(
-                      padding: const EdgeInsets.all(8.0),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8.0,
+                        vertical: 15
+                      ),
                       child: Row(
                         children: [
                           const Icon(
@@ -127,7 +139,7 @@ Future<void> showSafeZoneBottomSheet(
                             color: widgetPricolor,
                             size: 20,
                           ),
-                          const SizedBox(width: 5),
+                          const SizedBox(width: 10),
                           Text(
                             '${safeZone.scale?.toString()} rating by user ${safeZone.userId}',
                             style:
@@ -141,7 +153,10 @@ Future<void> showSafeZoneBottomSheet(
                       child: Divider(height: 0.5, color: Colors.white),
                     ),
                     Padding(
-                      padding: const EdgeInsets.all(8.0),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8.0,
+                        vertical: 15
+                      ),
                       child: Row(
                         children: [
                           const Icon(
@@ -149,7 +164,7 @@ Future<void> showSafeZoneBottomSheet(
                             color: widgetPricolor,
                             size: 20,
                           ),
-                          const SizedBox(width: 5),
+                          const SizedBox(width: 10),
                           Text(
                             'Feels safe here during: ${safeZone.timeOfDay ?? 'N/A'}',
                             style:
@@ -163,7 +178,10 @@ Future<void> showSafeZoneBottomSheet(
                       child: Divider(height: 0.5, color: Colors.white),
                     ),
                     Padding(
-                      padding: const EdgeInsets.all(8.0),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8.0,
+                        vertical: 15
+                      ),
                       child: Row(
                         children: [
                           const Icon(
@@ -171,7 +189,7 @@ Future<void> showSafeZoneBottomSheet(
                             color: widgetPricolor,
                             size: 20,
                           ),
-                          const SizedBox(width: 5),
+                          const SizedBox(width: 10),
                           Text(
                             'Visit frequency: ${safeZone.frequency ?? 'N/A'}',
                             style:
@@ -183,24 +201,23 @@ Future<void> showSafeZoneBottomSheet(
                   ],
                 ),
               ),
-              const SizedBox(height: 10.0),
-              ElevatedButton.icon(
-                onPressed: () {
-                  final googleMapsUrl =
-                      'https://www.google.com/maps/search/?api=1&query=${safeZone.latitude},${safeZone.longitude}';
-                  launchUrl(Uri.parse(googleMapsUrl),
-                      mode: LaunchMode.externalApplication);
-                },
-                icon: const Icon(
-                  Icons.map,
-                  color: widgetPricolor,
-                ),
-                label: const Text('Open in Maps'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  foregroundColor: textColor,
-                ),
-              ),
+              // ElevatedButton.icon(
+              //   onPressed: () {
+              //     final googleMapsUrl =
+              //         'https://www.google.com/maps/search/?api=1&query=${safeZone.latitude},${safeZone.longitude}';
+              //     launchUrl(Uri.parse(googleMapsUrl),
+              //         mode: LaunchMode.externalApplication);
+              //   },
+              //   icon: const Icon(
+              //     Icons.map,
+              //     color: widgetPricolor,
+              //   ),
+              //   label: const Text('Open in Maps'),
+              //   style: ElevatedButton.styleFrom(
+              //     backgroundColor: Colors.white,
+              //     foregroundColor: textColor,
+              //   ),
+              // ),
               const SizedBox(height: 25.0),
             ],
           ),

@@ -250,17 +250,21 @@ class RowText extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 10),
       child: Row(
         children: [
-          Text(
-            title,
-            style: GoogleFonts.inter(
-                fontWeight: FontWeight.w500, color: textColor, fontSize: 13),
+          Flexible(
+            child: Text(
+              title,
+              style: GoogleFonts.inter(
+                  fontWeight: FontWeight.w500, color: textColor, fontSize: 13),
+            ),
           ),
           const Spacer(),
-          Text(
-            text,
-            style: GoogleFonts.inter(
-                fontWeight: FontWeight.w500, color: textColor, fontSize: 13),
-          ),
+          Flexible(
+            child: Text(
+              text,
+              style: GoogleFonts.inter(
+                  fontWeight: FontWeight.w500, color: textColor, fontSize: 13),
+            ),
+          )
         ],
       ),
     );

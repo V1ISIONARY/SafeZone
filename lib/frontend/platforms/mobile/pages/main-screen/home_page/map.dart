@@ -616,24 +616,25 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
   Future<void> _createCustomMarker() async {
     try {
       customMyLocationMarker = await MarkerUtils.createCustomMarker(
-          context, widgetPricolor, profilePictureUrl);
+        context, widgetPricolor, profilePictureUrl
+      );
 
       customPendingDangerZoneMarker = await MarkerUtils.resizeMarker(
         'lib/resource/image/png/marker_danger_pending.png',
-        63,
-        90,
+        55,
+        60,
       );
 
       customDangerZoneMarker = await MarkerUtils.resizeMarker(
         'lib/resource/image/png/dangerzone.png',
-        65,
-        90,
+        55,
+        60,
       );
 
       customSafeZoneMarker = await MarkerUtils.resizeMarker(
         'lib/resource/image/png/safezone.png',
-        65,
-        90,
+        55,
+        60,
       );
 
       if (mounted) {
@@ -720,7 +721,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
             center: LatLng(dangerZone.latitude!, dangerZone.longitude!),
             radius: dangerZone.radius ?? 100.0,
             strokeWidth: 1,
-            strokeColor: Colors.transparent,
+            strokeColor: circleColor.withOpacity(0.6),
             fillColor: circleColor,
           ),
         );
@@ -747,7 +748,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
             center: LatLng(safeZone.latitude!, safeZone.longitude!),
             radius: safeZone.radius ?? 100.0,
             strokeWidth: 1,
-            strokeColor: Colors.transparent,
+            strokeColor: Colors.green.withOpacity(0.6),
             fillColor: Colors.green.withOpacity(0.1),
           ),
         );
