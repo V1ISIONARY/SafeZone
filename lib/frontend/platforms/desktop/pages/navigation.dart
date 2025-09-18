@@ -1053,6 +1053,7 @@ class _NavigationDTState extends State<NavigationDT>
   @override
   void dispose() {
     _focusNode.dispose();
+    selectedPageNotifier.dispose();
     // selectedDropdownIndex = 0;
     // _selectedPageIndex = 0;
     // selectedComs = 0;

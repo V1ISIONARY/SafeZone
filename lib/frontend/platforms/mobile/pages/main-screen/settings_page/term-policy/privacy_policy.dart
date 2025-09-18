@@ -15,7 +15,7 @@ class _PrivacyPolicyState extends State<PrivacyPolicy> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: Color.fromARGB(255, 250, 250, 250),
         automaticallyImplyLeading: false,
         centerTitle: true,
         title: const CategoryText(text: "Privacy Policy"),

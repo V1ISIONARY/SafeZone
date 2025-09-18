@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:safezone/backend/properties/properties.dart';
 import 'package:safezone/resource/schema/colors.dart';
 import 'package:safezone/resource/schema/texts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MapHeader extends StatefulWidget {
   const MapHeader({super.key});
@@ -12,15 +13,37 @@ class MapHeader extends StatefulWidget {
 }
 
 class _MapHeaderState extends State<MapHeader> {
-  bool isMapSelected = true;
   final sharedController = SharedProperties();
-
   final TextEditingController searchController = TextEditingController();
 
-  void toggleSwitch() {
-    setState(() {
-      isMapSelected = !isMapSelected;
-    });
+  Future<void> _saveMapType(int index) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('mapType', index);
+    sharedController.currentMapType.value = index;
+  }
+
+  Future<void> _loadSelectedMapType() async {
+    final prefs = await SharedPreferences.getInstance();
+    int? savedIndex = prefs.getInt('mapType');
+    if (savedIndex != null) {
+      sharedController.currentMapType.value = savedIndex;
+    }
+  }
+
+  void onItemTap(int index) {
+    _saveMapType(index);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSelectedMapType();
+  }
+
+  @override
+  void dispose() {
+    searchController.dispose();
+    super.dispose();
   }
 
   @override
@@ -140,10 +163,8 @@ class _MapHeaderState extends State<MapHeader> {
                     double maxMargin = 150;
                     double minMargin = 0;
                     double screenWidth = constraints.maxWidth;
-
                     double margin =
                         (screenWidth / 10).clamp(minMargin, maxMargin);
-
                     return Container(
                       margin: EdgeInsets.symmetric(horizontal: margin),
                       child: Row(
@@ -240,120 +261,87 @@ class _MapHeaderState extends State<MapHeader> {
                   },
                 ),
               ),
-              Container(
-                width: 130,
-                height: 30,
-                padding: const EdgeInsets.all(2),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(5),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.2),
-                      blurRadius: 5,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: Stack(
-                  children: [
-                    AnimatedAlign(
-                      alignment: isMapSelected
-                          ? Alignment.centerLeft
-                          : Alignment.centerRight,
-                      duration: const Duration(milliseconds: 250),
-                      curve: Curves.easeInOut,
-                      child: Container(
-                        width: 60,
-                        height: 30,
-                        decoration: BoxDecoration(
-                          color: btnColor,
-                          borderRadius: BorderRadius.circular(5),
-                        ),
-                      ),
-                    ),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: GestureDetector(
-                            onTap: () {
-                              if (!isMapSelected) toggleSwitch();
-                            },
-                            child: Container(
-                              height: 30,
-                              alignment: Alignment.center,
-                              child: Text(
-                                'Map',
-                                style: TextStyle(
-                                  color: isMapSelected
-                                      ? Colors.white
-                                      : Colors.grey,
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                        Expanded(
-                          child: GestureDetector(
-                            onTap: () {
-                              if (isMapSelected) toggleSwitch();
-                            },
-                            child: Container(
-                              height: 30,
-                              alignment: Alignment.center,
-                              child: Text(
-                                'Satellite',
-                                style: TextStyle(
-                                  color: isMapSelected
-                                      ? Colors.grey
-                                      : Colors.white,
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ),
-                          ),
+              ValueListenableBuilder<int>(
+                valueListenable: sharedController.currentMapType,
+                builder: (context, selectedItem, _) {
+                  return Container(
+                    width: 130,
+                    height: 30,
+                    padding: const EdgeInsets.all(2),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(5),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.2),
+                          blurRadius: 5,
+                          offset: const Offset(0, 2),
                         ),
                       ],
                     ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 10),
-              Container(
-                width: 80,
-                height: 30,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(5),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.2),
-                      blurRadius: 5,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: const Center(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.layers_outlined,
-                          size: 15, color: Colors.black),
-                      SizedBox(width: 4),
-                      Text(
-                        'Layers',
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 9,
-                          fontWeight: FontWeight.w500,
+                    child: Stack(
+                      children: [
+                        AnimatedAlign(
+                          alignment: selectedItem == 0
+                              ? Alignment.centerLeft
+                              : Alignment.centerRight,
+                          duration: const Duration(milliseconds: 250),
+                          curve: Curves.easeInOut,
+                          child: Container(
+                            width: 60,
+                            height: 30,
+                            decoration: BoxDecoration(
+                              color: btnColor,
+                              borderRadius: BorderRadius.circular(5),
+                            ),
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                ),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: GestureDetector(
+                                onTap: () => onItemTap(0),
+                                child: Container(
+                                  height: 30,
+                                  alignment: Alignment.center,
+                                  child: Text(
+                                    'Default',
+                                    style: TextStyle(
+                                      color: selectedItem == 0
+                                          ? Colors.white
+                                          : Colors.grey,
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                              child: GestureDetector(
+                                onTap: () => onItemTap(1),
+                                child: Container(
+                                  height: 30,
+                                  alignment: Alignment.center,
+                                  child: Text(
+                                    'Satellite',
+                                    style: TextStyle(
+                                      color: selectedItem == 1
+                                          ? Colors.white
+                                          : Colors.grey,
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  );
+                },
               ),
             ],
           ),

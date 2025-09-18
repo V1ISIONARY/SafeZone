@@ -21,7 +21,7 @@ class SharedProperties {
 
   //Map Variables
   final TextEditingController mapSearchTE = TextEditingController();
-  MapType currentMapType = MapType.normal;
+  ValueNotifier<int> currentMapType = ValueNotifier<int>(0);
   bool showMarkers = true;
   Set<Circle> circles = {};
   Set<Polyline> polylines = {};

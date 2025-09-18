@@ -111,6 +111,13 @@ class _MapDTState extends State<MapDT> with TickerProviderStateMixin {
 
   List<Map<String, dynamic>> _currentMembers = [];
 
+  bool get _areCustomMarkersLoaded {
+    return customMyLocationMarker != null &&
+        customDangerZoneMarker != null &&
+        customPendingDangerZoneMarker != null &&
+        customSafeZoneMarker != null;
+  }
+
   void _toggleExpand() {
     setState(() {
       _isExpanded = !_isExpanded;
@@ -161,11 +168,6 @@ class _MapDTState extends State<MapDT> with TickerProviderStateMixin {
 
     _initSharedPreferences();
     _runInitLogicOnce();
-
-    _createCustomMarker().then((_) {
-      _fetchLocation();
-      setState(() {});
-    });
 
     _speech = stt.SpeechToText();
 
@@ -225,10 +227,10 @@ class _MapDTState extends State<MapDT> with TickerProviderStateMixin {
     final prefs = await SharedPreferences.getInstance();
 
     bool hasRunBefore = prefs.getBool('mapsHasInitialized') ?? false;
+    context.read<MapBloc>().add(FetchMapData());
+    context.read<DangerZoneBloc>().add(FetchDangerZones());
 
     if (!hasRunBefore) {
-      context.read<MapBloc>().add(FetchMapData());
-      context.read<DangerZoneBloc>().add(FetchDangerZones());
       await prefs.setBool('mapsHasInitialized', true);
       print("✅ Maps init logic executed");
     } else {
@@ -273,9 +275,7 @@ class _MapDTState extends State<MapDT> with TickerProviderStateMixin {
     int? mapTypeIndex = prefs.getInt('mapType');
 
     if (mapTypeIndex != null) {
-      setState(() {
-        sharedController.currentMapType = _mapTypeFromIndex(mapTypeIndex);
-      });
+      sharedController.currentMapType.value = mapTypeIndex;
     }
   }
 
@@ -312,6 +312,10 @@ class _MapDTState extends State<MapDT> with TickerProviderStateMixin {
     int? circleId = prefs.getInt('circle');
     profilePictureUrl = prefs.getString('profile_picture_url') ??
         'https://storage.googleapis.com/safezone-11724.firebasestorage.app/profile_pictures/2.jpg';
+
+    await _createCustomMarker();
+
+    _fetchLocation();
 
     if (userId != null) {
       setState(() {
@@ -618,25 +622,28 @@ class _MapDTState extends State<MapDT> with TickerProviderStateMixin {
 
       customPendingDangerZoneMarker = await MarkerUtils.resizeMarker(
         'lib/resource/image/png/marker_danger_pending.png',
-        55,
-        60,
+        70,
+        77,
       );
 
       customDangerZoneMarker = await MarkerUtils.resizeMarker(
         'lib/resource/image/png/dangerzone.png',
-        55,
-        60,
+        70,
+        77,
       );
 
       customSafeZoneMarker = await MarkerUtils.resizeMarker(
         'lib/resource/image/png/safezone.png',
-        55,
-        60,
+        70,
+        77,
       );
 
       if (mounted) {
-        setState(() {});
+        setState(() {
+        });
       }
+
+      print("✅ All custom markers loaded successfully");
     } catch (e) {
       print("Error loading markers: $e");
     }
@@ -645,14 +652,27 @@ class _MapDTState extends State<MapDT> with TickerProviderStateMixin {
   Set<Marker> _createMarkers(MapState state) {
     Set<Marker> markers = {};
 
+    if (!_areCustomMarkersLoaded) {
+      print("Custom markers not yet loaded, showing minimal markers");
+      if (_currentUserLocation != null) {
+        markers.add(
+          Marker(
+            markerId: const MarkerId("My Location"),
+            position: _currentUserLocation!,
+            icon: BitmapDescriptor.defaultMarker,
+            infoWindow: const InfoWindow(title: 'My Location'),
+          ),
+        );
+      }
+      return markers;
+    }
+
     if (_currentUserLocation != null) {
       markers.add(
         Marker(
           markerId: const MarkerId("My Location"),
           position: _currentUserLocation!,
-          icon: customMyLocationMarker != null
-              ? customMyLocationMarker!
-              : BitmapDescriptor.defaultMarker,
+          icon: customMyLocationMarker!,
           infoWindow: const InfoWindow(title: 'My Location'),
         ),
       );
@@ -689,17 +709,13 @@ class _MapDTState extends State<MapDT> with TickerProviderStateMixin {
 
       for (var dangerZone in state.dangerZones) {
         final dangerZoneIcon = dangerZone.isVerified
-            ? (customDangerZoneMarker != null
-                ? customDangerZoneMarker
-                : BitmapDescriptor.defaultMarker)
-            : (customPendingDangerZoneMarker != null
-                ? customPendingDangerZoneMarker
-                : BitmapDescriptor.defaultMarker);
+            ? customDangerZoneMarker!
+            : customPendingDangerZoneMarker!;
 
         markers.add(
           Marker(
             markerId: MarkerId(dangerZone.id.toString()),
-            icon: dangerZoneIcon!,
+            icon: dangerZoneIcon,
             position: LatLng(dangerZone.latitude!, dangerZone.longitude!),
             infoWindow: InfoWindow(title: dangerZone.name),
             onTap: () {
@@ -728,9 +744,7 @@ class _MapDTState extends State<MapDT> with TickerProviderStateMixin {
         markers.add(
           Marker(
             markerId: MarkerId(safeZone.id.toString()),
-            icon: customSafeZoneMarker != null
-                ? customSafeZoneMarker!
-                : BitmapDescriptor.defaultMarker,
+            icon: customSafeZoneMarker!,
             position: LatLng(safeZone.latitude!, safeZone.longitude!),
             infoWindow: InfoWindow(title: safeZone.name),
             onTap: () {
@@ -1213,93 +1227,97 @@ class _MapDTState extends State<MapDT> with TickerProviderStateMixin {
                   } else if (state is MapError) {
                     return Center(child: Text(state.message));
                   }
-                  return GoogleMap(
-                    initialCameraPosition: const CameraPosition(
-                      target: sourceLocation,
-                      zoom: 14.0,
-                    ),
-                    mapType: sharedController.currentMapType,
-                    markers: sharedController.showMarkers
-                        ? _createMarkers(state)
-                        : {},
-                    circles: sharedController.circles,
-                    polylines: sharedController.polylines,
-                    onMapCreated: (GoogleMapController controller) async {
-                      sharedController.googleMapController = controller;
-                      String style = '''
-                        [
-                          {
-                            "featureType": "administrative",
-                            "elementType": "labels.text",
-                            "stylers": [
-                              { "visibility": "off" }
+                  return ValueListenableBuilder<int>(
+                    valueListenable: sharedController.currentMapType,
+                    builder: (context, mapTypeIndex, _) {
+                      final mapType = mapTypeIndex == 0 ? MapType.normal : MapType.satellite;
+
+                      return GoogleMap(
+                        initialCameraPosition: const CameraPosition(
+                          target: sourceLocation,
+                          zoom: 14.0,
+                        ),
+                        mapType: mapType,
+                        markers: sharedController.showMarkers ? _createMarkers(state) : {},
+                        circles: sharedController.circles,
+                        polylines: sharedController.polylines,
+                        onMapCreated: (GoogleMapController controller) async {
+                          sharedController.googleMapController = controller;
+                          String style = '''
+                            [
+                              {
+                                "featureType": "administrative",
+                                "elementType": "labels.text",
+                                "stylers": [
+                                  { "visibility": "off" }
+                                ]
+                              },
+                              {
+                                "featureType": "administrative.locality",
+                                "elementType": "labels.text",
+                                "stylers": [
+                                  { "visibility": "on" }
+                                ]
+                              },
+                              {
+                                "featureType": "administrative.neighborhood",
+                                "elementType": "labels.text",
+                                "stylers": [
+                                  { "visibility": "on" }
+                                ]
+                              },
+                              {
+                                "featureType": "poi",
+                                "elementType": "labels.text",
+                                "stylers": [
+                                  { "visibility": "off" }
+                                ]
+                              },
+                              {
+                                "featureType": "poi.business",
+                                "elementType": "labels",
+                                "stylers": [
+                                  { "visibility": "off" }
+                                ]
+                              },
+                              {
+                                "featureType": "poi.government",
+                                "elementType": "labels",
+                                "stylers": [
+                                  { "visibility": "on" }
+                                ]
+                              },
+                              {
+                                "featureType": "poi.medical",
+                                "elementType": "labels",
+                                "stylers": [
+                                  { "visibility": "on" }
+                                ]
+                              },
+                              {
+                                "featureType": "transit.station.bus",
+                                "elementType": "labels",
+                                "stylers": [
+                                  { "visibility": "off" }
+                                ]
+                              },
+                              {
+                                "featureType": "road",
+                                "elementType": "labels",
+                                "stylers": [
+                                  { "visibility": "off" }
+                                ]
+                              }
                             ]
-                          },
-                          {
-                            "featureType": "administrative.locality",
-                            "elementType": "labels.text",
-                            "stylers": [
-                              { "visibility": "on" }
-                            ]
-                          },
-                          {
-                            "featureType": "administrative.neighborhood",
-                            "elementType": "labels.text",
-                            "stylers": [
-                              { "visibility": "on" }
-                            ]
-                          },
-                          {
-                            "featureType": "poi",
-                            "elementType": "labels.text",
-                            "stylers": [
-                              { "visibility": "off" }
-                            ]
-                          },
-                          {
-                            "featureType": "poi.business",
-                            "elementType": "labels",
-                            "stylers": [
-                              { "visibility": "off" }
-                            ]
-                          },
-                          {
-                            "featureType": "poi.government",
-                            "elementType": "labels",
-                            "stylers": [
-                              { "visibility": "on" }
-                            ]
-                          },
-                          {
-                            "featureType": "poi.medical",
-                            "elementType": "labels",
-                            "stylers": [
-                              { "visibility": "on" }
-                            ]
-                          },
-                          {
-                            "featureType": "transit.station.bus",
-                            "elementType": "labels",
-                            "stylers": [
-                              { "visibility": "off" }
-                            ]
-                          },
-                          {
-                            "featureType": "road",
-                            "elementType": "labels",
-                            "stylers": [
-                              { "visibility": "off" }
-                            ]
-                          }
-                        ]
-                        ''';
-                      controller.setMapStyle(style);
-                      sharedController.mapController.complete(controller);
+                            ''';
+                          controller.setMapStyle(style);
+                        },
+                        mapToolbarEnabled: false,
+                        zoomControlsEnabled: false,
+                        myLocationEnabled: true,
+                        myLocationButtonEnabled: false,
+                      );
                     },
-                    mapToolbarEnabled: false,
-                    zoomControlsEnabled: false,
-                    myLocationEnabled: true,
-                    myLocationButtonEnabled: false,
                   );
                 },
               ),

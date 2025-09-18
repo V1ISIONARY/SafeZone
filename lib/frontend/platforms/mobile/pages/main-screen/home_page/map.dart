@@ -367,9 +367,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
     int? mapTypeIndex = prefs.getInt('mapType');
 
     if (mapTypeIndex != null) {
-      setState(() {
-        sharedController.currentMapType = _mapTypeFromIndex(mapTypeIndex);
-      });
+      sharedController.currentMapType.value = mapTypeIndex;
     }
   }
 
@@ -1337,93 +1335,97 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                   } else if (state is MapError) {
                     return Center(child: Text(state.message));
                   }
-                  return GoogleMap(
-                    initialCameraPosition: const CameraPosition(
-                      target: sourceLocation,
-                      zoom: 14.0,
-                    ),
-                    mapType: sharedController.currentMapType,
-                    markers: sharedController.showMarkers
-                        ? _createMarkers(state)
-                        : {},
-                    circles: sharedController.circles,
-                    polylines: sharedController.polylines,
-                    onMapCreated: (GoogleMapController controller) async {
-                      sharedController.googleMapController = controller;
-                      String style = '''
-                        [
-                          {
-                            "featureType": "administrative",
-                            "elementType": "labels.text",
-                            "stylers": [
-                              { "visibility": "off" }
+                  return ValueListenableBuilder<int>(
+                    valueListenable: sharedController.currentMapType,
+                    builder: (context, mapTypeIndex, _) {
+                      final mapType = mapTypeIndex == 0 ? MapType.normal : MapType.satellite;
+
+                      return GoogleMap(
+                        initialCameraPosition: const CameraPosition(
+                          target: sourceLocation,
+                          zoom: 14.0,
+                        ),
+                        mapType: mapType,
+                        markers: sharedController.showMarkers ? _createMarkers(state) : {},
+                        circles: sharedController.circles,
+                        polylines: sharedController.polylines,
+                        onMapCreated: (GoogleMapController controller) async {
+                          sharedController.googleMapController = controller;
+                          String style = '''
+                            [
+                              {
+                                "featureType": "administrative",
+                                "elementType": "labels.text",
+                                "stylers": [
+                                  { "visibility": "off" }
+                                ]
+                              },
+                              {
+                                "featureType": "administrative.locality",
+                                "elementType": "labels.text",
+                                "stylers": [
+                                  { "visibility": "on" }
+                                ]
+                              },
+                              {
+                                "featureType": "administrative.neighborhood",
+                                "elementType": "labels.text",
+                                "stylers": [
+                                  { "visibility": "on" }
+                                ]
+                              },
+                              {
+                                "featureType": "poi",
+                                "elementType": "labels.text",
+                                "stylers": [
+                                  { "visibility": "off" }
+                                ]
+                              },
+                              {
+                                "featureType": "poi.business",
+                                "elementType": "labels",
+                                "stylers": [
+                                  { "visibility": "off" }
+                                ]
+                              },
+                              {
+                                "featureType": "poi.government",
+                                "elementType": "labels",
+                                "stylers": [
+                                  { "visibility": "on" }
+                                ]
+                              },
+                              {
+                                "featureType": "poi.medical",
+                                "elementType": "labels",
+                                "stylers": [
+                                  { "visibility": "on" }
+                                ]
+                              },
+                              {
+                                "featureType": "transit.station.bus",
+                                "elementType": "labels",
+                                "stylers": [
+                                  { "visibility": "off" }
+                                ]
+                              },
+                              {
+                                "featureType": "road",
+                                "elementType": "labels",
+                                "stylers": [
+                                  { "visibility": "off" }
+                                ]
+                              }
                             ]
-                          },
-                          {
-                            "featureType": "administrative.locality",
-                            "elementType": "labels.text",
-                            "stylers": [
-                              { "visibility": "on" }
-                            ]
-                          },
-                          {
-                            "featureType": "administrative.neighborhood",
-                            "elementType": "labels.text",
-                            "stylers": [
-                              { "visibility": "on" }
-                            ]
-                          },
-                          {
-                            "featureType": "poi",
-                            "elementType": "labels.text",
-                            "stylers": [
-                              { "visibility": "off" }
-                            ]
-                          },
-                          {
-                            "featureType": "poi.business",
-                            "elementType": "labels",
-                            "stylers": [
-                              { "visibility": "off" }
-                            ]
-                          },
-                          {
-                            "featureType": "poi.government",
-                            "elementType": "labels",
-                            "stylers": [
-                              { "visibility": "on" }
-                            ]
-                          },
-                          {
-                            "featureType": "poi.medical",
-                            "elementType": "labels",
-                            "stylers": [
-                              { "visibility": "on" }
-                            ]
-                          },
-                          {
-                            "featureType": "transit.station.bus",
-                            "elementType": "labels",
-                            "stylers": [
-                              { "visibility": "off" }
-                            ]
-                          },
-                          {
-                            "featureType": "road",
-                            "elementType": "labels",
-                            "stylers": [
-                              { "visibility": "off" }
-                            ]
-                          }
-                        ]
-                        ''';
-                      controller.setMapStyle(style);
-                      sharedController.mapController.complete(controller);
+                            ''';
+                          controller.setMapStyle(style);
+                        },
+                        mapToolbarEnabled: false,
+                        zoomControlsEnabled: false,
+                        myLocationEnabled: true,
+                        myLocationButtonEnabled: false,
+                      );
                     },
-                    mapToolbarEnabled: false,
-                    zoomControlsEnabled: false,
-                    myLocationEnabled: true,
-                    myLocationButtonEnabled: false,
                   );
                 },
               ),
