@@ -38,6 +38,7 @@ class _NavigationDTState extends State<NavigationDT>
   @override
   bool get wantKeepAlive => true;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  final GlobalKey<MapDTState> mapKey = GlobalKey<MapDTState>();
 
   int selectedDropdownIndex = 0;
   int _selectedPageIndex = 0;
@@ -55,7 +56,10 @@ class _NavigationDTState extends State<NavigationDT>
       Widget pageContent;
       switch (_selectedPageIndex) {
         case 0:
-          pageContent = MapDT(UserToken: widget.userToken);
+          pageContent = MapDT(
+            key: mapKey, 
+            UserToken: widget.userToken
+          );
           break;
         case 1:
           pageContent = AdminInitialScreen();
@@ -176,7 +180,12 @@ class _NavigationDTState extends State<NavigationDT>
 
     return Column(
       children: [
-        if (_selectedPageIndex == 0) const MapHeader(),
+        if (_selectedPageIndex == 0) MapHeader(
+          onSearch: (query) {
+          final mapState = mapKey.currentState;
+          mapState?.searchLocation(query);
+        },
+        ),
         if (_selectedPageIndex == 1) const InitialHeader(),
         if (_selectedPageIndex == 2 || _selectedPageIndex == 3) const HelpHeader(),
         Expanded(
@@ -653,7 +662,7 @@ class _NavigationDTState extends State<NavigationDT>
                                           ),
                                           Icon(Icons.arrow_upward_outlined,
                                               color: Colors.black38, size: 10),
-                                          Text('A',
+                                          Text('W',
                                               style: TextStyle(
                                                   fontSize: 10,
                                                   color: Colors.black38)),
@@ -838,7 +847,7 @@ class _NavigationDTState extends State<NavigationDT>
                                           Icon(Icons.arrow_upward_outlined,
                                               color: Colors.black38, size: 10),
                                           Text(
-                                            'W',
+                                            'A',
                                             style: TextStyle(
                                                 fontSize: 10,
                                                 color: Colors.black38),
@@ -917,14 +926,14 @@ class _NavigationDTState extends State<NavigationDT>
                                         withDrop: false,
                                         hoverTrailing: const [
                                           Text(
-                                            'Shift',
+                                            'Alt',
                                             style: TextStyle(
                                                 fontSize: 10,
                                                 color: Colors.black38),
                                           ),
                                           Icon(Icons.arrow_upward_outlined,
                                               color: Colors.black38, size: 10),
-                                          Text('H',
+                                          Text('S',
                                               style: TextStyle(
                                                   fontSize: 10,
                                                   color: Colors.black38)),
@@ -938,7 +947,55 @@ class _NavigationDTState extends State<NavigationDT>
                                       ),
                                     ]),
                                 const Spacer(),
-                                GestureDetector(
+                                sharedController.isSidebarCollapsed.value
+                                ? GestureDetector(
+                                  onTap: () async {
+                                    NotificationPollingService().stopPolling();
+                                    final SharedPreferences prefs = await SharedPreferences.getInstance();
+                                    Map<String, bool> firstRunFlags = {};
+                                    for (String key in prefs.getKeys()) {
+                                      if (key.startsWith('isFirstRunFlag_')) {
+                                        firstRunFlags[key] = prefs.getBool(key) ?? true;
+                                      }
+                                    }
+
+                                    await prefs.clear();
+
+                                    for (var entry in firstRunFlags.entries) {
+                                      await prefs.setBool(entry.key, entry.value);
+                                    }
+                                    sharedController.emailController.text = "";
+                                    sharedController.passwordController.text = "";
+                                    context.push('/login');
+                                  },
+                                  child: Container(
+                                    height: 30,
+                                    margin: const EdgeInsets.only(bottom: 20),
+                                    padding: EdgeInsets.all(5),
+                                    width: double.infinity,
+                                    decoration: BoxDecoration(
+                                      color: Colors.red.withOpacity(0.8),
+                                      borderRadius: BorderRadius.circular(5)
+                                    ),
+                                    child: Row(
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      children: [
+                                        SizedBox(width: 2),
+                                        Transform(
+                                          alignment: Alignment.center,
+                                          transform: Matrix4.rotationY(3.1416),
+                                          child: const Icon(
+                                            Icons.logout_sharp,
+                                            size: 14,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                )
+                                : GestureDetector(
                                   onTap: () async {
                                     NotificationPollingService().stopPolling();
                                     final SharedPreferences prefs = await SharedPreferences.getInstance();

@@ -6,7 +6,8 @@ import 'package:safezone/resource/schema/texts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class MapHeader extends StatefulWidget {
-  const MapHeader({super.key});
+  final Function(String) onSearch;
+  const MapHeader({super.key, required this.onSearch});
 
   @override
   State<MapHeader> createState() => _MapHeaderState();
@@ -14,7 +15,7 @@ class MapHeader extends StatefulWidget {
 
 class _MapHeaderState extends State<MapHeader> {
   final sharedController = SharedProperties();
-  final TextEditingController searchController = TextEditingController();
+  final TextEditingController textfield = TextEditingController();
 
   Future<void> _saveMapType(int index) async {
     final prefs = await SharedPreferences.getInstance();
@@ -42,7 +43,7 @@ class _MapHeaderState extends State<MapHeader> {
 
   @override
   void dispose() {
-    searchController.dispose();
+    textfield.dispose();
     super.dispose();
   }
 
@@ -175,7 +176,7 @@ class _MapHeaderState extends State<MapHeader> {
                               height: 35,
                               margin: const EdgeInsets.only(right: 10),
                               child: TextField(
-                                controller: searchController,
+                                controller: textfield,
                                 cursorColor: labelFormFieldColor,
                                 style: const TextStyle(
                                   fontSize: 10,
@@ -213,7 +214,9 @@ class _MapHeaderState extends State<MapHeader> {
                                     padding: const EdgeInsets.all(3),
                                     child: GestureDetector(
                                       onTap: () {
-                                        print("Search tapped");
+                                        if (textfield.text.isNotEmpty) {
+                                          widget.onSearch(textfield.text);
+                                        }
                                       },
                                       child: Container(
                                         width: 70,
@@ -240,21 +243,21 @@ class _MapHeaderState extends State<MapHeader> {
                               ),
                             ),
                           ),
-                          GestureDetector(
-                            child: Container(
-                              height: 33,
-                              width: 33,
-                              decoration: const BoxDecoration(
-                                color: btnColor,
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Icon(
-                                Icons.mic,
-                                size: 17,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
+                          // GestureDetector(
+                          //   child: Container(
+                          //     height: 33,
+                          //     width: 33,
+                          //     decoration: const BoxDecoration(
+                          //       color: btnColor,
+                          //       shape: BoxShape.circle,
+                          //     ),
+                          //     child: const Icon(
+                          //       Icons.mic,
+                          //       size: 17,
+                          //       color: Colors.white,
+                          //     ),
+                          //   ),
+                          // ),
                         ],
                       ),
                     );

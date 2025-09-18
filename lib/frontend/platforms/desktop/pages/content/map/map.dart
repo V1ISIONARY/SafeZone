@@ -51,10 +51,10 @@ class MapDT extends StatefulWidget {
   const MapDT({super.key, required this.UserToken});
 
   @override
-  State<MapDT> createState() => _MapDTState();
+  State<MapDT> createState() => MapDTState();
 }
 
-class _MapDTState extends State<MapDT> with TickerProviderStateMixin {
+class MapDTState extends State<MapDT> with TickerProviderStateMixin {
   final sharedController = SharedProperties();
 
   Map<String, BitmapDescriptor> memberMarkers = {};
@@ -159,6 +159,7 @@ class _MapDTState extends State<MapDT> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
+    sharedController.mapSearchTE.text = "";
 
     _loadUserId();
     _loadMapType();
@@ -953,15 +954,12 @@ class _MapDTState extends State<MapDT> with TickerProviderStateMixin {
     _updateMapPosition(LatLng(position.latitude, position.longitude));
   }
 
-  void _updateMapPosition(LatLng newPosition) async {
-    setState(() {
-      _initialPosition = newPosition;
-    });
-
-    final GoogleMapController controller =
-        await sharedController.mapController.future;
-    controller
-        .animateCamera(CameraUpdate.newLatLngZoom(_initialPosition, 14.0));
+  void _updateMapPosition(LatLng target) {
+    sharedController.googleMapController?.animateCamera(
+      CameraUpdate.newCameraPosition(
+        CameraPosition(target: target, zoom: 15),
+      ),
+    );
   }
 
   void _showSnackBar(String message) {
@@ -969,30 +967,32 @@ class _MapDTState extends State<MapDT> with TickerProviderStateMixin {
         .showSnackBar(SnackBar(content: Text(message)));
   }
 
-  void _searchLocation() async {
-    if (sharedController.mapSearchTE.text.isNotEmpty) {
-      String location = sharedController.mapSearchTE.text;
-      String url =
-          "https://maps.googleapis.com/maps/api/geocode/json?address=$location&key=$apiKey";
+  void searchLocation(String text) {
+    sharedController.mapSearchTE.text = text;
+    _searchLocation();
+  }
 
-      try {
-        final response = await http.get(Uri.parse(url));
+  Future<void> _searchLocation() async {
+    final text = sharedController.mapSearchTE.text;
+    if (text.isEmpty) return;
 
-        if (response.statusCode == 200) {
-          final data = json.decode(response.body);
+    final url =
+        "https://maps.googleapis.com/maps/api/geocode/json?address=$text&key=$apiKey";
 
-          if (data["status"] == "OK") {
-            double lat = data["results"][0]["geometry"]["location"]["lat"];
-            double lng = data["results"][0]["geometry"]["location"]["lng"];
-
-            _updateMapPosition(LatLng(lat, lng));
-          }
+    try {
+      final response = await http.get(Uri.parse(url));
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data["status"] == "OK") {
+          final location = data["results"][0]["geometry"]["location"];
+          final latLng = LatLng(location["lat"], location["lng"]);
+          _updateMapPosition(latLng);
+        } else {
+          _showSnackBar("No results found for '$text'.");
         }
-      } catch (e) {
-        _showSnackBar("Network error: Unable to fetch location.");
       }
-    } else {
-      _showSnackBar("Please enter a location to search.");
+    } catch (e) {
+      _showSnackBar("Network error: Unable to fetch location.");
     }
   }
 
