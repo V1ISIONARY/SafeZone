@@ -19,20 +19,54 @@ class HelpCenter extends StatefulWidget {
 
 class HelpCenterState extends State<HelpCenter>
     with SingleTickerProviderStateMixin {
+
   late TabController _tabController;
   final List<String> _categories = [
     'Recommended',
     'Accessability',
     'Emergency',
     'General',
-  ]
-      .map((category) => category[0].toUpperCase() + category.substring(1))
-      .toList();
+  ].map((category) => category[0].toUpperCase() + category.substring(1)).toList();
+
+  final Map<String, int?> expandedIndexes = {};
+
+  final Map<String, String> descriptions = {
+    "Is SafeZone accessible for users with disabilities or vision impairments?":
+        "SafeZone is designed to work with accessibility services and screen readers.",
+    "What should I do in a real emergency?":
+        "Immediately press the alert button in the app and follow on-screen instructions.",
+    "How do I update my SafeZone profile?":
+        "Go to Settings > Profile and update your personal information.",
+    "[Troubleshoot] What should I do if alerts aren’t sent or if I have connectivity issues?":
+        "Verify that you have a stable internet or mobile data connection and check app permissions. If problems continue, try restarting the app or device, or contact support for assistance.",
+    "[Privacy & Security] Is my location tracked all the time?":
+        "Your location is only shared when you actively use certain features, such as sending an SOS alert or checking in. Location tracking is not continuous and is only activated as needed for your safety.",
+    "[Troubleshoot] Why can’t I check in, or why is my location not detected accurately?":
+        "Ensure that your device’s location services are enabled and that the app has the necessary permissions. If the issue persists, try restarting your phone or checking your network connection.",
+    "[Accessability] Are there alternatives if I cannot use the app due to accessibility reasons?":
+        "If you are unable to use the app, we recommend informing your institution or organization, as alternative contact methods (such as direct calls to campus security or emergency services) may be available.",
+    "[Emergency] How quickly will I get a response if I send an alert?":
+        "Responses to alerts are typically rapid, as your Circle and registered Emergency Contacts are notified instantly. Actual response time may vary depending on their proximity and availability.",
+    "What happens if I raise a false alert or press a button by mistake?":
+        "If you trigger a false alert, please notify your contacts immediately to inform them that it was unintentional. This helps prevent unnecessary concern or emergency responses.",
+    "Who receives my alert, and how will they contact me?":
+        "When you send an alert, your Circle and Emergency Contacts receive your notification along with your location. They may respond via in-app messaging, phone call, or by coming to your location, depending on the situation.",
+    "What are the app’s privacy settings?":
+        "Privacy settings are available under Settings > Privacy, where you can adjust tracking and sharing.",
+  };
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: _categories.length, vsync: this);
+
+    _tabController.addListener(() {
+      if (_tabController.indexIsChanging) {
+        setState(() {
+          expandedIndexes.clear();
+        });
+      }
+    });
   }
 
   String? _selectedPage;
@@ -488,10 +522,10 @@ class HelpCenterState extends State<HelpCenter>
                                                     children: [
                                                       const TextSpan(
                                                           text:
-                                                              'Still have questions? View the '),
+                                                              ''),
                                                       TextSpan(
                                                         text:
-                                                            'Help Center Articles',
+                                                            '',
                                                         style:
                                                             const TextStyle(
                                                           color:
@@ -513,55 +547,6 @@ class HelpCenterState extends State<HelpCenter>
                                               ),
                                             ]))
                                       ])),
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 10, vertical: 5),
-                                decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius:
-                                        BorderRadius.circular(10)),
-                                child: Column(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.start,
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.center,
-                                  children: [
-                                    const Padding(
-                                      padding:
-                                          EdgeInsets.symmetric(vertical: 5),
-                                      child: Text(
-                                        "Do You Have Any Other Question?",
-                                        style: TextStyle(
-                                            fontSize: 13,
-                                            color: Colors.black,
-                                            fontWeight: FontWeight.w500),
-                                      ),
-                                    ),
-                                    Settingsbtn(
-                                      title: 'Chat Support',
-                                      svgIcon:
-                                          'lib/resource/svg/support-agent.svg',
-                                      navigateTo: 'about',
-                                      description:
-                                          'Powered by our support agent.',
-                                      onTap: () {},
-                                    ),
-                                    const Divider(
-                                      color: Colors.black26,
-                                      height: 0.2,
-                                    ),
-                                    Settingsbtn(
-                                      title: 'Live Chat Support',
-                                      svgIcon:
-                                          'lib/resource/svg/support-agent.svg',
-                                      navigateTo: 'about',
-                                      description:
-                                          'Get real-time help from our support team.',
-                                      onTap: () {},
-                                    ),
-                                  ],
-                                ),
-                              )
                             ],
                           ),
                         ))
@@ -573,12 +558,13 @@ class HelpCenterState extends State<HelpCenter>
     }
   }
 
+  
   final List<String> recommend = [
     "[Troubleshoot] What should I do if alerts aren’t sent or if I have connectivity issues?",
     "[Privacy & Security] Is my location tracked all the time?",
     "[Troubleshoot] Why can’t I check in, or why is my location not detected accurately?",
-    "[Accessability] Are there alternatives if I cannot use the app due to accessibility reasons?"
-        "[Emergency] How quickly will I get a response if I send an alert?"
+    "[Accessability] Are there alternatives if I cannot use the app due to accessibility reasons?",
+    "[Emergency] How quickly will I get a response if I send an alert?",
   ];
 
   final List<String> accessability = [
@@ -625,6 +611,7 @@ class HelpCenterState extends State<HelpCenter>
           itemCount: selectedList.length,
           itemBuilder: (context, index) {
             final text = selectedList[index];
+            final isExpanded = expandedIndexes[status] == index;
 
             return LayoutBuilder(
               builder: (context, constraints) {
@@ -642,44 +629,81 @@ class HelpCenterState extends State<HelpCenter>
                 textPainter.layout(maxWidth: constraints.maxWidth - 30);
                 final lineCount = textPainter.computeLineMetrics().length;
 
-                return Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                  decoration: const BoxDecoration(
-                    border: Border(
-                      bottom: BorderSide(width: 1, color: Colors.black12),
+                return GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      expandedIndexes[status] =
+                          isExpanded ? null : index;
+                    });
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                    decoration: const BoxDecoration(
+                      border: Border(
+                        bottom: BorderSide(width: 1, color: Colors.black12),
+                      ),
                     ),
-                  ),
-                  child: Row(
-                    crossAxisAlignment: lineCount == 1
-                        ? CrossAxisAlignment.center
-                        : CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Text(
-                        "${index + 1}",
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: index == 0
-                              ? Colors.red
-                              : index == 1
-                                  ? Colors.green
-                                  : index == 2
-                                      ? Colors.blue
-                                      : Colors.black45,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          crossAxisAlignment: lineCount == 1
+                              ? CrossAxisAlignment.center
+                              : CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "${index + 1}",
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: index == 0
+                                    ? Colors.red
+                                    : index == 1
+                                        ? Colors.green
+                                        : index == 2
+                                            ? Colors.blue
+                                            : Colors.black45,
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Text(
+                                text,
+                                style: const TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 10,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Icon(
+                              isExpanded
+                                  ? Icons.keyboard_arrow_up
+                                  : Icons.keyboard_arrow_down,
+                              size: 16,
+                              color: Colors.black54,
+                            ),
+                          ],
                         ),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Text(
-                          text,
-                          style: const TextStyle(
-                            color: Colors.black,
-                            fontSize: 10,
-                          ),
+                        AnimatedSize(
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.easeInOut,
+                          child: isExpanded
+                              ? Padding(
+                                  padding: const EdgeInsets.only(
+                                      left: 0, top: 10, bottom: 5),
+                                  child: Text(
+                                    descriptions[text] ??
+                                        "No description available for this item.",
+                                    style: const TextStyle(
+                                      fontSize: 10,
+                                      color: Colors.black54,
+                                    ),
+                                  ),
+                                )
+                              : const SizedBox.shrink(),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 );
               },
@@ -688,5 +712,6 @@ class HelpCenterState extends State<HelpCenter>
         ),
       ),
     );
+    
   }
 }
