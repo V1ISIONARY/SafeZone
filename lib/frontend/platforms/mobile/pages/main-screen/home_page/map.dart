@@ -8,7 +8,6 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:geocoding/geocoding.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
@@ -45,7 +44,6 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'dart:convert';
 import 'package:location/location.dart' as locs;
 
-import '../../../widgets/cards/users.dart';
 
 class Maps extends StatefulWidget {
   final String UserToken;
@@ -65,8 +63,8 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
   Set<Marker> membersMarkers = {};
   Widget? _floatingWidget;
 
-  List<LatLng> _safeZones = [];
-  List<LatLng> _dangerZones = [];
+  final List<LatLng> _safeZones = [];
+  final List<LatLng> _dangerZones = [];
   final locs.Location location = locs.Location();
   static const LatLng sourceLocation = LatLng(16.0433, 120.3333);
   LatLng _initialPosition = const LatLng(37.7749, -122.4194);
@@ -123,15 +121,6 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
         customSafeZoneMarker != null;
   }
 
-  void _toggleExpand() {
-    setState(() {
-      _isExpanded = !_isExpanded;
-      if (!_isExpanded) {
-        sharedController.mapSearchTE.clear();
-        _focusNode.unfocus();
-      }
-    });
-  }
 
   void _toggleCircles() {
     setState(() {

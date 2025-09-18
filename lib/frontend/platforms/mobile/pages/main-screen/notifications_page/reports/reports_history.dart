@@ -77,7 +77,24 @@ class _ReportsHistoryState extends State<ReportsHistory>
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        context.go('/home');
+        if (widget.fromSuccess == true) {
+          final prefs = await SharedPreferences.getInstance();
+          final userToken = prefs.getString('userToken');
+          if (userToken != null) {
+            context.go('/home', extra: userToken);
+            return false;
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text("User token not found! Please log in again."),
+                backgroundColor: Colors.red,
+              ),
+            );
+            context.go('/login');
+          }
+        } else {
+          Navigator.pop(context);
+        }
         return false;
       },
       child: Scaffold(
