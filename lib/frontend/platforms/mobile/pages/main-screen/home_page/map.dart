@@ -78,6 +78,8 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
   bool _isAllZoneShown = false;
   bool _isSafeZoneShown = false;
   bool _isDangerZoneShown = false;
+  bool _isRefreshing = false;
+  Timer? _refreshTimer;
 
   BitmapDescriptor? customMyLocationMarker;
   BitmapDescriptor? customPendingDangerZoneMarker;
@@ -223,6 +225,94 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
     });
 
     _startLocationUpdates();
+    _startPeriodicRefresh();
+  }
+
+  Future<void> _refreshMapData() async {
+    print("it is refreshing");
+    if (_isRefreshing) return;
+
+    setState(() {
+      _isRefreshing = true;
+    });
+
+    try {
+      await Future.wait([
+        _fetchLocation().timeout(Duration(seconds: 10)),
+        Future.delayed(Duration.zero, () {
+          context.read<MapBloc>().add(FetchMapData());
+        }).timeout(Duration(seconds: 10)),
+      ]).timeout(Duration(seconds: 15));
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Data updated!"),
+            duration: Duration(seconds: 1),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } catch (e) {
+      print('Light refresh failed: $e');
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isRefreshing = false;
+        });
+      }
+    }
+  }
+
+  void _startPeriodicRefresh() {
+    _refreshTimer?.cancel();
+    _refreshTimer = Timer.periodic(const Duration(minutes: 5), (timer) {
+      if (mounted && !_isRefreshing) {
+        _refreshMapData();
+      }
+    });
+  }
+
+  void _stopPeriodicRefresh() {
+    _refreshTimer?.cancel();
+    _refreshTimer = null;
+  }
+
+  Widget _buildRefreshButton() {
+    return GestureDetector(
+      onTap: _isRefreshing ? null : _refreshMapData,
+      child: Container(
+        width: 40,
+        height: 40,
+        decoration: BoxDecoration(
+          color: _isRefreshing ? Colors.grey[300] : Colors.white,
+          borderRadius: BorderRadius.circular(10),
+          boxShadow: const [
+            BoxShadow(
+              color: Colors.grey,
+              blurRadius: 2,
+              offset: Offset(1, 1),
+            ),
+          ],
+        ),
+        child: Center(
+          child: _isRefreshing
+              ? SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(widgetPricolor),
+                  ),
+                )
+              : Icon(
+                  Icons.refresh,
+                  color: widgetPricolor,
+                  size: 20,
+                ),
+        ),
+      ),
+    );
   }
 
   void _runInitLogicOnce() async {
@@ -292,8 +382,9 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
     _focusNode.dispose();
     _focusNodeCircles.dispose();
     _focusNodeText.dispose();
-    // sharedController.mapSearchTE.dispose();
     _locationSubscription?.cancel();
+    _membersSubscription?.cancel();
+    _refreshTimer?.cancel();
     super.dispose();
   }
 
@@ -643,8 +734,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
       );
 
       if (mounted) {
-        setState(() {
-        });
+        setState(() {});
       }
 
       print("✅ All custom markers loaded successfully");
@@ -1239,7 +1329,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                     ));
                   } else if (state is MapDataLoaded) {
                     //_currentMembers = state.members;
-
+      
                     // WidgetsBinding.instance.addPostFrameCallback((_) async {
                     //   await _preloadMemberMarkers(state.members);
                     //   setState(() {});
@@ -1410,8 +1500,9 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                                       child: Image.network(
                                                         profilePictureUrl,
                                                         fit: BoxFit.cover,
-                                                        errorBuilder: (context,
-                                                            error, stackTrace) {
+                                                        errorBuilder:
+                                                            (context, error,
+                                                                stackTrace) {
                                                           return Image.asset(
                                                             'lib/resource/image/jpg/profile.jpg',
                                                             fit: BoxFit.cover,
@@ -1450,7 +1541,8 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                                 _circles.isEmpty
                                                     ? const Center(
                                                         child: SizedBox(
-                                                        child: Text("No Circle",
+                                                        child: Text(
+                                                            "No Circle",
                                                             style: TextStyle(
                                                                 fontSize: 11,
                                                                 color: Colors
@@ -1465,7 +1557,8 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                                                 .start,
                                                         children: _circles
                                                             .where((circle) =>
-                                                                circle.isActive)
+                                                                circle
+                                                                    .isActive)
                                                             .map((circle) =>
                                                                 CategoryDescripText(
                                                                   text: circle
@@ -1506,8 +1599,8 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                                       const RoundedRectangleBorder(
                                                     borderRadius:
                                                         BorderRadius.vertical(
-                                                            top:
-                                                                Radius.circular(
+                                                            top: Radius
+                                                                .circular(
                                                                     10)),
                                                   ),
                                                   builder:
@@ -1524,7 +1617,8 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                                                     top: Radius
                                                                         .circular(
                                                                             10)),
-                                                            color: Colors.white,
+                                                            color:
+                                                                Colors.white,
                                                           ),
                                                           child: Column(
                                                             crossAxisAlignment:
@@ -1545,16 +1639,15 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                                                           .grey,
                                                                       blurRadius:
                                                                           2,
-                                                                      offset:
-                                                                          Offset(
-                                                                              1,
-                                                                              1),
+                                                                      offset: Offset(
+                                                                          1,
+                                                                          1),
                                                                     ),
                                                                   ],
                                                                   borderRadius:
                                                                       BorderRadius.vertical(
-                                                                          top: Radius.circular(
-                                                                              10)),
+                                                                          top:
+                                                                              Radius.circular(10)),
                                                                 ),
                                                                 child: Row(
                                                                   crossAxisAlignment:
@@ -1594,7 +1687,8 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                                                           15),
                                                                   width: double
                                                                       .infinity,
-                                                                  child: Column(
+                                                                  child:
+                                                                      Column(
                                                                     mainAxisAlignment:
                                                                         MainAxisAlignment
                                                                             .center,
@@ -1606,8 +1700,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                                                           circle
                                                                               .isActive))
                                                                         Container(
-                                                                            margin:
-                                                                                const EdgeInsets.symmetric(vertical: 30),
+                                                                            margin: const EdgeInsets.symmetric(vertical: 30),
                                                                             child: Text(circle.code, style: const TextStyle(fontWeight: FontWeight.bold, color: widgetPricolor, fontSize: 30))),
                                                                       const CategoryText(
                                                                           text:
@@ -1631,7 +1724,8 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                                 decoration: BoxDecoration(
                                                   color: Colors.white,
                                                   borderRadius:
-                                                      BorderRadius.circular(10),
+                                                      BorderRadius.circular(
+                                                          10),
                                                   boxShadow: const [
                                                     BoxShadow(
                                                       color: Colors.grey,
@@ -1718,16 +1812,19 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                               children: [
                                                 Positioned.fill(
                                                   child: TextField(
-                                                    controller: sharedController
-                                                        .mapSearchTE,
+                                                    controller:
+                                                        sharedController
+                                                            .mapSearchTE,
                                                     focusNode: _focusNodeText,
-                                                    style: GoogleFonts.poppins(
+                                                    style:
+                                                        GoogleFonts.poppins(
                                                       fontSize: 9,
                                                       fontWeight:
                                                           FontWeight.w500,
                                                       color: Colors.black,
                                                     ),
-                                                    decoration: InputDecoration(
+                                                    decoration:
+                                                        InputDecoration(
                                                       filled: true,
                                                       fillColor: Colors.white,
                                                       hintText: '',
@@ -1736,7 +1833,8 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                                               color: Colors
                                                                   .transparent),
                                                       contentPadding:
-                                                          const EdgeInsets.only(
+                                                          const EdgeInsets
+                                                              .only(
                                                               left: 35,
                                                               right: 40,
                                                               bottom: 8),
@@ -1744,7 +1842,8 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                                           OutlineInputBorder(
                                                         borderRadius:
                                                             BorderRadius
-                                                                .circular(20.0),
+                                                                .circular(
+                                                                    20.0),
                                                         borderSide:
                                                             const BorderSide(
                                                                 color:
@@ -1754,7 +1853,8 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                                           OutlineInputBorder(
                                                         borderRadius:
                                                             BorderRadius
-                                                                .circular(20.0),
+                                                                .circular(
+                                                                    20.0),
                                                         borderSide:
                                                             const BorderSide(
                                                                 color:
@@ -1764,7 +1864,8 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                                           OutlineInputBorder(
                                                         borderRadius:
                                                             BorderRadius
-                                                                .circular(20.0),
+                                                                .circular(
+                                                                    20.0),
                                                         borderSide:
                                                             const BorderSide(
                                                                 color:
@@ -1778,7 +1879,8 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                                 ),
                                                 Row(
                                                   crossAxisAlignment:
-                                                      CrossAxisAlignment.center,
+                                                      CrossAxisAlignment
+                                                          .center,
                                                   mainAxisAlignment:
                                                       MainAxisAlignment.start,
                                                   children: [
@@ -1787,7 +1889,8 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                                       width: 40,
                                                       alignment:
                                                           Alignment.center,
-                                                      color: Colors.transparent,
+                                                      color:
+                                                          Colors.transparent,
                                                       child: SvgPicture.asset(
                                                         'lib/resource/svg/search.svg',
                                                         color: Colors.black,
@@ -1806,12 +1909,14 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                                       child: Padding(
                                                         padding:
                                                             const EdgeInsets
-                                                                .only(right: 4),
-                                                        child: AnimatedBuilder(
+                                                                .only(
+                                                                right: 4),
+                                                        child:
+                                                            AnimatedBuilder(
                                                           animation:
                                                               _controllerFade,
-                                                          builder:
-                                                              (context, child) {
+                                                          builder: (context,
+                                                              child) {
                                                             return Row(
                                                               crossAxisAlignment:
                                                                   CrossAxisAlignment
@@ -1838,32 +1943,28 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                                       ),
                                                     ),
                                                     Transform.translate(
-                                                        offset:
-                                                            const Offset(-5, 0),
+                                                        offset: const Offset(
+                                                            -5, 0),
                                                         child: SlideTransition(
-                                                            position:
-                                                                _hintAnimation,
-                                                            child:
-                                                                AnimatedBuilder(
-                                                                    animation:
-                                                                        _hintColorAnimation,
-                                                                    builder:
-                                                                        (context,
-                                                                            child) {
-                                                                      return GestureDetector(
-                                                                          onTap:
-                                                                              () {
-                                                                            FocusScope.of(context).requestFocus(_focusNode);
-                                                                          },
-                                                                          child:
-                                                                              CategoryDescripText(
-                                                                            text:
-                                                                                hints[_currentHintIndex],
-                                                                            color: _hintAnimation.isCompleted
-                                                                                ? Colors.transparent
-                                                                                : _hintColorAnimation.value,
-                                                                          ));
-                                                                    })))
+                                                            position: _hintAnimation,
+                                                            child: AnimatedBuilder(
+                                                                animation: _hintColorAnimation,
+                                                                builder: (context, child) {
+                                                                  return GestureDetector(
+                                                                      onTap:
+                                                                          () {
+                                                                        FocusScope.of(context)
+                                                                            .requestFocus(_focusNode);
+                                                                      },
+                                                                      child:
+                                                                          CategoryDescripText(
+                                                                        text:
+                                                                            hints[_currentHintIndex],
+                                                                        color: _hintAnimation.isCompleted
+                                                                            ? Colors.transparent
+                                                                            : _hintColorAnimation.value,
+                                                                      ));
+                                                                })))
                                                   ],
                                                 ),
                                                 Positioned(
@@ -1880,7 +1981,8 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                                               _isListening =
                                                                   true);
                                                           _speech.listen(
-                                                            onResult: (result) {
+                                                            onResult:
+                                                                (result) {
                                                               setState(() {
                                                                 sharedController
                                                                         .mapSearchTE
@@ -1891,7 +1993,8 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                                             },
                                                             listenFor:
                                                                 const Duration(
-                                                                    seconds: 5),
+                                                                    seconds:
+                                                                        5),
                                                           );
                                                         }
                                                       } else {
@@ -1906,7 +2009,8 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                                       width: 40,
                                                       alignment:
                                                           Alignment.center,
-                                                      color: Colors.transparent,
+                                                      color:
+                                                          Colors.transparent,
                                                       child: SvgPicture.asset(
                                                         'lib/resource/svg/mic.svg',
                                                         color: Colors.black87,
@@ -1923,8 +2027,10 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                           GestureDetector(
                                             onTap: () {
                                               setState(() {
-                                                if (sharedController.mapSearchTE
-                                                    .text.isNotEmpty) {
+                                                if (sharedController
+                                                    .mapSearchTE
+                                                    .text
+                                                    .isNotEmpty) {
                                                   _searchLocation();
                                                 } else {
                                                   _isExpanded = false;
@@ -1939,11 +2045,14 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                               height: 40,
                                               decoration: const BoxDecoration(
                                                 color: Colors.grey,
-                                                borderRadius: BorderRadius.only(
-                                                    bottomRight:
-                                                        Radius.circular(20),
-                                                    topRight:
-                                                        Radius.circular(20)),
+                                                borderRadius:
+                                                    BorderRadius.only(
+                                                        bottomRight:
+                                                            Radius.circular(
+                                                                20),
+                                                        topRight:
+                                                            Radius.circular(
+                                                                20)),
                                               ),
                                               child: const Center(
                                                 child: Icon(Icons.send,
@@ -2103,8 +2212,8 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                   _isExpanded = true;
                                 });
                               }
-                            }, child:
-                                LayoutBuilder(builder: (context, constraints) {
+                            }, child: LayoutBuilder(
+                                builder: (context, constraints) {
                               return AnimatedContainer(
                                 duration: const Duration(milliseconds: 300),
                                 margin: const EdgeInsets.only(right: 10),
@@ -2129,11 +2238,13 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                             child: Container(
                                                 height: 40,
                                                 width: double.infinity,
-                                                decoration: const BoxDecoration(
+                                                decoration:
+                                                    const BoxDecoration(
                                                   color: Colors.grey,
                                                   borderRadius:
                                                       BorderRadius.all(
-                                                          Radius.circular(20)),
+                                                          Radius.circular(
+                                                              20)),
                                                   boxShadow: [
                                                     BoxShadow(
                                                       color: Colors.grey,
@@ -2159,14 +2270,15 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                                               fontWeight:
                                                                   FontWeight
                                                                       .w500,
-                                                              color:
-                                                                  Colors.black,
+                                                              color: Colors
+                                                                  .black,
                                                             ),
                                                             decoration:
                                                                 InputDecoration(
                                                               filled: true,
                                                               fillColor:
-                                                                  Colors.white,
+                                                                  Colors
+                                                                      .white,
                                                               hintText: '',
                                                               hintStyle: const TextStyle(
                                                                   color: Colors
@@ -2174,8 +2286,10 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                                               contentPadding:
                                                                   const EdgeInsets
                                                                       .only(
-                                                                      left: 35,
-                                                                      right: 40,
+                                                                      left:
+                                                                          35,
+                                                                      right:
+                                                                          40,
                                                                       bottom:
                                                                           8),
                                                               border:
@@ -2222,8 +2336,9 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                                               alignment:
                                                                   Alignment
                                                                       .center,
-                                                              child: SvgPicture
-                                                                  .asset(
+                                                              child:
+                                                                  SvgPicture
+                                                                      .asset(
                                                                 'lib/resource/svg/search.svg',
                                                                 color: Colors
                                                                     .black,
@@ -2237,7 +2352,8 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                                               padding:
                                                                   const EdgeInsets
                                                                       .only(
-                                                                      right: 4),
+                                                                      right:
+                                                                          4),
                                                               child:
                                                                   AnimatedBuilder(
                                                                 animation:
@@ -2262,7 +2378,8 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                                                 },
                                                               ),
                                                             ),
-                                                            Transform.translate(
+                                                            Transform
+                                                                .translate(
                                                               offset:
                                                                   const Offset(
                                                                       -5, 0),
@@ -2281,10 +2398,8 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                                                       text: hints[
                                                                           _currentHintIndex],
                                                                       color: _hintAnimation.isCompleted
-                                                                          ? Colors
-                                                                              .transparent
-                                                                          : _hintColorAnimation
-                                                                              .value,
+                                                                          ? Colors.transparent
+                                                                          : _hintColorAnimation.value,
                                                                     );
                                                                   },
                                                                 ),
@@ -2301,7 +2416,8 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                                               _focusNodeText
                                                                   .requestFocus();
                                                               if (!_isListening) {
-                                                                bool available =
+                                                                bool
+                                                                    available =
                                                                     await _speech
                                                                         .initialize();
                                                                 if (available) {
@@ -2319,16 +2435,17 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                                                             .text = result.recognizedWords;
                                                                       });
                                                                     },
-                                                                    listenFor: const Duration(
-                                                                        seconds:
-                                                                            5),
+                                                                    listenFor:
+                                                                        const Duration(
+                                                                            seconds: 5),
                                                                   );
                                                                 }
                                                               } else {
                                                                 setState(() =>
                                                                     _isListening =
                                                                         false);
-                                                                _speech.stop();
+                                                                _speech
+                                                                    .stop();
                                                               }
                                                             },
                                                             child: Container(
@@ -2337,8 +2454,9 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                                               alignment:
                                                                   Alignment
                                                                       .center,
-                                                              child: SvgPicture
-                                                                  .asset(
+                                                              child:
+                                                                  SvgPicture
+                                                                      .asset(
                                                                 'lib/resource/svg/mic.svg',
                                                                 color: Colors
                                                                     .black87,
@@ -2362,7 +2480,8 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                                               .isNotEmpty) {
                                                             _searchLocation();
                                                           } else {
-                                                            _isExpanded = false;
+                                                            _isExpanded =
+                                                                false;
                                                             sharedController
                                                                 .mapSearchTE
                                                                 .clear();
@@ -2376,7 +2495,8 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                                           height: 40,
                                                           decoration:
                                                               const BoxDecoration(
-                                                            color: Colors.grey,
+                                                            color:
+                                                                Colors.grey,
                                                             borderRadius:
                                                                 BorderRadius
                                                                     .only(
@@ -2385,7 +2505,8 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                                                       .circular(
                                                                           20),
                                                               topRight: Radius
-                                                                  .circular(20),
+                                                                  .circular(
+                                                                      20),
                                                             ),
                                                           ),
                                                           child: Center(
@@ -2395,7 +2516,8 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                                                 sharedController
                                                                     .mapSearchTE,
                                                             builder: (context,
-                                                                value, child) {
+                                                                value,
+                                                                child) {
                                                               return Transform
                                                                   .translate(
                                                                       offset: const Offset(
@@ -2406,8 +2528,8 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                                                         value.text.isNotEmpty
                                                                             ? Icons.send
                                                                             : Icons.close,
-                                                                        color: Colors
-                                                                            .white,
+                                                                        color:
+                                                                            Colors.white,
                                                                         size:
                                                                             18,
                                                                       ));
@@ -2438,7 +2560,8 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                   ],
                                 ),
                                 child: const Row(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.center,
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   children: [
                                     SizedBox(width: 5),
@@ -2475,7 +2598,8 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                   ],
                                 ),
                                 child: const Row(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.center,
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   children: [
                                     SizedBox(width: 5),
@@ -2511,11 +2635,13 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                   ],
                                 ),
                                 child: const Row(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.center,
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   children: [
                                     SizedBox(width: 5),
-                                    Icon(Icons.safety_check, color: Colors.red),
+                                    Icon(Icons.safety_check,
+                                        color: Colors.red),
                                     SizedBox(width: 5),
                                     Expanded(
                                       child: CategoryDescripText(
@@ -2540,17 +2666,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                         Positioned(
                           bottom: 15,
                           left: 15,
-                          child: GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                sharedController.showMarkers =
-                                    !sharedController.showMarkers;
-                              });
-                            },
-                            child: _buildButton(sharedController.showMarkers
-                                ? Icons.visibility
-                                : Icons.visibility_off),
-                          ),
+                          child: _buildRefreshButton(),
                         )
                       ],
                     ),
@@ -2564,17 +2680,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                         Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              GestureDetector(
-                                onTap: () {
-                                  setState(() {
-                                    sharedController.showMarkers =
-                                        !sharedController.showMarkers;
-                                  });
-                                },
-                                child: _buildButton(sharedController.showMarkers
-                                    ? Icons.visibility
-                                    : Icons.visibility_off),
-                              )
+                              _buildRefreshButton(),
                             ])
                       ],
                     )),
@@ -2592,7 +2698,8 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                           GestureDetector(
                             key: _circleKey,
                             onTap: () async {
-                              final result = await context.push('/groups-list');
+                              final result =
+                                  await context.push('/groups-list');
                               if (result == null) {
                                 _loadUserId();
                               } else {
