@@ -5,6 +5,7 @@ import 'package:safezone/backend/properties/import.dart' show TapGestureRecogniz
 import 'package:safezone/frontend/platforms/desktop/pages/content/help/term-policy/community_standards.dart';
 import 'package:safezone/frontend/platforms/desktop/pages/content/help/term-policy/privacy_policy.dart';
 import 'package:safezone/frontend/platforms/desktop/pages/content/help/term-policy/terms_service.dart';
+import 'package:safezone/frontend/platforms/desktop/pages/content/help/tips.dart';
 import 'package:safezone/frontend/platforms/mobile/widgets/buttons/settings_btn.dart';
 import 'package:safezone/frontend/platforms/mobile/widgets/fade.dart';
 import 'package:safezone/resource/schema/colors.dart';
@@ -96,6 +97,14 @@ class HelpCenterState extends State<HelpCenter>
         );
       case "communityStandard":
         return CommunityStandards(
+          onBack: () {
+            setState(() {
+              _selectedPage = null;
+            });
+          },
+        );
+      case "support":
+        return Tips(
           onBack: () {
             setState(() {
               _selectedPage = null;
@@ -338,47 +347,48 @@ class HelpCenterState extends State<HelpCenter>
                                 ],
                               ),
                               SizedBox(height: 10),
-                              Container(
-                                  width: double.infinity,
-                                  height: 30,
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 15, vertical: 5),
-                                  margin: const EdgeInsets.only(bottom: 10),
-                                  decoration: BoxDecoration(
-                                      color: const Color.fromARGB(
-                                          255, 229, 232, 209),
-                                      borderRadius:
-                                          BorderRadius.circular(10)),
-                                  child: const Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.start,
-                                    children: [
-                                      Icon(
-                                        Icons.volume_up_outlined,
-                                        color: widgetPricolor,
-                                        size: 11,
-                                      ),
-                                      SizedBox(width: 10),
-                                      Text(
-                                        "Safezone new features announcements",
-                                        style: TextStyle(
-                                          fontSize: 10,
-                                          color: widgetPricolor,
-                                        ),
-                                      ),
-                                      Spacer(),
-                                      Icon(
-                                        Icons.chevron_right_outlined,
-                                        color: widgetPricolor,
-                                        size: 11,
-                                      ),
-                                    ],
-                                  )),
+                              // Container(
+                              //     width: double.infinity,
+                              //     height: 30,
+                              //     padding: const EdgeInsets.symmetric(
+                              //         horizontal: 15, vertical: 5),
+                              //     margin: const EdgeInsets.only(bottom: 10),
+                              //     decoration: BoxDecoration(
+                              //         color: const Color.fromARGB(
+                              //             255, 229, 232, 209),
+                              //         borderRadius:
+                              //             BorderRadius.circular(10)),
+                              //     child: const Row(
+                              //       crossAxisAlignment:
+                              //           CrossAxisAlignment.center,
+                              //       mainAxisAlignment:
+                              //           MainAxisAlignment.start,
+                              //       children: [
+                              //         Icon(
+                              //           Icons.volume_up_outlined,
+                              //           color: widgetPricolor,
+                              //           size: 11,
+                              //         ),
+                              //         SizedBox(width: 10),
+                              //         Text(
+                              //           "Safezone new features announcements",
+                              //           style: TextStyle(
+                              //             fontSize: 10,
+                              //             color: widgetPricolor,
+                              //           ),
+                              //         ),
+                              //         Spacer(),
+                              //         Icon(
+                              //           Icons.chevron_right_outlined,
+                              //           color: widgetPricolor,
+                              //           size: 11,
+                              //         ),
+                              //       ],
+                              //     )),
                               Container(
                                 width: double.infinity,
                                 height: 90,
+                                margin: EdgeInsets.only(top: 20),
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 15, vertical: 5),
                                 decoration: BoxDecoration(
@@ -402,7 +412,11 @@ class HelpCenterState extends State<HelpCenter>
                                       height: 10,
                                     ),
                                     GestureDetector(
-                                      onTap: () {},
+                                      onTap: () {
+                                        setState(() {
+                                          _selectedPage = "support";
+                                        });
+                                      },
                                       child: Container(
                                         height: 40,
                                         width: double.infinity,

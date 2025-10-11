@@ -40,7 +40,6 @@ class HelpCenterState extends State<HelpCenter>
     'General',
   ].map((category) => category[0].toUpperCase() + category.substring(1)).toList();
 
-  // Track expanded indexes per category
   final Map<String, int?> expandedIndexes = {};
 
   final Map<String, String> descriptions = {
@@ -132,54 +131,55 @@ class HelpCenterState extends State<HelpCenter>
                             color: Colors.white,
                           ),
                         ),
-                        Container(
-                          width: double.infinity,
-                          height: 40,
-                          margin: const EdgeInsets.only(top: 30, bottom: 10),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                        ),
-                        Container(
-                          width: double.infinity,
-                          height: 30,
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 15, vertical: 5),
-                          margin: const EdgeInsets.only(bottom: 10),
-                          decoration: BoxDecoration(
-                            color: const Color.fromARGB(255, 229, 232, 209),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: const Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Icon(
-                                Icons.volume_up_outlined,
-                                color: widgetPricolor,
-                                size: 11,
-                              ),
-                              SizedBox(width: 10),
-                              Text(
-                                "Safezone new features announcements",
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  color: widgetPricolor,
-                                ),
-                              ),
-                              Spacer(),
-                              Icon(
-                                Icons.chevron_right_outlined,
-                                color: widgetPricolor,
-                                size: 11,
-                              ),
-                            ],
-                          ),
-                        ),
+                        // Container(
+                        //   width: double.infinity,
+                        //   height: 40,
+                        //   margin: const EdgeInsets.only(top: 30, bottom: 10),
+                        //   decoration: BoxDecoration(
+                        //     color: Colors.white,
+                        //     borderRadius: BorderRadius.circular(30),
+                        //   ),
+                        // ),
+                        // Container(
+                        //   width: double.infinity,
+                        //   height: 30,
+                        //   padding: const EdgeInsets.symmetric(
+                        //       horizontal: 15, vertical: 5),
+                        //   margin: const EdgeInsets.only(bottom: 10),
+                        //   decoration: BoxDecoration(
+                        //     color: const Color.fromARGB(255, 229, 232, 209),
+                        //     borderRadius: BorderRadius.circular(10),
+                        //   ),
+                        //   child: const Row(
+                        //     crossAxisAlignment: CrossAxisAlignment.center,
+                        //     mainAxisAlignment: MainAxisAlignment.start,
+                        //     children: [
+                        //       Icon(
+                        //         Icons.volume_up_outlined,
+                        //         color: widgetPricolor,
+                        //         size: 11,
+                        //       ),
+                        //       SizedBox(width: 10),
+                        //       Text(
+                        //         "Safezone new features announcements",
+                        //         style: TextStyle(
+                        //           fontSize: 10,
+                        //           color: widgetPricolor,
+                        //         ),
+                        //       ),
+                        //       Spacer(),
+                        //       Icon(
+                        //         Icons.chevron_right_outlined,
+                        //         color: widgetPricolor,
+                        //         size: 11,
+                        //       ),
+                        //     ],
+                        //   ),
+                        // ),
                         Container(
                           width: double.infinity,
                           height: 90,
+                          margin: EdgeInsets.only(top: 20),
                           padding: const EdgeInsets.symmetric(
                               horizontal: 15, vertical: 5),
                           decoration: BoxDecoration(
@@ -351,116 +351,116 @@ class HelpCenterState extends State<HelpCenter>
     }
 
     return Container(
-  width: double.infinity,
-  height: 400,
-  color: Colors.transparent,
-  child: ScrollConfiguration(
-    behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
-    child: ListView.builder(
-      itemCount: selectedList.length,
-      itemBuilder: (context, index) {
-        final text = selectedList[index];
-        final isExpanded = expandedIndexes[status] == index;
+      width: double.infinity,
+      height: 400,
+      color: Colors.transparent,
+      child: ScrollConfiguration(
+        behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
+        child: ListView.builder(
+          itemCount: selectedList.length,
+          itemBuilder: (context, index) {
+            final text = selectedList[index];
+            final isExpanded = expandedIndexes[status] == index;
 
-        return LayoutBuilder(
-          builder: (context, constraints) {
-            final textSpan = TextSpan(
-              text: text,
-              style: const TextStyle(fontSize: 10, color: Colors.black),
-            );
+            return LayoutBuilder(
+              builder: (context, constraints) {
+                final textSpan = TextSpan(
+                  text: text,
+                  style: const TextStyle(fontSize: 10, color: Colors.black),
+                );
 
-            final textPainter = TextPainter(
-              text: textSpan,
-              textDirection: TextDirection.ltr,
-              maxLines: null,
-            );
+                final textPainter = TextPainter(
+                  text: textSpan,
+                  textDirection: TextDirection.ltr,
+                  maxLines: null,
+                );
 
-            textPainter.layout(maxWidth: constraints.maxWidth - 30);
-            final lineCount = textPainter.computeLineMetrics().length;
+                textPainter.layout(maxWidth: constraints.maxWidth - 30);
+                final lineCount = textPainter.computeLineMetrics().length;
 
-            return GestureDetector(
-              onTap: () {
-                setState(() {
-                  expandedIndexes[status] =
-                      isExpanded ? null : index;
-                });
-              },
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                decoration: const BoxDecoration(
-                  border: Border(
-                    bottom: BorderSide(width: 1, color: Colors.black12),
-                  ),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      crossAxisAlignment: lineCount == 1
-                          ? CrossAxisAlignment.center
-                          : CrossAxisAlignment.start,
+                return GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      expandedIndexes[status] =
+                          isExpanded ? null : index;
+                    });
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                    decoration: const BoxDecoration(
+                      border: Border(
+                        bottom: BorderSide(width: 1, color: Colors.black12),
+                      ),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          "${index + 1}",
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: index == 0
-                                ? Colors.red
-                                : index == 1
-                                    ? Colors.green
-                                    : index == 2
-                                        ? Colors.blue
-                                        : Colors.black45,
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: Text(
-                            text,
-                            style: const TextStyle(
-                              color: Colors.black,
-                              fontSize: 10,
+                        Row(
+                          crossAxisAlignment: lineCount == 1
+                              ? CrossAxisAlignment.center
+                              : CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "${index + 1}",
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: index == 0
+                                    ? Colors.red
+                                    : index == 1
+                                        ? Colors.green
+                                        : index == 2
+                                            ? Colors.blue
+                                            : Colors.black45,
+                              ),
                             ),
-                          ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Text(
+                                text,
+                                style: const TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 10,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Icon(
+                              isExpanded
+                                  ? Icons.keyboard_arrow_up
+                                  : Icons.keyboard_arrow_down,
+                              size: 16,
+                              color: Colors.black54,
+                            ),
+                          ],
                         ),
-                        const SizedBox(width: 10),
-                        Icon(
-                          isExpanded
-                              ? Icons.keyboard_arrow_up
-                              : Icons.keyboard_arrow_down,
-                          size: 16,
-                          color: Colors.black54,
+                        AnimatedSize(
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.easeInOut,
+                          child: isExpanded
+                              ? Padding(
+                                  padding: const EdgeInsets.only(
+                                      left: 0, top: 10, bottom: 5),
+                                  child: Text(
+                                    descriptions[text] ??
+                                        "No description available for this item.",
+                                    style: const TextStyle(
+                                      fontSize: 10,
+                                      color: Colors.black54,
+                                    ),
+                                  ),
+                                )
+                              : const SizedBox.shrink(),
                         ),
                       ],
                     ),
-                    AnimatedSize(
-                      duration: const Duration(milliseconds: 300),
-                      curve: Curves.easeInOut,
-                      child: isExpanded
-                          ? Padding(
-                              padding: const EdgeInsets.only(
-                                  left: 0, top: 10, bottom: 5),
-                              child: Text(
-                                descriptions[text] ??
-                                    "No description available for this item.",
-                                style: const TextStyle(
-                                  fontSize: 10,
-                                  color: Colors.black54,
-                                ),
-                              ),
-                            )
-                          : const SizedBox.shrink(),
-                    ),
-                  ],
-                ),
-              ),
+                  ),
+                );
+              },
             );
           },
-        );
-      },
-    ),
-  ),
-);
+        ),
+      ),
+    );
 
   }
 }

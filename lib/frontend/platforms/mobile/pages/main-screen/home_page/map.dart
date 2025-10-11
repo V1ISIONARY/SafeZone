@@ -134,6 +134,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
   bool _showTitle = false;
   double _appBarHeight = 0;
   Color _appBarColor = Colors.transparent;
+  String _appBarText = "";
 
   List<CircleModel> _circles = [];
   int? _userId;
@@ -326,12 +327,14 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
 
     if (widget.UserToken != 'guest' && !hasShownBefore) {
       prefs.setBool('appBarShown', true);
+
       Future.delayed(const Duration(milliseconds: 200), () {
         if (mounted) {
           setState(() {
             _appBarHeight = 40;
             _appBarColor = Colors.green;
             _showTitle = true;
+            _appBarText = "You are already signed in."; // dynamic text
           });
         }
 
@@ -341,6 +344,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
               _appBarHeight = 0;
               _appBarColor = Colors.transparent;
               _showTitle = false;
+              _appBarText = ""; // clear text
             });
           }
         });
@@ -968,10 +972,9 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
         currentUserLocation: _currentUserLocation,
         safeZones: _safeZones,
         onPolylinesUpdated: _updatePolylines,
-        onFloatingWidgetUpdate: _updateFloatingWidget, // Add this line
+        onFloatingWidgetUpdate: _updateFloatingWidget,
         context: context,
       ).findNearestSafeZone();
-
       setState(() {
         _isSafeZoneShown = true;
         _isAllZoneShown = false;
@@ -992,7 +995,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
         currentUserLocation: _currentUserLocation,
         dangerZones: _dangerZones,
         onPolylinesUpdated: _updatePolylines,
-        onFloatingWidgetUpdate: _updateFloatingWidget, // Add this line
+        onFloatingWidgetUpdate: _updateFloatingWidget, 
         context: context,
       ).findNearestDangerZone();
 
@@ -1012,7 +1015,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
   void _resetMap() {
     setState(() {
       sharedController.polylines.clear();
-      _floatingWidget = null; // Clear floating widget when resetting map
+      _floatingWidget = null; 
     });
 
     sharedController.googleMapController?.animateCamera(
@@ -1453,11 +1456,11 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                   width: double.infinity,
                   alignment: Alignment.center,
                   child: _showTitle
-                      ? const CategoryDescripText(
-                          text: "you are already signed in.",
-                          color: Colors.white,
-                        )
-                      : null,
+                    ? CategoryDescripText(
+                        text: _appBarText,
+                        color: Colors.white,
+                      )
+                    : null,
                 ),
                 const SizedBox(height: 10),
                 widget.UserToken == 'guest'
@@ -1819,8 +1822,8 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                               children: [
                                                 Positioned.fill(
                                                   child: TextField(
-                                                    controller: sharedController
-                                                        .mapSearchTE,
+                                                    controller: sharedController.mapSearchTE,
+                                                    cursorColor: Colors.black,
                                                     focusNode: _focusNodeText,
                                                     style: GoogleFonts.poppins(
                                                       fontSize: 9,
@@ -2252,6 +2255,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                                             controller:
                                                                 sharedController
                                                                     .mapSearchTE,
+                                                            cursorColor: Colors.black,
                                                             focusNode:
                                                                 _focusNodeText,
                                                             style: GoogleFonts

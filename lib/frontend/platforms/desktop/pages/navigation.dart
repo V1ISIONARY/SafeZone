@@ -451,102 +451,102 @@ class _NavigationDTState extends State<NavigationDT>
                                     ],
                                   ),
                                 ),
-                                sharedController.isSidebarCollapsed.value
-                                    ? const SizedBox.shrink()
-                                    : Container(
-                                        height: 33,
-                                        margin: const EdgeInsets.only(
-                                            top: 15, bottom: 10),
-                                        child: TextField(
-                                          cursorColor: labelFormFieldColor,
-                                          style: const TextStyle(
-                                            fontSize: 10,
-                                            color: Colors.black,
-                                            fontWeight: FontWeight.w100,
-                                          ),
-                                          decoration: InputDecoration(
-                                            hintText: "Search",
-                                            hintStyle: const TextStyle(
-                                              fontSize: 10,
-                                              color: labelFormFieldColor,
-                                              fontWeight: FontWeight.w100,
-                                            ),
-                                            border: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(5),
-                                              borderSide: const BorderSide(
-                                                  color: Colors.black12),
-                                            ),
-                                            enabledBorder: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(5),
-                                              borderSide: const BorderSide(
-                                                  color: Colors.black12,
-                                                  width: 2),
-                                            ),
-                                            focusedBorder: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(5),
-                                              borderSide: const BorderSide(
-                                                  color: widgetPricolor,
-                                                  width: 2),
-                                            ),
-                                            filled: true,
-                                            fillColor: Colors.transparent,
-                                            contentPadding:
-                                                const EdgeInsets.only(
-                                                    left: -5,
-                                                    top: 12,
-                                                    bottom: 12),
-                                            prefixIcon: Padding(
-                                                padding: const EdgeInsets.only(
-                                                    left: 0,
-                                                    right:
-                                                        5), // Remove extra padding
-                                                child: Transform.translate(
-                                                  offset: const Offset(5, 0),
-                                                  child: Icon(
-                                                    Icons.search,
-                                                    size: 18,
-                                                    color: sharedController
-                                                            .emailController
-                                                            .text
-                                                            .isNotEmpty
-                                                        ? widgetPricolor
-                                                        : Colors.black26,
-                                                  ),
-                                                )),
-                                            prefixIconConstraints:
-                                                const BoxConstraints(
-                                              minWidth: 28,
-                                              minHeight: 18,
-                                            ),
-                                            suffixIcon: const Row(
-                                              mainAxisSize: MainAxisSize.min,
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.end,
-                                              children: [
-                                                Icon(Icons.grid_view_outlined,
-                                                    color: Colors.black54,
-                                                    size: 16),
-                                                SizedBox(width: 2),
-                                                Text(
-                                                  'K',
-                                                  style: TextStyle(
-                                                    fontSize: 13,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Colors.black54,
-                                                  ),
-                                                ),
-                                                SizedBox(width: 15),
-                                              ],
-                                            ),
-                                          ),
-                                          onChanged: (text) {
-                                            setState(() {});
-                                          },
-                                        ),
-                                      ),
+                                // sharedController.isSidebarCollapsed.value
+                                //     ? const SizedBox.shrink()
+                                //     : Container(
+                                //         height: 33,
+                                //         margin: const EdgeInsets.only(
+                                //             top: 15, bottom: 10),
+                                //         child: TextField(
+                                //           cursorColor: labelFormFieldColor,
+                                //           style: const TextStyle(
+                                //             fontSize: 10,
+                                //             color: Colors.black,
+                                //             fontWeight: FontWeight.w100,
+                                //           ),
+                                //           decoration: InputDecoration(
+                                //             hintText: "Search",
+                                //             hintStyle: const TextStyle(
+                                //               fontSize: 10,
+                                //               color: labelFormFieldColor,
+                                //               fontWeight: FontWeight.w100,
+                                //             ),
+                                //             border: OutlineInputBorder(
+                                //               borderRadius:
+                                //                   BorderRadius.circular(5),
+                                //               borderSide: const BorderSide(
+                                //                   color: Colors.black12),
+                                //             ),
+                                //             enabledBorder: OutlineInputBorder(
+                                //               borderRadius:
+                                //                   BorderRadius.circular(5),
+                                //               borderSide: const BorderSide(
+                                //                   color: Colors.black12,
+                                //                   width: 2),
+                                //             ),
+                                //             focusedBorder: OutlineInputBorder(
+                                //               borderRadius:
+                                //                   BorderRadius.circular(5),
+                                //               borderSide: const BorderSide(
+                                //                   color: widgetPricolor,
+                                //                   width: 2),
+                                //             ),
+                                //             filled: true,
+                                //             fillColor: Colors.transparent,
+                                //             contentPadding:
+                                //                 const EdgeInsets.only(
+                                //                     left: -5,
+                                //                     top: 12,
+                                //                     bottom: 12),
+                                //             prefixIcon: Padding(
+                                //                 padding: const EdgeInsets.only(
+                                //                     left: 0,
+                                //                     right:
+                                //                         5), // Remove extra padding
+                                //                 child: Transform.translate(
+                                //                   offset: const Offset(5, 0),
+                                //                   child: Icon(
+                                //                     Icons.search,
+                                //                     size: 18,
+                                //                     color: sharedController
+                                //                             .emailController
+                                //                             .text
+                                //                             .isNotEmpty
+                                //                         ? widgetPricolor
+                                //                         : Colors.black26,
+                                //                   ),
+                                //                 )),
+                                //             prefixIconConstraints:
+                                //                 const BoxConstraints(
+                                //               minWidth: 28,
+                                //               minHeight: 18,
+                                //             ),
+                                //             suffixIcon: const Row(
+                                //               mainAxisSize: MainAxisSize.min,
+                                //               mainAxisAlignment:
+                                //                   MainAxisAlignment.end,
+                                //               children: [
+                                //                 Icon(Icons.grid_view_outlined,
+                                //                     color: Colors.black54,
+                                //                     size: 16),
+                                //                 SizedBox(width: 2),
+                                //                 Text(
+                                //                   'K',
+                                //                   style: TextStyle(
+                                //                     fontSize: 13,
+                                //                     fontWeight: FontWeight.bold,
+                                //                     color: Colors.black54,
+                                //                   ),
+                                //                 ),
+                                //                 SizedBox(width: 15),
+                                //               ],
+                                //             ),
+                                //           ),
+                                //           onChanged: (text) {
+                                //             setState(() {});
+                                //           },
+                                //         ),
+                                //       ),
                                 Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
@@ -565,6 +565,7 @@ class _NavigationDTState extends State<NavigationDT>
                                               crossAxisAlignment:
                                                   CrossAxisAlignment.start,
                                               children: [
+                                                  SizedBox(height: 10),
                                                   Text(
                                                     'Control Panel',
                                                     style: TextStyle(

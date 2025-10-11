@@ -8,6 +8,10 @@ class LoginErrorDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String displayMessage = message.toString();
+    if (displayMessage.toLowerCase().contains('invalid credentials')) {
+      displayMessage = 'Invalid username or password';
+    }
     return Dialog(
       backgroundColor: Colors.white,
       shape: RoundedRectangleBorder(
@@ -15,7 +19,9 @@ class LoginErrorDialog extends StatelessWidget {
       ),
       elevation: 0,
       child: Container(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.only(
+          top: 24
+        ),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(12),
@@ -23,23 +29,8 @@ class LoginErrorDialog extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(
-              width: 60,
-              height: 60,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(color: dangerStatusColor, width: 2),
-              ),
-              child: const Icon(
-                Icons.error_outline,
-                color: dangerStatusColor,
-                size: 36,
-              ),
-            ),
-            const SizedBox(height: 16),
-
             const Text(
-              "Login Failed",
+              "Wrong Credentials",
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.bold,
@@ -47,9 +38,8 @@ class LoginErrorDialog extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 8),
-
             Text(
-              message,
+              displayMessage,
               textAlign: TextAlign.center,
               style: const TextStyle(
                 fontSize: 11,
@@ -57,25 +47,28 @@ class LoginErrorDialog extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 24),
-
+            Divider(
+              color: Colors.grey,
+              height: 0.5,
+            ),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () => Navigator.of(context).pop(),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: widgetPricolor,
+                  backgroundColor: Colors.white,
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  padding: const EdgeInsets.symmetric(vertical: 20),
                 ),
                 child: const Text(
-                  "Try Again",
+                  "OK",
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: Colors.white
+                    color: widgetPricolor,
                   ),
                 ),
               ),

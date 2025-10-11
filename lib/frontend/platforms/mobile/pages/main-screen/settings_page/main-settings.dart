@@ -427,7 +427,7 @@ class _SettingsState extends State<Settings> {
                           )
                         ],
                       ),
-                      widget.UserToken == 'gueguestss'
+                      widget.UserToken == 'guest'
                           ? const SizedBox()
                           : Settingsbtn(
                               title: 'Privacy',

@@ -20,8 +20,7 @@ class AdminInitialScreen extends StatefulWidget {
   State<AdminInitialScreen> createState() => _AdminInitialScreenState();
 }
 
-class _AdminInitialScreenState extends State<AdminInitialScreen>
-    with AutomaticKeepAliveClientMixin {
+class _AdminInitialScreenState extends State<AdminInitialScreen> with AutomaticKeepAliveClientMixin {
   @override
   bool get wantKeepAlive => true;
 
@@ -186,6 +185,8 @@ class _AdminInitialScreenState extends State<AdminInitialScreen>
     );
   }
 
+  Map<String, dynamic>? _cachedData;
+
   @override
   Widget build(BuildContext context) {
     final sharedController = SharedProperties();
@@ -193,14 +194,18 @@ class _AdminInitialScreenState extends State<AdminInitialScreen>
       backgroundColor: Colors.white,
       body: BlocBuilder<AdminBloc, AdminState>(
         builder: (context, state) {
-          if (state is AdminLoading) {
+          if (state is AdminLoading && _cachedData == null) {
             return const Center(child: LoadingState());
           } else if (state is AdminError) {
             return Center(
-                child: Text('Error: ${state.message}',
-                    style: const TextStyle(fontSize: 11)));
-          } else if (state is AllDataLoaded) {
-            final data = state.data;
+              child: Text('Error: ${state.message}',
+                  style: const TextStyle(fontSize: 11))
+            );
+          } else if (state is AllDataLoaded || _cachedData != null) {
+            final data = state is AllDataLoaded ? state.data : _cachedData!;
+            if (state is AllDataLoaded) {
+              _cachedData = state.data;
+            }
             final users = data['users'];
             final safeZones = data['safe_zones'];
             final incidentReports = data['incident_reports'];
@@ -1213,8 +1218,9 @@ class _AdminInitialScreenState extends State<AdminInitialScreen>
             );
           } else {
             return const Center(
-                child:
-                    Text('No data available', style: TextStyle(fontSize: 11)));
+              child:
+                  Text('No data available', style: TextStyle(fontSize: 11))
+              );
           }
         },
       ),

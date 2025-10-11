@@ -1,6 +1,6 @@
 // ignore_for_file: prefer_const_constructors
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart'; // Import BLoC package
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:safezone/backend/architecture/bloc/authBloc/auth_bloc.dart';
@@ -10,7 +10,6 @@ import 'package:safezone/backend/architecture/bloc/notificationBloc/notification
 import 'package:safezone/backend/properties/properties.dart';
 import 'package:safezone/frontend/platforms/mobile/widgets/Dialogs/login_error_dialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../../../../../backend/properties/import.dart';
 
 class LoginMD extends StatefulWidget {
@@ -21,18 +20,13 @@ class LoginMD extends StatefulWidget {
 }
 
 class _LoginMDState extends State<LoginMD> {
-  final bool _rememberMe = false;
-  final bool _passwordVisible = false;
+  final emailFocusNode = FocusNode();
+  final passwordFocusNode = FocusNode();
   final sharedController = SharedProperties();
-  final NotificationPollingService _pollingService =
-      NotificationPollingService();
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
+  final NotificationPollingService _pollingService = NotificationPollingService();
 
   @override
   void dispose() {
-    emailController.dispose();
-    passwordController.dispose();
     super.dispose();
   }
 
@@ -73,16 +67,15 @@ class _LoginMDState extends State<LoginMD> {
                     text: TextSpan(
                       text: 'Welcome Back To ',
                       style: TextStyle(
-                          fontSize: 20,
-                          color: Colors.black,
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: 1),
+                        fontSize: 20,
+                        color: Colors.black,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 1,
+                      ),
                       children: const [
                         TextSpan(
                           text: 'SafeZone',
-                          style: TextStyle(
-                            color: widgetPricolor,
-                          ),
+                          style: TextStyle(color: widgetPricolor),
                         ),
                       ],
                     ),
@@ -93,7 +86,7 @@ class _LoginMDState extends State<LoginMD> {
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w400,
-                      color: const Color(0xFF707070),
+                      color: Color(0xFF707070),
                     ),
                   ),
                   SizedBox(height: 50),
@@ -107,47 +100,50 @@ class _LoginMDState extends State<LoginMD> {
                   ),
                   SizedBox(height: 8),
                   TextField(
+                    focusNode: emailFocusNode,
                     controller: sharedController.emailController,
                     cursorColor: labelFormFieldColor,
                     style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.black,
-                        fontWeight: FontWeight.w100),
+                      fontSize: 12,
+                      color: Colors.black,
+                      fontWeight: FontWeight.w100,
+                    ),
                     decoration: InputDecoration(
-                        hintText: "safezone@gmail.com",
-                        hintStyle: TextStyle(
-                            fontSize: 12,
-                            color: labelFormFieldColor,
-                            fontWeight: FontWeight.w100),
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: BorderSide(color: Colors.black12)),
-                        enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide:
-                                BorderSide(color: Colors.black12, width: 2)),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide:
-                              BorderSide(color: widgetPricolor, width: 2),
+                      hintText: "safezone@gmail.com",
+                      hintStyle: TextStyle(
+                        fontSize: 12,
+                        color: labelFormFieldColor,
+                        fontWeight: FontWeight.w100,
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(color: Colors.black12),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(color: Colors.black12, width: 2),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(color: widgetPricolor, width: 2),
+                      ),
+                      filled: true,
+                      fillColor: Colors.transparent,
+                      contentPadding:
+                          const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
+                      prefixIcon: Container(
+                        margin: EdgeInsets.only(left: 10),
+                        child: Icon(
+                          Icons.email_outlined,
+                          color: sharedController.emailController.text.isNotEmpty
+                              ? widgetPricolor
+                              : Colors.black26,
                         ),
-                        filled: true,
-                        fillColor: Colors.transparent,
-                        contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 15, vertical: 12),
-                        prefixIcon: Container(
-                          margin: EdgeInsets.only(left: 10),
-                          child: Icon(Icons.email_outlined,
-                              color: sharedController
-                                      .emailController.text.isNotEmpty
-                                  ? widgetPricolor
-                                  : Colors.black26),
-                        )),
-                    onChanged: (text) {
-                      setState(() {});
-                    },
+                      ),
+                    ),
+                    onChanged: (text) => setState(() {}),
                   ),
-                  const SizedBox(height: 10),
+                  SizedBox(height: 10),
                   Text(
                     'Password',
                     style: TextStyle(
@@ -156,67 +152,70 @@ class _LoginMDState extends State<LoginMD> {
                       color: Colors.black45,
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  SizedBox(height: 8),
                   TextField(
-                    cursorColor: labelFormFieldColor,
+                    focusNode: passwordFocusNode,
                     controller: sharedController.passwordController,
+                    cursorColor: labelFormFieldColor,
                     obscureText: !sharedController.passwordVisible,
                     style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.black,
-                        fontWeight: FontWeight.w100),
+                      fontSize: 12,
+                      color: Colors.black,
+                      fontWeight: FontWeight.w100,
+                    ),
                     decoration: InputDecoration(
-                        filled: true,
-                        fillColor: Colors.transparent,
-                        hintText: "exampl*******",
-                        hintStyle: TextStyle(
-                            fontSize: 12,
-                            color: labelFormFieldColor,
-                            fontWeight: FontWeight.w100),
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: BorderSide(color: Colors.black12)),
-                        enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide:
-                                BorderSide(color: Colors.black12, width: 2)),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide:
-                              BorderSide(color: widgetPricolor, width: 2),
+                      filled: true,
+                      fillColor: Colors.transparent,
+                      hintText: "exampl*******",
+                      hintStyle: TextStyle(
+                        fontSize: 12,
+                        color: labelFormFieldColor,
+                        fontWeight: FontWeight.w100,
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(color: Colors.black12),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(color: Colors.black12, width: 2),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(color: widgetPricolor, width: 2),
+                      ),
+                      contentPadding:
+                          const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
+                      prefixIcon: Padding(
+                        padding: const EdgeInsets.only(left: 10),
+                        child: Icon(
+                          Icons.lock_outline,
+                          color: sharedController.passwordController.text.isNotEmpty
+                              ? widgetPricolor
+                              : Colors.black26,
                         ),
-                        contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 15, vertical: 12),
-                        prefixIcon: Padding(
-                          padding: const EdgeInsets.only(left: 10),
-                          child: Icon(Icons.lock_outline,
-                              color: sharedController
-                                      .passwordController.text.isNotEmpty
-                                  ? widgetPricolor
-                                  : Colors.black26),
-                        ),
-                        suffixIcon: Padding(
-                          padding: EdgeInsets.only(right: 10),
-                          child: GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                sharedController.passwordVisible =
-                                    !sharedController.passwordVisible;
-                              });
-                            },
-                            child: Icon(
-                              sharedController.passwordVisible
-                                  ? Icons.visibility_outlined
-                                  : Icons.visibility_off_outlined,
-                              color: Color(0xFF707070),
-                            ),
+                      ),
+                      suffixIcon: Padding(
+                        padding: EdgeInsets.only(right: 10),
+                        child: GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              sharedController.passwordVisible =
+                                  !sharedController.passwordVisible;
+                            });
+                          },
+                          child: Icon(
+                            sharedController.passwordVisible
+                                ? Icons.visibility_outlined
+                                : Icons.visibility_off_outlined,
+                            color: Color(0xFF707070),
                           ),
-                        )),
-                    onChanged: (text) {
-                      setState(() {});
-                    },
+                        ),
+                      ),
+                    ),
+                    onChanged: (text) => setState(() {}),
                   ),
-                  const SizedBox(height: 10),
+                  SizedBox(height: 10),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -229,12 +228,8 @@ class _LoginMDState extends State<LoginMD> {
                                 sharedController.rememberMe = value!;
                               });
                             },
-                            side: BorderSide(
-                              color: Color(0x99EF8D88),
-                              width: 2,
-                            ),
-                            materialTapTargetSize:
-                                MaterialTapTargetSize.shrinkWrap,
+                            side: BorderSide(color: Color(0x99EF8D88), width: 2),
+                            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                             visualDensity: VisualDensity.compact,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(3),
@@ -246,7 +241,7 @@ class _LoginMDState extends State<LoginMD> {
                             style: TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.w400,
-                              color: const Color(0xFF707070),
+                              color: Color(0xFF707070),
                             ),
                           ),
                         ],
@@ -273,59 +268,73 @@ class _LoginMDState extends State<LoginMD> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 100),
+                  SizedBox(height: 100),
                   Container(
-                      height: 50,
-                      width: double.infinity,
-                      margin:
-                          EdgeInsets.symmetric(vertical: 40, horizontal: 20),
-                      child: GestureDetector(
-                        onTap: () {
-                          final email = sharedController.emailController.text;
-                          final password =
-                              sharedController.passwordController.text;
-                          context.read<AuthenticationBloc>().add(
-                                UserLogin(email, password),
-                              );
-                        },
-                        child: BlocBuilder<AuthenticationBloc,
-                            AuthenticationState>(
-                          builder: (context, state) {
-                            return Container(
-                              height: 50,
-                              width: double.infinity,
-                              decoration: BoxDecoration(
-                                color: widgetPricolor,
-                                borderRadius: BorderRadius.circular(50),
-                              ),
-                              child: Center(
-                                child: state is LoginLoading
-                                    ? SizedBox(
-                                        height: 20,
-                                        width: 20,
-                                        child: Center(
-                                            child: CircularProgressIndicator(
-                                                color: Colors.white,
-                                                strokeWidth: 1)),
-                                      )
-                                    : Text(
-                                        'Sign In',
-                                        style: TextStyle(
-                                          fontSize: 12,
+                    height: 50,
+                    width: double.infinity,
+                    margin: EdgeInsets.symmetric(vertical: 40, horizontal: 20),
+                    child: GestureDetector(
+                      onTap: () {
+                        final email =
+                            sharedController.emailController.text.trim();
+                        final password =
+                            sharedController.passwordController.text.trim();
+
+                        if (email.isEmpty) {
+                          FocusScope.of(context)
+                              .requestFocus(emailFocusNode);
+                          return;
+                        }
+
+                        if (password.isEmpty) {
+                          FocusScope.of(context)
+                              .requestFocus(passwordFocusNode);
+                          return;
+                        }
+
+                        context
+                            .read<AuthenticationBloc>()
+                            .add(UserLogin(email, password));
+                      },
+                      child: BlocBuilder<AuthenticationBloc, AuthenticationState>(
+                        builder: (context, state) {
+                          return Container(
+                            height: 50,
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              color: widgetPricolor,
+                              borderRadius: BorderRadius.circular(50),
+                            ),
+                            child: Center(
+                              child: state is LoginLoading
+                                  ? SizedBox(
+                                      height: 20,
+                                      width: 20,
+                                      child: Center(
+                                        child: CircularProgressIndicator(
                                           color: Colors.white,
+                                          strokeWidth: 1,
                                         ),
                                       ),
-                              ),
-                            );
-                          },
-                        ),
-                      )),
+                                    )
+                                  : Text(
+                                      'Sign In',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
                   Container(
                     width: double.infinity,
                     margin: EdgeInsets.symmetric(horizontal: 20),
                     child: Center(
                       child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
@@ -372,8 +381,7 @@ class _LoginMDState extends State<LoginMD> {
 
                         if (userId != 0) {
                           int intervalInSeconds = 10;
-                          _pollingService.startPolling(
-                              userId, intervalInSeconds);
+                          _pollingService.startPolling(userId, intervalInSeconds);
                         }
 
                         GoRouter.of(context).go(
@@ -385,8 +393,7 @@ class _LoginMDState extends State<LoginMD> {
                       } else if (state is LoginError) {
                         showDialog(
                           context: context,
-                          barrierDismissible:
-                              false, 
+                          barrierDismissible: false,
                           builder: (BuildContext context) {
                             return LoginErrorDialog(message: state.message);
                           },
@@ -395,7 +402,7 @@ class _LoginMDState extends State<LoginMD> {
                       }
                     },
                     child: Container(),
-                  )
+                  ),
                 ],
               ),
             ),
