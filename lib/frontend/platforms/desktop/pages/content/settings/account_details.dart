@@ -44,8 +44,6 @@ class _AccountDetailsState extends State<AccountDetails> {
       isGirl = prefs.getBool('is_girl') ?? false;
       isVerified = prefs.getBool('is_verified') ?? false;
     });
-
-    print('profile piccccccc $profilePictureUrl');
   }
 
   @override
@@ -266,17 +264,16 @@ class _AccountDetailsState extends State<AccountDetails> {
               child: const CategoryText(text: "Account Details")),
           actions: [
             GestureDetector(
-              onTap: () {
-                if (widget.onClose != null) {
-                  widget.onClose!();
-                }
-              },
-              child: const Icon(
-                Icons.cancel_outlined,
-                size: 20,
-                color: Colors.black38,
-              )
-            ),
+                onTap: () {
+                  if (widget.onClose != null) {
+                    widget.onClose!();
+                  }
+                },
+                child: const Icon(
+                  Icons.cancel_outlined,
+                  size: 20,
+                  color: Colors.black38,
+                )),
             SizedBox(width: 10)
           ],
         ),

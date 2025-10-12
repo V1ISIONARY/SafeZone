@@ -53,10 +53,6 @@ class MapBloc extends Bloc<MapPageEvent, MapState> {
 
   Future<void> _onListenForMemberLocations(
       ListenForMemberLocations event, Emitter<MapState> emit) async {
-    print("Starting to listen for members' location data...");
-    print("Event members: ${event.members}");
-    print("Current user ID: ${event.userId}");
-
     try {
       for (var member in event.members) {
         String userId = member['user_id'].toString();

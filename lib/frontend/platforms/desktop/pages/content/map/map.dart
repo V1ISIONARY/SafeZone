@@ -334,16 +334,6 @@ class MapDTState extends State<MapDT> with TickerProviderStateMixin {
     context.read<CircleBloc>().stream.listen((state) {
       if (state is CircleMembersLoadedState) {
         context.read<MapBloc>().add(FetchMapData());
-        print("CIRCLEMEMBERLOADEDSTATE IS CALLED");
-        print("CIRCLEMEMBERLOADEDSTATE IS CALLED");
-        print("CIRCLEMEMBERLOADEDSTATE IS CALLED");
-        print("CIRCLEMEMBERLOADEDSTATE IS CALLED");
-        print("CIRCLEMEMBERLOADEDSTATE IS CALLED");
-        print("CIRCLEMEMBERLOADEDSTATE IS CALLED");
-        print("CIRCLEMEMBERLOADEDSTATE IS CALLED");
-        print("CIRCLEMEMBERLOADEDSTATE IS CALLED");
-        print("CIRCLEMEMBERLOADEDSTATE IS CALLED");
-        print("CIRCLEMEMBERLOADEDSTATE IS CALLED");
         if (mounted && _userId != null) {}
         context
             .read<MapBloc>()
@@ -640,8 +630,7 @@ class MapDTState extends State<MapDT> with TickerProviderStateMixin {
       );
 
       if (mounted) {
-        setState(() {
-        });
+        setState(() {});
       }
 
       print("✅ All custom markers loaded successfully");
@@ -1230,7 +1219,9 @@ class MapDTState extends State<MapDT> with TickerProviderStateMixin {
                   return ValueListenableBuilder<int>(
                     valueListenable: sharedController.currentMapType,
                     builder: (context, mapTypeIndex, _) {
-                      final mapType = mapTypeIndex == 0 ? MapType.normal : MapType.satellite;
+                      final mapType = mapTypeIndex == 0
+                          ? MapType.normal
+                          : MapType.satellite;
 
                       return GoogleMap(
                         initialCameraPosition: const CameraPosition(
@@ -1238,7 +1229,9 @@ class MapDTState extends State<MapDT> with TickerProviderStateMixin {
                           zoom: 14.0,
                         ),
                         mapType: mapType,
-                        markers: sharedController.showMarkers ? _createMarkers(state) : {},
+                        markers: sharedController.showMarkers
+                            ? _createMarkers(state)
+                            : {},
                         circles: sharedController.circles,
                         polylines: sharedController.polylines,
                         onMapCreated: (GoogleMapController controller) async {

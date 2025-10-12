@@ -205,14 +205,6 @@ class NotificationImplementation extends NotificationRepository {
         final backendMessage =
             responseBody['error'] ?? responseBody['message'] ?? 'Unknown error';
 
-        print(url);
-        print(userId);
-        print(title);
-        print(policeStationName);
-        print(message);
-        print(type);
-        print("🚨 Backend Message: $backendMessage");
-
         throw Exception(
             "Failed to broadcast notification to police station. Status Code: ${response.statusCode}, Message: $backendMessage");
       }

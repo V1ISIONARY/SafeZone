@@ -84,9 +84,6 @@ class CircleBloc extends Bloc<CircleEvent, CircleState> {
       emit(CircleLoadingState());
       try {
         final members = await _circleImplementation.viewMembers(event.circleId);
-        print("Fetched Members for Circle ID: ${event.circleId}");
-        print(
-            "Raw API Response: $event.circleId $event.circleId$event.circleId$event.circleId$event.circleId$event.circleId$event.circleId$event.circleId$event.circleId$event.circleId$event.circleId  $members");
         emit(CircleMembersLoadedState(members: members));
       } catch (e) {
         emit(CircleErrorState(

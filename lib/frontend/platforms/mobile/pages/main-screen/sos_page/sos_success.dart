@@ -72,19 +72,6 @@ class _SosSuccessState extends State<SosSuccess> {
       String? address = prefs.getString('currentAddress');
       String policeStationName =
           prefs.getString('nearest_station_name') ?? "WALA";
-      print(policeStationName);
-      print(policeStationName);
-      print(policeStationName);
-      print(policeStationName);
-      print(policeStationName);
-      print(policeStationName);
-      print(policeStationName);
-      print(policeStationName);
-      print(address);
-      print(address);
-      print(address);
-      print(address);
-      print(address);
       context.read<NotificationBloc>().add(
             BroadcastNotification(
                 userId, // Use the stored user ID

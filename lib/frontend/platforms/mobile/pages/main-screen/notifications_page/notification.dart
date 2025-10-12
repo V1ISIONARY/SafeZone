@@ -44,18 +44,13 @@ class _NotifState extends State<Notif> with TickerProviderStateMixin {
   List<Widget> getTopLevelPagesForCategory(String category) {
     switch (category) {
       case 'Read':
-        print('111111111111111111111111111');
         return [Read(userToken: widget.UserToken)];
       case 'Unread':
-        print('2222222222222222222222222222222');
         return [Unread(userToken: widget.UserToken)];
       case 'SOS History':
-        print('33333333333333333333333333333333');
-
         return [Soshistory(userToken: widget.UserToken)];
       case 'All':
       default:
-        print('4444444444444444444444444444444');
         return [All(userToken: widget.UserToken)];
     }
   }

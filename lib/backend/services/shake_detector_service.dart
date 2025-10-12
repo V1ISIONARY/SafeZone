@@ -24,7 +24,6 @@ class ShakeDetectorService {
   void _navigateToTargetPage() {
     final context = navigatorKey.currentContext;
     if (context != null) {
-      print('iz shakingggg');
       GoRouter.of(context).push('/sos-page');
     } else {
       print("Context is null");

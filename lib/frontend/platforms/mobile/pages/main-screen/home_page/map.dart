@@ -418,16 +418,6 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
     context.read<CircleBloc>().stream.listen((state) {
       if (state is CircleMembersLoadedState) {
         context.read<MapBloc>().add(FetchMapData());
-        print("CIRCLEMEMBERLOADEDSTATE IS CALLED");
-        print("CIRCLEMEMBERLOADEDSTATE IS CALLED");
-        print("CIRCLEMEMBERLOADEDSTATE IS CALLED");
-        print("CIRCLEMEMBERLOADEDSTATE IS CALLED");
-        print("CIRCLEMEMBERLOADEDSTATE IS CALLED");
-        print("CIRCLEMEMBERLOADEDSTATE IS CALLED");
-        print("CIRCLEMEMBERLOADEDSTATE IS CALLED");
-        print("CIRCLEMEMBERLOADEDSTATE IS CALLED");
-        print("CIRCLEMEMBERLOADEDSTATE IS CALLED");
-        print("CIRCLEMEMBERLOADEDSTATE IS CALLED");
         if (mounted && _userId != null) {}
         context
             .read<MapBloc>()
