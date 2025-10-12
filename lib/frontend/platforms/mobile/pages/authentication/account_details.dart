@@ -44,7 +44,6 @@ class _AccountDetailsState extends State<AccountDetails> {
       isGirl = prefs.getBool('is_girl') ?? false;
       isVerified = prefs.getBool('is_verified') ?? false;
     });
-
     print('profile piccccccc $profilePictureUrl');
   }
 
@@ -56,7 +55,7 @@ class _AccountDetailsState extends State<AccountDetails> {
 
   Future<void> _openProfilePictureBottomSheet() async {
     await showUploadPictureBottomSheet(context, user_id);
-    await loadUserData(); // Force refresh
+    await loadUserData();
   }
 
   void _showChangePasswordDialog(BuildContext context) {

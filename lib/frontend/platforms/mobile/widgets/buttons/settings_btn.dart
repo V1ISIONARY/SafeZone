@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:safezone/frontend/root/authentication/login.dart';
 
 import '../../../../../backend/properties/import.dart';
 
@@ -27,6 +28,14 @@ class Settingsbtn extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         onTap();
+        if(navigateTo.toLowerCase() == 'login') {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const LoginRT(),
+            ),
+          );
+        }
         if (replace != null && replace == true) {
           context.go('/$navigateTo');
         } else {

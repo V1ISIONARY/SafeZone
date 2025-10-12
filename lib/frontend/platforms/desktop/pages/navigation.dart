@@ -22,6 +22,7 @@ import 'package:safezone/frontend/platforms/desktop/pages/content/notification/n
 import 'package:safezone/frontend/platforms/desktop/pages/content/settings/account_details.dart';
 import 'package:safezone/frontend/platforms/desktop/pages/content/settings/privacy.dart';
 import 'package:safezone/frontend/platforms/desktop/widget/button/sidenav.dart';
+import 'package:safezone/frontend/root/authentication/login.dart';
 import 'package:safezone/resource/schema/colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -49,6 +50,23 @@ class _NavigationDTState extends State<NavigationDT>
   bool dropdown = false;
   bool? _wasSmallScreen;
   final sharedController = SharedProperties();
+
+  String username = 'User';
+  String email = 'user@example.com';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      username = prefs.getString('username') ?? 'User';
+      email = prefs.getString('email') ?? 'user@example.com';
+    });
+  }
 
   ValueNotifier<String?> selectedPageNotifier = ValueNotifier(null);
 
@@ -299,10 +317,10 @@ class _NavigationDTState extends State<NavigationDT>
                                           borderRadius:
                                               BorderRadius.circular(5),
                                         ),
-                                        child: const Center(
+                                        child: Center(
                                           child: Text(
-                                            'R',
-                                            style: TextStyle(
+                                            username.isNotEmpty ? username[0].toUpperCase() : '',
+                                              style: TextStyle(
                                               color: Colors.white,
                                               fontSize: 20,
                                             ),
@@ -320,15 +338,13 @@ class _NavigationDTState extends State<NavigationDT>
                                         child: Expanded(
                                           child: Row(
                                             children: [
-                                              const Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
+                                              Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                mainAxisAlignment: MainAxisAlignment.center,
                                                 children: [
                                                   Text(
-                                                    'Ramon',
-                                                    style: TextStyle(
+                                                    username,
+                                                    style: const TextStyle(
                                                       color: Colors.black,
                                                       fontSize: 11,
                                                       fontWeight:
@@ -336,7 +352,7 @@ class _NavigationDTState extends State<NavigationDT>
                                                     ),
                                                   ),
                                                   Text(
-                                                    'ramonlangpu@gmail.com',
+                                                    email,
                                                     overflow:
                                                         TextOverflow.ellipsis,
                                                     style: TextStyle(
@@ -951,12 +967,16 @@ class _NavigationDTState extends State<NavigationDT>
                                 sharedController.isSidebarCollapsed.value
                                 ? GestureDetector(
                                   onTap: () async {
+                                    SharedProperties().emailController.text = "";
+                                    SharedProperties().passwordController.text = "";
                                     NotificationPollingService().stopPolling();
-                                    final SharedPreferences prefs = await SharedPreferences.getInstance();
+                                    final SharedPreferences prefs =
+                                        await SharedPreferences.getInstance();
                                     Map<String, bool> firstRunFlags = {};
                                     for (String key in prefs.getKeys()) {
                                       if (key.startsWith('isFirstRunFlag_')) {
-                                        firstRunFlags[key] = prefs.getBool(key) ?? true;
+                                        firstRunFlags[key] =
+                                            prefs.getBool(key) ?? true;
                                       }
                                     }
 
@@ -965,9 +985,12 @@ class _NavigationDTState extends State<NavigationDT>
                                     for (var entry in firstRunFlags.entries) {
                                       await prefs.setBool(entry.key, entry.value);
                                     }
-                                    sharedController.emailController.text = "";
-                                    sharedController.passwordController.text = "";
-                                    context.push('/login');
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => const LoginRT(),
+                                      ),
+                                    );
                                   },
                                   child: Container(
                                     height: 30,
@@ -998,12 +1021,16 @@ class _NavigationDTState extends State<NavigationDT>
                                 )
                                 : GestureDetector(
                                   onTap: () async {
+                                    SharedProperties().emailController.text = "";
+                                    SharedProperties().passwordController.text = "";
                                     NotificationPollingService().stopPolling();
-                                    final SharedPreferences prefs = await SharedPreferences.getInstance();
+                                    final SharedPreferences prefs =
+                                        await SharedPreferences.getInstance();
                                     Map<String, bool> firstRunFlags = {};
                                     for (String key in prefs.getKeys()) {
                                       if (key.startsWith('isFirstRunFlag_')) {
-                                        firstRunFlags[key] = prefs.getBool(key) ?? true;
+                                        firstRunFlags[key] =
+                                            prefs.getBool(key) ?? true;
                                       }
                                     }
 
@@ -1012,9 +1039,12 @@ class _NavigationDTState extends State<NavigationDT>
                                     for (var entry in firstRunFlags.entries) {
                                       await prefs.setBool(entry.key, entry.value);
                                     }
-                                    sharedController.emailController.text = "";
-                                    sharedController.passwordController.text = "";
-                                    context.push('/login');
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => const LoginRT(),
+                                      ),
+                                    );
                                   },
                                   child: Container(
                                     height: 40,

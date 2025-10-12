@@ -9,6 +9,7 @@ import 'package:safezone/backend/architecture/bloc/authBloc/auth_state.dart';
 import 'package:safezone/backend/architecture/bloc/notificationBloc/notification_polling.dart';
 import 'package:safezone/backend/properties/properties.dart';
 import 'package:safezone/frontend/platforms/mobile/widgets/Dialogs/login_error_dialog.dart';
+import 'package:safezone/frontend/root/content/navigation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../../backend/properties/import.dart';
 
@@ -384,9 +385,16 @@ class _LoginMDState extends State<LoginMD> {
                           _pollingService.startPolling(userId, intervalInSeconds);
                         }
 
-                        GoRouter.of(context).go(
-                          '/home',
-                          extra: userId.toString(),
+                        // GoRouter.of(context).go(
+                        //   '/home',
+                        //   extra: userId.toString(),
+                        // );
+
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => NavigationRT(userToken: userId.toString() ?? "guess"),
+                          ),
                         );
 
                         print(state);

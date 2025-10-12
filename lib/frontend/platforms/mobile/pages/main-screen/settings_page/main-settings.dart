@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:safezone/backend/architecture/bloc/notificationBloc/notification_polling.dart';
 import 'package:safezone/backend/architecture/bloc/profileBloc/profile_bloc.dart';
 import 'package:safezone/backend/properties/properties.dart';
+import 'package:safezone/frontend/root/authentication/login.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../../../backend/architecture/bloc/profileBloc/profile_state.dart';
@@ -679,7 +680,7 @@ class _SettingsState extends State<Settings> {
                           ? Settingsbtn(
                               title: 'Sign In',
                               svgIcon: 'lib/resource/svg/logout.svg',
-                              navigateTo: 'starter',
+                              navigateTo: 'login',
                               description: 'Start your journey now!',
                               replace: false,
                               onTap: () {},
