@@ -182,7 +182,8 @@ class NotificationImplementation extends NotificationRepository {
   @override
   Future<bool> broadcastNotificationpolicestation(int userId, String title,
       String policeStationName, String message, String type) async {
-    final String url = '$baseUrl/broadcast'; // Adjusted to match Flask API
+    final String url =
+        '$baseUrl/broadcastpolicestation'; // Adjusted to match Flask API
 
     try {
       final response = await http.post(
@@ -200,11 +201,23 @@ class NotificationImplementation extends NotificationRepository {
       if (response.statusCode == 200) {
         return true;
       } else {
+        final Map<String, dynamic> responseBody = json.decode(response.body);
+        final backendMessage =
+            responseBody['error'] ?? responseBody['message'] ?? 'Unknown error';
+
+        print(url);
+        print(userId);
+        print(title);
+        print(policeStationName);
+        print(message);
+        print(type);
+        print("🚨 Backend Message: $backendMessage");
+
         throw Exception(
-            "Failed to broadcast notification. Status Code: ${response.statusCode}");
+            "Failed to broadcast notification to police station. Status Code: ${response.statusCode}, Message: $backendMessage");
       }
     } catch (e) {
-      print("Error broadcasting notification: $e");
+      print("Error broadcasting notification to police station: $e");
       return false;
     }
   }

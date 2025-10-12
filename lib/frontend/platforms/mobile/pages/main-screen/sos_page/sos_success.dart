@@ -70,7 +70,16 @@ class _SosSuccessState extends State<SosSuccess> {
     if (userId != 0) {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? address = prefs.getString('currentAddress');
-      String policeStationName = prefs.getString('nearest_station_name') ?? "";
+      String policeStationName =
+          prefs.getString('nearest_station_name') ?? "WALA";
+      print(policeStationName);
+      print(policeStationName);
+      print(policeStationName);
+      print(policeStationName);
+      print(policeStationName);
+      print(policeStationName);
+      print(policeStationName);
+      print(policeStationName);
       print(address);
       print(address);
       print(address);

@@ -44,7 +44,6 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'dart:convert';
 import 'package:location/location.dart' as locs;
 
-
 class Maps extends StatefulWidget {
   final String UserToken;
 
@@ -120,7 +119,6 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
         customPendingDangerZoneMarker != null &&
         customSafeZoneMarker != null;
   }
-
 
   void _toggleCircles() {
     setState(() {
@@ -767,6 +765,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
     }
 
     if (state is MapDataLoaded) {
+      // 👥 Add member markers
       for (var member in _currentMembers) {
         String userId = member['user_id'].toString();
         String firstName = member['first_name'];
@@ -788,8 +787,15 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
             icon: memberMarker ?? BitmapDescriptor.defaultMarker,
             infoWindow: InfoWindow(title: '$firstName $lastName'),
             onTap: () {
-              showMemberBottomSheet(userId, firstName, lastName, longitude,
-                  latitude, profile, context);
+              showMemberBottomSheet(
+                userId,
+                firstName,
+                lastName,
+                longitude,
+                latitude,
+                profile,
+                context,
+              );
             },
           ),
         );
@@ -855,6 +861,38 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
           ),
         );
       }
+
+      if (_currentUserLocation != null) {
+        SafeZoneModel? nearestSafeZone;
+        double minDistance = double.infinity;
+
+        for (var safeZone in state.safeZones) {
+          if (safeZone.latitude == null || safeZone.longitude == null) continue;
+
+          double distance = Geolocator.distanceBetween(
+            _currentUserLocation!.latitude,
+            _currentUserLocation!.longitude,
+            safeZone.latitude!,
+            safeZone.longitude!,
+          );
+
+          if (distance < minDistance) {
+            minDistance = distance;
+            nearestSafeZone = safeZone;
+          }
+        }
+
+        if (nearestSafeZone != null) {
+          SharedPreferences.getInstance().then((prefs) {
+            prefs.setString(
+                'nearest_station_name', nearestSafeZone!.name ?? "Unknown");
+            print("Nearest safe zone saved to prefs: ${nearestSafeZone!.name}");
+          });
+          print("🟢 Nearest Safe Zone: ${nearestSafeZone.name}");
+        } else {
+          print("⚠️ No valid safe zones found.");
+        }
+      }
     }
 
     return markers;
@@ -864,8 +902,13 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
     double minDistance = double.infinity;
     SafeZoneModel? nearest;
 
+    print("Finding nearest station from ${policeStations.length} stations...");
     for (var station in policeStations) {
-      if (station.latitude == null || station.longitude == null) continue;
+      if (station.latitude == null || station.longitude == null) {
+        print("⚠️ Skipped ${station.name}: missing coordinates");
+        continue;
+      }
+
       double distance = Geolocator.distanceBetween(
         currentPosition.latitude,
         currentPosition.longitude,
@@ -873,16 +916,31 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
         station.longitude!,
       );
 
+      print(
+          "Station: ${station.name}, Distance: ${distance.toStringAsFixed(2)}m");
+
       if (distance < minDistance) {
         minDistance = distance;
         nearest = station;
       }
     }
 
+    if (nearest != null) {
+      print(
+          "✅ Nearest station is ${nearest.name}, ${minDistance.toStringAsFixed(2)} meters away");
+    } else {
+      print("❌ No valid stations found.");
+    }
+
     return nearest;
   }
 
   Future<void> findNearestSafezone() async {
+    if (_currentUserLocation == null) {
+      print("❌ Current user location not available.");
+      return;
+    }
+
     SafeZoneModel? nearest = await getNearestStation(_currentUserLocation!);
 
     if (nearest != null) {
@@ -995,7 +1053,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
         currentUserLocation: _currentUserLocation,
         dangerZones: _dangerZones,
         onPolylinesUpdated: _updatePolylines,
-        onFloatingWidgetUpdate: _updateFloatingWidget, 
+        onFloatingWidgetUpdate: _updateFloatingWidget,
         context: context,
       ).findNearestDangerZone();
 
@@ -1015,7 +1073,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
   void _resetMap() {
     setState(() {
       sharedController.polylines.clear();
-      _floatingWidget = null; 
+      _floatingWidget = null;
     });
 
     sharedController.googleMapController?.animateCamera(
@@ -1456,11 +1514,11 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                   width: double.infinity,
                   alignment: Alignment.center,
                   child: _showTitle
-                    ? CategoryDescripText(
-                        text: _appBarText,
-                        color: Colors.white,
-                      )
-                    : null,
+                      ? CategoryDescripText(
+                          text: _appBarText,
+                          color: Colors.white,
+                        )
+                      : null,
                 ),
                 const SizedBox(height: 10),
                 widget.UserToken == 'guest'
@@ -1822,7 +1880,8 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                               children: [
                                                 Positioned.fill(
                                                   child: TextField(
-                                                    controller: sharedController.mapSearchTE,
+                                                    controller: sharedController
+                                                        .mapSearchTE,
                                                     cursorColor: Colors.black,
                                                     focusNode: _focusNodeText,
                                                     style: GoogleFonts.poppins(
@@ -2255,7 +2314,8 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                                             controller:
                                                                 sharedController
                                                                     .mapSearchTE,
-                                                            cursorColor: Colors.black,
+                                                            cursorColor:
+                                                                Colors.black,
                                                             focusNode:
                                                                 _focusNodeText,
                                                             style: GoogleFonts
