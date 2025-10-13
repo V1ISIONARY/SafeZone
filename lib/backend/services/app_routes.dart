@@ -70,7 +70,6 @@ GoRouter appRouter(bool isFirstRun, String? userToken) => GoRouter(
       token != "guest" &&
       (state.matchedLocation == '/login' || state.matchedLocation == '/register'
     )) {
-      // print("butninam makulit: ${token}");
       return '/home';
     }
 
@@ -91,7 +90,6 @@ GoRouter appRouter(bool isFirstRun, String? userToken) => GoRouter(
     ];
 
     if (token == null && protectedRoutes.contains(state.uri.toString())) {
-      print('hindi ako mawawala');
       return '/login';
     }
     return null;

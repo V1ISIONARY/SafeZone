@@ -1,4 +1,4 @@
-import 'package:safezone/backend/properties/import.dart';
+import 'package:flutter/material.dart';
 
 class NoBackWrapper extends StatelessWidget {
   final Widget child;
@@ -12,13 +12,10 @@ class NoBackWrapper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return PopScope(
-      canPop: !disableBack, // prevents Android back button
-      onPopInvoked: (didPop) {
-        if (disableBack && !didPop) {
-          // If user tries to swipe or system-back, ignore it
-          return;
-        }
+    return WillPopScope(
+      onWillPop: () async {
+        // If disableBack is true, prevent system back button
+        return !disableBack; // false blocks back, true allows
       },
       child: child,
     );
