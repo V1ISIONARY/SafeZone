@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:safezone/backend/architecture/bloc/notificationBloc/notification_polling.dart';
 import 'package:safezone/backend/architecture/bloc/profileBloc/profile_bloc.dart';
 import 'package:safezone/backend/properties/properties.dart';
+import 'package:safezone/frontend/platforms/desktop/widget/button/sidenav.dart';
 import 'package:safezone/frontend/root/authentication/login.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -665,8 +666,7 @@ class _SettingsState extends State<Settings> {
                         title: 'Terms and Policy',
                         svgIcon: 'lib/resource/svg/law.svg',
                         navigateTo: 'termsPolicy',
-                        description:
-                            'Outlines rules and user responsibilities.',
+                        description: 'Outlines rules and user responsibilities.',
                         onTap: () {},
                       ),
                       // Settingsbtn(
@@ -699,8 +699,8 @@ class _SettingsState extends State<Settings> {
                                 Map<String, bool> firstRunFlags = {};
                                 for (String key in prefs.getKeys()) {
                                   if (key.startsWith('isFirstRunFlag_')) {
-                                    firstRunFlags[key] =
-                                        prefs.getBool(key) ?? true;
+                                    // firstRunFlags[key] = prefs.getBool(key) ?? true;
+                                    firstRunFlags[key] = true;
                                   }
                                 }
 
@@ -709,6 +709,8 @@ class _SettingsState extends State<Settings> {
                                 for (var entry in firstRunFlags.entries) {
                                   await prefs.setBool(entry.key, entry.value);
                                 }
+
+                                // sharedController.userTokenNotifier.value = 'guest';
                               },
                             ),
                       Container(

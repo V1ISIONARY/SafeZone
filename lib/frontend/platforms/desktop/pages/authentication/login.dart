@@ -1,4 +1,6 @@
 // ignore_for_file: prefer_const_constructors
+import 'package:safezone/frontend/root/content/navigation.dart';
+
 import '../../../../../backend/architecture/bloc/authBloc/auth_bloc.dart';
 import '../../../../../backend/architecture/bloc/authBloc/auth_event.dart';
 import '../../../../../backend/architecture/bloc/authBloc/auth_state.dart';
@@ -152,8 +154,7 @@ class _LoginDesktopState extends State<LoginDesktop> {
           TextField(
             controller: sharedController.emailController,
             cursorColor: labelFormFieldColor,
-            style: TextStyle(
-                fontSize: 12, color: Colors.black, fontWeight: FontWeight.w100),
+            style: TextStyle(fontSize: 12, color: Colors.black, fontWeight: FontWeight.w100),
             decoration: InputDecoration(
                 hintText: "safezone@gmail.com",
                 hintStyle: TextStyle(
@@ -290,9 +291,7 @@ class _LoginDesktopState extends State<LoginDesktop> {
           GestureDetector(onTap: () {
             final email = sharedController.emailController.text;
             final password = sharedController.passwordController.text;
-            context.read<AuthenticationBloc>().add(
-                  UserLogin(email, password),
-                );
+            context.read<AuthenticationBloc>().add(UserLogin(email, password));
           }, child: BlocBuilder<AuthenticationBloc, AuthenticationState>(
               builder: (context, state) {
             return Container(
@@ -369,9 +368,14 @@ class _LoginDesktopState extends State<LoginDesktop> {
                   _pollingService.startPolling(userId, intervalInSeconds);
                 }
 
-                GoRouter.of(context).go(
-                  '/home',
-                  extra: userId.toString(),
+                Navigator.push(
+                  context,
+                  PageRouteBuilder(
+                    pageBuilder: (context, animation, secondaryAnimation) =>
+                        NavigationRT(userToken: userId.toString()),
+                    transitionDuration: Duration.zero,
+                    reverseTransitionDuration: Duration.zero,
+                  ),
                 );
 
                 print(state);

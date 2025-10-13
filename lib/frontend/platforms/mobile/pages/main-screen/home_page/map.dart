@@ -62,6 +62,8 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
   Set<Marker> membersMarkers = {};
   Widget? _floatingWidget;
 
+  late String currentToken;
+
   final List<LatLng> _safeZones = [];
   final List<LatLng> _dangerZones = [];
   final locs.Location location = locs.Location();
@@ -153,10 +155,18 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
   void initState() {
     super.initState();
 
+    // currentToken = widget.UserToken;
+    // sharedController.userTokenNotifier.addListener(() {
+    //   setState(() {
+    //     print('asdasdasdasd');
+    //     currentToken = sharedController.userTokenNotifier.value ?? 'guest';
+    //   });
+    // });
+
     _loadUserId();
     _loadMapType();
     _checkIfShown();
-    _checkFirstRun();
+    // _checkFirstRun();
     _getCurrentLocation();
 
     _initSharedPreferences();

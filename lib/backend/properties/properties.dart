@@ -38,4 +38,7 @@ class SharedProperties {
 
   ValueNotifier<bool> authenticationPage = ValueNotifier(true);
   ValueNotifier<bool> inSlide = ValueNotifier(false);
+
+  final ValueNotifier<String?> userTokenNotifier = ValueNotifier<String?>(null);
+
 }
