@@ -3,6 +3,8 @@ import 'package:safezone/backend/models/dangerzoneModel/incident_report_request_
 import 'package:safezone/backend/models/safezoneModel/safezone_model.dart';
 import 'package:safezone/backend/models/userModel/circle_model.dart';
 import 'package:safezone/backend/models/userModel/notifications_model.dart';
+import 'package:safezone/backend/properties/import.dart' hide NotificationModel;
+import 'package:safezone/frontend/platforms/desktop/widget/button/sidenav.dart';
 import 'package:safezone/frontend/platforms/mobile/pages/admin/admin_initial_screen.dart';
 import 'package:safezone/frontend/platforms/mobile/pages/admin/admin_reports.dart';
 import 'package:safezone/frontend/platforms/mobile/pages/admin/admin_reports_details.dart';
@@ -53,276 +55,308 @@ import 'package:safezone/main.dart';
 import '../../frontend/root/content/navigation.dart';
 
 GoRouter appRouter(bool isFirstRun, String? userToken) => GoRouter(
-      navigatorKey: navigatorKey,
-      initialLocation: '/',
-      routes: [
-        GoRoute(
-          path: '/',
-          builder: (context, state) => isFirstRun
-              ? const SplashScreen()
-              : NavigationRT(userToken: userToken ?? 'guest'),
-        ),
-        GoRoute(
-          path: '/home',
-          builder: (context, state) {
-            final token = state.extra as String? ?? 'guest';
-            return NavigationRT(userToken: token);
-          },
-        ),
-        // GoRoute(
-        //   path: '/experiement',
-        //   builder: (context, state) => const Experiement(),
-        // ),
-        GoRoute(
-          path: '/register',
-          builder: (context, state) => const RegisterMD(),
-        ),
-        // GoRoute(
-        //   path: '/login',
-        //   builder: (context, state) => const LoginMD(),
-        // ),
-        GoRoute(
-          path: '/create-report',
-          builder: (context, state) => const CreateReport(),
-        ),
-        GoRoute(
-          path: '/review-report',
-          builder: (context, state) {
-            final report = state.extra as IncidentReportRequestModel;
-            return ReviewReport(reportInfo: report);
-          },
-        ),
-        GoRoute(
-          path: '/report-success',
-          builder: (context, state) => const ReportSuccess(),
-        ),
-        GoRoute(
-            path: '/reports-history',
-            builder: (context, state) {
-              final maybe = state.extra as bool;
-              return ReportsHistory(fromSuccess: maybe);
-            }),
-        GoRoute(
-          path: '/reports-history-details',
-          builder: (context, state) {
-            final incidentReport = state.extra as IncidentReportModel;
-            return ReportsHistoryDetails(reportInfo: incidentReport);
-          },
-        ),
-        GoRoute(
-          path: '/reports-status-history',
-          builder: (context, state) {
-            final incidentReport = state.extra as IncidentReportModel;
-            return ReportsStatusHistory(reportInfo: incidentReport);
-          },
-        ),
-        GoRoute(
-          path: '/mark-safe-zone',
-          builder: (context, state) => const MarkSafeZone(),
-        ),
-        GoRoute(
-          path: '/review-safe-zone',
-          builder: (context, state) {
-            final safeZone = state.extra as SafeZoneModel;
-            return ReviewSafezone(safeZone: safeZone);
-          },
-        ),
-        GoRoute(
-            path: '/safezone-history',
-            builder: (context, state) {
-              final maybe = state.extra as bool;
-              return SafezoneHistory(fromSuccess: maybe);
-            }),
-        GoRoute(
-          path: '/safezone-history-details',
-          builder: (context, state) {
-            final safezone = state.extra as SafeZoneModel;
-            return SafeZoneHistoryDetails(safezonemodel: safezone);
-          },
-        ),
-        GoRoute(
-          path: '/safezone-status-history',
-          builder: (context, state) {
-            final safezone = state.extra as SafeZoneModel;
-            return SafeZoneStatusHistory(safezonemodel: safezone);
-          },
-        ),
-        GoRoute(
-            path: '/notification-details',
-            builder: (context, state) {
-              final notificationModel = state.extra as NotificationModel;
-              return NotificationDetails(
-                notificationModel: notificationModel,
-              );
-            }),
-        // GoRoute(
-        //   path: '/members-list',
-        //   builder: (context, state) => const ListOfMembers(),
-        // ),
-        // GoRoute(
-        //   path: '/members-list',
-        //   builder: (context, state) {
-        //     final groupId = state.extra as Int;
-        //     return ListOfMembers(groupID: state.extra);
-        //   },
-        // ),
-        GoRoute(
-          path: '/mark-safe-zone-success',
-          builder: (context, state) => const MarkSafeSuccess(),
-        ),
-        GoRoute(
-          path: '/sos-page',
-          builder: (context, state) => const SosPage(),
-        ),
-        GoRoute(
-          path: '/sos-countdown',
-          builder: (context, state) => const SosCountdown(),
-        ),
-        GoRoute(
-          path: '/sos-success',
-          builder: (context, state) => const SosSuccess(),
-        ),
-        GoRoute(
-          path: '/sos-cancelled',
-          builder: (context, state) => const SosCancelled(),
-        ),
+  refreshListenable: sharedController.userTokenNotifier,
+  navigatorKey: navigatorKey,
+  initialLocation: '/',
+  redirect: (context, state) async {
 
-        // CIRCLE/GROUP ROUTES
-        GoRoute(
-          path: '/groups-list',
-          builder: (context, state) => const ListOfGroups(),
-        ),
+    // if (isFirstRun && state.uri.toString() != '/') {
+    //   return '/';
+    // }
 
-        GoRoute(
-          path: '/members/:circleId',
-          builder: (context, state) {
-            final circleId = int.parse(state.pathParameters['circleId']!);
-            final group = state.extra as CircleModel;
-            return ListOfMembers(
-              circleId: circleId,
-              circleInfo: group,
-            );
-          },
-        ),
-        GoRoute(
-          path: '/generate-group-code',
-          builder: (context, state) => const GenerateNewCode(),
-        ),
-        GoRoute(
-          path: '/create-new-group',
-          builder: (context, state) => const CreateNewGroup(),
-        ),
-        GoRoute(
-          path: '/join-group',
-          builder: (context, state) => const JoinGroup(),
-        ),
-        GoRoute(
-          path: '/accountDetails',
-          builder: (context, state) => const AccountDetails(),
-        ),
-             GoRoute(
-          path: '/request-admin-access',
-          builder: (context, state) => const RequestAdminAccessPage(),
-        ),
-        GoRoute(
-          path: '/privacySecurity',
-          builder: (context, state) => const PrivacySecurity(),
-        ),
-        GoRoute(
-          path: '/location-service',
-          builder: (context, state) => const Locationservice(),
-        ),
-        GoRoute(
-          path: '/privacy',
-          builder: (context, state) => const Privacy(),
-        ),
-        GoRoute(
-          path: '/termsPolicy',
-          builder: (context, state) => const TermsPolicy(),
-        ),
-        GoRoute(
-          path: '/help-center',
-          builder: (context, state) => const HelpCenter(),
-        ),
-        GoRoute(
-          path: '/freespace',
-          builder: (context, state) => const Freespace(),
-        ),
-        GoRoute(
-          path: '/userGuide',
-          builder: (context, state) => const UserGuide(),
-        ),
-        GoRoute(
-          path: '/analytics',
-          builder: (context, state) => const MainAnalytics(initialPage: 0),
-        ),
-        GoRoute(
-          path: '/about',
-          builder: (context, state) => const About(),
-        ),
-        GoRoute(
-          path: '/starter',
-          builder: (context, state) => const Starter(),
-        ),
-        GoRoute(
-          path: '/login',
-          builder: (context, state) => const LoginRT(),
-        ),
-        GoRoute(
-          path: '/admin-initial-screen',
-          builder: (context, state) => const AdminInitialScreen(),
-        ),
-        GoRoute(
-          path: '/admin-safezones',
-          builder: (context, state) => const AdminSafezones(),
-        ),
-        GoRoute(
-          path: '/admin-reports',
-          builder: (context, state) => const AdminReports(),
-        ),
-        GoRoute(
-          path: '/admin-reports-details',
-          builder: (context, state) {
-            final extra = state.extra as Map<String, dynamic>;
-            final reportModel = extra['reportModel'] as IncidentReportModel;
-            final address = extra['address'] as String;
+    final token = sharedController.userTokenNotifier.value ?? 'guest';
+    if (
+      token != "guest" &&
+      (state.matchedLocation == '/login' || state.matchedLocation == '/register'
+    )) {
+      // print("butninam makulit: ${token}");
+      return '/home';
+    }
 
-            return AdminReportsDetails(
-                reportInfo: reportModel, address: address);
-          },
-        ),
-        GoRoute(
-          path: '/admin-safezone-details',
-          builder: (context, state) {
-            final extra = state.extra as Map<String, dynamic>;
-            final safezone = extra['safezone'] as SafeZoneModel;
-            final address = extra['address'] as String;
-            final Function(SafeZoneModel)? onStatusChanged =
-                extra['onStatusChanged'] as Function(SafeZoneModel)?;
+    final protectedRoutes = [
+      '/create-report', '/review-report', '/report-success',
+      '/reports-history', '/reports-history-details', '/reports-status-history',
+      '/mark-safe-zone', '/review-safe-zone', '/safezone-history',
+      '/safezone-history-details', '/safezone-status-history',
+      '/notification-details', '/mark-safe-zone-success',
+      '/sos-page', '/sos-countdown', '/sos-success', '/sos-cancelled',
+      '/groups-list', '/members/:circleId', '/generate-group-code',
+      '/create-new-group', '/join-group',
+      '/accountDetails', '/request-admin-access', '/privacySecurity',
+      '/location-service', '/privacy', '/termsPolicy', '/help-center',
+      '/freespace', '/userGuide', '/analytics', '/about',
+      '/starter', '/admin-initial-screen', '/admin-safezones',
+      '/admin-reports', '/admin-reports-details', '/admin-safezone-details',
+    ];
 
-            return AdminSafezoneDetails(
-              safezonemodel: safezone,
-              address: address,
-              onStatusChanged: onStatusChanged,
-            );
-          },
-        ),
+    if (token == null && protectedRoutes.contains(state.uri.toString())) {
+      print('hindi ako mawawala');
+      return '/login';
+    }
+    return null;
+  },
+  errorBuilder: (context, state) {
+    print('object');
+    return NavigationRT(userToken: userToken ?? 'guest');
+  },
+  routes: [
+    // Splash or Navigation
+    GoRoute(
+      path: '/',
+      pageBuilder: (context, state) => NoTransitionPage(
+        child: isFirstRun
+          ? SplashScreen()
+          : NavigationRT(userToken: userToken ?? 'guest'),
+      ),
+    ),
 
-        GoRoute(
-          path: '/admin-reports-details',
-          builder: (context, state) {
-            final extra = state.extra as Map<String, dynamic>;
-            final reportModel = extra['reportModel'] as IncidentReportModel;
-            final address = extra['address'] as String;
-            final Function(IncidentReportModel)? onStatusChanged =
-                extra['onStatusChanged'] as Function(IncidentReportModel)?;
+    // Home page
+    GoRoute(
+      path: '/home',
+      pageBuilder: (context, state) => NoTransitionPage(
+        child: NavigationRT(userToken: sharedController.userTokenNotifier.value ?? 'guest'),
+      ),
+    ),
 
-            return AdminReportsDetails(
-              reportInfo: reportModel,
-              address: address,
-              onStatusChanged: onStatusChanged,
-            );
-          },
+    // Register page
+    GoRoute(
+      path: '/register',
+      pageBuilder: (context, state) => NoTransitionPage(child: const RegisterMD()),
+    ),
+
+    // Create report
+    GoRoute(
+      path: '/create-report',
+      pageBuilder: (context, state) => NoTransitionPage(child: const CreateReport()),
+    ),
+
+    // Review report
+    GoRoute(
+      path: '/review-report',
+      pageBuilder: (context, state) => NoTransitionPage(
+        child: ReviewReport(reportInfo: state.extra as IncidentReportRequestModel),
+      ),
+    ),
+
+    // Report success
+    GoRoute(
+      path: '/report-success',
+      pageBuilder: (context, state) => NoTransitionPage(child: const ReportSuccess()),
+    ),
+
+    // Reports history
+    GoRoute(
+      path: '/reports-history',
+      pageBuilder: (context, state) => NoTransitionPage(
+        child: ReportsHistory(fromSuccess: state.extra as bool),
+      ),
+    ),
+
+    // Reports history details
+    GoRoute(
+      path: '/reports-history-details',
+      pageBuilder: (context, state) => NoTransitionPage(
+        child: ReportsHistoryDetails(reportInfo: state.extra as IncidentReportModel),
+      ),
+    ),
+
+    // Reports status history
+    GoRoute(
+      path: '/reports-status-history',
+      pageBuilder: (context, state) => NoTransitionPage(
+        child: ReportsStatusHistory(reportInfo: state.extra as IncidentReportModel),
+      ),
+    ),
+
+    // Mark safe zone
+    GoRoute(
+      path: '/mark-safe-zone',
+      pageBuilder: (context, state) => NoTransitionPage(child: const MarkSafeZone()),
+    ),
+
+    // Review safe zone
+    GoRoute(
+      path: '/review-safe-zone',
+      pageBuilder: (context, state) => NoTransitionPage(
+        child: ReviewSafezone(safeZone: state.extra as SafeZoneModel),
+      ),
+    ),
+
+    // Safezone history
+    GoRoute(
+      path: '/safezone-history',
+      pageBuilder: (context, state) => NoTransitionPage(
+        child: SafezoneHistory(fromSuccess: state.extra as bool),
+      ),
+    ),
+
+    // Safezone history details
+    GoRoute(
+      path: '/safezone-history-details',
+      pageBuilder: (context, state) => NoTransitionPage(
+        child: SafeZoneHistoryDetails(safezonemodel: state.extra as SafeZoneModel),
+      ),
+    ),
+
+    // Safezone status history
+    GoRoute(
+      path: '/safezone-status-history',
+      pageBuilder: (context, state) => NoTransitionPage(
+        child: SafeZoneStatusHistory(safezonemodel: state.extra as SafeZoneModel),
+      ),
+    ),
+
+    // Notification details
+    GoRoute(
+      path: '/notification-details',
+      pageBuilder: (context, state) => NoTransitionPage(
+        child: NotificationDetails(notificationModel: state.extra as NotificationModel),
+      ),
+    ),
+
+    // Mark safe zone success
+    GoRoute(
+      path: '/mark-safe-zone-success',
+      pageBuilder: (context, state) => NoTransitionPage(child: const MarkSafeSuccess()),
+    ),
+
+    // SOS pages
+    GoRoute(
+      path: '/sos-page',
+      pageBuilder: (context, state) => NoTransitionPage(child: const SosPage()),
+    ),
+    GoRoute(
+      path: '/sos-countdown',
+      pageBuilder: (context, state) => NoTransitionPage(child: const SosCountdown()),
+    ),
+    GoRoute(
+      path: '/sos-success',
+      pageBuilder: (context, state) => NoTransitionPage(child: const SosSuccess()),
+    ),
+    GoRoute(
+      path: '/sos-cancelled',
+      pageBuilder: (context, state) => NoTransitionPage(child: const SosCancelled()),
+    ),
+
+    // Circle / Group routes
+    GoRoute(
+      path: '/groups-list',
+      pageBuilder: (context, state) => NoTransitionPage(child: const ListOfGroups()),
+    ),
+    GoRoute(
+      path: '/members/:circleId',
+      pageBuilder: (context, state) => NoTransitionPage(
+        child: ListOfMembers(
+          circleId: int.parse(state.pathParameters['circleId']!),
+          circleInfo: state.extra as CircleModel,
         ),
-      ],
-    );
+      ),
+    ),
+    GoRoute(
+      path: '/generate-group-code',
+      pageBuilder: (context, state) => NoTransitionPage(child: const GenerateNewCode()),
+    ),
+    GoRoute(
+      path: '/create-new-group',
+      pageBuilder: (context, state) => NoTransitionPage(child: const CreateNewGroup()),
+    ),
+    GoRoute(
+      path: '/join-group',
+      pageBuilder: (context, state) => NoTransitionPage(child: const JoinGroup()),
+    ),
+
+    // Account and settings
+    GoRoute(
+      path: '/accountDetails',
+      pageBuilder: (context, state) => NoTransitionPage(child: const AccountDetails()),
+    ),
+    GoRoute(
+      path: '/request-admin-access',
+      pageBuilder: (context, state) => NoTransitionPage(child: const RequestAdminAccessPage()),
+    ),
+    GoRoute(
+      path: '/privacySecurity',
+      pageBuilder: (context, state) => NoTransitionPage(child: const PrivacySecurity()),
+    ),
+    GoRoute(
+      path: '/location-service',
+      pageBuilder: (context, state) => NoTransitionPage(child: const Locationservice()),
+    ),
+    GoRoute(
+      path: '/privacy',
+      pageBuilder: (context, state) => NoTransitionPage(child: const Privacy()),
+    ),
+    GoRoute(
+      path: '/termsPolicy',
+      pageBuilder: (context, state) => NoTransitionPage(child: const TermsPolicy()),
+    ),
+    GoRoute(
+      path: '/help-center',
+      pageBuilder: (context, state) => NoTransitionPage(child: const HelpCenter()),
+    ),
+    GoRoute(
+      path: '/freespace',
+      pageBuilder: (context, state) => NoTransitionPage(child: const Freespace()),
+    ),
+    GoRoute(
+      path: '/userGuide',
+      pageBuilder: (context, state) => NoTransitionPage(child: const UserGuide()),
+    ),
+    GoRoute(
+      path: '/analytics',
+      pageBuilder: (context, state) => NoTransitionPage(child: const MainAnalytics(initialPage: 0)),
+    ),
+    GoRoute(
+      path: '/about',
+      pageBuilder: (context, state) => NoTransitionPage(child: const About()),
+    ),
+    GoRoute(
+      path: '/starter',
+      pageBuilder: (context, state) => NoTransitionPage(child: const Starter()),
+    ),
+    GoRoute(
+      path: '/login',
+      pageBuilder: (context, state) => NoTransitionPage(child: const LoginRT()),
+    ),
+
+    // Admin pages
+    GoRoute(
+      path: '/admin-initial-screen',
+      pageBuilder: (context, state) => NoTransitionPage(child: const AdminInitialScreen()),
+    ),
+    GoRoute(
+      path: '/admin-safezones',
+      pageBuilder: (context, state) => NoTransitionPage(child: const AdminSafezones()),
+    ),
+    GoRoute(
+      path: '/admin-reports',
+      pageBuilder: (context, state) => NoTransitionPage(child: const AdminReports()),
+    ),
+    GoRoute(
+      path: '/admin-reports-details',
+      pageBuilder: (context, state) {
+        final extra = state.extra as Map<String, dynamic>;
+        return NoTransitionPage(
+          child: AdminReportsDetails(
+            reportInfo: extra['reportModel'] as IncidentReportModel,
+            address: extra['address'] as String,
+            onStatusChanged: extra['onStatusChanged'] as Function(IncidentReportModel)?,
+          ),
+        );
+      },
+    ),
+    GoRoute(
+      path: '/admin-safezone-details',
+      pageBuilder: (context, state) {
+        final extra = state.extra as Map<String, dynamic>;
+        return NoTransitionPage(
+          child: AdminSafezoneDetails(
+            safezonemodel: extra['safezone'] as SafeZoneModel,
+            address: extra['address'] as String,
+            onStatusChanged: extra['onStatusChanged'] as Function(SafeZoneModel)?,
+          ),
+        );
+      },
+    ),
+  ],
+);
