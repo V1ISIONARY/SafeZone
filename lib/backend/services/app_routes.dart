@@ -4,6 +4,7 @@ import 'package:safezone/backend/models/safezoneModel/safezone_model.dart';
 import 'package:safezone/backend/models/userModel/circle_model.dart';
 import 'package:safezone/backend/models/userModel/notifications_model.dart';
 import 'package:safezone/backend/properties/import.dart' hide NotificationModel;
+import 'package:safezone/backend/properties/security/backwrapper.dart';
 import 'package:safezone/frontend/platforms/desktop/widget/button/sidenav.dart';
 import 'package:safezone/frontend/platforms/mobile/pages/admin/admin_initial_screen.dart';
 import 'package:safezone/frontend/platforms/mobile/pages/admin/admin_reports.dart';
@@ -104,9 +105,11 @@ GoRouter appRouter(bool isFirstRun, String? userToken) => GoRouter(
     GoRoute(
       path: '/',
       pageBuilder: (context, state) => NoTransitionPage(
-        child: isFirstRun
-          ? SplashScreen()
-          : NavigationRT(userToken: userToken ?? 'guest'),
+        child: NoBackWrapper(
+          child: isFirstRun
+              ? SplashScreen()
+              : NavigationRT(userToken: userToken ?? 'guest'),
+        ),
       ),
     ),
 
@@ -114,41 +117,55 @@ GoRouter appRouter(bool isFirstRun, String? userToken) => GoRouter(
     GoRoute(
       path: '/home',
       pageBuilder: (context, state) => NoTransitionPage(
-        child: NavigationRT(userToken: sharedController.userTokenNotifier.value ?? 'guest'),
+        child: NoBackWrapper(
+          child: NavigationRT(
+            userToken: sharedController.userTokenNotifier.value ?? 'guest',
+          ),
+        ),
       ),
     ),
 
     // Register page
     GoRoute(
       path: '/register',
-      pageBuilder: (context, state) => NoTransitionPage(child: const RegisterMD()),
+      pageBuilder: (context, state) => NoTransitionPage(
+        child: NoBackWrapper(child: const RegisterMD()),
+      ),
     ),
 
     // Create report
     GoRoute(
       path: '/create-report',
-      pageBuilder: (context, state) => NoTransitionPage(child: const CreateReport()),
+      pageBuilder: (context, state) => NoTransitionPage(
+        child: NoBackWrapper(child: const CreateReport()),
+      ),
     ),
 
     // Review report
     GoRoute(
       path: '/review-report',
       pageBuilder: (context, state) => NoTransitionPage(
-        child: ReviewReport(reportInfo: state.extra as IncidentReportRequestModel),
+        child: NoBackWrapper(
+          child: ReviewReport(reportInfo: state.extra as IncidentReportRequestModel),
+        ),
       ),
     ),
 
     // Report success
     GoRoute(
       path: '/report-success',
-      pageBuilder: (context, state) => NoTransitionPage(child: const ReportSuccess()),
+      pageBuilder: (context, state) => NoTransitionPage(
+        child: NoBackWrapper(child: const ReportSuccess()),
+      ),
     ),
 
     // Reports history
     GoRoute(
       path: '/reports-history',
       pageBuilder: (context, state) => NoTransitionPage(
-        child: ReportsHistory(fromSuccess: state.extra as bool),
+        child: NoBackWrapper(
+          child: ReportsHistory(fromSuccess: state.extra as bool),
+        ),
       ),
     ),
 
@@ -156,7 +173,11 @@ GoRouter appRouter(bool isFirstRun, String? userToken) => GoRouter(
     GoRoute(
       path: '/reports-history-details',
       pageBuilder: (context, state) => NoTransitionPage(
-        child: ReportsHistoryDetails(reportInfo: state.extra as IncidentReportModel),
+        child: NoBackWrapper(
+          child: ReportsHistoryDetails(
+            reportInfo: state.extra as IncidentReportModel,
+          ),
+        ),
       ),
     ),
 
@@ -164,21 +185,29 @@ GoRouter appRouter(bool isFirstRun, String? userToken) => GoRouter(
     GoRoute(
       path: '/reports-status-history',
       pageBuilder: (context, state) => NoTransitionPage(
-        child: ReportsStatusHistory(reportInfo: state.extra as IncidentReportModel),
+        child: NoBackWrapper(
+          child: ReportsStatusHistory(
+            reportInfo: state.extra as IncidentReportModel,
+          ),
+        ),
       ),
     ),
 
     // Mark safe zone
     GoRoute(
       path: '/mark-safe-zone',
-      pageBuilder: (context, state) => NoTransitionPage(child: const MarkSafeZone()),
+      pageBuilder: (context, state) => NoTransitionPage(
+        child: NoBackWrapper(child: const MarkSafeZone()),
+      ),
     ),
 
     // Review safe zone
     GoRoute(
       path: '/review-safe-zone',
       pageBuilder: (context, state) => NoTransitionPage(
-        child: ReviewSafezone(safeZone: state.extra as SafeZoneModel),
+        child: NoBackWrapper(
+          child: ReviewSafezone(safeZone: state.extra as SafeZoneModel),
+        ),
       ),
     ),
 
@@ -186,7 +215,9 @@ GoRouter appRouter(bool isFirstRun, String? userToken) => GoRouter(
     GoRoute(
       path: '/safezone-history',
       pageBuilder: (context, state) => NoTransitionPage(
-        child: SafezoneHistory(fromSuccess: state.extra as bool),
+        child: NoBackWrapper(
+          child: SafezoneHistory(fromSuccess: state.extra as bool),
+        ),
       ),
     ),
 
@@ -194,7 +225,11 @@ GoRouter appRouter(bool isFirstRun, String? userToken) => GoRouter(
     GoRoute(
       path: '/safezone-history-details',
       pageBuilder: (context, state) => NoTransitionPage(
-        child: SafeZoneHistoryDetails(safezonemodel: state.extra as SafeZoneModel),
+        child: NoBackWrapper(
+          child: SafeZoneHistoryDetails(
+            safezonemodel: state.extra as SafeZoneModel,
+          ),
+        ),
       ),
     ),
 
@@ -202,7 +237,11 @@ GoRouter appRouter(bool isFirstRun, String? userToken) => GoRouter(
     GoRoute(
       path: '/safezone-status-history',
       pageBuilder: (context, state) => NoTransitionPage(
-        child: SafeZoneStatusHistory(safezonemodel: state.extra as SafeZoneModel),
+        child: NoBackWrapper(
+          child: SafeZoneStatusHistory(
+            safezonemodel: state.extra as SafeZoneModel,
+          ),
+        ),
       ),
     ),
 
@@ -210,137 +249,197 @@ GoRouter appRouter(bool isFirstRun, String? userToken) => GoRouter(
     GoRoute(
       path: '/notification-details',
       pageBuilder: (context, state) => NoTransitionPage(
-        child: NotificationDetails(notificationModel: state.extra as NotificationModel),
+        child: NoBackWrapper(
+          child: NotificationDetails(
+            notificationModel: state.extra as NotificationModel,
+          ),
+        ),
       ),
     ),
 
     // Mark safe zone success
     GoRoute(
       path: '/mark-safe-zone-success',
-      pageBuilder: (context, state) => NoTransitionPage(child: const MarkSafeSuccess()),
+      pageBuilder: (context, state) => NoTransitionPage(
+        child: NoBackWrapper(child: const MarkSafeSuccess()),
+      ),
     ),
 
     // SOS pages
     GoRoute(
       path: '/sos-page',
-      pageBuilder: (context, state) => NoTransitionPage(child: const SosPage()),
+      pageBuilder: (context, state) => NoTransitionPage(
+        child: NoBackWrapper(child: const SosPage()),
+      ),
     ),
     GoRoute(
       path: '/sos-countdown',
-      pageBuilder: (context, state) => NoTransitionPage(child: const SosCountdown()),
+      pageBuilder: (context, state) => NoTransitionPage(
+        child: NoBackWrapper(child: const SosCountdown()),
+      ),
     ),
     GoRoute(
       path: '/sos-success',
-      pageBuilder: (context, state) => NoTransitionPage(child: const SosSuccess()),
+      pageBuilder: (context, state) => NoTransitionPage(
+        child: NoBackWrapper(child: const SosSuccess()),
+      ),
     ),
     GoRoute(
       path: '/sos-cancelled',
-      pageBuilder: (context, state) => NoTransitionPage(child: const SosCancelled()),
+      pageBuilder: (context, state) => NoTransitionPage(
+        child: NoBackWrapper(child: const SosCancelled()),
+      ),
     ),
 
     // Circle / Group routes
     GoRoute(
       path: '/groups-list',
-      pageBuilder: (context, state) => NoTransitionPage(child: const ListOfGroups()),
+      pageBuilder: (context, state) => NoTransitionPage(
+        child: NoBackWrapper(child: const ListOfGroups()),
+      ),
     ),
     GoRoute(
       path: '/members/:circleId',
       pageBuilder: (context, state) => NoTransitionPage(
-        child: ListOfMembers(
-          circleId: int.parse(state.pathParameters['circleId']!),
-          circleInfo: state.extra as CircleModel,
+        child: NoBackWrapper(
+          child: ListOfMembers(
+            circleId: int.parse(state.pathParameters['circleId']!),
+            circleInfo: state.extra as CircleModel,
+          ),
         ),
       ),
     ),
     GoRoute(
       path: '/generate-group-code',
-      pageBuilder: (context, state) => NoTransitionPage(child: const GenerateNewCode()),
+      pageBuilder: (context, state) => NoTransitionPage(
+        child: NoBackWrapper(child: const GenerateNewCode()),
+      ),
     ),
     GoRoute(
       path: '/create-new-group',
-      pageBuilder: (context, state) => NoTransitionPage(child: const CreateNewGroup()),
+      pageBuilder: (context, state) => NoTransitionPage(
+        child: NoBackWrapper(child: const CreateNewGroup()),
+      ),
     ),
     GoRoute(
       path: '/join-group',
-      pageBuilder: (context, state) => NoTransitionPage(child: const JoinGroup()),
+      pageBuilder: (context, state) => NoTransitionPage(
+        child: NoBackWrapper(child: const JoinGroup()),
+      ),
     ),
 
     // Account and settings
     GoRoute(
       path: '/accountDetails',
-      pageBuilder: (context, state) => NoTransitionPage(child: const AccountDetails()),
+      pageBuilder: (context, state) => NoTransitionPage(
+        child: NoBackWrapper(child: const AccountDetails()),
+      ),
     ),
     GoRoute(
       path: '/request-admin-access',
-      pageBuilder: (context, state) => NoTransitionPage(child: const RequestAdminAccessPage()),
+      pageBuilder: (context, state) => NoTransitionPage(
+        child: NoBackWrapper(child: const RequestAdminAccessPage()),
+      ),
     ),
     GoRoute(
       path: '/privacySecurity',
-      pageBuilder: (context, state) => NoTransitionPage(child: const PrivacySecurity()),
+      pageBuilder: (context, state) => NoTransitionPage(
+        child: NoBackWrapper(child: const PrivacySecurity()),
+      ),
     ),
     GoRoute(
       path: '/location-service',
-      pageBuilder: (context, state) => NoTransitionPage(child: const Locationservice()),
+      pageBuilder: (context, state) => NoTransitionPage(
+        child: NoBackWrapper(child: const Locationservice()),
+      ),
     ),
     GoRoute(
       path: '/privacy',
-      pageBuilder: (context, state) => NoTransitionPage(child: const Privacy()),
+      pageBuilder: (context, state) => NoTransitionPage(
+        child: NoBackWrapper(child: const Privacy()),
+      ),
     ),
     GoRoute(
       path: '/termsPolicy',
-      pageBuilder: (context, state) => NoTransitionPage(child: const TermsPolicy()),
+      pageBuilder: (context, state) => NoTransitionPage(
+        child: NoBackWrapper(child: const TermsPolicy()),
+      ),
     ),
     GoRoute(
       path: '/help-center',
-      pageBuilder: (context, state) => NoTransitionPage(child: const HelpCenter()),
+      pageBuilder: (context, state) => NoTransitionPage(
+        child: NoBackWrapper(child: const HelpCenter()),
+      ),
     ),
     GoRoute(
       path: '/freespace',
-      pageBuilder: (context, state) => NoTransitionPage(child: const Freespace()),
+      pageBuilder: (context, state) => NoTransitionPage(
+        child: NoBackWrapper(child: const Freespace()),
+      ),
     ),
     GoRoute(
       path: '/userGuide',
-      pageBuilder: (context, state) => NoTransitionPage(child: const UserGuide()),
+      pageBuilder: (context, state) => NoTransitionPage(
+        child: NoBackWrapper(child: const UserGuide()),
+      ),
     ),
     GoRoute(
       path: '/analytics',
-      pageBuilder: (context, state) => NoTransitionPage(child: const MainAnalytics(initialPage: 0)),
+      pageBuilder: (context, state) => NoTransitionPage(
+        child: NoBackWrapper(
+          child: const MainAnalytics(initialPage: 0),
+        ),
+      ),
     ),
     GoRoute(
       path: '/about',
-      pageBuilder: (context, state) => NoTransitionPage(child: const About()),
+      pageBuilder: (context, state) => NoTransitionPage(
+        child: NoBackWrapper(child: const About()),
+      ),
     ),
     GoRoute(
       path: '/starter',
-      pageBuilder: (context, state) => NoTransitionPage(child: const Starter()),
+      pageBuilder: (context, state) => NoTransitionPage(
+        child: NoBackWrapper(child: const Starter()),
+      ),
     ),
     GoRoute(
       path: '/login',
-      pageBuilder: (context, state) => NoTransitionPage(child: const LoginRT()),
+      pageBuilder: (context, state) => NoTransitionPage(
+        child: NoBackWrapper(child: const LoginRT()),
+      ),
     ),
 
     // Admin pages
     GoRoute(
       path: '/admin-initial-screen',
-      pageBuilder: (context, state) => NoTransitionPage(child: const AdminInitialScreen()),
+      pageBuilder: (context, state) => NoTransitionPage(
+        child: NoBackWrapper(child: const AdminInitialScreen()),
+      ),
     ),
     GoRoute(
       path: '/admin-safezones',
-      pageBuilder: (context, state) => NoTransitionPage(child: const AdminSafezones()),
+      pageBuilder: (context, state) => NoTransitionPage(
+        child: NoBackWrapper(child: const AdminSafezones()),
+      ),
     ),
     GoRoute(
       path: '/admin-reports',
-      pageBuilder: (context, state) => NoTransitionPage(child: const AdminReports()),
+      pageBuilder: (context, state) => NoTransitionPage(
+        child: NoBackWrapper(child: const AdminReports()),
+      ),
     ),
     GoRoute(
       path: '/admin-reports-details',
       pageBuilder: (context, state) {
         final extra = state.extra as Map<String, dynamic>;
         return NoTransitionPage(
-          child: AdminReportsDetails(
-            reportInfo: extra['reportModel'] as IncidentReportModel,
-            address: extra['address'] as String,
-            onStatusChanged: extra['onStatusChanged'] as Function(IncidentReportModel)?,
+          child: NoBackWrapper(
+            child: AdminReportsDetails(
+              reportInfo: extra['reportModel'] as IncidentReportModel,
+              address: extra['address'] as String,
+              onStatusChanged: extra['onStatusChanged'] as Function(IncidentReportModel)?,
+            ),
           ),
         );
       },
@@ -350,10 +449,12 @@ GoRouter appRouter(bool isFirstRun, String? userToken) => GoRouter(
       pageBuilder: (context, state) {
         final extra = state.extra as Map<String, dynamic>;
         return NoTransitionPage(
-          child: AdminSafezoneDetails(
-            safezonemodel: extra['safezone'] as SafeZoneModel,
-            address: extra['address'] as String,
-            onStatusChanged: extra['onStatusChanged'] as Function(SafeZoneModel)?,
+          child: NoBackWrapper(
+            child: AdminSafezoneDetails(
+              safezonemodel: extra['safezone'] as SafeZoneModel,
+              address: extra['address'] as String,
+              onStatusChanged: extra['onStatusChanged'] as Function(SafeZoneModel)?,
+            ),
           ),
         );
       },
