@@ -536,91 +536,91 @@ class _SettingsState extends State<Settings> {
                                   )
                                 ],
                               )),
-                      widget.UserToken == 'guest'
-                          ? const SizedBox()
-                          : GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  isColorBlind = !isColorBlind;
-                                });
-                              },
-                              child: Container(
-                                  width: double.infinity,
-                                  color: Colors.transparent,
-                                  margin: const EdgeInsets.only(
-                                      top: 10, bottom: 10, right: 10),
-                                  child: Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        children: [
-                                          Container(
-                                              height: 25,
-                                              width: 25,
-                                              margin: const EdgeInsets.only(
-                                                  right: 17),
-                                              child: SvgPicture.asset(
-                                                'lib/resource/svg/color-blind.svg',
-                                                color: const Color.fromARGB(
-                                                    179, 0, 0, 0),
-                                              )),
-                                          const Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              PrimaryText(text: 'Color Blind'),
-                                              DescriptionText(
-                                                text:
-                                                    "Enhances visuals for colorblind accessibility.",
-                                              )
-                                            ],
-                                          )
-                                        ],
-                                      ),
-                                      const Spacer(),
-                                      Container(
-                                        height: 20,
-                                        width: 35,
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal:
-                                                2), // Padding for inner circle
-                                        decoration: BoxDecoration(
-                                          color: isColorBlind
-                                              ? Colors.green.shade300
-                                              : Colors.black26,
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                        ),
-                                        child: AnimatedAlign(
-                                          duration:
-                                              const Duration(milliseconds: 200),
-                                          alignment: isColorBlind
-                                              ? Alignment.centerRight
-                                              : Alignment.centerLeft,
-                                          child: Container(
-                                            height: 16,
-                                            width: 16,
-                                            decoration: const BoxDecoration(
-                                              color: Colors.white,
-                                              shape: BoxShape.circle,
-                                              boxShadow: [
-                                                BoxShadow(
-                                                  color: Colors.black26,
-                                                  spreadRadius: 0.5,
-                                                  blurRadius: 4,
-                                                  offset: Offset(0, 2),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      )
-                                    ],
-                                  ))),
+                      // widget.UserToken == 'guest'
+                      //     ? const SizedBox()
+                      //     : GestureDetector(
+                      //         onTap: () {
+                      //           setState(() {
+                      //             isColorBlind = !isColorBlind;
+                      //           });
+                      //         },
+                      //         child: Container(
+                      //             width: double.infinity,
+                      //             color: Colors.transparent,
+                      //             margin: const EdgeInsets.only(
+                      //                 top: 10, bottom: 10, right: 10),
+                      //             child: Row(
+                      //               crossAxisAlignment:
+                      //                   CrossAxisAlignment.center,
+                      //               mainAxisAlignment: MainAxisAlignment.start,
+                      //               children: [
+                      //                 Row(
+                      //                   crossAxisAlignment:
+                      //                       CrossAxisAlignment.center,
+                      //                   children: [
+                      //                     Container(
+                      //                         height: 25,
+                      //                         width: 25,
+                      //                         margin: const EdgeInsets.only(
+                      //                             right: 17),
+                      //                         child: SvgPicture.asset(
+                      //                           'lib/resource/svg/color-blind.svg',
+                      //                           color: const Color.fromARGB(
+                      //                               179, 0, 0, 0),
+                      //                         )),
+                      //                     const Column(
+                      //                       crossAxisAlignment:
+                      //                           CrossAxisAlignment.start,
+                      //                       children: [
+                      //                         PrimaryText(text: 'Color Blind'),
+                      //                         DescriptionText(
+                      //                           text:
+                      //                               "Enhances visuals for colorblind accessibility.",
+                      //                         )
+                      //                       ],
+                      //                     )
+                      //                   ],
+                      //                 ),
+                      //                 const Spacer(),
+                      //                 Container(
+                      //                   height: 20,
+                      //                   width: 35,
+                      //                   padding: const EdgeInsets.symmetric(
+                      //                       horizontal:
+                      //                           2), // Padding for inner circle
+                      //                   decoration: BoxDecoration(
+                      //                     color: isColorBlind
+                      //                         ? Colors.green.shade300
+                      //                         : Colors.black26,
+                      //                     borderRadius:
+                      //                         BorderRadius.circular(10),
+                      //                   ),
+                      //                   child: AnimatedAlign(
+                      //                     duration:
+                      //                         const Duration(milliseconds: 200),
+                      //                     alignment: isColorBlind
+                      //                         ? Alignment.centerRight
+                      //                         : Alignment.centerLeft,
+                      //                     child: Container(
+                      //                       height: 16,
+                      //                       width: 16,
+                      //                       decoration: const BoxDecoration(
+                      //                         color: Colors.white,
+                      //                         shape: BoxShape.circle,
+                      //                         boxShadow: [
+                      //                           BoxShadow(
+                      //                             color: Colors.black26,
+                      //                             spreadRadius: 0.5,
+                      //                             blurRadius: 4,
+                      //                             offset: Offset(0, 2),
+                      //                           ),
+                      //                         ],
+                      //                       ),
+                      //                     ),
+                      //                   ),
+                      //                 )
+                      //               ],
+                      //             ))),
                       widget.UserToken == 'gueguestss'
                           ? const SizedBox()
                           : SizedBox.shrink(),
