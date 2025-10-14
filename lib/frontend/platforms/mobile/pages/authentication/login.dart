@@ -276,26 +276,17 @@ class _LoginMDState extends State<LoginMD> {
                     margin: EdgeInsets.symmetric(vertical: 40, horizontal: 20),
                     child: GestureDetector(
                       onTap: () {
-                        final email =
-                            sharedController.emailController.text.trim();
-                        final password =
-                            sharedController.passwordController.text.trim();
-
+                        final email = sharedController.emailController.text.trim();
+                        final password = sharedController.passwordController.text.trim();
                         if (email.isEmpty) {
-                          FocusScope.of(context)
-                              .requestFocus(emailFocusNode);
+                          FocusScope.of(context).requestFocus(emailFocusNode);
                           return;
                         }
-
                         if (password.isEmpty) {
-                          FocusScope.of(context)
-                              .requestFocus(passwordFocusNode);
+                          FocusScope.of(context).requestFocus(passwordFocusNode);
                           return;
                         }
-
-                        context
-                            .read<AuthenticationBloc>()
-                            .add(UserLogin(email, password));
+                        context.read<AuthenticationBloc>().add(UserLogin(email, password));
                       },
                       child: BlocBuilder<AuthenticationBloc, AuthenticationState>(
                         builder: (context, state) {
@@ -375,8 +366,7 @@ class _LoginMDState extends State<LoginMD> {
                   BlocListener<AuthenticationBloc, AuthenticationState>(
                     listener: (context, state) async {
                       if (state is LoginSuccess) {
-                        final SharedPreferences prefs =
-                            await SharedPreferences.getInstance();
+                        final SharedPreferences prefs = await SharedPreferences.getInstance();
                         int userId = prefs.getInt('id') ?? 0;
                         await prefs.setString('userToken', userId.toString());
 

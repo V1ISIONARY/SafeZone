@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:safezone/backend/architecture/bloc/notificationBloc/notification_polling.dart';
 import 'package:safezone/backend/architecture/bloc/profileBloc/profile_bloc.dart';
 import 'package:safezone/backend/properties/properties.dart';
+import 'package:safezone/frontend/platforms/desktop/widget/button/sidenav.dart';
 import 'package:safezone/frontend/root/authentication/login.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -535,91 +536,91 @@ class _SettingsState extends State<Settings> {
                                   )
                                 ],
                               )),
-                      widget.UserToken == 'guest'
-                          ? const SizedBox()
-                          : GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  isColorBlind = !isColorBlind;
-                                });
-                              },
-                              child: Container(
-                                  width: double.infinity,
-                                  color: Colors.transparent,
-                                  margin: const EdgeInsets.only(
-                                      top: 10, bottom: 10, right: 10),
-                                  child: Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        children: [
-                                          Container(
-                                              height: 25,
-                                              width: 25,
-                                              margin: const EdgeInsets.only(
-                                                  right: 17),
-                                              child: SvgPicture.asset(
-                                                'lib/resource/svg/color-blind.svg',
-                                                color: const Color.fromARGB(
-                                                    179, 0, 0, 0),
-                                              )),
-                                          const Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              PrimaryText(text: 'Color Blind'),
-                                              DescriptionText(
-                                                text:
-                                                    "Enhances visuals for colorblind accessibility.",
-                                              )
-                                            ],
-                                          )
-                                        ],
-                                      ),
-                                      const Spacer(),
-                                      Container(
-                                        height: 20,
-                                        width: 35,
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal:
-                                                2), // Padding for inner circle
-                                        decoration: BoxDecoration(
-                                          color: isColorBlind
-                                              ? Colors.green.shade300
-                                              : Colors.black26,
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                        ),
-                                        child: AnimatedAlign(
-                                          duration:
-                                              const Duration(milliseconds: 200),
-                                          alignment: isColorBlind
-                                              ? Alignment.centerRight
-                                              : Alignment.centerLeft,
-                                          child: Container(
-                                            height: 16,
-                                            width: 16,
-                                            decoration: const BoxDecoration(
-                                              color: Colors.white,
-                                              shape: BoxShape.circle,
-                                              boxShadow: [
-                                                BoxShadow(
-                                                  color: Colors.black26,
-                                                  spreadRadius: 0.5,
-                                                  blurRadius: 4,
-                                                  offset: Offset(0, 2),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      )
-                                    ],
-                                  ))),
+                      // widget.UserToken == 'guest'
+                      //     ? const SizedBox()
+                      //     : GestureDetector(
+                      //         onTap: () {
+                      //           setState(() {
+                      //             isColorBlind = !isColorBlind;
+                      //           });
+                      //         },
+                      //         child: Container(
+                      //             width: double.infinity,
+                      //             color: Colors.transparent,
+                      //             margin: const EdgeInsets.only(
+                      //                 top: 10, bottom: 10, right: 10),
+                      //             child: Row(
+                      //               crossAxisAlignment:
+                      //                   CrossAxisAlignment.center,
+                      //               mainAxisAlignment: MainAxisAlignment.start,
+                      //               children: [
+                      //                 Row(
+                      //                   crossAxisAlignment:
+                      //                       CrossAxisAlignment.center,
+                      //                   children: [
+                      //                     Container(
+                      //                         height: 25,
+                      //                         width: 25,
+                      //                         margin: const EdgeInsets.only(
+                      //                             right: 17),
+                      //                         child: SvgPicture.asset(
+                      //                           'lib/resource/svg/color-blind.svg',
+                      //                           color: const Color.fromARGB(
+                      //                               179, 0, 0, 0),
+                      //                         )),
+                      //                     const Column(
+                      //                       crossAxisAlignment:
+                      //                           CrossAxisAlignment.start,
+                      //                       children: [
+                      //                         PrimaryText(text: 'Color Blind'),
+                      //                         DescriptionText(
+                      //                           text:
+                      //                               "Enhances visuals for colorblind accessibility.",
+                      //                         )
+                      //                       ],
+                      //                     )
+                      //                   ],
+                      //                 ),
+                      //                 const Spacer(),
+                      //                 Container(
+                      //                   height: 20,
+                      //                   width: 35,
+                      //                   padding: const EdgeInsets.symmetric(
+                      //                       horizontal:
+                      //                           2), // Padding for inner circle
+                      //                   decoration: BoxDecoration(
+                      //                     color: isColorBlind
+                      //                         ? Colors.green.shade300
+                      //                         : Colors.black26,
+                      //                     borderRadius:
+                      //                         BorderRadius.circular(10),
+                      //                   ),
+                      //                   child: AnimatedAlign(
+                      //                     duration:
+                      //                         const Duration(milliseconds: 200),
+                      //                     alignment: isColorBlind
+                      //                         ? Alignment.centerRight
+                      //                         : Alignment.centerLeft,
+                      //                     child: Container(
+                      //                       height: 16,
+                      //                       width: 16,
+                      //                       decoration: const BoxDecoration(
+                      //                         color: Colors.white,
+                      //                         shape: BoxShape.circle,
+                      //                         boxShadow: [
+                      //                           BoxShadow(
+                      //                             color: Colors.black26,
+                      //                             spreadRadius: 0.5,
+                      //                             blurRadius: 4,
+                      //                             offset: Offset(0, 2),
+                      //                           ),
+                      //                         ],
+                      //                       ),
+                      //                     ),
+                      //                   ),
+                      //                 )
+                      //               ],
+                      //             ))),
                       widget.UserToken == 'gueguestss'
                           ? const SizedBox()
                           : SizedBox.shrink(),
@@ -665,8 +666,7 @@ class _SettingsState extends State<Settings> {
                         title: 'Terms and Policy',
                         svgIcon: 'lib/resource/svg/law.svg',
                         navigateTo: 'termsPolicy',
-                        description:
-                            'Outlines rules and user responsibilities.',
+                        description: 'Outlines rules and user responsibilities.',
                         onTap: () {},
                       ),
                       // Settingsbtn(
@@ -699,8 +699,8 @@ class _SettingsState extends State<Settings> {
                                 Map<String, bool> firstRunFlags = {};
                                 for (String key in prefs.getKeys()) {
                                   if (key.startsWith('isFirstRunFlag_')) {
-                                    firstRunFlags[key] =
-                                        prefs.getBool(key) ?? true;
+                                    // firstRunFlags[key] = prefs.getBool(key) ?? true;
+                                    firstRunFlags[key] = true;
                                   }
                                 }
 
@@ -709,6 +709,8 @@ class _SettingsState extends State<Settings> {
                                 for (var entry in firstRunFlags.entries) {
                                   await prefs.setBool(entry.key, entry.value);
                                 }
+
+                                // sharedController.userTokenNotifier.value = 'guest';
                               },
                             ),
                       Container(

@@ -37,12 +37,15 @@ class _TipsState extends State<Tips> {
                     const Icon(Icons.arrow_back, color: Colors.black, size: 10),
               ),
             ),
-            const CategoryText(text: "Community Standards")
+            const CategoryText(text: "Safety Tips & Resources")
           ]),
         ),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.symmetric(
+          horizontal: 16.0,
+          vertical: 5.0
+        ),
         child: ListView(
           children: [
             RichText(

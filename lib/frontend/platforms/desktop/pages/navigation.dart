@@ -991,6 +991,7 @@ class _NavigationDTState extends State<NavigationDT>
                                         builder: (context) => const LoginRT(),
                                       ),
                                     );
+                                    sharedController.userTokenNotifier.value = 'guest';
                                   },
                                   child: Container(
                                     height: 30,

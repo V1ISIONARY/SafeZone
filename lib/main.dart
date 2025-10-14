@@ -34,6 +34,7 @@ import 'package:safezone/backend/repository/safezoneApi/safezone_impl.dart';
 import 'package:safezone/backend/services/app_routes.dart';
 import 'package:safezone/backend/services/firebase_options.dart';
 import 'package:safezone/backend/services/shake_detector_service.dart';
+import 'package:safezone/frontend/platforms/desktop/widget/button/sidenav.dart';
 import 'package:safezone/resource/schema/app_theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -46,7 +47,7 @@ void main() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   bool isFirstRun = prefs.getBool('isFirstRun') ?? true;
   String userToken = prefs.getString('userToken') ?? 'guest';
-
+  sharedController.userTokenNotifier.value = userToken;
   // Load environment variables
   await dotenv.load(fileName: ".env");
 
