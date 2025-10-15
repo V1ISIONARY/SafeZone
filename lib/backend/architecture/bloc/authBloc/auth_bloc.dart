@@ -13,7 +13,8 @@ class AuthenticationBloc
         await _authrepo.userLogin(event.email, event.password);
         emit(LoginSuccess(event.email, event.password));
       } catch (e) {
-        emit(LoginError('Error logging in: ${e.toString()}'));
+        // e.toString() already contains our professional message if thrown
+        emit(LoginError(e.toString().replaceAll('Exception: ', '')));
       }
     });
 

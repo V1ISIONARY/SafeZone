@@ -24,7 +24,9 @@ class _LoginMDState extends State<LoginMD> {
   final emailFocusNode = FocusNode();
   final passwordFocusNode = FocusNode();
   final sharedController = SharedProperties();
-  final NotificationPollingService _pollingService = NotificationPollingService();
+  final NotificationPollingService _pollingService =
+      NotificationPollingService();
+  bool _isDialogVisible = false;
 
   @override
   void dispose() {
@@ -130,15 +132,16 @@ class _LoginMDState extends State<LoginMD> {
                       ),
                       filled: true,
                       fillColor: Colors.transparent,
-                      contentPadding:
-                          const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 15, vertical: 12),
                       prefixIcon: Container(
                         margin: EdgeInsets.only(left: 10),
                         child: Icon(
                           Icons.email_outlined,
-                          color: sharedController.emailController.text.isNotEmpty
-                              ? widgetPricolor
-                              : Colors.black26,
+                          color:
+                              sharedController.emailController.text.isNotEmpty
+                                  ? widgetPricolor
+                                  : Colors.black26,
                         ),
                       ),
                     ),
@@ -185,13 +188,14 @@ class _LoginMDState extends State<LoginMD> {
                         borderRadius: BorderRadius.circular(8),
                         borderSide: BorderSide(color: widgetPricolor, width: 2),
                       ),
-                      contentPadding:
-                          const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 15, vertical: 12),
                       prefixIcon: Padding(
                         padding: const EdgeInsets.only(left: 10),
                         child: Icon(
                           Icons.lock_outline,
-                          color: sharedController.passwordController.text.isNotEmpty
+                          color: sharedController
+                                  .passwordController.text.isNotEmpty
                               ? widgetPricolor
                               : Colors.black26,
                         ),
@@ -229,8 +233,10 @@ class _LoginMDState extends State<LoginMD> {
                                 sharedController.rememberMe = value!;
                               });
                             },
-                            side: BorderSide(color: Color(0x99EF8D88), width: 2),
-                            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                            side:
+                                BorderSide(color: Color(0x99EF8D88), width: 2),
+                            materialTapTargetSize:
+                                MaterialTapTargetSize.shrinkWrap,
                             visualDensity: VisualDensity.compact,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(3),
@@ -276,19 +282,25 @@ class _LoginMDState extends State<LoginMD> {
                     margin: EdgeInsets.symmetric(vertical: 40, horizontal: 20),
                     child: GestureDetector(
                       onTap: () {
-                        final email = sharedController.emailController.text.trim();
-                        final password = sharedController.passwordController.text.trim();
+                        final email =
+                            sharedController.emailController.text.trim();
+                        final password =
+                            sharedController.passwordController.text.trim();
                         if (email.isEmpty) {
                           FocusScope.of(context).requestFocus(emailFocusNode);
                           return;
                         }
                         if (password.isEmpty) {
-                          FocusScope.of(context).requestFocus(passwordFocusNode);
+                          FocusScope.of(context)
+                              .requestFocus(passwordFocusNode);
                           return;
                         }
-                        context.read<AuthenticationBloc>().add(UserLogin(email, password));
+                        context
+                            .read<AuthenticationBloc>()
+                            .add(UserLogin(email, password));
                       },
-                      child: BlocBuilder<AuthenticationBloc, AuthenticationState>(
+                      child:
+                          BlocBuilder<AuthenticationBloc, AuthenticationState>(
                         builder: (context, state) {
                           return Container(
                             height: 50,
@@ -366,41 +378,47 @@ class _LoginMDState extends State<LoginMD> {
                   BlocListener<AuthenticationBloc, AuthenticationState>(
                     listener: (context, state) async {
                       if (state is LoginSuccess) {
-                        final SharedPreferences prefs = await SharedPreferences.getInstance();
+                        final SharedPreferences prefs =
+                            await SharedPreferences.getInstance();
                         int userId = prefs.getInt('id') ?? 0;
                         await prefs.setString('userToken', userId.toString());
 
                         if (userId != 0) {
                           int intervalInSeconds = 10;
-                          _pollingService.startPolling(userId, intervalInSeconds);
+                          _pollingService.startPolling(
+                              userId, intervalInSeconds);
                         }
-
-                        // GoRouter.of(context).go(
-                        //   '/home',
-                        //   extra: userId.toString(),
-                        // );
 
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => NavigationRT(userToken: userId.toString() ?? "guess"),
+                            builder: (context) =>
+                                NavigationRT(userToken: userId.toString()),
                           ),
                         );
 
-                        print(state);
+                        print("Login successful: $state");
                       } else if (state is LoginError) {
-                        showDialog(
+                        // 🧠 Prevent showing multiple dialogs
+                        if (_isDialogVisible) return;
+                        _isDialogVisible = true;
+
+                        await showDialog(
                           context: context,
                           barrierDismissible: false,
                           builder: (BuildContext context) {
                             return LoginErrorDialog(message: state.message);
                           },
                         );
-                        print(state.message);
+
+                        // Reset flag after dialog closes
+                        _isDialogVisible = false;
+
+                        print("Login error: ${state.message}");
                       }
                     },
                     child: Container(),
-                  ),
+                  )
                 ],
               ),
             ),

@@ -25,21 +25,31 @@ class AuthenticationImplementation extends AuthenticationRepository {
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
 
+      final profile = data['profile'];
+      final bool isActive = profile['activity_status'] ?? true;
+
+      // 🛑 Check if user is deactivated
+      if (!isActive) {
+        // Show professional snackbar
+        throw Exception(
+            "Your account has been deactivated due to a violation of our app’s community guidelines. Please contact support if you believe this was a mistake.");
+      }
+
+      // ✅ If active, save user data
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setInt('id', data['user']['id']);
       await prefs.setString('username', data['user']['username']);
       await prefs.setString('email', data['user']['email']);
       await prefs.setString(
-          'profile_picture_url', data['profile']['profile_picture'] ?? 'Safe');
-      await prefs.setString('address', data['profile']['address']);
-      await prefs.setString('first_name', data['profile']['first_name']);
-      await prefs.setString('last_name', data['profile']['last_name']);
-      await prefs.setBool('is_admin', data['profile']['is_admin']);
-      await prefs.setBool('is_girl', data['profile']['is_girl']);
-      await prefs.setBool('is_verified', data['profile']['is_verified']);
-      await prefs.setBool(
-          'activity_status', data['profile']['activity_status']);
-      await prefs.setInt('circle', data['profile']['active_circle'] ?? 0);
+          'profile_picture_url', profile['profile_picture'] ?? 'Safe');
+      await prefs.setString('address', profile['address']);
+      await prefs.setString('first_name', profile['first_name']);
+      await prefs.setString('last_name', profile['last_name']);
+      await prefs.setBool('is_admin', profile['is_admin']);
+      await prefs.setBool('is_girl', profile['is_girl']);
+      await prefs.setBool('is_verified', profile['is_verified']);
+      await prefs.setBool('activity_status', isActive);
+      await prefs.setInt('circle', profile['active_circle'] ?? 0);
       await prefs.setBool('wasInsideSafeZone', false);
       await prefs.setBool('wasInsideDangerZone', false);
 
