@@ -12,6 +12,10 @@ import 'package:geolocator/geolocator.dart';
 import 'package:safezone/backend/architecture/bloc/authBloc/auth_bloc.dart';
 import 'package:safezone/backend/architecture/bloc/authBloc/auth_event.dart';
 import 'package:safezone/backend/architecture/bloc/authBloc/auth_state.dart';
+import 'dart:convert';
+import 'dart:io';
+import 'package:image_picker/image_picker.dart';
+import 'package:http/http.dart' as http;
 
 import '../../../../../backend/properties/import.dart';
 
@@ -45,6 +49,15 @@ class _RegisterMDState extends State<RegisterMD> {
   String _notificationText = "";
   Color _appBarColor = Colors.transparent;
   bool _agreedToTerms = false;
+
+  File? idImage;
+  File? selfieImage;
+  bool isVerifyingFace = false;
+  bool isFaceMatched = false;
+  String? faceVerificationResult;
+  String? resultText;
+  bool isLoading = false;
+  final ImagePicker picker = ImagePicker();
 
   void _checkIfShown({required String text, required Color color}) {
     setState(() {
@@ -147,6 +160,64 @@ By tapping “I Agree,” you acknowledge that you have read, understood, and co
     );
   }
 
+  Future<void> pickImage(bool isID) async {
+    final picked = await picker.pickImage(source: ImageSource.gallery);
+    if (picked != null) {
+      setState(() {
+        if (isID) {
+          idImage = File(picked.path);
+        } else {
+          selfieImage = File(picked.path);
+        }
+      });
+    }
+  }
+
+  Future<void> verifyImages() async {
+    if (idImage == null || selfieImage == null) {
+      setState(() => resultText = "Please select both images first.");
+      return;
+    }
+
+    setState(() {
+      isLoading = true;
+      resultText = null;
+    });
+
+    try {
+      final idBytes = await idImage!.readAsBytes();
+      final selfieBytes = await selfieImage!.readAsBytes();
+
+      final idBase64 = base64Encode(idBytes);
+      final selfieBase64 = base64Encode(selfieBytes);
+
+      final response = await http.post(
+        Uri.parse(
+          "https://safezone-flask-emhe2f667-faokunns-projects.vercel.app/verify",
+        ), // change this
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({"id_image": idBase64, "selfie_image": selfieBase64}),
+      );
+
+      final data = jsonDecode(response.body);
+      setState(() {
+        if (response.statusCode == 200) {
+          final verified = data["verified"];
+          final confidence = data["confidence"];
+          isFaceMatched = verified; // ✅ store verification result
+          resultText =
+              "Verification: ${verified ? "VERIFIED" : "FAILED TO VERIFY: PLEASE TAKE ANOTHER PICTURE"}";
+        } else {
+          resultText = "Error: ${data["error"] ?? "Something went wrong."}";
+        }
+      });
+    } catch (e) {
+      setState(() => resultText = "Error: $e");
+    } finally {
+      setState(() => isLoading = false);
+    }
+  }
+
   Future<void> sendOTP(String recipientEmail) async {
     setState(() {
       _isSendingOTP = true;
@@ -196,6 +267,58 @@ By tapping “I Agree,” you acknowledge that you have read, understood, and co
     setState(() {
       _isSendingOTP = false;
     });
+  }
+
+  Future<void> verifyFaceMatch() async {
+    if (idImage == null || selfieImage == null) {
+      setState(() {
+        faceVerificationResult = "Please upload both ID and Selfie first.";
+      });
+      return;
+    }
+
+    setState(() {
+      isVerifyingFace = true;
+      faceVerificationResult = null;
+    });
+
+    try {
+      final idBytes = await idImage!.readAsBytes();
+      final selfieBytes = await selfieImage!.readAsBytes();
+
+      final response = await http.post(
+        Uri.parse("http://10.0.2.2:5000/verify"), // ⚠️ Change this if deployed
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({
+          "id_image": base64Encode(idBytes),
+          "selfie_image": base64Encode(selfieBytes),
+        }),
+      );
+
+      final data = jsonDecode(response.body);
+
+      if (response.statusCode == 200 && data["verified"] == true) {
+        setState(() {
+          isFaceMatched = true;
+          faceVerificationResult =
+              "✅ Face Matched! Confidence: ${data["confidence"].toStringAsFixed(2)}%";
+        });
+      } else {
+        setState(() {
+          isFaceMatched = false;
+          faceVerificationResult = "❌ Not matched. Please retake your photos.";
+        });
+      }
+    } catch (e) {
+      setState(() {
+        faceVerificationResult = "Error: $e";
+        isFaceMatched = false;
+      });
+    } finally {
+      setState(() {
+        isVerifyingFace = false;
+      });
+    }
   }
 
   @override
@@ -834,12 +957,69 @@ By tapping “I Agree,” you acknowledge that you have read, understood, and co
                   const SizedBox(height: 20),
                 ],
               ),
+            const Text(
+              "Select ID and Selfie Photos",
+              style: TextStyle(fontSize: 16),
+            ),
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                GestureDetector(
+                  onTap: () => pickImage(true),
+                  child: Container(
+                    width: 120,
+                    height: 120,
+                    color: Colors.grey[300],
+                    child: idImage != null
+                        ? Image.file(idImage!, fit: BoxFit.cover)
+                        : const Center(child: Text("Pick ID")),
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () => pickImage(false),
+                  child: Container(
+                    width: 120,
+                    height: 120,
+                    color: Colors.grey[300],
+                    child: selfieImage != null
+                        ? Image.file(selfieImage!, fit: BoxFit.cover)
+                        : const Center(child: Text("Pick Selfie")),
+                  ),
+                ),
+              ],
+            ),
+            ElevatedButton(
+              onPressed: isLoading ? null : verifyImages,
+              child: isLoading
+                  ? const CircularProgressIndicator(color: Colors.white)
+                  : const Text("Verify Faces"),
+            ),
+
+            const SizedBox(height: 20),
+            if (resultText != null)
+              Text(
+                resultText!,
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontSize: 16),
+              ),
+            const SizedBox(height: 30),
+
+            // --- Create Account Button ---
             GestureDetector(
               onTap: () async {
+                if (!isFaceMatched) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                        content: Text(
+                            "Please verify your face before creating an account.")),
+                  );
+                  return;
+                }
+
                 final signupBloc = context.read<AuthenticationBloc>();
                 final currentState = signupBloc.state;
 
-                // Prevent double-taps or re-pressing during loading
                 if (currentState is SignUpnLoading) return;
 
                 if (passwordController.text != confirmPasswordController.text) {
@@ -849,10 +1029,7 @@ By tapping “I Agree,” you acknowledge that you have read, understood, and co
                   return;
                 }
 
-                // 1️⃣ Show Terms dialog BEFORE proceeding
                 final agreed = await _showTermsDialog(context);
-
-                // If user didn't agree, stop here
                 if (agreed != true) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
@@ -862,11 +1039,9 @@ By tapping “I Agree,” you acknowledge that you have read, understood, and co
                 }
 
                 try {
-                  // 🔒 Temporarily disable button for 2 seconds
                   setState(() => _isButtonDisabled = true);
                   await Future.delayed(const Duration(seconds: 2));
 
-                  // 🕒 Proceed with the rest of the logic
                   Position position = await Geolocator.getCurrentPosition(
                     desiredAccuracy: LocationAccuracy.high,
                   );
@@ -892,7 +1067,6 @@ By tapping “I Agree,” you acknowledge that you have read, understood, and co
                             Text("Failed to get location: ${e.toString()}")),
                   );
                 } finally {
-                  // 🔓 Re-enable the button after delay and process
                   setState(() => _isButtonDisabled = false);
                 }
               },
