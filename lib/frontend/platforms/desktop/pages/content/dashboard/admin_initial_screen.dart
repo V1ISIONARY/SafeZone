@@ -225,12 +225,10 @@ class _AdminInitialScreenState extends State<AdminInitialScreen>
             final int verifiedIncidentReports = incidentReports
                 .where((report) => report['status'] == 'verified')
                 .length;
-            final int activeUsers = users
-                .where((user) => user['profile']['activity_status'] == true)
-                .length;
-            final int femaleUsers = users
-                .where((user) => user['profile']['is_girl'] == true)
-                .length;
+            final int activeUsers =
+                users.where((user) => user['activity_status'] == true).length;
+            final int femaleUsers =
+                users.where((user) => user['is_girl'] == true).length;
             final int maleUsers = totalUsers - femaleUsers;
 
             graphData['Monthly'] = _generateGraphData(

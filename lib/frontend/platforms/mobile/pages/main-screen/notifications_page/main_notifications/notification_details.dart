@@ -152,9 +152,6 @@ class _NotificationDetailsState extends State<NotificationDetails> {
                         RowText(title: "Type", text: notification.type),
                         RowText(
                             title: "Created At", text: notification.createdAt),
-                        RowText(
-                            title: "Status",
-                            text: notification.isDone ? "Resolved" : "Ongoing"),
 
                         // Show Location only if SOS
                         if (isSOS && location != null)

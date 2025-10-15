@@ -254,18 +254,59 @@ class _AdminReportsUsersState extends State<AdminReportsUsers> {
                           safeZone: (user['safe_zones'] as List?)?.length ?? 0,
                           incidents:
                               (user['incident_reports'] as List?)?.length ?? 0,
-                          onToggleStatus: () {
-                            setLocalState(() {
-                              activityStatus = !activityStatus;
-                            });
-                            context.read<AdminBloc>().add(
-                                  ToggleUserActivityEvent(
-                                    userId: user['id'],
-                                    currentStatus: !activityStatus,
+                          onToggleStatus: () async {
+                            final isDeactivating =
+                                activityStatus; // true if currently active
+                            final confirm = await showDialog<bool>(
+                              context: context,
+                              builder: (context) {
+                                return AlertDialog(
+                                  title: Text(isDeactivating
+                                      ? 'Deactivate Account'
+                                      : 'Activate Account'),
+                                  content: Text(
+                                    isDeactivating
+                                        ? 'Are you sure you want to deactivate this account? The user will lose access temporarily.'
+                                        : 'Are you sure you want to reactivate this account? The user will regain access.',
                                   ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () =>
+                                          Navigator.pop(context, false),
+                                      child: const Text('Cancel'),
+                                    ),
+                                    ElevatedButton(
+                                      onPressed: () =>
+                                          Navigator.pop(context, true),
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: isDeactivating
+                                            ? Colors.red
+                                            : Colors.green,
+                                      ),
+                                      child: Text(isDeactivating
+                                          ? 'Deactivate'
+                                          : 'Activate'),
+                                    ),
+                                  ],
                                 );
+                              },
+                            );
 
-                            //context.read<AdminBloc>().add(FetchUsersWithData());
+                            if (confirm == true) {
+                              setLocalState(() {
+                                activityStatus = !activityStatus;
+                              });
+
+                              context.read<AdminBloc>().add(
+                                    ToggleUserActivityEvent(
+                                      userId: user['id'],
+                                      currentStatus: !activityStatus,
+                                    ),
+                                  );
+
+                              // Optional: re-fetch latest data if needed
+                              // context.read<AdminBloc>().add(FetchUsersWithData());
+                            }
                           },
                         );
                       },
