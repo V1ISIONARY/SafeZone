@@ -35,7 +35,8 @@ class _RegisterMDState extends State<RegisterMD> {
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confirmPasswordController =
       TextEditingController();
-
+  bool _isVerifying = false;
+  bool _isButtonDisabled = false;
   EmailOTP myauth = EmailOTP();
   String generatedOTP = "";
   bool _isSendingOTP = false;
@@ -43,6 +44,7 @@ class _RegisterMDState extends State<RegisterMD> {
   double _appBarHeight = 0;
   String _notificationText = "";
   Color _appBarColor = Colors.transparent;
+  bool _agreedToTerms = false;
 
   void _checkIfShown({required String text, required Color color}) {
     setState(() {
@@ -79,7 +81,7 @@ class _RegisterMDState extends State<RegisterMD> {
 
   void nextStep() {
     setState(() {
-      currentStep++;
+      currentStep += 1;
     });
   }
 
@@ -87,6 +89,62 @@ class _RegisterMDState extends State<RegisterMD> {
     setState(() {
       currentStep--;
     });
+  }
+
+  Future<bool?> _showTermsDialog(BuildContext context) {
+    return showDialog<bool>(
+      context: context,
+      barrierDismissible: false, // ❗ Prevent closing by tapping outside
+      builder: (context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          title: const Text(
+            "Terms and Conditions",
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          content: SingleChildScrollView(
+              child: const Text(
+            '''
+Welcome to SafeZone.
+
+By creating an account and using our services, you agree to comply with and be bound by these Terms and Conditions. Please read them carefully before proceeding.
+
+SafeZone is designed to help users report and share safety-related information within their community. You agree that all information you provide during registration and while using the app is accurate, truthful, and up to date. Submitting false, misleading, or malicious reports is strictly prohibited and may result in the suspension or permanent termination of your account.
+
+To enhance safety and accuracy, SafeZone may collect and use your location data when you submit reports or access certain features. This data is used solely for legitimate operational purposes and handled in accordance with our Privacy Policy.
+
+You are responsible for maintaining the confidentiality of your account credentials and any actions taken under your account. You agree not to engage in any activity that could disrupt, damage, or impair the app’s functionality or other users’ experience.
+
+SafeZone reserves the right to modify, suspend, or discontinue any part of the service at any time without prior notice. We may also update these Terms periodically, and continued use of the app after such updates constitutes your acceptance of the revised terms.
+
+By tapping “I Agree,” you acknowledge that you have read, understood, and consent to these Terms and Conditions, as well as our Privacy Policy, governing the use of SafeZone and its related services.
+  ''',
+            style: TextStyle(fontSize: 13, height: 1.5),
+          )),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text("Cancel"),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blue,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text(
+                "I Agree",
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   Future<void> sendOTP(String recipientEmail) async {
@@ -130,7 +188,6 @@ class _RegisterMDState extends State<RegisterMD> {
     try {
       await send(message, smtpServer);
       nextStep();
-      print('OTP sent successfully: $generatedOTP');
     } catch (e) {
       print('Error sending OTP: $e');
       _checkIfShown(text: "Failed to send OTP", color: Colors.red);
@@ -146,7 +203,21 @@ class _RegisterMDState extends State<RegisterMD> {
     return BlocListener<AuthenticationBloc, AuthenticationState>(
       listener: (context, state) {
         if (state is SignUpSuccess) {
-          GoRouter.of(context).go('/login');
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                'Account created successfully. Please log in to continue.',
+                style: TextStyle(fontSize: 16),
+              ),
+              behavior: SnackBarBehavior.floating,
+              duration: Duration(seconds: 3),
+            ),
+          );
+
+          // Delay slightly so the snackbar shows before navigating
+          Future.delayed(const Duration(milliseconds: 500), () {
+            GoRouter.of(context).go('/login');
+          });
         } else if (state is SignUpFailed || state is SignUpError) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -285,16 +356,27 @@ class _RegisterMDState extends State<RegisterMD> {
           GestureDetector(
             onTap: _isSendingOTP
                 ? null
-                : () {
+                : () async {
+                    setState(() => _isSendingOTP = true);
+
                     final bloc = context.read<AuthenticationBloc>();
                     bloc.add(CheckEmailEvent(email: emailController.text));
 
-                    // Wait for result then trigger OTP
-                    bloc.stream.listen((state) {
+                    // Declare first (nullable), then assign after
+                    StreamSubscription? subscription;
+                    subscription = bloc.stream.listen((state) async {
                       if (state is EmailCheckSuccess) {
-                        sendOTP(emailController.text);
+                        await sendOTP(emailController.text);
+                        _checkIfShown(
+                          text: 'Verification code sent successfully.',
+                          color: Colors.green,
+                        );
+                        setState(() => _isSendingOTP = false);
+                        subscription?.cancel();
                       } else if (state is EmailCheckError) {
                         _checkIfShown(text: state.message, color: Colors.red);
+                        setState(() => _isSendingOTP = false);
+                        subscription?.cancel();
                       }
                     });
                   },
@@ -303,7 +385,7 @@ class _RegisterMDState extends State<RegisterMD> {
               width: double.infinity,
               margin: const EdgeInsets.only(bottom: 30),
               decoration: BoxDecoration(
-                color: widgetPricolor,
+                color: widgetPricolor.withOpacity(_isSendingOTP ? 0.6 : 1),
                 borderRadius: BorderRadius.circular(50),
               ),
               child: Center(
@@ -389,45 +471,65 @@ class _RegisterMDState extends State<RegisterMD> {
           ),
           const Spacer(),
           GestureDetector(
-            onTap: () async {
-              if (codeController.text.isEmpty) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text("Please enter the OTP")),
-                );
-                return;
-              }
+            onTap: _isVerifying
+                ? null
+                : () async {
+                    if (codeController.text.isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text("Please enter the OTP")),
+                      );
+                      return;
+                    }
 
-              if (codeController.text == generatedOTP) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text("OTP verified successfully")),
-                );
-                nextStep();
-              } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                      content: Text("Invalid OTP, please try again.")),
-                );
-              }
-            },
+                    setState(() => _isVerifying = true);
+
+                    await Future.delayed(const Duration(
+                        milliseconds:
+                            400)); // optional short delay for smooth UX
+
+                    if (codeController.text == generatedOTP) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                            content: Text("OTP verified successfully")),
+                      );
+                      nextStep();
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                            content: Text("Invalid OTP, please try again.")),
+                      );
+                    }
+
+                    setState(() => _isVerifying = false);
+                  },
             child: Container(
               height: 50,
               width: double.infinity,
               margin: const EdgeInsets.only(bottom: 30),
               decoration: BoxDecoration(
-                color: widgetPricolor,
+                color: widgetPricolor.withOpacity(_isVerifying ? 0.6 : 1),
                 borderRadius: BorderRadius.circular(50),
               ),
-              child: const Center(
-                child: Text(
-                  'Verify',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.white,
-                  ),
-                ),
+              child: Center(
+                child: _isVerifying
+                    ? const SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(
+                          color: Colors.white,
+                          strokeWidth: 2,
+                        ),
+                      )
+                    : const Text(
+                        'Verify',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.white,
+                        ),
+                      ),
               ),
             ),
-          )
+          ),
         ],
       ),
     );
@@ -734,6 +836,12 @@ class _RegisterMDState extends State<RegisterMD> {
               ),
             GestureDetector(
               onTap: () async {
+                final signupBloc = context.read<AuthenticationBloc>();
+                final currentState = signupBloc.state;
+
+                // Prevent double-taps or re-pressing during loading
+                if (currentState is SignUpnLoading) return;
+
                 if (passwordController.text != confirmPasswordController.text) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text("Passwords do not match")),
@@ -741,15 +849,28 @@ class _RegisterMDState extends State<RegisterMD> {
                   return;
                 }
 
+                // 1️⃣ Show Terms dialog BEFORE proceeding
+                final agreed = await _showTermsDialog(context);
+
+                // If user didn't agree, stop here
+                if (agreed != true) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                        content: Text("You must agree to continue.")),
+                  );
+                  return;
+                }
+
                 try {
-                  // Get user location
+                  // 🔒 Temporarily disable button for 2 seconds
+                  setState(() => _isButtonDisabled = true);
+                  await Future.delayed(const Duration(seconds: 2));
+
+                  // 🕒 Proceed with the rest of the logic
                   Position position = await Geolocator.getCurrentPosition(
                     desiredAccuracy: LocationAccuracy.high,
                   );
 
-                  final signupBloc = context.read<AuthenticationBloc>();
-
-                  // Dispatch event to trigger sign-up
                   signupBloc.add(UserSignUpEvent(
                     username: usernameController.text,
                     email: emailController.text,
@@ -770,6 +891,9 @@ class _RegisterMDState extends State<RegisterMD> {
                         content:
                             Text("Failed to get location: ${e.toString()}")),
                   );
+                } finally {
+                  // 🔓 Re-enable the button after delay and process
+                  setState(() => _isButtonDisabled = false);
                 }
               },
               child: Container(
@@ -777,25 +901,31 @@ class _RegisterMDState extends State<RegisterMD> {
                 margin: const EdgeInsets.only(bottom: 30),
                 width: double.infinity,
                 decoration: BoxDecoration(
-                  color: widgetPricolor,
+                  color: (_isButtonDisabled ||
+                          context.watch<AuthenticationBloc>().state
+                              is SignUpnLoading)
+                      ? widgetPricolor.withOpacity(0.6)
+                      : widgetPricolor,
                   borderRadius: BorderRadius.circular(50),
                 ),
                 child: Center(
                   child: BlocBuilder<AuthenticationBloc, AuthenticationState>(
                     builder: (context, state) {
-                      if (state is LoginLoading) {
+                      if (state is SignUpnLoading) {
                         return const SizedBox(
                           height: 20,
                           width: 20,
                           child: CircularProgressIndicator(
                             color: Colors.white,
-                            strokeWidth: 1,
+                            strokeWidth: 2,
                           ),
                         );
                       } else {
-                        return const Text(
-                          'Create new account',
-                          style: TextStyle(
+                        return Text(
+                          _isButtonDisabled
+                              ? 'Please wait...'
+                              : 'Create new account',
+                          style: const TextStyle(
                             fontSize: 12,
                             color: Colors.white,
                           ),

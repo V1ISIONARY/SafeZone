@@ -36,7 +36,7 @@ class AuthenticationBloc
 
         emit(SignUpSuccess());
       } catch (error) {
-        emit(SignUpError('Sign up failed: ${error.toString()}'));
+        emit(SignUpError(error.toString()));
       }
     });
 
@@ -58,7 +58,7 @@ class AuthenticationBloc
         final response = await _authrepo.checkEmail(event.email);
         emit(EmailCheckSuccess());
       } catch (e) {
-        emit(EmailCheckError("Failed to check email: ${e.toString()}"));
+        emit(EmailCheckError(e.toString()));
       }
     });
 

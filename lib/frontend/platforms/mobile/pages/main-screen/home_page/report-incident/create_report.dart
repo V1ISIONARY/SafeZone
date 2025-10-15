@@ -47,15 +47,19 @@ class _CreateReportState extends State<CreateReport> {
   );
 
   final List<String> _reportTypes = [
-    'Harassment',
-    'Assault',
-    'Theft',
-    'Suspicious Activity',
-    'Verbal Abuse',
-    'Stalking',
-    'Domestic Violence',
-    'Unsafe Environment',
-    'Others',
+    'Verbal Harassment',
+    'Unwanted Touching',
+    'Stalking in Public',
+    'Taking Inappropriate Photos',
+    'Attempted Sexual Assault',
+    'Public Indecency',
+    'Harassment in Public Transport',
+    'Group Harassment',
+    'Poorly Lit Area',
+    'Street Robbery',
+    'Abduction Attempt',
+    'Aggressive Individuals',
+    'Human Trafficking Suspicion',
   ];
 
   String? _selectedType;
@@ -175,7 +179,6 @@ class _CreateReportState extends State<CreateReport> {
 
           setState(() {
             _currentAddress = displayAddress;
-           
           });
         } else {
           setState(() {
@@ -491,26 +494,27 @@ class _CreateReportState extends State<CreateReport> {
                     ''';
                       controller.setMapStyle(style);
                     },
-                   onTap: (LatLng location) {
-                    if (!_useCurrentLocation) {
-                      setState(() {
-                        _pinnedLocation = location;
-                        _markers.clear();
-                        _markers.add(
-                          Marker(
-                            markerId: const MarkerId("pinned_location"),
-                            position: location,
-                            infoWindow: const InfoWindow(title: "Incident Location"),
-                            icon: BitmapDescriptor.defaultMarkerWithHue(
-                              BitmapDescriptor.hueGreen,
+                    onTap: (LatLng location) {
+                      if (!_useCurrentLocation) {
+                        setState(() {
+                          _pinnedLocation = location;
+                          _markers.clear();
+                          _markers.add(
+                            Marker(
+                              markerId: const MarkerId("pinned_location"),
+                              position: location,
+                              infoWindow:
+                                  const InfoWindow(title: "Incident Location"),
+                              icon: BitmapDescriptor.defaultMarkerWithHue(
+                                BitmapDescriptor.hueGreen,
+                              ),
                             ),
-                          ),
-                        );
-                        _updateCircle();
-                      });
-                      _getAddressFromLatLng(location);
-                    }
-                  },
+                          );
+                          _updateCircle();
+                        });
+                        _getAddressFromLatLng(location);
+                      }
+                    },
                     zoomGesturesEnabled: true,
                     scrollGesturesEnabled: true,
                     rotateGesturesEnabled: true,
@@ -518,7 +522,7 @@ class _CreateReportState extends State<CreateReport> {
                   ),
                 ),
               ),
-               Row(
+              Row(
                 children: [
                   Checkbox(
                     value: _useCurrentLocation,

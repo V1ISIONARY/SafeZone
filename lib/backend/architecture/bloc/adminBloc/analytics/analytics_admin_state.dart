@@ -108,3 +108,30 @@ class DashboardLoaded extends AdminState {
   @override
   List<Object> get props => [users, statistics];
 }
+
+// State while toggling user status
+class ToggleUserActivityLoading extends AdminState {}
+
+// State when user activity toggle succeeds
+class ToggleUserActivitySuccess extends AdminState {
+  final String message;
+  final bool newStatus;
+
+  const ToggleUserActivitySuccess({
+    required this.message,
+    required this.newStatus,
+  });
+
+  @override
+  List<Object> get props => [message, newStatus];
+}
+
+// State when toggling fails
+class ToggleUserActivityError extends AdminState {
+  final String message;
+
+  const ToggleUserActivityError(this.message);
+
+  @override
+  List<Object> get props => [message];
+}

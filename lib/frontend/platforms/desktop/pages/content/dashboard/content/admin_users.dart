@@ -242,15 +242,33 @@ class _AdminReportsUsersState extends State<AdminReportsUsers> {
                   ),
                   const SizedBox(height: 20),
                   ...users.map((user) {
-                    return Container(
-                      margin: const EdgeInsets.only(bottom: 8),
-                      child: Userinfomartion(
-                        username: user['username'] ?? 'Unknown',
-                        profileImage: user['profile_picture_url'] ?? '',
-                        safeZone: (user['safe_zones'] as List?)?.length ?? 0,
-                        incidents:
-                            (user['incident_reports'] as List?)?.length ?? 0,
-                      ),
+                    bool activityStatus = user['activity_status'];
+
+                    return StatefulBuilder(
+                      builder: (context, setLocalState) {
+                        return Userinfomartion(
+                          userid: user['id'],
+                          username: user['username'] ?? 'Unknown',
+                          profileImage: user['profile_picture_url'] ?? '',
+                          activity_status: activityStatus,
+                          safeZone: (user['safe_zones'] as List?)?.length ?? 0,
+                          incidents:
+                              (user['incident_reports'] as List?)?.length ?? 0,
+                          onToggleStatus: () {
+                            setLocalState(() {
+                              activityStatus = !activityStatus;
+                            });
+                            context.read<AdminBloc>().add(
+                                  ToggleUserActivityEvent(
+                                    userId: user['id'],
+                                    currentStatus: !activityStatus,
+                                  ),
+                                );
+
+                            //context.read<AdminBloc>().add(FetchUsersWithData());
+                          },
+                        );
+                      },
                     );
                   }),
                 ],

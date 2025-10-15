@@ -70,4 +70,29 @@ class AdminRepositoryImpl implements AdminRepository {
       throw Exception("Unexpected response format for profile statistics.");
     }
   }
+
+  @override
+  Future<Map<String, dynamic>> toggleUserActivity({
+    required int userId,
+    required bool currentStatus,
+  }) async {
+    final url = Uri.parse('$baseUrl/deactivate-account');
+
+    final response = await http.patch(
+      url,
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({
+        "user_id": userId,
+        "status": currentStatus,
+      }),
+    );
+
+    final data = _handleResponse(response);
+
+    if (data is Map<String, dynamic>) {
+      return data;
+    } else {
+      throw Exception("Unexpected response format for user toggle.");
+    }
+  }
 }

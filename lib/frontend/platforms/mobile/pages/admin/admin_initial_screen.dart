@@ -28,15 +28,19 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> {
   };
 
   final List<String> _reportTypes = [
-    'Harassment',
-    'Assault',
-    'Theft',
-    'Suspicious Activity',
-    'Verbal Abuse',
-    'Stalking',
-    'Domestic Violence',
-    'Unsafe Environment',
-    'Others',
+    'Verbal Harassment',
+    'Unwanted Touching',
+    'Stalking in Public',
+    'Taking Inappropriate Photos',
+    'Attempted Sexual Assault',
+    'Public Indecency',
+    'Harassment in Public Transport',
+    'Group Harassment',
+    'Poorly Lit Area',
+    'Street Robbery',
+    'Abduction Attempt',
+    'Aggressive Individuals',
+    'Human Trafficking Suspicion',
   ];
 
   Map<String, int> _countReportsByType(List<dynamic> incidentReports) {
@@ -188,14 +192,11 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> {
         builder: (context, state) {
           if (state is AdminLoading) {
             return Container(
-              color: Colors.white,
-              child: Center(
-                child: Transform.translate(
-                  offset: Offset(-25, -25),
-                  child: LoadingState()
-                ),
-              )
-            );
+                color: Colors.white,
+                child: Center(
+                  child: Transform.translate(
+                      offset: Offset(-25, -25), child: LoadingState()),
+                ));
           } else if (state is AdminError) {
             return Center(
                 child: Text('Error: ${state.message}',
@@ -240,11 +241,7 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> {
                 _generatePieChartData(reportCounts, totalIncidentReports);
 
             return SingleChildScrollView(
-              padding: const EdgeInsets.only(
-                left: 15,
-                right: 15,
-                bottom: 15
-              ),
+              padding: const EdgeInsets.only(left: 15, right: 15, bottom: 15),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -471,9 +468,7 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> {
                                   tooltipBgColor: Colors.white,
                                   tooltipRoundedRadius: 5,
                                   tooltipBorder: BorderSide(
-                                    color: Colors.black38,
-                                    width: 0.2
-                                  ),
+                                      color: Colors.black38, width: 0.2),
                                   getTooltipItems: (touchedSpots) {
                                     return touchedSpots.map((spot) {
                                       final weekDate = _getWeekLabel(spot.x);
@@ -481,10 +476,9 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> {
                                       return LineTooltipItem(
                                         "Week of $weekDate\n",
                                         const TextStyle(
-                                          fontSize: 10,
-                                          color: Colors.black38,
-                                          fontWeight: FontWeight.w500
-                                        ),
+                                            fontSize: 10,
+                                            color: Colors.black38,
+                                            fontWeight: FontWeight.w500),
                                         children: [
                                           const TextSpan(
                                             text: "Numeroes  ",
@@ -505,13 +499,15 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> {
                                     }).toList();
                                   },
                                 ),
-                                getTouchedSpotIndicator: (barData, spotIndexes) {
+                                getTouchedSpotIndicator:
+                                    (barData, spotIndexes) {
                                   return spotIndexes.map((index) {
                                     return TouchedSpotIndicatorData(
                                       FlLine(color: Colors.transparent),
                                       FlDotData(
                                         show: true,
-                                        getDotPainter: (spot, percent, barData, index) {
+                                        getDotPainter:
+                                            (spot, percent, barData, index) {
                                           return FlDotCirclePainter(
                                             radius: 5,
                                             color: widgetPricolor,
@@ -524,7 +520,6 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> {
                                   }).toList();
                                 },
                               ),
-
                               lineBarsData: [
                                 LineChartBarData(
                                   spots: graphData[selectedCategory]!,
@@ -584,9 +579,7 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> {
                       children: [
                         Container(
                           height: 200,
-                          margin: EdgeInsets.symmetric(
-                            vertical: 20
-                          ),
+                          margin: EdgeInsets.symmetric(vertical: 20),
                           child: PieChart(
                             PieChartData(
                               sections: pieChartData,
@@ -875,27 +868,25 @@ class MetricTile extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          children: [
-            Text(
-              title.toUpperCase(),
-              style: const TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w600,
-                color: Colors.black54,
-              ),
+        Row(children: [
+          Text(
+            title.toUpperCase(),
+            style: const TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              color: Colors.black54,
             ),
-            Spacer(),
-            Text(
-              "$value / $total",
-              style: const TextStyle(
-                fontSize: 12,
-                color: Colors.grey,
-                fontWeight: FontWeight.w500,
-              ),
+          ),
+          Spacer(),
+          Text(
+            "$value / $total",
+            style: const TextStyle(
+              fontSize: 12,
+              color: Colors.grey,
+              fontWeight: FontWeight.w500,
             ),
-          ]
-        ),
+          ),
+        ]),
         const SizedBox(height: 6),
         Stack(
           children: [
@@ -909,7 +900,8 @@ class MetricTile extends StatelessWidget {
             ),
             Container(
               height: 22,
-              width: (percentage / 100) * MediaQuery.of(context).size.width * 0.35,
+              width:
+                  (percentage / 100) * MediaQuery.of(context).size.width * 0.35,
               decoration: BoxDecoration(
                 color: color,
                 borderRadius: BorderRadius.circular(5),

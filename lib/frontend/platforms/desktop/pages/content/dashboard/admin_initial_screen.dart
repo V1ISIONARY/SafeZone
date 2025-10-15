@@ -20,7 +20,8 @@ class AdminInitialScreen extends StatefulWidget {
   State<AdminInitialScreen> createState() => _AdminInitialScreenState();
 }
 
-class _AdminInitialScreenState extends State<AdminInitialScreen> with AutomaticKeepAliveClientMixin {
+class _AdminInitialScreenState extends State<AdminInitialScreen>
+    with AutomaticKeepAliveClientMixin {
   @override
   bool get wantKeepAlive => true;
 
@@ -33,15 +34,19 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> with AutomaticK
   };
 
   final List<String> _reportTypes = [
-    'Harassment',
-    'Assault',
-    'Theft',
-    'Suspicious Activity',
-    'Verbal Abuse',
-    'Stalking',
-    'Domestic Violence',
-    'Unsafe Environment',
-    'Others',
+    'Verbal Harassment',
+    'Unwanted Touching',
+    'Stalking in Public',
+    'Taking Inappropriate Photos',
+    'Attempted Sexual Assault',
+    'Public Indecency',
+    'Harassment in Public Transport',
+    'Group Harassment',
+    'Poorly Lit Area',
+    'Street Robbery',
+    'Abduction Attempt',
+    'Aggressive Individuals',
+    'Human Trafficking Suspicion',
   ];
 
   Map<String, int> _countReportsByType(List<dynamic> incidentReports) {
@@ -198,9 +203,8 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> with AutomaticK
             return const Center(child: LoadingState());
           } else if (state is AdminError) {
             return Center(
-              child: Text('Error: ${state.message}',
-                  style: const TextStyle(fontSize: 11))
-            );
+                child: Text('Error: ${state.message}',
+                    style: const TextStyle(fontSize: 11)));
           } else if (state is AllDataLoaded || _cachedData != null) {
             final data = state is AllDataLoaded ? state.data : _cachedData!;
             if (state is AllDataLoaded) {
@@ -255,9 +259,7 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> with AutomaticK
                     children: [
                       Container(
                           color: Colors.transparent,
-                          margin: EdgeInsets.only(
-                            bottom: 5
-                          ),
+                          margin: EdgeInsets.only(bottom: 5),
                           child: SingleChildScrollView(
                             scrollDirection: Axis.horizontal,
                             child: Row(
@@ -347,8 +349,7 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> with AutomaticK
                         const SizedBox(height: 16),
                         LayoutBuilder(
                           builder: (context, constraints) {
-                            bool useColumn =
-                                constraints.maxWidth <= 855;
+                            bool useColumn = constraints.maxWidth <= 855;
                             print(
                                 "Current width: ${constraints.maxWidth}, useColumn: $useColumn");
                             return Container(
@@ -631,7 +632,7 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> with AutomaticK
                     ),
                   ),
                   Container(
-                    child: Column(
+                      child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -643,7 +644,8 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> with AutomaticK
                               bool isNarrow = constraints.maxWidth <= 473;
                               return isNarrow
                                   ? Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Text(
                                           'Analytics',
@@ -688,14 +690,17 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> with AutomaticK
                                           builder: (context) {
                                             return Theme(
                                               data: Theme.of(context).copyWith(
-                                                popupMenuTheme: PopupMenuThemeData(
+                                                popupMenuTheme:
+                                                    PopupMenuThemeData(
                                                   color: Colors.white,
                                                   textStyle: const TextStyle(
                                                     color: Colors.black87,
                                                     fontSize: 12,
                                                   ),
                                                   shape: RoundedRectangleBorder(
-                                                    borderRadius: BorderRadius.circular(5),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            5),
                                                   ),
                                                   elevation: 0,
                                                 ),
@@ -706,10 +711,15 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> with AutomaticK
                                                 child: Container(
                                                   height: 30,
                                                   width: 130,
-                                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
+                                                      horizontal: 12,
+                                                      vertical: 6),
                                                   decoration: BoxDecoration(
                                                     color: Colors.white,
-                                                    borderRadius: BorderRadius.circular(10),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10),
                                                     border: Border.all(
                                                       width: 0.5,
                                                       color: Colors.black38,
@@ -718,7 +728,8 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> with AutomaticK
                                                   child: Row(
                                                     children: [
                                                       Container(
-                                                        margin: const EdgeInsets.only(right: 5),
+                                                        margin: const EdgeInsets
+                                                            .only(right: 5),
                                                         child: const Icon(
                                                           Icons.calendar_month,
                                                           size: 13,
@@ -728,20 +739,26 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> with AutomaticK
                                                       Expanded(
                                                         child: Text(
                                                           selectedCategory,
-                                                          textAlign: TextAlign.center,
-                                                          style: const TextStyle(
+                                                          textAlign:
+                                                              TextAlign.center,
+                                                          style:
+                                                              const TextStyle(
                                                             color: Colors.black,
-                                                            fontWeight: FontWeight.w500,
+                                                            fontWeight:
+                                                                FontWeight.w500,
                                                             fontSize: 11,
                                                           ),
-                                                          overflow: TextOverflow.ellipsis,
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
                                                           maxLines: 1,
                                                         ),
                                                       ),
                                                       Container(
-                                                        margin: const EdgeInsets.only(left: 5),
+                                                        margin: const EdgeInsets
+                                                            .only(left: 5),
                                                         child: const Icon(
-                                                          Icons.keyboard_arrow_down_sharp,
+                                                          Icons
+                                                              .keyboard_arrow_down_sharp,
                                                           size: 16,
                                                           color: Colors.black54,
                                                         ),
@@ -752,21 +769,38 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> with AutomaticK
                                                 onSelected: (String category) {
                                                   _updateGraph(category);
                                                 },
-                                                itemBuilder: (BuildContext context) {
-                                                  return ['Monthly', 'Weekly', 'Today'].map((category) {
-                                                    return PopupMenuItem<String>(
+                                                itemBuilder:
+                                                    (BuildContext context) {
+                                                  return [
+                                                    'Monthly',
+                                                    'Weekly',
+                                                    'Today'
+                                                  ].map((category) {
+                                                    return PopupMenuItem<
+                                                        String>(
                                                       value: category,
                                                       padding: EdgeInsets.zero,
                                                       child: SizedBox(
                                                         width: 110,
                                                         child: Padding(
-                                                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .symmetric(
+                                                                  horizontal:
+                                                                      12,
+                                                                  vertical: 6),
                                                           child: Text(
                                                             category,
-                                                            overflow: TextOverflow.ellipsis,
-                                                            style: const TextStyle(
-                                                              color: Colors.black,
-                                                              fontWeight: FontWeight.w500,
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .ellipsis,
+                                                            style:
+                                                                const TextStyle(
+                                                              color:
+                                                                  Colors.black,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w500,
                                                               fontSize: 11,
                                                             ),
                                                           ),
@@ -829,14 +863,17 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> with AutomaticK
                                           builder: (context) {
                                             return Theme(
                                               data: Theme.of(context).copyWith(
-                                                popupMenuTheme: PopupMenuThemeData(
+                                                popupMenuTheme:
+                                                    PopupMenuThemeData(
                                                   color: Colors.white,
                                                   textStyle: const TextStyle(
                                                     color: Colors.black87,
                                                     fontSize: 12,
                                                   ),
                                                   shape: RoundedRectangleBorder(
-                                                    borderRadius: BorderRadius.circular(5),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            5),
                                                   ),
                                                   elevation: 0,
                                                 ),
@@ -847,10 +884,15 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> with AutomaticK
                                                 child: Container(
                                                   height: 30,
                                                   width: 130,
-                                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
+                                                      horizontal: 12,
+                                                      vertical: 6),
                                                   decoration: BoxDecoration(
                                                     color: Colors.white,
-                                                    borderRadius: BorderRadius.circular(10),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10),
                                                     border: Border.all(
                                                       width: 0.5,
                                                       color: Colors.black38,
@@ -859,7 +901,8 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> with AutomaticK
                                                   child: Row(
                                                     children: [
                                                       Container(
-                                                        margin: const EdgeInsets.only(right: 5),
+                                                        margin: const EdgeInsets
+                                                            .only(right: 5),
                                                         child: const Icon(
                                                           Icons.calendar_month,
                                                           size: 13,
@@ -869,20 +912,26 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> with AutomaticK
                                                       Expanded(
                                                         child: Text(
                                                           selectedCategory,
-                                                          textAlign: TextAlign.center,
-                                                          style: const TextStyle(
+                                                          textAlign:
+                                                              TextAlign.center,
+                                                          style:
+                                                              const TextStyle(
                                                             color: Colors.black,
-                                                            fontWeight: FontWeight.w500,
+                                                            fontWeight:
+                                                                FontWeight.w500,
                                                             fontSize: 11,
                                                           ),
-                                                          overflow: TextOverflow.ellipsis,
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
                                                           maxLines: 1,
                                                         ),
                                                       ),
                                                       Container(
-                                                        margin: const EdgeInsets.only(left: 5),
+                                                        margin: const EdgeInsets
+                                                            .only(left: 5),
                                                         child: const Icon(
-                                                          Icons.keyboard_arrow_down_sharp,
+                                                          Icons
+                                                              .keyboard_arrow_down_sharp,
                                                           size: 16,
                                                           color: Colors.black54,
                                                         ),
@@ -893,21 +942,38 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> with AutomaticK
                                                 onSelected: (String category) {
                                                   _updateGraph(category);
                                                 },
-                                                itemBuilder: (BuildContext context) {
-                                                  return ['Monthly', 'Weekly', 'Today'].map((category) {
-                                                    return PopupMenuItem<String>(
+                                                itemBuilder:
+                                                    (BuildContext context) {
+                                                  return [
+                                                    'Monthly',
+                                                    'Weekly',
+                                                    'Today'
+                                                  ].map((category) {
+                                                    return PopupMenuItem<
+                                                        String>(
                                                       value: category,
                                                       padding: EdgeInsets.zero,
                                                       child: SizedBox(
                                                         width: 110,
                                                         child: Padding(
-                                                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .symmetric(
+                                                                  horizontal:
+                                                                      12,
+                                                                  vertical: 6),
                                                           child: Text(
                                                             category,
-                                                            overflow: TextOverflow.ellipsis,
-                                                            style: const TextStyle(
-                                                              color: Colors.black,
-                                                              fontWeight: FontWeight.w500,
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .ellipsis,
+                                                            style:
+                                                                const TextStyle(
+                                                              color:
+                                                                  Colors.black,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w500,
                                                               fontSize: 11,
                                                             ),
                                                           ),
@@ -927,11 +993,11 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> with AutomaticK
                       Container(
                         height: 310,
                         margin: const EdgeInsets.only(bottom: 15),
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 30),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 30),
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(5),
-                          color: Color.fromARGB(255, 250, 250, 250)
-                        ),
+                            borderRadius: BorderRadius.circular(5),
+                            color: Color.fromARGB(255, 250, 250, 250)),
                         child: Column(
                           children: [
                             Expanded(
@@ -955,9 +1021,11 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> with AutomaticK
                                         ),
                                       ),
                                       topTitles: const AxisTitles(
-                                          sideTitles: SideTitles(showTitles: false)),
+                                          sideTitles:
+                                              SideTitles(showTitles: false)),
                                       rightTitles: const AxisTitles(
-                                          sideTitles: SideTitles(showTitles: false)),
+                                          sideTitles:
+                                              SideTitles(showTitles: false)),
                                     ),
                                     borderData: FlBorderData(
                                       show: true,
@@ -971,7 +1039,8 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> with AutomaticK
                                       drawVerticalLine: true,
                                       horizontalInterval: 5,
                                       verticalInterval: 1,
-                                      getDrawingHorizontalLine: (value) => FlLine(
+                                      getDrawingHorizontalLine: (value) =>
+                                          FlLine(
                                         color: Colors.grey.withOpacity(0.1),
                                         strokeWidth: 1,
                                       ),
@@ -986,20 +1055,18 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> with AutomaticK
                                         tooltipBgColor: Colors.white,
                                         tooltipRoundedRadius: 5,
                                         tooltipBorder: BorderSide(
-                                          color: Colors.black38,
-                                          width: 0.2
-                                        ),
+                                            color: Colors.black38, width: 0.2),
                                         getTooltipItems: (touchedSpots) {
                                           return touchedSpots.map((spot) {
-                                            final weekDate = _getWeekLabel(spot.x);
+                                            final weekDate =
+                                                _getWeekLabel(spot.x);
                                             final commits = spot.y.toInt();
                                             return LineTooltipItem(
                                               "Week of $weekDate\n",
                                               const TextStyle(
-                                                fontSize: 10,
-                                                color: Colors.black38,
-                                                fontWeight: FontWeight.w500
-                                              ),
+                                                  fontSize: 10,
+                                                  color: Colors.black38,
+                                                  fontWeight: FontWeight.w500),
                                               children: [
                                                 const TextSpan(
                                                   text: "Numeroes  ",
@@ -1020,13 +1087,15 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> with AutomaticK
                                           }).toList();
                                         },
                                       ),
-                                      getTouchedSpotIndicator: (barData, spotIndexes) {
+                                      getTouchedSpotIndicator:
+                                          (barData, spotIndexes) {
                                         return spotIndexes.map((index) {
                                           return TouchedSpotIndicatorData(
                                             FlLine(color: Colors.transparent),
                                             FlDotData(
                                               show: true,
-                                              getDotPainter: (spot, percent, barData, index) {
+                                              getDotPainter: (spot, percent,
+                                                  barData, index) {
                                                 return FlDotCirclePainter(
                                                   radius: 5,
                                                   color: widgetPricolor,
@@ -1039,7 +1108,6 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> with AutomaticK
                                         }).toList();
                                       },
                                     ),
-
                                     lineBarsData: [
                                       LineChartBarData(
                                         spots: graphData[selectedCategory]!,
@@ -1092,55 +1160,54 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> with AutomaticK
                     ),
                   ),
                   const SizedBox(height: 20),
-                  LayoutBuilder(
-                    builder: (context, constraints) {
-                      bool isNarrow = constraints.maxWidth <= 473;
-                      return isNarrow
-                          ? Column(
-                              children: [
-                                MetricTile(
-                                  title: 'Verified Safe Zones',
-                                  value: totalVerifiedSafeZones,
-                                  total: totalSafeZones,
-                                  color: Colors.lightBlue,
-                                ),
-                                const SizedBox(height: 16),
-                                MetricTile(
-                                  title: 'Pending Verification',
-                                  value: totalSafeZones - totalVerifiedSafeZones,
-                                  total: totalSafeZones,
-                                  color: Colors.orange,
-                                ),
-                                const SizedBox(height: 20),
-                                MetricTile(
-                                  title: 'Verified Reports',
-                                  value: verifiedIncidentReports,
-                                  total: totalIncidentReports,
-                                  color: Colors.green,
-                                ),
-                                const SizedBox(height: 16),
-                                MetricTile(
-                                  title: 'Pending Reports',
-                                  value: pendingIncidentReports,
-                                  total: totalIncidentReports,
-                                  color: Colors.red,
-                                ),
-                                const SizedBox(height: 20),
-                                MetricTile(
-                                  title: 'Female Users',
-                                  value: femaleUsers,
-                                  total: totalUsers,
-                                  color: Colors.pink,
-                                ),
-                                const SizedBox(height: 16),
-                                MetricTile(
-                                  title: 'Male Users',
-                                  value: maleUsers,
-                                  total: totalUsers,
-                                  color: Colors.blue,
-                                ),
-                              ],
-                            )
+                  LayoutBuilder(builder: (context, constraints) {
+                    bool isNarrow = constraints.maxWidth <= 473;
+                    return isNarrow
+                        ? Column(
+                            children: [
+                              MetricTile(
+                                title: 'Verified Safe Zones',
+                                value: totalVerifiedSafeZones,
+                                total: totalSafeZones,
+                                color: Colors.lightBlue,
+                              ),
+                              const SizedBox(height: 16),
+                              MetricTile(
+                                title: 'Pending Verification',
+                                value: totalSafeZones - totalVerifiedSafeZones,
+                                total: totalSafeZones,
+                                color: Colors.orange,
+                              ),
+                              const SizedBox(height: 20),
+                              MetricTile(
+                                title: 'Verified Reports',
+                                value: verifiedIncidentReports,
+                                total: totalIncidentReports,
+                                color: Colors.green,
+                              ),
+                              const SizedBox(height: 16),
+                              MetricTile(
+                                title: 'Pending Reports',
+                                value: pendingIncidentReports,
+                                total: totalIncidentReports,
+                                color: Colors.red,
+                              ),
+                              const SizedBox(height: 20),
+                              MetricTile(
+                                title: 'Female Users',
+                                value: femaleUsers,
+                                total: totalUsers,
+                                color: Colors.pink,
+                              ),
+                              const SizedBox(height: 16),
+                              MetricTile(
+                                title: 'Male Users',
+                                value: maleUsers,
+                                total: totalUsers,
+                                color: Colors.blue,
+                              ),
+                            ],
+                          )
                         : Column(
                             children: [
                               Row(
@@ -1157,7 +1224,8 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> with AutomaticK
                                   Expanded(
                                     child: MetricTile(
                                       title: 'Pending Verification',
-                                      value: totalSafeZones - totalVerifiedSafeZones,
+                                      value: totalSafeZones -
+                                          totalVerifiedSafeZones,
                                       total: totalSafeZones,
                                       color: Colors.orange,
                                     ),
@@ -1210,17 +1278,15 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> with AutomaticK
                               ),
                             ],
                           );
-                    }
-                  ),
+                  }),
                   const SizedBox(height: 30),
                 ],
               ),
             );
           } else {
             return const Center(
-              child:
-                  Text('No data available', style: TextStyle(fontSize: 11))
-              );
+                child:
+                    Text('No data available', style: TextStyle(fontSize: 11)));
           }
         },
       ),
@@ -1276,9 +1342,8 @@ class SummaryCard extends StatelessWidget {
         height: 90,
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(5),
-          color: Color.fromARGB(255, 250, 250, 250)
-        ),
+            borderRadius: BorderRadius.circular(5),
+            color: Color.fromARGB(255, 250, 250, 250)),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -1351,27 +1416,25 @@ class MetricTile extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          children: [
-            Text(
-              title.toUpperCase(),
-              style: const TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w600,
-                color: Colors.black54,
-              ),
+        Row(children: [
+          Text(
+            title.toUpperCase(),
+            style: const TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              color: Colors.black54,
             ),
-            Spacer(),
-            Text(
-              "$value / $total",
-              style: const TextStyle(
-                fontSize: 12,
-                color: Colors.grey,
-                fontWeight: FontWeight.w500,
-              ),
+          ),
+          Spacer(),
+          Text(
+            "$value / $total",
+            style: const TextStyle(
+              fontSize: 12,
+              color: Colors.grey,
+              fontWeight: FontWeight.w500,
             ),
-          ]
-        ),
+          ),
+        ]),
         const SizedBox(height: 6),
         Stack(
           children: [
@@ -1385,7 +1448,8 @@ class MetricTile extends StatelessWidget {
             ),
             Container(
               height: 22,
-              width: (percentage / 100) * MediaQuery.of(context).size.width * 0.35,
+              width:
+                  (percentage / 100) * MediaQuery.of(context).size.width * 0.35,
               decoration: BoxDecoration(
                 color: color,
                 borderRadius: BorderRadius.circular(5),

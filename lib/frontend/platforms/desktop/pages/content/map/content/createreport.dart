@@ -52,15 +52,19 @@ class _CreateReportDTState extends State<CreateReportDT> {
   );
 
   final List<String> _reportTypes = [
-    'Harassment',
-    'Assault',
-    'Theft',
-    'Suspicious Activity',
-    'Verbal Abuse',
-    'Stalking',
-    'Domestic Violence',
-    'Unsafe Environment',
-    'Others',
+    'Verbal Harassment',
+    'Unwanted Touching',
+    'Stalking in Public',
+    'Taking Inappropriate Photos',
+    'Attempted Sexual Assault',
+    'Public Indecency',
+    'Harassment in Public Transport',
+    'Group Harassment',
+    'Poorly Lit Area',
+    'Street Robbery',
+    'Abduction Attempt',
+    'Aggressive Individuals',
+    'Human Trafficking Suspicion',
   ];
 
   String? _selectedType;

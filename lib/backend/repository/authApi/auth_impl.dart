@@ -94,7 +94,7 @@ class AuthenticationImplementation extends AuthenticationRepository {
       print(
           "Account created successfully"); // This updates location in Firestore
     } else {
-      final errorMessage = jsonDecode(response.body)['error'];
+      final errorMessage = jsonDecode(response.body)['message'];
       print("Failed to create account: $errorMessage");
       throw Exception(errorMessage);
     }
@@ -211,7 +211,7 @@ class AuthenticationImplementation extends AuthenticationRepository {
     );
 
     if (response.statusCode != 200) {
-      final errorMessage = jsonDecode(response.body)['error'];
+      final errorMessage = jsonDecode(response.body)['message'];
       print("$errorMessage");
       throw Exception(errorMessage);
     }

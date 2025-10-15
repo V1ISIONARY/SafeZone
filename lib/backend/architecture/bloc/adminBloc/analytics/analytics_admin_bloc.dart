@@ -14,6 +14,21 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
     on<FetchSafeZones>(_onFetchSafeZones);
     on<FetchUsersWithSafeZones>(_onFetchUsersWithSafeZones);
     on<GetProfileStatisticsEvent>(_onGetProfileStatisticsEvent);
+    on<ToggleUserActivityEvent>(_onToggleUserActivity);
+  }
+
+  Future<void> _onToggleUserActivity(
+    ToggleUserActivityEvent event,
+    Emitter<AdminState> emit,
+  ) async {
+    try {
+      final response = await adminRepository.toggleUserActivity(
+        userId: event.userId,
+        currentStatus: event.currentStatus,
+      );
+    } catch (e) {
+      emit(ToggleUserActivityError(e.toString()));
+    }
   }
 
   // Handler for FetchAllData event

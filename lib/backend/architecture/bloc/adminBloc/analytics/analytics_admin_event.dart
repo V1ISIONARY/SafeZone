@@ -32,3 +32,17 @@ class GetProfileStatisticsEvent extends AdminEvent {
   @override
   List<Object> get props => [];
 }
+
+// Event to toggle user activation/deactivation
+class ToggleUserActivityEvent extends AdminEvent {
+  final int userId;
+  final bool currentStatus;
+
+  const ToggleUserActivityEvent({
+    required this.userId,
+    required this.currentStatus,
+  });
+
+  @override
+  List<Object> get props => [userId, currentStatus];
+}
