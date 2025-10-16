@@ -8,23 +8,21 @@ class CategoryText extends StatelessWidget {
   final Color? color;
   final bool? webText;
 
-  const CategoryText({
-    super.key, 
-    required this.text, 
-    this.alignment, 
-    this.color,
-    this.webText = false
-  });
+  const CategoryText(
+      {super.key,
+      required this.text,
+      this.alignment,
+      this.color,
+      this.webText = false});
 
   @override
   Widget build(BuildContext context) {
     return (Text(
       text,
       style: GoogleFonts.inter(
-        fontSize: webText! ? 12 : 11,
-        fontWeight: FontWeight.w500,
-        color: color ?? Colors.black
-      ),
+          fontSize: webText! ? 12 : 11,
+          fontWeight: FontWeight.w500,
+          color: color ?? Colors.black),
       textAlign: _getTextAlignment(),
     ));
   }
@@ -49,13 +47,12 @@ class CategoryDescripText extends StatelessWidget {
   final Color? color;
   final bool? webText;
 
-  const CategoryDescripText({
-    super.key,
-    required this.text,
-    this.alignment,
-    this.color,
-    this.webText = false
-  });
+  const CategoryDescripText(
+      {super.key,
+      required this.text,
+      this.alignment,
+      this.color,
+      this.webText = false});
 
   @override
   Widget build(BuildContext context) {
@@ -251,6 +248,7 @@ class RowText extends StatelessWidget {
       child: Row(
         children: [
           Flexible(
+            flex: 1,
             child: Text(
               title,
               style: GoogleFonts.inter(
@@ -259,6 +257,7 @@ class RowText extends StatelessWidget {
           ),
           const Spacer(),
           Flexible(
+            flex: 3,
             child: Text(
               text,
               style: GoogleFonts.inter(
