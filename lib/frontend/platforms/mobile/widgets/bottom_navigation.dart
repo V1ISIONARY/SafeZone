@@ -87,55 +87,22 @@ class _BottomNavigationWidgetState extends State<BottomNavigationWidget>
           ),
         ),
       ),
-      floatingActionButton: widget.userToken == 'guest'
-          ? FloatingActionButton(
-              backgroundColor: widgetPricolor,
-              splashColor: Colors.transparent,
-              elevation: 5,
-              shape: const CircleBorder(),
-              onPressed: () {
-                _startShake();
-              },
-              child: Stack(children: [
-                Container(
-                  decoration: const BoxDecoration(
-                      color: Colors.white38, shape: BoxShape.circle),
-                ),
-                Center(
-                  child: AnimatedBuilder(
-                    animation: _animation,
-                    builder: (context, child) {
-                      return Transform.translate(
-                        offset: Offset(_animation.value, 0),
-                        child: SizedBox(
-                          width: 40,
-                          height: 40,
-                          child: Image.asset(
-                            'lib/resource/image/png/lock.png',
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              ]))
-          : FloatingActionButton(
-              backgroundColor: widgetPricolor,
-              splashColor: Colors.transparent,
-              elevation: 5,
-              shape: const CircleBorder(),
-              onPressed: () {
-                context.push('/sos-countdown');
-              },
-              child: const Text(
-                'SOS',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: widgetPricolor,
+        splashColor: Colors.transparent,
+        elevation: 5,
+        shape: const CircleBorder(),
+        onPressed: () {
+          context.push('/sos-countdown');
+        },
+        child: const Text(
+          'SOS',
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
       floatingActionButtonLocation:
           FloatingActionButtonLocation.miniCenterDocked,
     );

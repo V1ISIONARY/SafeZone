@@ -764,8 +764,11 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
       );
     }
 
+    if (widget.UserToken == 'guest') {
+      return markers;
+    }
+
     if (state is MapDataLoaded) {
-      // 👥 Add member markers
       for (var member in _currentMembers) {
         String userId = member['user_id'].toString();
         String firstName = member['first_name'];
@@ -935,18 +938,37 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
     return nearest;
   }
 
-  Future<void> findNearestSafezone() async {
+ Future<void> findNearestSafezone() async {
     if (_currentUserLocation == null) {
       print("❌ Current user location not available.");
+      return;
+    }
+
+    if (widget.UserToken == 'guest') {
+      print("👤 Guest user: Using Dagupan Police Station as default");
+
+      SharedPreferences.getInstance().then((prefs) {
+        prefs.setString('nearest_station_name', "Dagupan Police Station");
+        print("🟡 Guest mode: Default station set to Dagupan Police Station");
+      });
       return;
     }
 
     SafeZoneModel? nearest = await getNearestStation(_currentUserLocation!);
 
     if (nearest != null) {
-      print("Nearest Police Station: ${nearest.name}");
+      SharedPreferences.getInstance().then((prefs) {
+        prefs.setString(
+            'nearest_station_name', nearest!.name ?? "Dagupan Police Station");
+        print("Nearest safe zone saved to prefs: ${nearest.name}");
+      });
+      print("🟢 Nearest Safe Zone: ${nearest.name}");
     } else {
-      print("No valid stations found.");
+      print("⚠️ No valid safe zones found.");
+
+      SharedPreferences.getInstance().then((prefs) {
+        prefs.setString('nearest_station_name', "Dagupan Police Station");
+      });
     }
   }
 
@@ -2119,141 +2141,6 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                       )),
                                 ),
                               ),
-                              const SizedBox(height: 10),
-                              SingleChildScrollView(
-                                  scrollDirection: Axis.horizontal,
-                                  child: Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        GestureDetector(
-                                          onTap: () {
-                                            _findAllRoute();
-                                          },
-                                          child: Container(
-                                            margin: const EdgeInsets.only(
-                                                right: 10),
-                                            width: 60,
-                                            height: 40,
-                                            decoration: BoxDecoration(
-                                              color: _isAllZoneShown
-                                                  ? Colors.grey[300]
-                                                  : Colors.white,
-                                              borderRadius:
-                                                  BorderRadius.circular(50),
-                                              boxShadow: const [
-                                                BoxShadow(
-                                                  color: Colors.grey,
-                                                  blurRadius: 2,
-                                                  offset: Offset(1, 1),
-                                                ),
-                                              ],
-                                            ),
-                                            child: const Row(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.center,
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.start,
-                                              children: [
-                                                SizedBox(width: 5),
-                                                Icon(Icons.safety_check,
-                                                    color: Colors.blue),
-                                                SizedBox(width: 5),
-                                                Expanded(
-                                                  child: CategoryDescripText(
-                                                    text: "All",
-                                                    color: Colors.black,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                        GestureDetector(
-                                          onTap: _findSafeRoute,
-                                          child: Container(
-                                            margin: const EdgeInsets.only(
-                                                right: 10),
-                                            width: 160,
-                                            height: 40,
-                                            decoration: BoxDecoration(
-                                              color: _isSafeZoneShown
-                                                  ? Colors.grey[300]
-                                                  : Colors.white,
-                                              borderRadius:
-                                                  BorderRadius.circular(50),
-                                              boxShadow: const [
-                                                BoxShadow(
-                                                  color: Colors.grey,
-                                                  blurRadius: 2,
-                                                  offset: Offset(1, 1),
-                                                ),
-                                              ],
-                                            ),
-                                            child: const Row(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.center,
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.start,
-                                              children: [
-                                                SizedBox(width: 5),
-                                                Icon(Icons.safety_check,
-                                                    color: Colors.green),
-                                                SizedBox(width: 5),
-                                                Expanded(
-                                                  child: CategoryDescripText(
-                                                    text:
-                                                        "Show nearest safe zone",
-                                                    color: Colors.black,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                        GestureDetector(
-                                          onTap: () {
-                                            _findDangerRoute();
-                                          },
-                                          child: Container(
-                                            width: 170,
-                                            height: 40,
-                                            decoration: BoxDecoration(
-                                              color: _isDangerZoneShown
-                                                  ? Colors.grey[300]
-                                                  : Colors.white,
-                                              borderRadius:
-                                                  BorderRadius.circular(50),
-                                              boxShadow: const [
-                                                BoxShadow(
-                                                  color: Colors.grey,
-                                                  blurRadius: 2,
-                                                  offset: Offset(1, 1),
-                                                ),
-                                              ],
-                                            ),
-                                            child: const Row(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.center,
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.start,
-                                              children: [
-                                                SizedBox(width: 5),
-                                                Icon(Icons.safety_check,
-                                                    color: Colors.red),
-                                                SizedBox(width: 5),
-                                                Expanded(
-                                                  child: CategoryDescripText(
-                                                    text:
-                                                        "Show nearest danger zone",
-                                                    color: Colors.black,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ]))
                             ]))
                     : SingleChildScrollView(
                         scrollDirection: Axis.horizontal,

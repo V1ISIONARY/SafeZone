@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:safezone/backend/models/userModel/notifications_model.dart';
 import 'package:safezone/resource/schema/colors.dart';
 import 'package:safezone/resource/schema/texts.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class NotificationDetails extends StatefulWidget {
   const NotificationDetails({super.key, required this.notificationModel});
@@ -23,57 +24,55 @@ class _NotificationDetailsState extends State<NotificationDetails> {
         : 'lib/resource/image/png/notif_info.png';
 
     String? location;
-    if (isSOS && notification.message.contains("- Location:")) {
-      final parts = notification.message.split("- Location:");
+    if (isSOS && notification.message.contains("Location:")) {
+      final parts = notification.message.split("Location:");
       if (parts.length > 1) {
         location = parts[1].trim();
       }
     }
 
+    print(notification.message);
+
     return Scaffold(
-      body: Stack(
-        children: [
-          SizedBox(
-            width: double.infinity,
-            child: Image.asset(
-              backgroundImage,
-              fit: BoxFit.cover,
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            expandedHeight: 300,
+            collapsedHeight:
+                kToolbarHeight + MediaQuery.of(context).padding.top,
+            floating: false,
+            pinned: true,
+            snap: false,
+            backgroundColor: Colors.transparent,
+            leading: Container(
+              margin: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                border: Border.all(width: 1, color: Colors.black),
+                shape: BoxShape.circle,
+              ),
+              child: IconButton(
+                icon:
+                    const Icon(Icons.arrow_back, color: Colors.black, size: 14),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ),
+            title: CategoryText(text: notification.title),
+            flexibleSpace: FlexibleSpaceBar(
+              background: Image.asset(
+                backgroundImage,
+                fit: BoxFit.cover,
+              ),
             ),
           ),
-          Column(
-            children: [
-              SafeArea(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                  child: Row(
-                    children: [
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.pop(context);
-                        },
-                        child: Container(
-                          margin: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            border: Border.all(width: 1, color: Colors.black),
-                            shape: BoxShape.circle,
-                          ),
-                          padding: const EdgeInsets.all(5),
-                          child: const Icon(Icons.arrow_back,
-                              color: Colors.black, size: 14),
-                        ),
-                      ),
-                      const Spacer(),
-                      CategoryText(text: notification.title),
-                      const Spacer(),
-                      const SizedBox(width: 44),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(height: 250),
+          SliverList(
+            delegate: SliverChildListDelegate([
+              const SizedBox(height: 20),
               Container(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                margin: const EdgeInsets.symmetric(horizontal: 15),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(10),
@@ -92,7 +91,7 @@ class _NotificationDetailsState extends State<NotificationDetails> {
                         ? [
                             TextSpan(
                               text: notification.message
-                                  .split("- Location:")
+                                  .split("📍")
                                   .first
                                   .trim(),
                               style: const TextStyle(
@@ -148,20 +147,55 @@ class _NotificationDetailsState extends State<NotificationDetails> {
                             thickness: 0.1,
                           ),
                         ),
-                        RowText(title: "Message", text: notification.message),
-                        RowText(title: "Type", text: notification.type),
-                        RowText(
-                            title: "Created At", text: notification.createdAt),
-
-                        // Show Location only if SOS
+                        _buildTwoColumnItem("Message", notification.message),
+                        _buildTwoColumnItem("Type", notification.type),
+                        _buildTwoColumnItem(
+                            "Created At", notification.createdAt),
                         if (isSOS && location != null)
-                          RowText(title: "Location", text: location),
+                          _buildTwoColumnItem("Location", location!),
                       ],
                     ),
                   ),
                 ),
               ),
-            ],
+              const SizedBox(height: 30),
+            ]),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTwoColumnItem(String title, String text) {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            flex: 2,
+            child: Padding(
+              padding: const EdgeInsets.only(right: 16.0),
+              child: Text(
+                title,
+                style: GoogleFonts.inter(
+                  fontWeight: FontWeight.w600,
+                  color: textColor,
+                  fontSize: 13,
+                ),
+              ),
+            ),
+          ),
+          Expanded(
+            flex: 4,
+            child: Text(
+              text,
+              style: GoogleFonts.inter(
+                fontWeight: FontWeight.w400,
+                color: textColor.withOpacity(0.8),
+                fontSize: 13,
+              ),
+            ),
           ),
         ],
       ),

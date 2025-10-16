@@ -94,7 +94,7 @@ class _LoginMDState extends State<LoginMD> {
                   ),
                   SizedBox(height: 50),
                   Text(
-                    'Email address or username',
+                    'Email address',
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w500,

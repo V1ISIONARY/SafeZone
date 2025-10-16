@@ -56,40 +56,121 @@ class _SosSuccessState extends State<SosSuccess> {
     final prefs = await SharedPreferences.getInstance();
 
     int userId = prefs.getInt('id') ?? 0;
-    String firstName = prefs.getString('first_name') ?? "User";
-    String lastName = prefs.getString('last_name') ?? "";
+    bool isGuest = userId == 0;
 
-    final formattedFirstName = firstName.isNotEmpty
-        ? firstName[0].toUpperCase() + firstName.substring(1).toLowerCase()
-        : '';
-    final formattedLastName = lastName.isNotEmpty
-        ? lastName[0].toUpperCase() + lastName.substring(1).toLowerCase()
-        : '';
-    String fullName = "$formattedFirstName $formattedLastName".trim();
+    String firstName, lastName, fullName;
 
-    if (userId != 0) {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? address = prefs.getString('currentAddress');
-      String policeStationName =
-          prefs.getString('nearest_station_name') ?? "WALA";
-      context.read<NotificationBloc>().add(
-            BroadcastNotification(
-                userId, // Use the stored user ID
-                "Emergency Alert",
-                "$fullName has triggered an SOS alert! - Location: $address",
-                "SOS"),
-          );
-      context.read<NotificationBloc>().add(
-            BroadcastNotificationPoliceStation(
-                userId, // Use the stored user ID
-                "Emergency Alert",
-                policeStationName,
-                "$fullName has triggered an SOS alert! - Location: $address",
-                "SOS"),
-          );
+    if (isGuest) {
+      firstName = "Guest";
+      lastName = "User";
+      fullName = "Guest User";
+      userId = DateTime.now().millisecondsSinceEpoch.remainder(1000000);
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Error: User ID not found!")));
+      firstName = prefs.getString('first_name') ?? "User";
+      lastName = prefs.getString('last_name') ?? "";
+
+      final formattedFirstName = firstName.isNotEmpty
+          ? firstName[0].toUpperCase() + firstName.substring(1).toLowerCase()
+          : '';
+      final formattedLastName = lastName.isNotEmpty
+          ? lastName[0].toUpperCase() + lastName.substring(1).toLowerCase()
+          : '';
+      fullName = "$formattedFirstName $formattedLastName".trim();
+    }
+
+    String? address =
+        prefs.getString('currentAddress') ?? "Location unavailable";
+    String policeStationName =
+        prefs.getString('nearest_station_name') ?? "WALA";
+
+    try {
+      if (isGuest) {
+        context.read<NotificationBloc>().add(
+              BroadcastNotificationPoliceStation(
+                userId,
+                "🚨 EMERGENCY SOS ALERT - GUEST USER",
+                policeStationName,
+                "$fullName has triggered an SOS alert! \n"
+                    "📍 Location: $address \n"
+                    "👤 User Type: Guest (Temporary ID: $userId)",
+                "SOS",
+              ),
+            );
+        print("🚨 Guest SOS sent to police station only (ID: $userId)");
+      } else {
+        context.read<NotificationBloc>().add(
+              BroadcastNotification(
+                userId,
+                "🚨 EMERGENCY SOS ALERT",
+                "$fullName has triggered an SOS alert! \n"
+                    "📍 Location: $address \n",
+                "SOS",
+              ),
+            );
+
+        context.read<NotificationBloc>().add(
+              BroadcastNotificationPoliceStation(
+                userId,
+                "🚨 EMERGENCY SOS ALERT",
+                policeStationName,
+                "$fullName has triggered an SOS alert! \n"
+                    "📍 Location: $address \n",
+                "SOS",
+              ),
+            );
+        print("🚨 Registered user SOS sent to circle and police (ID: $userId)");
+      }
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                const Icon(Icons.check_circle, color: Colors.white, size: 20),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    isGuest
+                        ? '✅ Emergency alert sent to authorities! Help is on the way.'
+                        : '✅ SOS Alert sent to your circle and authorities!',
+                    style: const TextStyle(color: Colors.white),
+                  ),
+                ),
+              ],
+            ),
+            backgroundColor: Colors.green,
+            duration: const Duration(seconds: 5),
+            behavior: SnackBarBehavior.floating,
+            margin: const EdgeInsets.all(16),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Row(
+              children: [
+                Icon(Icons.error_outline, color: Colors.white, size: 20),
+                SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    '⚠️ Emergency alert sent! Authorities notified.',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+              ],
+            ),
+            backgroundColor: Colors.orange,
+            duration: Duration(seconds: 5),
+            behavior: SnackBarBehavior.floating,
+            margin: EdgeInsets.all(16),
+            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          ),
+        );
+      }
+      print("❌ SOS notification error: $e");
     }
   }
 

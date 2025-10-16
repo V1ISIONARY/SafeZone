@@ -1,21 +1,9 @@
-import 'dart:math';
-
-import 'package:email_otp/email_otp.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:go_router/go_router.dart';
-import 'package:mailer/mailer.dart';
-import 'package:mailer/smtp_server/gmail.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:safezone/backend/architecture/bloc/authBloc/auth_bloc.dart';
 import 'package:safezone/backend/architecture/bloc/authBloc/auth_event.dart';
 import 'package:safezone/backend/architecture/bloc/authBloc/auth_state.dart';
-import 'dart:convert';
-import 'dart:io';
-import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
+import 'package:safezone/frontend/platforms/mobile/widgets/Dialogs/account.dart';
 
 import '../../../../../backend/properties/import.dart';
 
@@ -41,6 +29,7 @@ class _RegisterMDState extends State<RegisterMD> {
       TextEditingController();
   bool _isVerifying = false;
   bool _isButtonDisabled = false;
+  bool _isCreatingAccount = false; // Add this
   EmailOTP myauth = EmailOTP();
   String generatedOTP = "";
   bool _isSendingOTP = false;
@@ -107,56 +96,213 @@ class _RegisterMDState extends State<RegisterMD> {
   Future<bool?> _showTermsDialog(BuildContext context) {
     return showDialog<bool>(
       context: context,
-      barrierDismissible: false, // ❗ Prevent closing by tapping outside
+      barrierDismissible: false,
       builder: (context) {
-        return AlertDialog(
+        return Dialog(
+          backgroundColor: Colors.white,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(20),
           ),
-          title: const Text(
-            "Terms and Conditions",
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-          content: SingleChildScrollView(
-              child: const Text(
-            '''
-Welcome to SafeZone.
-
-By creating an account and using our services, you agree to comply with and be bound by these Terms and Conditions. Please read them carefully before proceeding.
-
-SafeZone is designed to help users report and share safety-related information within their community. You agree that all information you provide during registration and while using the app is accurate, truthful, and up to date. Submitting false, misleading, or malicious reports is strictly prohibited and may result in the suspension or permanent termination of your account.
-
-To enhance safety and accuracy, SafeZone may collect and use your location data when you submit reports or access certain features. This data is used solely for legitimate operational purposes and handled in accordance with our Privacy Policy.
-
-You are responsible for maintaining the confidentiality of your account credentials and any actions taken under your account. You agree not to engage in any activity that could disrupt, damage, or impair the app’s functionality or other users’ experience.
-
-SafeZone reserves the right to modify, suspend, or discontinue any part of the service at any time without prior notice. We may also update these Terms periodically, and continued use of the app after such updates constitutes your acceptance of the revised terms.
-
-By tapping “I Agree,” you acknowledge that you have read, understood, and consent to these Terms and Conditions, as well as our Privacy Policy, governing the use of SafeZone and its related services.
-  ''',
-            style: TextStyle(fontSize: 13, height: 1.5),
-          )),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context, false),
-              child: const Text("Cancel"),
+          elevation: 8,
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
             ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: widgetPricolor.withOpacity(0.1),
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(20),
+                      topRight: Radius.circular(20),
+                    ),
+                  ),
+                  child: const Column(
+                    children: [
+                      Icon(
+                        Icons.security,
+                        size: 40,
+                        color: widgetPricolor,
+                      ),
+                      SizedBox(height: 8),
+                      Text(
+                        "Terms & Conditions",
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87,
+                        ),
+                      ),
+                      SizedBox(height: 4),
+                      Text(
+                        "Please read carefully before proceeding",
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.black54,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              onPressed: () => Navigator.pop(context, true),
-              child: const Text(
-                "I Agree",
-                style: TextStyle(color: Colors.white),
-              ),
+
+                // Content
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildTermSection(
+                          icon: Icons.verified_user,
+                          title: "Account Responsibility",
+                          content:
+                              "You are responsible for maintaining the confidentiality of your account credentials and any activities that occur under your account.",
+                        ),
+                        const SizedBox(height: 16),
+                        _buildTermSection(
+                          icon: Icons.report_problem,
+                          title: "Accurate Reporting",
+                          content:
+                              "All information provided must be accurate and truthful. False, misleading, or malicious reports are strictly prohibited and may result in account suspension.",
+                        ),
+                        const SizedBox(height: 16),
+                        _buildTermSection(
+                          icon: Icons.location_on,
+                          title: "Location Data",
+                          content:
+                              "SafeZone collects location data to enhance safety features. This data is used solely for operational purposes in accordance with our Privacy Policy.",
+                        ),
+                        const SizedBox(height: 16),
+                        _buildTermSection(
+                          icon: Icons.gpp_maybe,
+                          title: "Service Changes",
+                          content:
+                              "We reserve the right to modify, suspend, or discontinue any part of our service. Continued use after updates constitutes acceptance of revised terms.",
+                        ),
+                        const SizedBox(height: 16),
+                        Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.orange[50],
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: Colors.orange[200]!),
+                          ),
+                          child: Text(
+                            "By tapping 'I Agree', you acknowledge that you have read, understood, and consent to these Terms and Conditions.",
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.orange[800],
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+
+                // Buttons
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: () => Navigator.pop(context, false),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: Colors.grey,
+                            side: const BorderSide(color: Colors.grey),
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                          child: const Text(
+                            "Cancel",
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: () => Navigator.pop(context, true),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: widgetPricolor,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            elevation: 2,
+                          ),
+                          child: const Text(
+                            "I Agree",
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         );
       },
+    );
+  }
+
+  Widget _buildTermSection({
+    required IconData icon,
+    required String title,
+    required String content,
+  }) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(
+          icon,
+          size: 20,
+          color: widgetPricolor,
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black87,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                content,
+                style: const TextStyle(
+                  fontSize: 12,
+                  color: Colors.black54,
+                  height: 1.4,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 
@@ -204,7 +350,7 @@ By tapping “I Agree,” you acknowledge that you have read, understood, and co
         if (response.statusCode == 200) {
           final verified = data["verified"];
           final confidence = data["confidence"];
-          isFaceMatched = verified; // ✅ store verification result
+          isFaceMatched = verified;
           resultText =
               "Verification: ${verified ? "VERIFIED" : "FAILED TO VERIFY: PLEASE TAKE ANOTHER PICTURE"}";
         } else {
@@ -326,22 +472,20 @@ By tapping “I Agree,” you acknowledge that you have read, understood, and co
     return BlocListener<AuthenticationBloc, AuthenticationState>(
       listener: (context, state) {
         if (state is SignUpSuccess) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text(
-                'Account created successfully. Please log in to continue.',
-                style: TextStyle(fontSize: 16),
-              ),
-              behavior: SnackBarBehavior.floating,
-              duration: Duration(seconds: 3),
-            ),
-          );
-
-          // Delay slightly so the snackbar shows before navigating
-          Future.delayed(const Duration(milliseconds: 500), () {
-            GoRouter.of(context).go('/login');
+          setState(() {
+            _isCreatingAccount = false;
+            _isButtonDisabled = false;
           });
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (context) => const AccountCreatedDialog(),
+          );
         } else if (state is SignUpFailed || state is SignUpError) {
+          setState(() {
+            _isCreatingAccount = false;
+            _isButtonDisabled = false;
+          });
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
@@ -405,7 +549,9 @@ By tapping “I Agree,” you acknowledge that you have read, understood, and co
                     ? _buildEmailStep()
                     : currentStep == 1
                         ? _buildCodeVerificationStep()
-                        : _buildUserDetailsStep(context),
+                        : currentStep == 2
+                            ? _buildUserDetailsStep(context)
+                            : _buildFaceVerificationStep(context),
               ),
             ],
           ),
@@ -419,10 +565,10 @@ By tapping “I Agree,” you acknowledge that you have read, understood, and co
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
-        children: List.generate(3, (index) {
+        children: List.generate(4, (index) {
           return Container(
             margin: const EdgeInsets.symmetric(horizontal: 5),
-            width: 95,
+            width: 70,
             height: 7,
             decoration: BoxDecoration(
               color: index <= currentStep
@@ -477,7 +623,7 @@ By tapping “I Agree,” you acknowledge that you have read, understood, and co
           ),
           const Spacer(),
           GestureDetector(
-            onTap: _isSendingOTP
+            onTap: _isSendingOTP || _isButtonDisabled
                 ? null
                 : () async {
                     setState(() => _isSendingOTP = true);
@@ -508,7 +654,8 @@ By tapping “I Agree,” you acknowledge that you have read, understood, and co
               width: double.infinity,
               margin: const EdgeInsets.only(bottom: 30),
               decoration: BoxDecoration(
-                color: widgetPricolor.withOpacity(_isSendingOTP ? 0.6 : 1),
+                color: widgetPricolor.withOpacity(
+                    (_isSendingOTP || _isButtonDisabled) ? 0.6 : 1),
                 borderRadius: BorderRadius.circular(50),
               ),
               child: Center(
@@ -594,7 +741,7 @@ By tapping “I Agree,” you acknowledge that you have read, understood, and co
           ),
           const Spacer(),
           GestureDetector(
-            onTap: _isVerifying
+            onTap: _isVerifying || _isButtonDisabled
                 ? null
                 : () async {
                     if (codeController.text.isEmpty) {
@@ -630,7 +777,8 @@ By tapping “I Agree,” you acknowledge that you have read, understood, and co
               width: double.infinity,
               margin: const EdgeInsets.only(bottom: 30),
               decoration: BoxDecoration(
-                color: widgetPricolor.withOpacity(_isVerifying ? 0.6 : 1),
+                color: widgetPricolor
+                    .withOpacity((_isVerifying || _isButtonDisabled) ? 0.6 : 1),
                 borderRadius: BorderRadius.circular(50),
               ),
               child: Center(
@@ -714,7 +862,7 @@ By tapping “I Agree,” you acknowledge that you have read, understood, and co
             const SizedBox(height: 5),
             const CategoryDescripText(
               text:
-                  'We’re almost there! Add these details to set up your account.',
+                  'We\'re almost there! Add these details to set up your account.',
             ),
             const SizedBox(height: 30),
             TextField(
@@ -957,162 +1105,655 @@ By tapping “I Agree,” you acknowledge that you have read, understood, and co
                   const SizedBox(height: 20),
                 ],
               ),
-            const Text(
-              "Select ID and Selfie Photos",
-              style: TextStyle(fontSize: 16),
-            ),
-            const SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                GestureDetector(
-                  onTap: () => pickImage(true),
-                  child: Container(
-                    width: 120,
-                    height: 120,
-                    color: Colors.grey[300],
-                    child: idImage != null
-                        ? Image.file(idImage!, fit: BoxFit.cover)
-                        : const Center(child: Text("Pick ID")),
-                  ),
-                ),
-                GestureDetector(
-                  onTap: () => pickImage(false),
-                  child: Container(
-                    width: 120,
-                    height: 120,
-                    color: Colors.grey[300],
-                    child: selfieImage != null
-                        ? Image.file(selfieImage!, fit: BoxFit.cover)
-                        : const Center(child: Text("Pick Selfie")),
-                  ),
-                ),
-              ],
-            ),
-            ElevatedButton(
-              onPressed: isLoading ? null : verifyImages,
-              child: isLoading
-                  ? const CircularProgressIndicator(color: Colors.white)
-                  : const Text("Verify Faces"),
-            ),
-
-            const SizedBox(height: 20),
-            if (resultText != null)
-              Text(
-                resultText!,
-                textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 16),
-              ),
-            const SizedBox(height: 30),
-
-            // --- Create Account Button ---
             GestureDetector(
-              onTap: () async {
-                if (!isFaceMatched) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                        content: Text(
-                            "Please verify your face before creating an account.")),
-                  );
-                  return;
-                }
+              onTap: _isButtonDisabled
+                  ? null
+                  : () {
+                      if (firstNameController.text.isEmpty ||
+                          lastNameController.text.isEmpty ||
+                          addressController.text.isEmpty ||
+                          usernameController.text.isEmpty ||
+                          passwordController.text.isEmpty ||
+                          confirmPasswordController.text.isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                              content: Text("Please fill in all fields")),
+                        );
+                        return;
+                      }
 
-                final signupBloc = context.read<AuthenticationBloc>();
-                final currentState = signupBloc.state;
+                      if (passwordController.text !=
+                          confirmPasswordController.text) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                              content: Text("Passwords do not match")),
+                        );
+                        return;
+                      }
 
-                if (currentState is SignUpnLoading) return;
-
-                if (passwordController.text != confirmPasswordController.text) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text("Passwords do not match")),
-                  );
-                  return;
-                }
-
-                final agreed = await _showTermsDialog(context);
-                if (agreed != true) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                        content: Text("You must agree to continue.")),
-                  );
-                  return;
-                }
-
-                try {
-                  setState(() => _isButtonDisabled = true);
-                  await Future.delayed(const Duration(seconds: 2));
-
-                  Position position = await Geolocator.getCurrentPosition(
-                    desiredAccuracy: LocationAccuracy.high,
-                  );
-
-                  signupBloc.add(UserSignUpEvent(
-                    username: usernameController.text,
-                    email: emailController.text,
-                    password: passwordController.text,
-                    address: addressController.text,
-                    age: int.tryParse(ageController.text) ?? 18,
-                    firstname: firstNameController.text,
-                    lastname: lastNameController.text,
-                    isAdmin: false,
-                    isGirl: true,
-                    isVerified: true,
-                    latitude: position.latitude,
-                    longitude: position.longitude,
-                  ));
-                } catch (e) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                        content:
-                            Text("Failed to get location: ${e.toString()}")),
-                  );
-                } finally {
-                  setState(() => _isButtonDisabled = false);
-                }
-              },
+                      nextStep();
+                    },
               child: Container(
                 height: 50,
-                margin: const EdgeInsets.only(bottom: 30),
                 width: double.infinity,
+                margin: const EdgeInsets.only(bottom: 30, top: 20),
                 decoration: BoxDecoration(
-                  color: (_isButtonDisabled ||
-                          context.watch<AuthenticationBloc>().state
-                              is SignUpnLoading)
-                      ? widgetPricolor.withOpacity(0.6)
-                      : widgetPricolor,
+                  color:
+                      widgetPricolor.withOpacity(_isButtonDisabled ? 0.6 : 1),
                   borderRadius: BorderRadius.circular(50),
                 ),
                 child: Center(
-                  child: BlocBuilder<AuthenticationBloc, AuthenticationState>(
-                    builder: (context, state) {
-                      if (state is SignUpnLoading) {
-                        return const SizedBox(
+                  child: _isButtonDisabled
+                      ? const SizedBox(
                           height: 20,
                           width: 20,
                           child: CircularProgressIndicator(
                             color: Colors.white,
                             strokeWidth: 2,
                           ),
-                        );
-                      } else {
-                        return Text(
-                          _isButtonDisabled
-                              ? 'Please wait...'
-                              : 'Create new account',
-                          style: const TextStyle(
+                        )
+                      : const Text(
+                          'Continue to Face Verification',
+                          style: TextStyle(
                             fontSize: 12,
                             color: Colors.white,
                           ),
-                        );
-                      }
-                    },
-                  ),
+                        ),
                 ),
               ),
             ),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildFaceVerificationStep(BuildContext context) {
+    return BlocBuilder<AuthenticationBloc, AuthenticationState>(
+      builder: (context, state) {
+        final isLoadingState = state is SignUpnLoading || _isCreatingAccount;
+
+        return SingleChildScrollView(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const CategoryText(
+                text: "Face Verification",
+              ),
+              const SizedBox(height: 5),
+              const CategoryDescripText(
+                text:
+                    'Verify your identity by taking photos of your ID and a live selfie.',
+              ),
+              const SizedBox(height: 30),
+
+              // Instructions
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.blue[50],
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.blue[200]!),
+                ),
+                child: const Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "📸 Important Instructions:",
+                      style:
+                          TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                    ),
+                    SizedBox(height: 8),
+                    Text(
+                      "• Ensure good lighting\n"
+                      "• Hold your ID steady\n"
+                      "• Remove any covers/cases from ID\n"
+                      "• Take a clear, recent selfie\n"
+                      "• Face should be clearly visible",
+                      style: TextStyle(fontSize: 12),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              const Text(
+                "Take Photos Using Camera",
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+              ),
+              const SizedBox(height: 16),
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Column(
+                    children: [
+                      GestureDetector(
+                        onTap: (isFaceMatched || isLoadingState)
+                            ? null
+                            : () => _showCameraOptions(true),
+                        child: Container(
+                          width: 140,
+                          height: 140,
+                          decoration: BoxDecoration(
+                            color: Colors.grey[100],
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: idImage != null
+                                  ? (isFaceMatched ? Colors.green : Colors.blue)
+                                  : Colors.grey[400]!,
+                              width: idImage != null ? 2 : 1,
+                            ),
+                          ),
+                          child: idImage != null
+                              ? ClipRRect(
+                                  borderRadius: BorderRadius.circular(12),
+                                  child:
+                                      Image.file(idImage!, fit: BoxFit.cover),
+                                )
+                              : const Center(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(Icons.credit_card,
+                                          size: 40, color: Colors.grey),
+                                      SizedBox(height: 8),
+                                      Text("Take ID Photo",
+                                          style: TextStyle(
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w500)),
+                                      SizedBox(height: 4),
+                                      Text("Tap to capture",
+                                          style: TextStyle(
+                                              fontSize: 10,
+                                              color: Colors.grey)),
+                                    ],
+                                  ),
+                                ),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        "Government ID",
+                        style: TextStyle(
+                            fontSize: 12,
+                            color: idImage != null
+                                ? (isFaceMatched ? Colors.green : Colors.blue)
+                                : Colors.black,
+                            fontWeight: idImage != null
+                                ? FontWeight.w600
+                                : FontWeight.normal),
+                      ),
+                    ],
+                  ),
+                  Column(
+                    children: [
+                      GestureDetector(
+                        onTap: (isFaceMatched || isLoadingState)
+                            ? null
+                            : () => _showCameraOptions(false),
+                        child: Container(
+                          width: 140,
+                          height: 140,
+                          decoration: BoxDecoration(
+                            color: Colors.grey[100],
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: selfieImage != null
+                                  ? (isFaceMatched ? Colors.green : Colors.blue)
+                                  : Colors.grey[400]!,
+                              width: selfieImage != null ? 2 : 1,
+                            ),
+                          ),
+                          child: selfieImage != null
+                              ? ClipRRect(
+                                  borderRadius: BorderRadius.circular(12),
+                                  child: Image.file(selfieImage!,
+                                      fit: BoxFit.cover),
+                                )
+                              : const Center(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(Icons.face,
+                                          size: 40, color: Colors.grey),
+                                      SizedBox(height: 8),
+                                      Text("Take Selfie",
+                                          style: TextStyle(
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w500)),
+                                      SizedBox(height: 4),
+                                      Text("Tap to capture",
+                                          style: TextStyle(
+                                              fontSize: 10,
+                                              color: Colors.grey)),
+                                    ],
+                                  ),
+                                ),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        "Live Selfie",
+                        style: TextStyle(
+                            fontSize: 12,
+                            color: selfieImage != null
+                                ? (isFaceMatched ? Colors.green : Colors.blue)
+                                : Colors.black,
+                            fontWeight: selfieImage != null
+                                ? FontWeight.w600
+                                : FontWeight.normal),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 20),
+
+              if (!isFaceMatched) ...[
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        onPressed: isLoadingState
+                            ? null
+                            : () => _showCameraOptions(true),
+                        icon: const Icon(Icons.credit_card, size: 16),
+                        label: const Text("ID Photo"),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blue[50],
+                          foregroundColor: Colors.blue[700],
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        onPressed: isLoadingState
+                            ? null
+                            : () => _showCameraOptions(false),
+                        icon: const Icon(Icons.face, size: 16),
+                        label: const Text("Selfie"),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blue[50],
+                          foregroundColor: Colors.blue[700],
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                Center(
+                  child: ElevatedButton(
+                    onPressed: (idImage != null &&
+                            selfieImage != null &&
+                            !isLoading &&
+                            !isLoadingState)
+                        ? verifyImages
+                        : null,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: widgetPricolor,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 32, vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(25),
+                      ),
+                    ),
+                    child: isLoading
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2,
+                            ),
+                          )
+                        : const Text(
+                            "Verify Identity",
+                            style: TextStyle(
+                                fontSize: 14, fontWeight: FontWeight.w600),
+                          ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+              ],
+
+              if (!isFaceMatched && resultText != null)
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.orange[50],
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: Colors.orange,
+                    ),
+                  ),
+                  child: Column(
+                    children: [
+                      const Icon(
+                        Icons.warning,
+                        color: Colors.orange,
+                        size: 32,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        resultText!,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.orange[800],
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      const Text(
+                        "Please retake photos and try again",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 12, color: Colors.grey),
+                      ),
+                    ],
+                  ),
+                ),
+
+              if (isFaceMatched)
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.green[50],
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.green),
+                  ),
+                  child: const Column(
+                    children: [
+                      Icon(
+                        Icons.verified_user,
+                        color: Colors.green,
+                        size: 40,
+                      ),
+                      SizedBox(height: 12),
+                      Text(
+                        "Identity Verified Successfully!",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.green,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      SizedBox(height: 8),
+                      Text(
+                        "Your identity has been verified. You can now create your account.",
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: Colors.green,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                ),
+
+              const SizedBox(height: 30),
+
+              GestureDetector(
+                onTap:
+                    (isFaceMatched && !isLoadingState) ? _createAccount : null,
+                child: Container(
+                  height: 55,
+                  margin: const EdgeInsets.only(bottom: 30),
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: (isFaceMatched && !isLoadingState)
+                        ? widgetPricolor
+                        : Colors.grey[400],
+                    borderRadius: BorderRadius.circular(25),
+                    boxShadow: (isFaceMatched && !isLoadingState)
+                        ? [
+                            BoxShadow(
+                              color: widgetPricolor.withOpacity(0.3),
+                              blurRadius: 8,
+                              offset: const Offset(0, 4),
+                            )
+                          ]
+                        : null,
+                  ),
+                  child: Center(
+                    child: _buildAccountButtonContent(),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _showCameraOptions(bool isID) async {
+    await showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return SingleChildScrollView(
+          child: Container(
+            color: Colors.white,
+            width: double.infinity,
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Center(
+                  child: Container(
+                    width: 50,
+                    height: 5,
+                    decoration: BoxDecoration(
+                      color: widgetPricolor.withOpacity(0.5),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 30.0),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.pop(context);
+                    _takePhotoWithCamera(isID);
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      color: Colors.white,
+                    ),
+                    height: 50,
+                    width: double.infinity,
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        const SizedBox(width: 10),
+                        Container(
+                          padding: const EdgeInsets.all(8.0),
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Color.fromARGB(255, 245, 245, 245),
+                          ),
+                          child: const Icon(
+                            size: 24,
+                            Icons.camera_alt,
+                            color: widgetPricolor,
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Text(
+                          'Take ${isID ? 'ID' : 'Selfie'} Photo',
+                          style: const TextStyle(
+                            fontSize: 13,
+                            color: textColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 15.0),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.pop(context);
+                    pickImage(isID);
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      color: Colors.white,
+                    ),
+                    height: 50,
+                    width: double.infinity,
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        const SizedBox(width: 10),
+                        Container(
+                          padding: const EdgeInsets.all(8.0),
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Color.fromARGB(255, 245, 245, 245),
+                          ),
+                          child: const Icon(
+                            size: 24,
+                            Icons.photo_library,
+                            color: widgetPricolor,
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Text(
+                          'Choose ${isID ? 'ID' : 'Selfie'} from Gallery',
+                          style: const TextStyle(
+                            fontSize: 13,
+                            color: textColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 25.0),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _takePhotoWithCamera(bool isID) async {
+    final picked = await picker.pickImage(
+      source: ImageSource.camera,
+      preferredCameraDevice: isID ? CameraDevice.rear : CameraDevice.front,
+      maxWidth: 1920,
+      maxHeight: 1080,
+      imageQuality: 90,
+    );
+
+    if (picked != null) {
+      setState(() {
+        if (isID) {
+          idImage = File(picked.path);
+        } else {
+          selfieImage = File(picked.path);
+        }
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content:
+              Text('${isID ? 'ID' : 'Selfie'} photo captured successfully'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    }
+  }
+
+  void _createAccount() async {
+    final signupBloc = context.read<AuthenticationBloc>();
+    final currentState = signupBloc.state;
+
+    if (currentState is SignUpnLoading || _isCreatingAccount) return;
+
+    final agreed = await _showTermsDialog(context);
+    if (agreed != true) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("You must agree to continue.")),
+      );
+      return;
+    }
+
+    try {
+      setState(() {
+        _isCreatingAccount = true;
+        _isButtonDisabled = true;
+      });
+
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+
+      signupBloc.add(UserSignUpEvent(
+        username: usernameController.text,
+        email: emailController.text,
+        password: passwordController.text,
+        address: addressController.text,
+        age: int.tryParse(ageController.text) ?? 18,
+        firstname: firstNameController.text,
+        lastname: lastNameController.text,
+        isAdmin: false,
+        isGirl: true,
+        isVerified: true,
+        latitude: position.latitude,
+        longitude: position.longitude,
+      ));
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Failed to get location: ${e.toString()}")),
+      );
+      setState(() {
+        _isCreatingAccount = false;
+        _isButtonDisabled = false;
+      });
+    }
+  }
+
+  Widget _buildAccountButtonContent() {
+    return BlocBuilder<AuthenticationBloc, AuthenticationState>(
+      builder: (context, state) {
+        final isLoading = state is SignUpnLoading || _isCreatingAccount;
+
+        if (isLoading) {
+          return const SizedBox(
+            height: 20,
+            width: 20,
+            child: CircularProgressIndicator(
+              color: Colors.white,
+              strokeWidth: 2,
+            ),
+          );
+        } else {
+          return const Text(
+            'Create Account',
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.white,
+              fontWeight: FontWeight.w600,
+            ),
+          );
+        }
+      },
     );
   }
 }
