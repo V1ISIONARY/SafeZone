@@ -3,26 +3,27 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:safezone/backend/architecture/bloc/notificationBloc/notification_bloc.dart';
 import 'package:safezone/backend/architecture/bloc/notificationBloc/notification_event.dart';
 import 'package:safezone/backend/architecture/bloc/notificationBloc/notification_state.dart';
+import 'package:safezone/frontend/platforms/desktop/pages/content/notification/center/read.dart';
 import 'package:safezone/frontend/platforms/mobile/widgets/loading/shimmer_loading.dart';
 import 'package:safezone/resource/schema/colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:safezone/backend/models/userModel/notifications_model.dart';
 
-class All extends StatefulWidget {
+class Sosread extends StatefulWidget {
   final String userToken;
   final Function(NotificationModel) onOpenNotification;
 
-  const All({
+  const Sosread({
     super.key,
     required this.userToken,
     required this.onOpenNotification,
   });
 
   @override
-  State<All> createState() => _AllState();
+  State<Read> createState() => _ReadState();
 }
 
-class _AllState extends State<All> {
+class _ReadState extends State<Read> {
   List<NotificationModel> notifications = [];
   int userId = 0;
 
@@ -68,18 +69,26 @@ class _AllState extends State<All> {
   }
 
   Widget _buildNotificationList() {
+    // 🔥 Filter only SOS notifications
+    final sosNotifications =
+        notifications.where((n) => n.type.toUpperCase() == 'SOS').toList();
+
+    if (sosNotifications.isEmpty) {
+      return _buildNoSOSPlaceholder();
+    }
+
     return Container(
       margin: const EdgeInsets.only(bottom: 30.0),
       child: ListView.builder(
-        itemCount: notifications.length,
+        itemCount: sosNotifications.length,
         itemBuilder: (context, index) {
-          final notification = notifications[index];
+          final notification = sosNotifications[index];
           return GestureDetector(
             onTap: () {
               widget.onOpenNotification(notification);
               if (!notification.isRead) {
                 setState(() {
-                  notifications[index] = notification.copyWith(isRead: true);
+                  sosNotifications[index] = notification.copyWith(isRead: true);
                 });
                 context.read<NotificationBloc>().add(
                       MarkNotificationAsRead(notification.id),
@@ -114,9 +123,10 @@ class _AllState extends State<All> {
                         ),
                       ),
                       child: Icon(
-                        Icons.notifications,
-                        color:
-                            notification.isRead ? Colors.grey : widgetPricolor,
+                        Icons.warning_amber_rounded,
+                        color: notification.isRead
+                            ? Colors.grey
+                            : Colors.redAccent,
                       ),
                     ),
                     const SizedBox(width: 16),
@@ -127,7 +137,7 @@ class _AllState extends State<All> {
                           Text(
                             notification.title,
                             style: const TextStyle(
-                              fontWeight: FontWeight.w500,
+                              fontWeight: FontWeight.w600,
                               color: Colors.black,
                               fontSize: 13,
                             ),
@@ -157,6 +167,39 @@ class _AllState extends State<All> {
             ),
           );
         },
+      ),
+    );
+  }
+
+  Widget _buildNoSOSPlaceholder() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Image.asset(
+            'lib/resource/image/png/notif1.png',
+            width: 150,
+            height: 150,
+          ),
+          const SizedBox(height: 10),
+          const Text(
+            'No SOS Notifications',
+            style: TextStyle(
+              color: Colors.black,
+              fontSize: 15,
+              fontWeight: FontWeight.w500,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const Text(
+            'You currently have no SOS alerts.',
+            style: TextStyle(
+              color: Colors.black54,
+              fontSize: 10,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
       ),
     );
   }

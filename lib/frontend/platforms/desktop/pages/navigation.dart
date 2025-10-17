@@ -887,7 +887,7 @@ class _NavigationDTState extends State<NavigationDT>
                                       ),
                                       Sidenav(
                                         icon: Icons.error_outline,
-                                        label: 'Reports And SOS Alerts',
+                                        label: 'SOS Alerts',
                                         dropleftPage: true,
                                         onTap: () {
                                           setState(() {

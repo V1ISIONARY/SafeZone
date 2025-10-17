@@ -351,6 +351,7 @@ class _AdminInitialScreenState extends State<AdminInitialScreen>
                             print(
                                 "Current width: ${constraints.maxWidth}, useColumn: $useColumn");
 
+                            // 🎨 Define consistent colors for each incident type
                             List<Color> colors = [
                               Colors.blue,
                               Colors.red,
@@ -363,34 +364,63 @@ class _AdminInitialScreenState extends State<AdminInitialScreen>
                               Colors.grey,
                             ];
 
-                            // ✅ Create multiple line sets, one per report type
-                            List<LineChartBarData> lineBars = [];
+                            // ✅ Prepare Bar Groups (one per report type)
+                            List<BarChartGroupData> barGroups = [];
                             for (int i = 0; i < _reportTypes.length; i++) {
                               String type = _reportTypes[i];
                               double count =
                                   (reportCounts[type] ?? 0).toDouble();
 
-                              lineBars.add(
-                                LineChartBarData(
-                                  spots: [
-                                    FlSpot(i.toDouble(), count),
+                              barGroups.add(
+                                BarChartGroupData(
+                                  x: i,
+                                  barRods: [
+                                    BarChartRodData(
+                                      toY: count,
+                                      color: colors[i % colors.length],
+                                      width: 20,
+                                      borderRadius: BorderRadius.circular(4),
+                                    ),
                                   ],
-                                  isCurved: true,
-                                  color: colors[i % colors.length],
-                                  barWidth: 3,
-                                  dotData: FlDotData(show: true),
-                                  belowBarData: BarAreaData(show: false),
                                 ),
                               );
                             }
 
-                            final lineChartData = LineChartData(
-                              gridData: FlGridData(show: true),
-                              borderData: FlBorderData(show: true),
+                            // 📊 Bar Chart Data Setup
+                            final barChartData = BarChartData(
+                              alignment: BarChartAlignment.spaceAround,
+                              gridData: FlGridData(
+                                  show: true, drawVerticalLine: false),
+                              borderData: FlBorderData(
+                                show: true,
+                                border: const Border(
+                                  left: BorderSide(color: Colors.black12),
+                                  bottom: BorderSide(color: Colors.black12),
+                                ),
+                              ),
                               titlesData: FlTitlesData(
                                 bottomTitles: AxisTitles(
                                   sideTitles: SideTitles(
-                                      showTitles: false), // hide X labels
+                                    showTitles: true,
+                                    reservedSize: 30,
+                                    getTitlesWidget: (value, meta) {
+                                      int index = value.toInt();
+                                      if (index < 0 ||
+                                          index >= _reportTypes.length) {
+                                        return const SizedBox.shrink();
+                                      }
+                                      return Transform.rotate(
+                                        angle:
+                                            -0.5, // Tilt text slightly to prevent overlap
+                                        child: Text(
+                                          _reportTypes[index],
+                                          style: const TextStyle(
+                                              fontSize: 10,
+                                              color: Colors.black54),
+                                        ),
+                                      );
+                                    },
+                                  ),
                                 ),
                                 leftTitles: AxisTitles(
                                   sideTitles: SideTitles(
@@ -401,139 +431,118 @@ class _AdminInitialScreenState extends State<AdminInitialScreen>
                                 topTitles: AxisTitles(
                                     sideTitles: SideTitles(showTitles: false)),
                               ),
-                              // ✅ Tooltip for hover/tap
-                              lineTouchData: LineTouchData(
+                              barTouchData: BarTouchData(
                                 enabled: true,
-                                touchTooltipData: LineTouchTooltipData(
+                                touchTooltipData: BarTouchTooltipData(
                                   tooltipBgColor:
                                       Colors.black.withOpacity(0.75),
-                                  getTooltipItems: (touchedSpots) {
-                                    return touchedSpots
-                                        .map((touchedSpot) {
-                                          final index = touchedSpot.x.toInt();
-                                          if (index >= 0 &&
-                                              index < _reportTypes.length) {
-                                            final type = _reportTypes[index];
-                                            final count = touchedSpot.y.toInt();
-                                            return LineTooltipItem(
-                                              '$type\n$count Reports',
-                                              const TextStyle(
-                                                color: Colors.white,
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 12,
-                                              ),
-                                            );
-                                          }
-                                          return null;
-                                        })
-                                        .whereType<LineTooltipItem>()
-                                        .toList();
+                                  getTooltipItem:
+                                      (group, groupIndex, rod, rodIndex) {
+                                    final type = _reportTypes[group.x.toInt()];
+                                    final count = rod.toY.toInt();
+                                    return BarTooltipItem(
+                                      '$type\n$count Reports',
+                                      const TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 12,
+                                      ),
+                                    );
                                   },
                                 ),
                               ),
-                              lineBarsData: lineBars,
+                              barGroups: barGroups,
                             );
 
+                            // 🧩 Layout: Responsive (Column for narrow screens)
                             return Container(
                               height: useColumn ? 520 : 350,
                               color: Colors.green.withOpacity(0.05),
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 0),
+                              padding: const EdgeInsets.all(16),
                               child: useColumn
                                   ? Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
+                                        // Chart
                                         Expanded(
-                                          child: Container(
-                                            height: 200,
-                                            width: double.infinity,
-                                            child: LineChart(lineChartData),
-                                          ),
+                                          child: BarChart(barChartData),
                                         ),
                                         const SizedBox(height: 20),
-                                        // ✅ Legend below the chart
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 20),
-                                          child: Wrap(
-                                            spacing: 8,
-                                            runSpacing: 8,
-                                            children: _reportTypes
-                                                .asMap()
-                                                .entries
-                                                .map((entry) {
-                                              int index = entry.key;
-                                              String type = entry.value;
-                                              int count =
-                                                  reportCounts[type] ?? 0;
-                                              double percentage =
-                                                  totalIncidentReports == 0
-                                                      ? 0
-                                                      : (count /
-                                                              totalIncidentReports) *
-                                                          100;
 
-                                              return Container(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                        horizontal: 12,
-                                                        vertical: 6),
-                                                decoration: BoxDecoration(
+                                        // Legend Below Chart
+                                        Wrap(
+                                          spacing: 8,
+                                          runSpacing: 8,
+                                          children: _reportTypes
+                                              .asMap()
+                                              .entries
+                                              .map((entry) {
+                                            int index = entry.key;
+                                            String type = entry.value;
+                                            int count = reportCounts[type] ?? 0;
+
+                                            return Container(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 12,
+                                                      vertical: 6),
+                                              decoration: BoxDecoration(
+                                                color: colors[
+                                                        index % colors.length]
+                                                    .withOpacity(0.1),
+                                                borderRadius:
+                                                    BorderRadius.circular(16),
+                                                border: Border.all(
                                                   color: colors[
                                                           index % colors.length]
-                                                      .withOpacity(0.1),
-                                                  borderRadius:
-                                                      BorderRadius.circular(16),
-                                                  border: Border.all(
-                                                    color: colors[index %
-                                                            colors.length]
-                                                        .withOpacity(0.3),
+                                                      .withOpacity(0.3),
+                                                ),
+                                              ),
+                                              child: Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  Container(
+                                                    width: 12,
+                                                    height: 12,
+                                                    decoration: BoxDecoration(
+                                                      color: colors[index %
+                                                          colors.length],
+                                                      shape: BoxShape.circle,
+                                                    ),
                                                   ),
-                                                ),
-                                                child: Row(
-                                                  mainAxisSize:
-                                                      MainAxisSize.min,
-                                                  children: [
-                                                    Container(
-                                                      width: 12,
-                                                      height: 12,
-                                                      decoration: BoxDecoration(
-                                                        color: colors[index %
-                                                            colors.length],
-                                                        shape: BoxShape.circle,
-                                                      ),
+                                                  const SizedBox(width: 6),
+                                                  Text(
+                                                    '$type ($count)',
+                                                    style: TextStyle(
+                                                      fontSize: 10,
+                                                      color: Colors.grey[700],
+                                                      fontWeight:
+                                                          FontWeight.w500,
                                                     ),
-                                                    const SizedBox(width: 6),
-                                                    Text(
-                                                      '$type (${percentage.toStringAsFixed(1)}%)',
-                                                      style: TextStyle(
-                                                        fontSize: 10,
-                                                        color: Colors.grey[700],
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              );
-                                            }).toList(),
-                                          ),
+                                                  ),
+                                                ],
+                                              ),
+                                            );
+                                          }).toList(),
                                         ),
-                                        const SizedBox(height: 20),
                                       ],
                                     )
                                   : Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
-                                        Container(
-                                          height: 200,
-                                          width: 500,
-                                          child: LineChart(lineChartData),
-                                        ),
+                                        // Chart
                                         Expanded(
-                                          child: Container(
-                                            padding: const EdgeInsets.only(
-                                                right: 30),
+                                          flex: 3,
+                                          child: BarChart(barChartData),
+                                        ),
+                                        // Legend beside chart
+                                        Expanded(
+                                          flex: 2,
+                                          child: Padding(
+                                            padding:
+                                                const EdgeInsets.only(left: 10),
                                             child: Wrap(
                                               spacing: 8,
                                               runSpacing: 8,
@@ -545,12 +554,6 @@ class _AdminInitialScreenState extends State<AdminInitialScreen>
                                                 String type = entry.value;
                                                 int count =
                                                     reportCounts[type] ?? 0;
-                                                double percentage =
-                                                    totalIncidentReports == 0
-                                                        ? 0
-                                                        : (count /
-                                                                totalIncidentReports) *
-                                                            100;
 
                                                 return Container(
                                                   padding: const EdgeInsets
@@ -587,7 +590,7 @@ class _AdminInitialScreenState extends State<AdminInitialScreen>
                                                       ),
                                                       const SizedBox(width: 6),
                                                       Text(
-                                                        '$type (${percentage.toStringAsFixed(1)}%)',
+                                                        '$type ($count)',
                                                         style: TextStyle(
                                                           fontSize: 10,
                                                           color:
@@ -607,7 +610,7 @@ class _AdminInitialScreenState extends State<AdminInitialScreen>
                                     ),
                             );
                           },
-                        ),
+                        )
                       ],
                     ),
                   ),

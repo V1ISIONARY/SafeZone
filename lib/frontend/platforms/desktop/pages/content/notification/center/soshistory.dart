@@ -5,32 +5,35 @@ import 'package:safezone/backend/architecture/bloc/notificationBloc/notification
 import 'package:safezone/backend/architecture/bloc/notificationBloc/notification_state.dart';
 import 'package:safezone/frontend/platforms/mobile/widgets/loading/shimmer_loading.dart';
 import 'package:safezone/resource/schema/colors.dart';
-import 'package:safezone/resource/schema/texts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:safezone/backend/models/userModel/notifications_model.dart';
 
 class Soshistory extends StatefulWidget {
+  final VoidCallback? onClose;
   final String userToken;
   final Function(NotificationModel) onOpenNotification;
-  final VoidCallback? onClose;
 
-  const Soshistory(
-      {super.key,
-      required this.userToken,
-      required this.onOpenNotification,
-      this.onClose});
+  const Soshistory({
+    super.key,
+    required this.onClose,
+    required this.userToken,
+    required this.onOpenNotification,
+  });
 
   @override
   State<Soshistory> createState() => _SoshistoryState();
 }
 
-class _SoshistoryState extends State<Soshistory> {
-  List<NotificationModel> notifications = [];
+class _SoshistoryState extends State<Soshistory>
+    with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+  List<NotificationModel> allNotifications = [];
   int userId = 0;
 
   @override
   void initState() {
     super.initState();
+    _tabController = TabController(length: 3, vsync: this);
     _fetchUserIdAndNotifications();
   }
 
@@ -42,37 +45,22 @@ class _SoshistoryState extends State<Soshistory> {
     }
   }
 
+  List<NotificationModel> _filterNotifications(String category) {
+    switch (category) {
+      case 'Unread':
+        return allNotifications.where((n) => !n.isRead).toList();
+      case 'Read':
+        return allNotifications.where((n) => n.isRead).toList();
+      case 'All':
+      default:
+        return allNotifications;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        automaticallyImplyLeading: false,
-        centerTitle: false,
-        title: Transform.translate(
-            offset: const Offset(-15, 0),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: const CategoryText(text: "Sos Alerts"),
-            )),
-        actions: [
-          GestureDetector(
-              onTap: () {
-                if (widget.onClose != null) {
-                  widget.onClose!();
-                }
-              },
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: const Icon(
-                  Icons.cancel_outlined,
-                  size: 20,
-                  color: Colors.black38,
-                ),
-              )),
-        ],
-      ),
       body: BlocBuilder<NotificationBloc, NotificationState>(
         builder: (context, state) {
           if (state is NotificationLoading) {
@@ -85,10 +73,39 @@ class _SoshistoryState extends State<Soshistory> {
           } else if (state is NotificationUpdated) {
             _fetchUserIdAndNotifications();
           } else if (state is NotificationLoaded) {
-            notifications = state.notifications;
-            return notifications.isNotEmpty
-                ? _buildNotificationList()
-                : _buildPlaceholder();
+            // ✅ Only SOS notifications
+            allNotifications = state.notifications
+                .where((n) => n.type.toLowerCase() == "sos")
+                .toList();
+
+            if (allNotifications.isEmpty) return _buildPlaceholder();
+
+            return Column(
+              children: [
+                TabBar(
+                  controller: _tabController,
+                  indicatorColor: widgetPricolor,
+                  labelColor: Colors.black,
+                  labelStyle: const TextStyle(fontSize: 12),
+                  tabs: const [
+                    Tab(text: "All"),
+                    Tab(text: "Unread"),
+                    Tab(text: "Read"),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                Expanded(
+                  child: TabBarView(
+                    controller: _tabController,
+                    children: [
+                      _buildNotificationList("All"),
+                      _buildNotificationList("Unread"),
+                      _buildNotificationList("Read"),
+                    ],
+                  ),
+                ),
+              ],
+            );
           }
           return _buildPlaceholder();
         },
@@ -96,96 +113,108 @@ class _SoshistoryState extends State<Soshistory> {
     );
   }
 
-  Widget _buildNotificationList() {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 30.0),
-      child: ListView.builder(
-        itemCount: notifications.length,
-        itemBuilder: (context, index) {
-          final notification = notifications[index];
-          return GestureDetector(
-            onTap: () {
-              widget.onOpenNotification(notification);
-              if (!notification.isRead) {
-                setState(() {
-                  notifications[index] = notification.copyWith(isRead: true);
-                });
-                context.read<NotificationBloc>().add(
-                      MarkNotificationAsRead(notification.id),
-                    );
-              }
-            },
-            child: Container(
-              width: double.infinity,
-              margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-              decoration: BoxDecoration(
-                color: notification.isRead
-                    ? Colors.transparent
-                    : const Color.fromARGB(10, 0, 0, 0),
-                borderRadius: BorderRadius.circular(5),
-              ),
-              child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.white,
-                        border: Border.all(
-                          color: notification.isRead
-                              ? const Color.fromARGB(44, 0, 0, 0)
-                              : Colors.transparent,
-                          width: notification.isRead ? 1 : 0,
+  Widget _buildNotificationList(String category) {
+    final filtered = _filterNotifications(category);
+    if (filtered.isEmpty) {
+      return _buildEmptyTab(category);
+    }
+
+    return ListView.builder(
+      itemCount: filtered.length,
+      itemBuilder: (context, index) {
+        final notification = filtered[index];
+        return GestureDetector(
+          onTap: () {
+            widget.onOpenNotification(notification);
+            if (!notification.isRead) {
+              setState(() {
+                filtered[index] = notification.copyWith(isRead: true);
+              });
+              context
+                  .read<NotificationBloc>()
+                  .add(MarkNotificationAsRead(notification.id));
+            }
+          },
+          child: Container(
+            width: double.infinity,
+            margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+            decoration: BoxDecoration(
+              color: notification.isRead
+                  ? Colors.transparent
+                  : const Color.fromARGB(10, 255, 0, 0), // 🔴 Light red tint
+              borderRadius: BorderRadius.circular(5),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Row(
+                children: [
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white,
+                      border: Border.all(
+                        color: notification.isRead
+                            ? const Color.fromARGB(44, 0, 0, 0)
+                            : Colors.redAccent,
+                        width: notification.isRead ? 1 : 2,
+                      ),
+                    ),
+                    child: Icon(
+                      Icons.emergency_outlined,
+                      color:
+                          notification.isRead ? Colors.grey : Colors.redAccent,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          notification.title,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: notification.isRead
+                                ? Colors.black87
+                                : Colors.redAccent,
+                            fontSize: 13,
+                          ),
                         ),
-                      ),
-                      child: Icon(
-                        Icons.notifications,
-                        color:
-                            notification.isRead ? Colors.grey : widgetPricolor,
-                      ),
+                        const SizedBox(height: 4),
+                        Text(
+                          notification.message,
+                          style: const TextStyle(
+                            color: labelFormFieldColor,
+                            fontSize: 10,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          notification.createdAt,
+                          style: const TextStyle(
+                            color: Color.fromARGB(132, 92, 92, 92),
+                            fontSize: 10,
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            notification.title,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w500,
-                              color: Colors.black,
-                              fontSize: 13,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            notification.message,
-                            style: const TextStyle(
-                              color: labelFormFieldColor,
-                              fontSize: 10,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            notification.createdAt,
-                            style: const TextStyle(
-                              color: Color.fromARGB(132, 92, 92, 92),
-                              fontSize: 10,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
-          );
-        },
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildEmptyTab(String category) {
+    return Center(
+      child: Text(
+        "No $category SOS notifications.",
+        style: const TextStyle(color: Colors.black54, fontSize: 12),
       ),
     );
   }
@@ -204,7 +233,7 @@ class _SoshistoryState extends State<Soshistory> {
                 ),
                 const SizedBox(height: 10),
                 const Text(
-                  'Empty Notification',
+                  'No SOS Alerts',
                   style: TextStyle(
                     color: Colors.black,
                     fontSize: 15,
@@ -212,7 +241,7 @@ class _SoshistoryState extends State<Soshistory> {
                   textAlign: TextAlign.center,
                 ),
                 const Text(
-                  'There are no new notifications, check back later.',
+                  'You currently have no SOS-type notifications.',
                   style: TextStyle(
                     color: Colors.black54,
                     fontSize: 9,
