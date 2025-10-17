@@ -29,7 +29,11 @@ class _NotifState extends State<Notif> with TickerProviderStateMixin {
   late List<Widget> topLevelPages;
 
   late TabController _tabController;
-  final List<String> _categories = ['All', 'Read', 'Unread', 'SOS History']
+  // final List<String> _categories = ['All', 'Read', 'Unread', 'SOS History']
+  //     .map((category) => category[0].toUpperCase() + category.substring(1))
+  //     .toList();
+
+  final List<String> _categories = ['All', 'Read', 'Unread']
       .map((category) => category[0].toUpperCase() + category.substring(1))
       .toList();
 
@@ -47,8 +51,8 @@ class _NotifState extends State<Notif> with TickerProviderStateMixin {
         return [Read(userToken: widget.UserToken)];
       case 'Unread':
         return [Unread(userToken: widget.UserToken)];
-      case 'SOS History':
-        return [Soshistory(userToken: widget.UserToken)];
+      // case 'SOS History':
+      //   return [Soshistory(userToken: widget.UserToken)];
       case 'All':
       default:
         return [All(userToken: widget.UserToken)];

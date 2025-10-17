@@ -284,13 +284,12 @@ class _AdminSafezoneDetailsState extends State<AdminSafezoneDetails> {
                                   ),
                                 ),
                                 Container(
-                                  height: 20,
-                                  width: 20,
-                                  child: Icon(
-                                    Icons.chevron_right_outlined,
-                                    color: Colors.grey[500],
-                                  )
-                                ),
+                                    height: 20,
+                                    width: 20,
+                                    child: Icon(
+                                      Icons.chevron_right_outlined,
+                                      color: Colors.grey[500],
+                                    )),
                               ],
                             ),
                           ),

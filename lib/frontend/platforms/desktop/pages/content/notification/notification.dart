@@ -11,7 +11,8 @@ import 'package:safezone/frontend/platforms/desktop/widget/button/horizontalBtn.
 import 'package:safezone/backend/properties/import.dart';
 import 'package:safezone/resource/schema/colors.dart';
 import 'package:safezone/resource/schema/texts.dart';
-import 'package:safezone/backend/models/userModel/notifications_model.dart' as user_notif;
+import 'package:safezone/backend/models/userModel/notifications_model.dart'
+    as user_notif;
 import 'package:safezone/frontend/platforms/desktop/pages/content/notification/center/notification_details.dart';
 
 class NotificationDT extends StatefulWidget {
@@ -38,7 +39,8 @@ class _NotificationDTState extends State<NotificationDT>
   late Animation<double> _animation;
   late PageController pageController;
   late TabController _tabController;
-  final List<String> _categories = ['All', 'Read', 'Unread', 'SOS History'];
+  // final List<String> _categories = ['All', 'Read', 'Unread', 'SOS History'];
+  final List<String> _categories = ['All', 'Read', 'Unread'];
   String? selectedInternalPage;
   late user_notif.NotificationModel notificationModel;
 
@@ -114,18 +116,18 @@ class _NotificationDTState extends State<NotificationDT>
             },
           )
         ];
-      case 'SOS History':
-        return [
-          Soshistory(
-            userToken: widget.UserToken,
-            onOpenNotification: (notif) {
-              setState(() {
-                selectedInternalPage = "Notifications";
-                notificationModel = notif;
-              });
-            },
-          )
-        ];
+      // case 'SOS History':
+      //   return [
+      //     Soshistory(
+      //       userToken: widget.UserToken,
+      //       onOpenNotification: (notif) {
+      //         setState(() {
+      //           selectedInternalPage = "Notifications";
+      //           notificationModel = notif;
+      //         });
+      //       },
+      //     )
+      //   ];
       case 'All':
       default:
         return [

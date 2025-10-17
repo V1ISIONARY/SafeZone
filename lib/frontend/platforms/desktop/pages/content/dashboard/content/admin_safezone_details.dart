@@ -46,14 +46,26 @@ class _AdminSafezoneDetailsState extends State<AdminSafezoneDetails> {
           backgroundColor: Colors.white,
           actions: <Widget>[
             TextButton(
-              style: TextButton.styleFrom(foregroundColor: Colors.black),
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.grey[700],
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              ),
               child: const Text('Cancel'),
               onPressed: () {
                 Navigator.of(context).pop(); // Dismiss the dialog
               },
             ),
-            TextButton(
-              style: TextButton.styleFrom(foregroundColor: Colors.black),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: _getActionColor(action),
+                foregroundColor: Colors.white,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
               child: Text(action[0].toUpperCase() + action.substring(1)),
               onPressed: () {
                 onConfirm(); // Call the action function
@@ -64,6 +76,19 @@ class _AdminSafezoneDetailsState extends State<AdminSafezoneDetails> {
         );
       },
     );
+  }
+
+  Color _getActionColor(String action) {
+    switch (action.toLowerCase()) {
+      case 'verify':
+        return const Color.fromARGB(255, 76, 175, 80);
+      case 'reject':
+        return const Color.fromARGB(255, 244, 67, 54);
+      case 'review':
+        return const Color.fromARGB(255, 33, 150, 243);
+      default:
+        return const Color.fromARGB(255, 33, 150, 243);
+    }
   }
 
   Gradient statusGradient(String status) {
@@ -545,116 +570,65 @@ class _AdminSafezoneDetailsState extends State<AdminSafezoneDetails> {
                       const SizedBox(
                         height: 20,
                       ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: ElevatedButton.icon(
-                              onPressed: () {
-                                _showConfirmationDialog('review', () {
-                                  print(
-                                      "Review button pressed for ID: ${widget.safezonemodel.id}");
-                                  safeZoneAdminBloc.add(
-                                      ReviewSafeZone(widget.safezonemodel.id!));
-                                });
-                              },
-                              icon: const Icon(
-                                Icons.timelapse,
-                                color: Color.fromARGB(171, 73, 87, 124),
-                              ),
-                              label: const Text(
-                                "Review",
-                                style:
-                                    TextStyle(fontSize: 13, color: textColor),
-                              ),
-                              style: ElevatedButton.styleFrom(
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: _ActionButton(
+                                onPressed: () {
+                                  _showConfirmationDialog('review', () {
+                                    print(
+                                        "Review button pressed for ID: ${widget.safezonemodel.id}");
+                                    safeZoneAdminBloc.add(ReviewSafeZone(
+                                        widget.safezonemodel.id!));
+                                  });
+                                },
+                                icon: Icons.timelapse,
+                                label: "Review",
                                 backgroundColor:
-                                    const Color.fromARGB(37, 94, 98, 117),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(7),
-                                  side: const BorderSide(
-                                    color: Color.fromARGB(126, 94, 100, 117),
-                                    width: 1,
-                                  ),
-                                ),
-                                padding: const EdgeInsets.all(15),
-                                alignment: Alignment.centerLeft,
+                                    const Color.fromARGB(255, 33, 150, 243),
+                                iconColor: Colors.white,
                               ),
                             ),
-                          ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: ElevatedButton.icon(
-                              onPressed: () {
-                                _showConfirmationDialog('verify', () {
-                                  print(
-                                      "Verify button pressed for ID: ${widget.safezonemodel.id}");
-                                  safeZoneAdminBloc.add(
-                                      VerifySafeZone(widget.safezonemodel.id!));
-                                });
-                              },
-                              icon: const Icon(
-                                Icons.check_circle,
-                                color: Color.fromARGB(179, 81, 116, 99),
-                              ),
-                              label: const Text(
-                                "Verify",
-                                style:
-                                    TextStyle(fontSize: 13, color: textColor),
-                              ),
-                              style: ElevatedButton.styleFrom(
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: _ActionButton(
+                                onPressed: () {
+                                  _showConfirmationDialog('verify', () {
+                                    print(
+                                        "Verify button pressed for ID: ${widget.safezonemodel.id}");
+                                    safeZoneAdminBloc.add(VerifySafeZone(
+                                        widget.safezonemodel.id!));
+                                  });
+                                },
+                                icon: Icons.check_circle,
+                                label: "Verify",
                                 backgroundColor:
-                                    const Color.fromARGB(38, 94, 117, 106),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(7),
-                                  side: const BorderSide(
-                                    color: Color.fromARGB(127, 94, 117, 106),
-                                    width: 1,
-                                  ),
-                                ),
-                                padding: const EdgeInsets.all(15),
-                                alignment: Alignment.centerLeft,
+                                    const Color.fromARGB(255, 76, 175, 80),
+                                iconColor: Colors.white,
                               ),
                             ),
-                          ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: ElevatedButton.icon(
-                              onPressed: () {
-                                _showConfirmationDialog('reject', () {
-                                  print(
-                                      "Reject button pressed for ID: ${widget.safezonemodel.id}");
-                                  safeZoneAdminBloc.add(
-                                      RejectSafeZone(widget.safezonemodel.id!));
-                                });
-                              },
-                              icon: const Icon(
-                                Icons.cancel,
-                                color: Color.fromARGB(197, 133, 97, 94),
-                              ),
-                              label: const Text(
-                                "Reject",
-                                style:
-                                    TextStyle(fontSize: 13, color: textColor),
-                              ),
-                              style: ElevatedButton.styleFrom(
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: _ActionButton(
+                                onPressed: () {
+                                  _showConfirmationDialog('reject', () {
+                                    print(
+                                        "Reject button pressed for ID: ${widget.safezonemodel.id}");
+                                    safeZoneAdminBloc.add(RejectSafeZone(
+                                        widget.safezonemodel.id!));
+                                  });
+                                },
+                                icon: Icons.cancel,
+                                label: "Reject",
                                 backgroundColor:
-                                    const Color.fromARGB(37, 117, 94, 94),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(7),
-                                  side: const BorderSide(
-                                    color: Color.fromARGB(126, 117, 96, 94),
-                                    width: 1,
-                                  ),
-                                ),
-                                padding: const EdgeInsets.all(15),
-                                alignment: Alignment.centerLeft,
+                                    const Color.fromARGB(255, 244, 67, 54),
+                                iconColor: Colors.white,
                               ),
                             ),
-                          ),
-                          const SizedBox(width: 10),
-                        ],
+                          ],
+                        ),
                       ),
                       const SizedBox(
                         height: 50,
@@ -665,5 +639,58 @@ class _AdminSafezoneDetailsState extends State<AdminSafezoneDetails> {
               }),
             ));
     }
+  }
+}
+
+class _ActionButton extends StatelessWidget {
+  final VoidCallback onPressed;
+  final IconData icon;
+  final String label;
+  final Color backgroundColor;
+  final Color iconColor;
+
+  const _ActionButton({
+    required this.onPressed,
+    required this.icon,
+    required this.label,
+    required this.backgroundColor,
+    required this.iconColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton(
+      onPressed: onPressed,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: backgroundColor,
+        foregroundColor: Colors.white,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        elevation: 2,
+        shadowColor: backgroundColor.withOpacity(0.3),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            icon,
+            size: 24,
+            color: iconColor,
+          ),
+          const SizedBox(height: 8),
+          Text(
+            label,
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: Colors.white,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
   }
 }

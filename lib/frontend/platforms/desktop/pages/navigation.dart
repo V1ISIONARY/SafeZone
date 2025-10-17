@@ -18,6 +18,7 @@ import 'package:safezone/frontend/platforms/desktop/pages/content/map/content/li
 import 'package:safezone/frontend/platforms/desktop/pages/content/map/content/marksafezone.dart';
 import 'package:safezone/frontend/platforms/desktop/pages/content/map/map.dart';
 import 'package:safezone/frontend/platforms/desktop/pages/content/map/mapheader.dart';
+import 'package:safezone/frontend/platforms/desktop/pages/content/notification/center/soshistory.dart';
 import 'package:safezone/frontend/platforms/desktop/pages/content/notification/notification.dart';
 import 'package:safezone/frontend/platforms/desktop/pages/content/settings/account_details.dart';
 import 'package:safezone/frontend/platforms/desktop/pages/content/settings/privacy.dart';
@@ -123,6 +124,17 @@ class _NavigationDTState extends State<NavigationDT>
           );
         case 3:
           return Privacy(
+            onClose: () {
+              setState(() {
+                showit = false;
+                Sidenav.selectedComsNotifier.value = null;
+              });
+            },
+          );
+        case 4:
+          return Soshistory(
+            userToken: widget.userToken,
+            onOpenNotification: (_) {},
             onClose: () {
               setState(() {
                 showit = false;
@@ -744,29 +756,6 @@ class _NavigationDTState extends State<NavigationDT>
                                           });
                                         },
                                       ),
-                                      sharedController.isSidebarCollapsed.value
-                                          ? Container(
-                                              margin:
-                                                  const EdgeInsets.symmetric(
-                                                      vertical: 10),
-                                              height: 1,
-                                              width: double.infinity,
-                                              color: Colors.black12,
-                                            )
-                                          : const Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                  SizedBox(height: 10),
-                                                  Text(
-                                                    'User Preference',
-                                                    style: TextStyle(
-                                                      color: Colors.black38,
-                                                      fontSize: 11,
-                                                    ),
-                                                  ),
-                                                  SizedBox(height: 10)
-                                                ]),
                                       // Sidenav(
                                       //   icon:
                                       //       Icons.private_connectivity_outlined,
@@ -778,66 +767,6 @@ class _NavigationDTState extends State<NavigationDT>
                                       //     });
                                       //   },
                                       // ),
-                                      Sidenav(
-                                        icon: Icons.settings_outlined,
-                                        label: 'Settings',
-                                        withDrop: true,
-                                        dropleftPage: true,
-                                        hoverTrailing: const [
-                                          Text(
-                                            'Alt',
-                                            style: TextStyle(
-                                                fontSize: 10,
-                                                color: Colors.black38),
-                                          ),
-                                          Icon(Icons.arrow_upward_outlined,
-                                              color: Colors.black38, size: 10),
-                                          Text('S',
-                                              style: TextStyle(
-                                                  fontSize: 10,
-                                                  color: Colors.black38)),
-                                        ],
-                                        dropdownItems: [
-                                          DropdownItem(
-                                            label: 'Account Details',
-                                            id: 'account_details',
-                                            onTap: () {
-                                              setState(() {
-                                                if (selectedComs == 2) {
-                                                  showit = !showit;
-                                                  Sidenav.selectedComsNotifier
-                                                          .value =
-                                                      showit ? 2 : null;
-                                                } else {
-                                                  showit = true;
-                                                  selectedComs = 2;
-                                                  Sidenav.selectedComsNotifier
-                                                      .value = 2;
-                                                }
-                                              });
-                                            },
-                                          ),
-                                          DropdownItem(
-                                            label: 'Privacy',
-                                            id: 'privacy',
-                                            onTap: () {
-                                              setState(() {
-                                                if (selectedComs == 3) {
-                                                  showit = !showit;
-                                                  Sidenav.selectedComsNotifier
-                                                          .value =
-                                                      showit ? 3 : null;
-                                                } else {
-                                                  showit = true;
-                                                  selectedComs = 3;
-                                                  Sidenav.selectedComsNotifier
-                                                      .value = 3;
-                                                }
-                                              });
-                                            },
-                                          ),
-                                        ],
-                                      ),
                                       sharedController.isSidebarCollapsed.value
                                           ? Container(
                                               margin:
@@ -863,8 +792,79 @@ class _NavigationDTState extends State<NavigationDT>
                                                 ]),
                                       Sidenav(
                                         icon: Icons.location_on_outlined,
-                                        label: 'SafeZone',
+                                        label: 'Safe Zone',
                                         dropleftPage: true,
+                                        onTap: () {
+                                          setState(() {
+                                            if (selectedDropdownIndex == 5) {
+                                              dropdown = !dropdown;
+                                            } else {
+                                              dropdown = true;
+                                              selectedDropdownIndex = 5;
+                                            }
+                                            _selectedPageIndex = 1;
+                                          });
+                                        },
+                                      ),
+                                      Sidenav(
+                                        icon: Icons.location_off_outlined,
+                                        label: 'Danger Zone',
+                                        dropleftPage: true,
+                                        onTap: () {
+                                          setState(() {
+                                            if (selectedDropdownIndex == 4) {
+                                              dropdown = !dropdown;
+                                            } else {
+                                              dropdown = true;
+                                              selectedDropdownIndex = 4;
+                                            }
+                                            _selectedPageIndex = 1;
+                                          });
+                                        },
+                                      ),
+                                      sharedController.isSidebarCollapsed.value
+                                          ? Container(
+                                              margin:
+                                                  const EdgeInsets.symmetric(
+                                                      vertical: 10),
+                                              height: 1,
+                                              width: double.infinity,
+                                              color: Colors.black12,
+                                            )
+                                          : const Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                  SizedBox(height: 10),
+                                                  Text(
+                                                    'Communication & Alerts',
+                                                    style: TextStyle(
+                                                      color: Colors.black38,
+                                                      fontSize: 11,
+                                                    ),
+                                                  ),
+                                                  SizedBox(height: 10)
+                                                ]),
+                                      Sidenav(
+                                        icon: Icons.notifications_outlined,
+                                        label: 'Notification',
+                                        dropleftPage: true,
+                                        hoverTrailing: const [
+                                          Text(
+                                            'Alt',
+                                            style: TextStyle(
+                                                fontSize: 10,
+                                                color: Colors.black38),
+                                          ),
+                                          Icon(Icons.arrow_upward_outlined,
+                                              color: Colors.black38, size: 10),
+                                          Text(
+                                            'A',
+                                            style: TextStyle(
+                                                fontSize: 10,
+                                                color: Colors.black38),
+                                          ),
+                                        ],
                                         onTap: () {
                                           setState(() {
                                             if (selectedComs == 0) {
@@ -886,25 +886,49 @@ class _NavigationDTState extends State<NavigationDT>
                                         },
                                       ),
                                       Sidenav(
-                                        icon: Icons.location_off_outlined,
-                                        label: 'DangerZone',
+                                        icon: Icons.error_outline,
+                                        label: 'Reports And SOS Alerts',
                                         dropleftPage: true,
                                         onTap: () {
                                           setState(() {
-                                            if (selectedComs == 0) {
+                                            if (selectedComs == 4) {
                                               showit = !showit;
                                               if (!showit) {
                                                 Sidenav.selectedComsNotifier
                                                     .value = null;
                                               } else {
                                                 Sidenav.selectedComsNotifier
-                                                    .value = 0;
+                                                    .value = 4;
                                               }
                                             } else {
                                               showit = true;
-                                              selectedComs = 0;
+                                              selectedComs = 4;
                                               Sidenav.selectedComsNotifier
-                                                  .value = 0;
+                                                  .value = 4;
+                                            }
+                                          });
+                                        },
+                                      ),
+                                      Sidenav(
+                                        icon: Icons.phone_outlined,
+                                        dropleftPage: true,
+                                        label: 'Contact',
+                                        onTap: () {
+                                          setState(() {
+                                            if (selectedComs == 1) {
+                                              showit = !showit;
+                                              if (!showit) {
+                                                Sidenav.selectedComsNotifier
+                                                    .value = null;
+                                              } else {
+                                                Sidenav.selectedComsNotifier
+                                                    .value = 1;
+                                              }
+                                            } else {
+                                              showit = true;
+                                              selectedComs = 1;
+                                              Sidenav.selectedComsNotifier
+                                                  .value = 1;
                                             }
                                           });
                                         },
@@ -992,117 +1016,6 @@ class _NavigationDTState extends State<NavigationDT>
                                             },
                                           ),
                                         ],
-                                      ),
-                                      sharedController.isSidebarCollapsed.value
-                                          ? Container(
-                                              margin:
-                                                  const EdgeInsets.symmetric(
-                                                      vertical: 10),
-                                              height: 1,
-                                              width: double.infinity,
-                                              color: Colors.black12,
-                                            )
-                                          : const Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                  SizedBox(height: 10),
-                                                  Text(
-                                                    'Communication & Alerts',
-                                                    style: TextStyle(
-                                                      color: Colors.black38,
-                                                      fontSize: 11,
-                                                    ),
-                                                  ),
-                                                  SizedBox(height: 10)
-                                                ]),
-                                      Sidenav(
-                                        icon: Icons.notifications_outlined,
-                                        label: 'Notification',
-                                        dropleftPage: true,
-                                        hoverTrailing: const [
-                                          Text(
-                                            'Alt',
-                                            style: TextStyle(
-                                                fontSize: 10,
-                                                color: Colors.black38),
-                                          ),
-                                          Icon(Icons.arrow_upward_outlined,
-                                              color: Colors.black38, size: 10),
-                                          Text(
-                                            'A',
-                                            style: TextStyle(
-                                                fontSize: 10,
-                                                color: Colors.black38),
-                                          ),
-                                        ],
-                                        onTap: () {
-                                          setState(() {
-                                            if (selectedComs == 0) {
-                                              showit = !showit;
-                                              if (!showit) {
-                                                Sidenav.selectedComsNotifier
-                                                    .value = null;
-                                              } else {
-                                                Sidenav.selectedComsNotifier
-                                                    .value = 0;
-                                              }
-                                            } else {
-                                              showit = true;
-                                              selectedComs = 0;
-                                              Sidenav.selectedComsNotifier
-                                                  .value = 0;
-                                            }
-                                          });
-                                        },
-                                      ),
-                                      Sidenav(
-                                        icon: Icons.error_outline,
-                                        label: 'Reports And SOS Alerts',
-                                        dropleftPage: true,
-                                        onTap: () {
-                                          setState(() {
-                                            if (selectedComs == 0) {
-                                              showit = !showit;
-                                              if (!showit) {
-                                                Sidenav.selectedComsNotifier
-                                                    .value = null;
-                                              } else {
-                                                Sidenav.selectedComsNotifier
-                                                    .value = 0;
-                                              }
-                                            } else {
-                                              showit = true;
-                                              selectedComs = 0;
-                                              Sidenav.selectedComsNotifier
-                                                  .value = 0;
-                                            }
-                                          });
-                                        },
-                                      ),
-                                      Sidenav(
-                                        icon: Icons.phone_outlined,
-                                        dropleftPage: true,
-                                        label: 'Contact',
-                                        onTap: () {
-                                          setState(() {
-                                            if (selectedComs == 1) {
-                                              showit = !showit;
-                                              if (!showit) {
-                                                Sidenav.selectedComsNotifier
-                                                    .value = null;
-                                              } else {
-                                                Sidenav.selectedComsNotifier
-                                                    .value = 1;
-                                              }
-                                            } else {
-                                              showit = true;
-                                              selectedComs = 1;
-                                              Sidenav.selectedComsNotifier
-                                                  .value = 1;
-                                            }
-                                          });
-                                        },
                                       ),
                                       sharedController.isSidebarCollapsed.value
                                           ? Container(

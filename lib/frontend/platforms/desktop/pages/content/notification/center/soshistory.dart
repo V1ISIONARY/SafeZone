@@ -5,18 +5,20 @@ import 'package:safezone/backend/architecture/bloc/notificationBloc/notification
 import 'package:safezone/backend/architecture/bloc/notificationBloc/notification_state.dart';
 import 'package:safezone/frontend/platforms/mobile/widgets/loading/shimmer_loading.dart';
 import 'package:safezone/resource/schema/colors.dart';
+import 'package:safezone/resource/schema/texts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:safezone/backend/models/userModel/notifications_model.dart';
 
 class Soshistory extends StatefulWidget {
   final String userToken;
   final Function(NotificationModel) onOpenNotification;
+  final VoidCallback? onClose;
 
-  const Soshistory({
-    super.key,
-    required this.userToken,
-    required this.onOpenNotification,
-  });
+  const Soshistory(
+      {super.key,
+      required this.userToken,
+      required this.onOpenNotification,
+      this.onClose});
 
   @override
   State<Soshistory> createState() => _SoshistoryState();
@@ -44,6 +46,33 @@ class _SoshistoryState extends State<Soshistory> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        automaticallyImplyLeading: false,
+        centerTitle: false,
+        title: Transform.translate(
+            offset: const Offset(-15, 0),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: const CategoryText(text: "Sos Alerts"),
+            )),
+        actions: [
+          GestureDetector(
+              onTap: () {
+                if (widget.onClose != null) {
+                  widget.onClose!();
+                }
+              },
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: const Icon(
+                  Icons.cancel_outlined,
+                  size: 20,
+                  color: Colors.black38,
+                ),
+              )),
+        ],
+      ),
       body: BlocBuilder<NotificationBloc, NotificationState>(
         builder: (context, state) {
           if (state is NotificationLoading) {
@@ -82,8 +111,8 @@ class _SoshistoryState extends State<Soshistory> {
                   notifications[index] = notification.copyWith(isRead: true);
                 });
                 context.read<NotificationBloc>().add(
-                  MarkNotificationAsRead(notification.id),
-                );
+                      MarkNotificationAsRead(notification.id),
+                    );
               }
             },
             child: Container(
@@ -96,7 +125,8 @@ class _SoshistoryState extends State<Soshistory> {
                 borderRadius: BorderRadius.circular(5),
               ),
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: Row(
                   children: [
                     Container(
