@@ -27,6 +27,10 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> {
     'Today': [],
   };
 
+  DateTime? _startDate;
+  DateTime? _endDate;
+  bool _isCustomRange = false;
+
   final List<String> _reportTypes = [
     'Verbal Harassment',
     'Unwanted Touching',
@@ -68,11 +72,14 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> {
       return [
         PieChartSectionData(
           value: 1,
-          color: Colors.grey[300],
+          color: Colors.grey[300]!,
           title: 'No Data',
-          radius: 60,
-          titleStyle:
-              const TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
+          radius: 40,
+          titleStyle: const TextStyle(
+            fontSize: 10,
+            fontWeight: FontWeight.bold,
+            color: Colors.black54,
+          ),
         )
       ];
     }
@@ -99,7 +106,7 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> {
         value: count.toDouble(),
         color: colors[index % colors.length],
         title: percentage > 5 ? '${percentage.toStringAsFixed(1)}%' : '',
-        radius: 60,
+        radius: 40,
         titleStyle: const TextStyle(
           fontSize: 10,
           fontWeight: FontWeight.bold,
@@ -125,6 +132,94 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> {
     setState(() {
       selectedMetric = metric;
     });
+  }
+
+  void _onCustomRangeToggle(bool value) {
+    setState(() {
+      _isCustomRange = value;
+      if (!value) {
+        _startDate = null;
+        _endDate = null;
+      }
+    });
+  }
+
+  Future<void> _selectDate(BuildContext context,
+      {required bool isStartDate}) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: isStartDate
+          ? _startDate ?? DateTime.now()
+          : _endDate ?? DateTime.now(),
+      firstDate: DateTime(2020),
+      lastDate: DateTime.now(),
+    );
+
+    if (picked != null) {
+      setState(() {
+        if (isStartDate) {
+          _startDate = picked;
+          if (_endDate != null && _endDate!.isBefore(picked)) {
+            _endDate = picked;
+          }
+        } else {
+          _endDate = picked;
+          if (_startDate != null && _startDate!.isAfter(picked)) {
+            _startDate = picked;
+          }
+        }
+      });
+    }
+  }
+
+  void _clearDateRange() {
+    setState(() {
+      _startDate = null;
+      _endDate = null;
+    });
+  }
+
+  int _getFilteredCount(List<dynamic> data, String type) {
+    if (!_isCustomRange || _startDate == null || _endDate == null) {
+      return data.length;
+    }
+
+    return data.where((item) {
+      try {
+        String? timestampString;
+        if (type == 'incident_reports') {
+          timestampString = item['report_timestamp'] ??
+              item['timestamp'] ??
+              item['created_at'] ??
+              item['date'];
+        } else if (type == 'safe_zones') {
+          timestampString =
+              item['created_at'] ?? item['timestamp'] ?? item['date'];
+        } else if (type == 'users') {
+          timestampString = item['created_at'] ??
+              item['registration_date'] ??
+              item['timestamp'];
+        }
+
+        if (timestampString != null) {
+          DateTime reportDate = DateTime.parse(timestampString);
+          DateTime normalizedReportDate =
+              DateTime(reportDate.year, reportDate.month, reportDate.day);
+          DateTime normalizedStartDate =
+              DateTime(_startDate!.year, _startDate!.month, _startDate!.day);
+          DateTime normalizedEndDate =
+              DateTime(_endDate!.year, _endDate!.month, _endDate!.day)
+                  .add(const Duration(days: 1));
+
+          return normalizedReportDate.isAfter(
+                  normalizedStartDate.subtract(const Duration(days: 1))) &&
+              normalizedReportDate.isBefore(normalizedEndDate);
+        }
+      } catch (e) {
+        return false;
+      }
+      return false;
+    }).length;
   }
 
   Widget _bottomTitleWidgets(double value, TitleMeta meta) {
@@ -178,11 +273,7 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> {
     );
   }
 
-  String _getWeekLabel(double x) {
-    final baseDate = DateTime(2025, 1, 1);
-    final weekDate = baseDate.add(Duration(days: (x.toInt() * 7)));
-    return DateFormat("d MMM, yyyy").format(weekDate);
-  }
+  Map<String, dynamic>? _cachedData;
 
   @override
   Widget build(BuildContext context) {
@@ -190,7 +281,7 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> {
       backgroundColor: Colors.white,
       body: BlocBuilder<AdminBloc, AdminState>(
         builder: (context, state) {
-          if (state is AdminLoading) {
+          if (state is AdminLoading && _cachedData == null) {
             return Container(
                 color: Colors.white,
                 child: Center(
@@ -201,27 +292,193 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> {
             return Center(
                 child: Text('Error: ${state.message}',
                     style: const TextStyle(fontSize: 11)));
-          } else if (state is AllDataLoaded) {
-            final data = state.data;
+          } else if (state is AllDataLoaded || _cachedData != null) {
+            final data = state is AllDataLoaded ? state.data : _cachedData!;
+            if (state is AllDataLoaded) {
+              _cachedData = state.data;
+            }
             final users = data['users'];
             final safeZones = data['safe_zones'];
             final incidentReports = data['incident_reports'];
 
-            final int totalUsers = users.length;
-            final int totalSafeZones = safeZones.length;
-            final int totalIncidentReports = incidentReports.length;
-            final int totalVerifiedSafeZones =
-                safeZones.where((zone) => zone['is_verified'] == true).length;
-            final int pendingIncidentReports = incidentReports
-                .where((report) => report['status'] == 'pending')
-                .length;
-            final int verifiedIncidentReports = incidentReports
-                .where((report) => report['status'] == 'verified')
-                .length;
-            final int activeUsers =
-                users.where((user) => user['activity_status'] == true).length;
-            final int femaleUsers =
-                users.where((user) => user['is_girl'] == true).length;
+            final int totalUsers = _getFilteredCount(users, 'users');
+            final int totalSafeZones =
+                _getFilteredCount(safeZones, 'safe_zones');
+            final int totalIncidentReports =
+                _getFilteredCount(incidentReports, 'incident_reports');
+
+            final int totalVerifiedSafeZones = _isCustomRange &&
+                    _startDate != null &&
+                    _endDate != null
+                ? safeZones.where((zone) {
+                    if (zone['is_verified'] == true) {
+                      try {
+                        String? timestampString = zone['created_at'] ??
+                            zone['timestamp'] ??
+                            zone['date'];
+                        if (timestampString != null) {
+                          DateTime zoneDate = DateTime.parse(timestampString);
+                          DateTime normalizedZoneDate = DateTime(
+                              zoneDate.year, zoneDate.month, zoneDate.day);
+                          DateTime normalizedStartDate = DateTime(
+                              _startDate!.year,
+                              _startDate!.month,
+                              _startDate!.day);
+                          DateTime normalizedEndDate = DateTime(_endDate!.year,
+                                  _endDate!.month, _endDate!.day)
+                              .add(const Duration(days: 1));
+                          return normalizedZoneDate.isAfter(normalizedStartDate
+                                  .subtract(const Duration(days: 1))) &&
+                              normalizedZoneDate.isBefore(normalizedEndDate);
+                        }
+                      } catch (e) {
+                        return false;
+                      }
+                    }
+                    return false;
+                  }).length
+                : safeZones.where((zone) => zone['is_verified'] == true).length;
+
+            final int pendingIncidentReports = _isCustomRange &&
+                    _startDate != null &&
+                    _endDate != null
+                ? incidentReports.where((report) {
+                    if (report['status'] == 'pending') {
+                      try {
+                        String? timestampString = report['report_timestamp'] ??
+                            report['timestamp'] ??
+                            report['created_at'] ??
+                            report['date'];
+                        if (timestampString != null) {
+                          DateTime reportDate = DateTime.parse(timestampString);
+                          DateTime normalizedReportDate = DateTime(
+                              reportDate.year,
+                              reportDate.month,
+                              reportDate.day);
+                          DateTime normalizedStartDate = DateTime(
+                              _startDate!.year,
+                              _startDate!.month,
+                              _startDate!.day);
+                          DateTime normalizedEndDate = DateTime(_endDate!.year,
+                                  _endDate!.month, _endDate!.day)
+                              .add(const Duration(days: 1));
+                          return normalizedReportDate.isAfter(
+                                  normalizedStartDate
+                                      .subtract(const Duration(days: 1))) &&
+                              normalizedReportDate.isBefore(normalizedEndDate);
+                        }
+                      } catch (e) {
+                        return false;
+                      }
+                    }
+                    return false;
+                  }).length
+                : incidentReports
+                    .where((report) => report['status'] == 'pending')
+                    .length;
+
+            final int verifiedIncidentReports = _isCustomRange &&
+                    _startDate != null &&
+                    _endDate != null
+                ? incidentReports.where((report) {
+                    if (report['status'] == 'verified') {
+                      try {
+                        String? timestampString = report['report_timestamp'] ??
+                            report['timestamp'] ??
+                            report['created_at'] ??
+                            report['date'];
+                        if (timestampString != null) {
+                          DateTime reportDate = DateTime.parse(timestampString);
+                          DateTime normalizedReportDate = DateTime(
+                              reportDate.year,
+                              reportDate.month,
+                              reportDate.day);
+                          DateTime normalizedStartDate = DateTime(
+                              _startDate!.year,
+                              _startDate!.month,
+                              _startDate!.day);
+                          DateTime normalizedEndDate = DateTime(_endDate!.year,
+                                  _endDate!.month, _endDate!.day)
+                              .add(const Duration(days: 1));
+                          return normalizedReportDate.isAfter(
+                                  normalizedStartDate
+                                      .subtract(const Duration(days: 1))) &&
+                              normalizedReportDate.isBefore(normalizedEndDate);
+                        }
+                      } catch (e) {
+                        return false;
+                      }
+                    }
+                    return false;
+                  }).length
+                : incidentReports
+                    .where((report) => report['status'] == 'verified')
+                    .length;
+
+            final int activeUsers = _isCustomRange &&
+                    _startDate != null &&
+                    _endDate != null
+                ? users.where((user) {
+                    if (user['activity_status'] == true) {
+                      try {
+                        String? timestampString = user['created_at'] ??
+                            user['registration_date'] ??
+                            user['timestamp'];
+                        if (timestampString != null) {
+                          DateTime userDate = DateTime.parse(timestampString);
+                          DateTime normalizedUserDate = DateTime(
+                              userDate.year, userDate.month, userDate.day);
+                          DateTime normalizedStartDate = DateTime(
+                              _startDate!.year,
+                              _startDate!.month,
+                              _startDate!.day);
+                          DateTime normalizedEndDate = DateTime(_endDate!.year,
+                                  _endDate!.month, _endDate!.day)
+                              .add(const Duration(days: 1));
+                          return normalizedUserDate.isAfter(normalizedStartDate
+                                  .subtract(const Duration(days: 1))) &&
+                              normalizedUserDate.isBefore(normalizedEndDate);
+                        }
+                      } catch (e) {
+                        return false;
+                      }
+                    }
+                    return false;
+                  }).length
+                : users.where((user) => user['activity_status'] == true).length;
+
+            final int femaleUsers = _isCustomRange &&
+                    _startDate != null &&
+                    _endDate != null
+                ? users.where((user) {
+                    if (user['is_girl'] == true) {
+                      try {
+                        String? timestampString = user['created_at'] ??
+                            user['registration_date'] ??
+                            user['timestamp'];
+                        if (timestampString != null) {
+                          DateTime userDate = DateTime.parse(timestampString);
+                          DateTime normalizedUserDate = DateTime(
+                              userDate.year, userDate.month, userDate.day);
+                          DateTime normalizedStartDate = DateTime(
+                              _startDate!.year,
+                              _startDate!.month,
+                              _startDate!.day);
+                          DateTime normalizedEndDate = DateTime(_endDate!.year,
+                                  _endDate!.month, _endDate!.day)
+                              .add(const Duration(days: 1));
+                          return normalizedUserDate.isAfter(normalizedStartDate
+                                  .subtract(const Duration(days: 1))) &&
+                              normalizedUserDate.isBefore(normalizedEndDate);
+                        }
+                      } catch (e) {
+                        return false;
+                      }
+                    }
+                    return false;
+                  }).length
+                : users.where((user) => user['is_girl'] == true).length;
+
             final int maleUsers = totalUsers - femaleUsers;
 
             graphData['Monthly'] = _generateGraphData(
@@ -233,6 +490,7 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> {
             graphData['Today'] = _generateGraphData(
                 selectedMetric == 'Safe Zones' ? safeZones : incidentReports,
                 'Today');
+
             final Map<String, int> reportCounts =
                 _countReportsByType(incidentReports);
             final List<PieChartSectionData> pieChartData =
@@ -317,9 +575,66 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> {
                     height: 50,
                     padding: const EdgeInsets.symmetric(
                         horizontal: 10, vertical: 10),
+                    margin: const EdgeInsets.only(top: 16, bottom: 16),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(5),
-                      color: Color.fromARGB(255, 250, 250, 250),
+                      color: const Color.fromARGB(255, 250, 250, 250),
+                    ),
+                    child: Row(
+                      children: [
+                        const Text(
+                          'Custom Range:',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 11),
+                        ),
+                        const SizedBox(width: 8),
+                        Switch(
+                          value: _isCustomRange,
+                          onChanged: _onCustomRangeToggle,
+                          activeColor: widgetPricolor,
+                        ),
+                        if (_isCustomRange) ...[
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: _buildDatePickerButton(
+                              label: 'Start',
+                              date: _startDate,
+                              onTap: () =>
+                                  _selectDate(context, isStartDate: true),
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                          const Text('to',
+                              style: TextStyle(
+                                  fontSize: 10, color: Colors.black54)),
+                          const SizedBox(width: 4),
+                          Expanded(
+                            child: _buildDatePickerButton(
+                              label: 'End',
+                              date: _endDate,
+                              onTap: () =>
+                                  _selectDate(context, isStartDate: false),
+                            ),
+                          ),
+                          if (_startDate != null && _endDate != null)
+                            IconButton(
+                              icon: const Icon(Icons.clear,
+                                  size: 16, color: Colors.red),
+                              onPressed: _clearDateRange,
+                              padding: EdgeInsets.zero,
+                              constraints: const BoxConstraints(),
+                            ),
+                        ],
+                      ],
+                    ),
+                  ),
+                  Container(
+                    height: 50,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 10, vertical: 10),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(5),
+                      color: const Color.fromARGB(255, 250, 250, 250),
                     ),
                     child: Row(
                       children: [
@@ -361,7 +676,7 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> {
                         horizontal: 10, vertical: 10),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(5),
-                      color: Color.fromARGB(255, 250, 250, 250),
+                      color: const Color.fromARGB(255, 250, 250, 250),
                     ),
                     child: Row(
                       children: [
@@ -404,7 +719,7 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> {
                         horizontal: 10, vertical: 10),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(5),
-                      color: Color.fromARGB(255, 250, 250, 250),
+                      color: const Color.fromARGB(255, 250, 250, 250),
                     ),
                     child: Column(
                       children: [
@@ -469,27 +784,50 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> {
                                       color: Colors.black38, width: 0.2),
                                   getTooltipItems: (touchedSpots) {
                                     return touchedSpots.map((spot) {
-                                      final weekDate = _getWeekLabel(spot.x);
-                                      final commits = spot.y.toInt();
+                                      String timeLabel;
+                                      String dateLabel = "";
+
+                                      if (selectedCategory == 'Today') {
+                                        timeLabel = 'Hour ${spot.x.toInt()}:00';
+                                        dateLabel = DateFormat("MMM d, yyyy")
+                                            .format(DateTime.now());
+                                      } else if (selectedCategory == 'Weekly') {
+                                        DateTime now = DateTime.now();
+                                        DateTime weekStart = now.subtract(
+                                            Duration(days: now.weekday - 1));
+                                        DateTime actualDate = weekStart.add(
+                                            Duration(days: spot.x.toInt()));
+                                        timeLabel = DateFormat("EEEE")
+                                            .format(actualDate);
+                                        dateLabel = DateFormat("MMM d, yyyy")
+                                            .format(actualDate);
+                                      } else {
+                                        DateTime now = DateTime.now();
+                                        DateTime monthStart =
+                                            DateTime(now.year, now.month, 1);
+                                        DateTime actualDate = monthStart.add(
+                                            Duration(days: spot.x.toInt()));
+                                        timeLabel = DateFormat("EEEE")
+                                            .format(actualDate);
+                                        dateLabel = DateFormat("MMM d, yyyy")
+                                            .format(actualDate);
+                                      }
+
                                       return LineTooltipItem(
-                                        "Week of $weekDate\n",
+                                        "$dateLabel\n$timeLabel\n",
                                         const TextStyle(
-                                            fontSize: 10,
-                                            color: Colors.black38,
-                                            fontWeight: FontWeight.w500),
+                                          fontSize: 10,
+                                          color: Colors.black38,
+                                          fontWeight: FontWeight.w500,
+                                        ),
                                         children: [
-                                          const TextSpan(
-                                            text: "Numeroes  ",
-                                            style: TextStyle(
+                                          TextSpan(
+                                            text:
+                                                "${selectedMetric}: ${spot.y.toInt()}",
+                                            style: const TextStyle(
                                               color: Colors.black,
-                                              fontSize: 10,
-                                            ),
-                                          ),
-                                          const TextSpan(
-                                            text: "samplu  ",
-                                            style: TextStyle(
-                                              color: Colors.black,
-                                              fontSize: 10,
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.bold,
                                             ),
                                           ),
                                         ],
@@ -548,10 +886,12 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> {
                               minY: 0,
                               maxY: graphData[selectedCategory]!.isEmpty
                                   ? 10
-                                  : graphData[selectedCategory]!
-                                          .map((spot) => spot.y)
-                                          .reduce(max) *
-                                      1.2,
+                                  : (graphData[selectedCategory]!
+                                              .map((spot) => spot.y)
+                                              .reduce(max) *
+                                          1.2)
+                                      .ceilToDouble()
+                                      .clamp(1, double.infinity),
                             ),
                           ),
                         ),
@@ -571,13 +911,13 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> {
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10),
-                      color: Color.fromARGB(255, 250, 250, 250),
+                      color: const Color.fromARGB(255, 250, 250, 250),
                     ),
                     child: Column(
                       children: [
                         Container(
                           height: 200,
-                          margin: EdgeInsets.symmetric(vertical: 20),
+                          margin: const EdgeInsets.symmetric(vertical: 20),
                           child: PieChart(
                             PieChartData(
                               sections: pieChartData,
@@ -741,18 +1081,44 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> {
     );
   }
 
+  Widget _buildDatePickerButton({
+    required String label,
+    required DateTime? date,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(6),
+          border: Border.all(color: Colors.grey.withOpacity(0.3), width: 1),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              label,
+              style: const TextStyle(fontSize: 10, color: Colors.black54),
+            ),
+            const SizedBox(width: 4),
+            Text(
+              date != null ? DateFormat('MMM d').format(date) : 'Select',
+              style: TextStyle(
+                fontSize: 10,
+                color: date != null ? Colors.black : Colors.grey,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   List<FlSpot> _generateGraphData(List<dynamic> data, String category) {
     Map<int, int> dataPoints = {};
-
-    for (var item in data) {
-      DateTime reportDate = DateTime.parse(item['report_timestamp']);
-      int key = category == 'Today'
-          ? reportDate.hour
-          : category == 'Weekly'
-              ? reportDate.weekday - 1
-              : reportDate.day - 1;
-      dataPoints[key] = (dataPoints[key] ?? 0) + 1;
-    }
 
     int maxKey = category == 'Today'
         ? 23
@@ -760,9 +1126,108 @@ class _AdminInitialScreenState extends State<AdminInitialScreen> {
             ? 6
             : 30;
 
+    for (int i = 0; i <= maxKey; i++) {
+      dataPoints[i] = 0;
+    }
+
+    List<dynamic> filteredData = data;
+    if (_isCustomRange && _startDate != null && _endDate != null) {
+      filteredData = data.where((item) {
+        try {
+          String? timestampString = item['report_timestamp'] ??
+              item['timestamp'] ??
+              item['created_at'] ??
+              item['date'];
+          if (timestampString != null) {
+            DateTime reportDate = DateTime.parse(timestampString);
+            DateTime normalizedReportDate =
+                DateTime(reportDate.year, reportDate.month, reportDate.day);
+            DateTime normalizedStartDate =
+                DateTime(_startDate!.year, _startDate!.month, _startDate!.day);
+            DateTime normalizedEndDate =
+                DateTime(_endDate!.year, _endDate!.month, _endDate!.day)
+                    .add(const Duration(days: 1));
+
+            return normalizedReportDate.isAfter(
+                    normalizedStartDate.subtract(const Duration(days: 1))) &&
+                normalizedReportDate.isBefore(normalizedEndDate);
+          }
+        } catch (e) {
+          return false;
+        }
+        return false;
+      }).toList();
+    } else {
+      DateTime now = DateTime.now();
+      DateTime todayStart = DateTime(now.year, now.month, now.day);
+      DateTime todayEnd = todayStart.add(const Duration(days: 1));
+
+      filteredData = data.where((item) {
+        try {
+          String? timestampString = item['report_timestamp'] ??
+              item['timestamp'] ??
+              item['created_at'] ??
+              item['date'];
+
+          if (timestampString != null) {
+            DateTime reportDate = DateTime.parse(timestampString);
+            bool shouldInclude = false;
+
+            if (category == 'Today') {
+              shouldInclude = reportDate.isAfter(todayStart) &&
+                  reportDate.isBefore(todayEnd);
+            } else if (category == 'Weekly') {
+              DateTime weekStart =
+                  now.subtract(Duration(days: now.weekday - 1));
+              DateTime weekEnd = weekStart.add(const Duration(days: 7));
+              shouldInclude =
+                  reportDate.isAfter(weekStart) && reportDate.isBefore(weekEnd);
+            } else {
+              DateTime monthStart = DateTime(now.year, now.month, 1);
+              DateTime monthEnd = DateTime(now.year, now.month + 1, 1);
+              shouldInclude = reportDate.isAfter(monthStart) &&
+                  reportDate.isBefore(monthEnd);
+            }
+            return shouldInclude;
+          }
+        } catch (e) {
+          return false;
+        }
+        return false;
+      }).toList();
+    }
+
+    for (var item in filteredData) {
+      try {
+        String? timestampString = item['report_timestamp'] ??
+            item['timestamp'] ??
+            item['created_at'] ??
+            item['date'];
+
+        if (timestampString != null) {
+          DateTime reportDate = DateTime.parse(timestampString);
+          int key;
+
+          if (category == 'Today') {
+            key = reportDate.hour;
+          } else if (category == 'Weekly') {
+            key = reportDate.weekday - 1;
+          } else {
+            key = reportDate.day - 1;
+          }
+
+          if (key >= 0 && key <= maxKey) {
+            dataPoints[key] = (dataPoints[key] ?? 0) + 1;
+          }
+        }
+      } catch (e) {
+        continue;
+      }
+    }
+
     List<FlSpot> spots = [];
     for (int i = 0; i <= maxKey; i++) {
-      spots.add(FlSpot(i.toDouble(), dataPoints[i]?.toDouble() ?? 0));
+      spots.add(FlSpot(i.toDouble(), dataPoints[i]?.toDouble() ?? 0.0));
     }
 
     return spots;
@@ -792,7 +1257,7 @@ class SummaryCard extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(5),
-          color: Color.fromARGB(255, 250, 250, 250),
+          color: const Color.fromARGB(255, 250, 250, 250),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -892,7 +1357,7 @@ class MetricTile extends StatelessWidget {
               height: 22,
               width: double.infinity,
               decoration: BoxDecoration(
-                color: Color.fromARGB(255, 250, 250, 250),
+                color: const Color.fromARGB(255, 250, 250, 250),
                 borderRadius: BorderRadius.circular(5),
               ),
             ),
