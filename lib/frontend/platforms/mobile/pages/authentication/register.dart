@@ -1,9 +1,19 @@
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:safezone/backend/architecture/bloc/authBloc/auth_bloc.dart';
 import 'package:safezone/backend/architecture/bloc/authBloc/auth_event.dart';
 import 'package:safezone/backend/architecture/bloc/authBloc/auth_state.dart';
 import 'package:http/http.dart' as http;
-import 'package:safezone/frontend/platforms/mobile/widgets/Dialogs/account.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
+import 'dart:convert';
+import 'dart:math';
+import 'package:geolocator/geolocator.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mailer/mailer.dart';
+import 'package:mailer/smtp_server.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../../backend/properties/import.dart';
 
@@ -27,9 +37,10 @@ class _RegisterMDState extends State<RegisterMD> {
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confirmPasswordController =
       TextEditingController();
+
   bool _isVerifying = false;
   bool _isButtonDisabled = false;
-  bool _isCreatingAccount = false; // Add this
+  bool _isCreatingAccount = false;
   EmailOTP myauth = EmailOTP();
   String generatedOTP = "";
   bool _isSendingOTP = false;
@@ -48,6 +59,11 @@ class _RegisterMDState extends State<RegisterMD> {
   bool isLoading = false;
   final ImagePicker picker = ImagePicker();
 
+  bool _isProcessingOTP = false;
+  bool _isProcessingForm = false;
+  bool _isProcessingVerification = false;
+  DateTime? _lastSnackBarTime;
+
   void _checkIfShown({required String text, required Color color}) {
     setState(() {
       _appBarHeight = 40;
@@ -65,6 +81,20 @@ class _RegisterMDState extends State<RegisterMD> {
         });
       }
     });
+  }
+
+  bool _canShowSnackBar() {
+    final now = DateTime.now();
+    if (_lastSnackBarTime == null) {
+      _lastSnackBarTime = now;
+      return true;
+    }
+
+    if (now.difference(_lastSnackBarTime!).inMilliseconds > 1000) {
+      _lastSnackBarTime = now;
+      return true;
+    }
+    return false;
   }
 
   @override
@@ -91,6 +121,87 @@ class _RegisterMDState extends State<RegisterMD> {
     setState(() {
       currentStep--;
     });
+  }
+
+  void _showAccountCreatedDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        elevation: 0,
+        child: Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                "Account Created",
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                "Your account has been created successfully.",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.black87,
+                ),
+              ),
+              const SizedBox(height: 24),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    _navigateToLogin();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: widgetPricolor,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                  ),
+                  child: const Text(
+                    "Continue to Login",
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _navigateToLogin() {
+    try {
+      GoRouter.of(context).go('/login');
+    } catch (e) {
+      try {
+        context.go('/login');
+      } catch (e) {
+        Navigator.of(context)
+            .pushNamedAndRemoveUntil('/login', (route) => false);
+      }
+    }
   }
 
   Future<bool?> _showTermsDialog(BuildContext context) {
@@ -150,7 +261,6 @@ class _RegisterMDState extends State<RegisterMD> {
                   ),
                 ),
 
-                // Content
                 Expanded(
                   child: SingleChildScrollView(
                     padding: const EdgeInsets.all(20),
@@ -206,7 +316,6 @@ class _RegisterMDState extends State<RegisterMD> {
                   ),
                 ),
 
-                // Buttons
                 Container(
                   padding: const EdgeInsets.all(16),
                   child: Row(
@@ -320,13 +429,18 @@ class _RegisterMDState extends State<RegisterMD> {
   }
 
   Future<void> verifyImages() async {
+    if (_isProcessingVerification) return;
+
     if (idImage == null || selfieImage == null) {
-      setState(() => resultText = "Please select both images first.");
+      if (_canShowSnackBar()) {
+        setState(() => resultText = "Please select both images first.");
+      }
       return;
     }
 
     setState(() {
       isLoading = true;
+      _isProcessingVerification = true;
       resultText = null;
     });
 
@@ -340,7 +454,7 @@ class _RegisterMDState extends State<RegisterMD> {
       final response = await http.post(
         Uri.parse(
           "https://safezone-flask-emhe2f667-faokunns-projects.vercel.app/verify",
-        ), // change this
+        ),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({"id_image": idBase64, "selfie_image": selfieBase64}),
       );
@@ -360,7 +474,10 @@ class _RegisterMDState extends State<RegisterMD> {
     } catch (e) {
       setState(() => resultText = "Error: $e");
     } finally {
-      setState(() => isLoading = false);
+      setState(() {
+        isLoading = false;
+        _isProcessingVerification = false;
+      });
     }
   }
 
@@ -415,58 +532,6 @@ class _RegisterMDState extends State<RegisterMD> {
     });
   }
 
-  Future<void> verifyFaceMatch() async {
-    if (idImage == null || selfieImage == null) {
-      setState(() {
-        faceVerificationResult = "Please upload both ID and Selfie first.";
-      });
-      return;
-    }
-
-    setState(() {
-      isVerifyingFace = true;
-      faceVerificationResult = null;
-    });
-
-    try {
-      final idBytes = await idImage!.readAsBytes();
-      final selfieBytes = await selfieImage!.readAsBytes();
-
-      final response = await http.post(
-        Uri.parse("http://10.0.2.2:5000/verify"), // ⚠️ Change this if deployed
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode({
-          "id_image": base64Encode(idBytes),
-          "selfie_image": base64Encode(selfieBytes),
-        }),
-      );
-
-      final data = jsonDecode(response.body);
-
-      if (response.statusCode == 200 && data["verified"] == true) {
-        setState(() {
-          isFaceMatched = true;
-          faceVerificationResult =
-              "✅ Face Matched! Confidence: ${data["confidence"].toStringAsFixed(2)}%";
-        });
-      } else {
-        setState(() {
-          isFaceMatched = false;
-          faceVerificationResult = "❌ Not matched. Please retake your photos.";
-        });
-      }
-    } catch (e) {
-      setState(() {
-        faceVerificationResult = "Error: $e";
-        isFaceMatched = false;
-      });
-    } finally {
-      setState(() {
-        isVerifyingFace = false;
-      });
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return BlocListener<AuthenticationBloc, AuthenticationState>(
@@ -475,26 +540,26 @@ class _RegisterMDState extends State<RegisterMD> {
           setState(() {
             _isCreatingAccount = false;
             _isButtonDisabled = false;
+            _isProcessingForm = false;
           });
-          showDialog(
-            context: context,
-            barrierDismissible: false,
-            builder: (context) => const AccountCreatedDialog(),
-          );
+          _showAccountCreatedDialog();
         } else if (state is SignUpFailed || state is SignUpError) {
           setState(() {
             _isCreatingAccount = false;
             _isButtonDisabled = false;
+            _isProcessingForm = false;
           });
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                state is SignUpFailed
-                    ? state.message
-                    : (state as SignUpError).message,
+          if (_canShowSnackBar()) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  state is SignUpFailed
+                      ? state.message
+                      : (state as SignUpError).message,
+                ),
               ),
-            ),
-          );
+            );
+          }
         }
       },
       child: Scaffold(
@@ -550,8 +615,8 @@ class _RegisterMDState extends State<RegisterMD> {
                     : currentStep == 1
                         ? _buildCodeVerificationStep()
                         : currentStep == 2
-                            ? _buildUserDetailsStep(context)
-                            : _buildFaceVerificationStep(context),
+                            ? _buildFaceVerificationStep(context)
+                            : _buildUserDetailsStep(context),
               ),
             ],
           ),
@@ -626,12 +691,13 @@ class _RegisterMDState extends State<RegisterMD> {
             onTap: _isSendingOTP || _isButtonDisabled
                 ? null
                 : () async {
+                    if (_isSendingOTP) return;
+
                     setState(() => _isSendingOTP = true);
 
                     final bloc = context.read<AuthenticationBloc>();
                     bloc.add(CheckEmailEvent(email: emailController.text));
 
-                    // Declare first (nullable), then assign after
                     StreamSubscription? subscription;
                     subscription = bloc.stream.listen((state) async {
                       if (state is EmailCheckSuccess) {
@@ -741,44 +807,51 @@ class _RegisterMDState extends State<RegisterMD> {
           ),
           const Spacer(),
           GestureDetector(
-            onTap: _isVerifying || _isButtonDisabled
+            onTap: (_isVerifying || _isButtonDisabled || _isProcessingOTP)
                 ? null
                 : () async {
+                    if (_isProcessingOTP) return;
+
+                    setState(() => _isProcessingOTP = true);
+                    ScaffoldMessenger.of(context).clearSnackBars();
+
                     if (codeController.text.isEmpty) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text("Please enter the OTP")),
                       );
+                      setState(() => _isProcessingOTP = false);
                       return;
                     }
 
                     setState(() => _isVerifying = true);
 
-                    await Future.delayed(const Duration(
-                        milliseconds:
-                            400)); // optional short delay for smooth UX
+                    await Future.delayed(const Duration(milliseconds: 400));
 
                     if (codeController.text == generatedOTP) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                            content: Text("OTP verified successfully")),
-                      );
+                      ScaffoldMessenger.of(context).clearSnackBars();
                       nextStep();
                     } else {
+                      ScaffoldMessenger.of(context).clearSnackBars();
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                             content: Text("Invalid OTP, please try again.")),
                       );
                     }
 
-                    setState(() => _isVerifying = false);
+                    setState(() {
+                      _isVerifying = false;
+                      _isProcessingOTP = false;
+                    });
                   },
             child: Container(
               height: 50,
               width: double.infinity,
               margin: const EdgeInsets.only(bottom: 30),
               decoration: BoxDecoration(
-                color: widgetPricolor
-                    .withOpacity((_isVerifying || _isButtonDisabled) ? 0.6 : 1),
+                color: widgetPricolor.withOpacity(
+                    (_isVerifying || _isButtonDisabled || _isProcessingOTP)
+                        ? 0.6
+                        : 1),
                 borderRadius: BorderRadius.circular(50),
               ),
               child: Center(
@@ -803,6 +876,393 @@ class _RegisterMDState extends State<RegisterMD> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildFaceVerificationStep(BuildContext context) {
+    return BlocBuilder<AuthenticationBloc, AuthenticationState>(
+      builder: (context, state) {
+        final isLoadingState = state is SignUpnLoading || _isCreatingAccount;
+
+        return SingleChildScrollView(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const CategoryText(
+                text: "Face Verification",
+              ),
+              const SizedBox(height: 5),
+              const CategoryDescripText(
+                text:
+                    'Verify your identity by taking photos of your ID and a live selfie.',
+              ),
+              const SizedBox(height: 30),
+
+              // Instructions
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.blue[50],
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.blue[200]!),
+                ),
+                child: const Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "📸 Important Instructions:",
+                      style:
+                          TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                    ),
+                    SizedBox(height: 8),
+                    Text(
+                      "• Ensure good lighting\n"
+                      "• Hold your ID steady\n"
+                      "• Remove any covers/cases from ID\n"
+                      "• Take a clear, recent selfie\n"
+                      "• Face should be clearly visible",
+                      style: TextStyle(fontSize: 12),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              const Text(
+                "Take Photos Using Camera",
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+              ),
+              const SizedBox(height: 16),
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Column(
+                    children: [
+                      GestureDetector(
+                        onTap: (isFaceMatched ||
+                                isLoadingState ||
+                                _isProcessingVerification)
+                            ? null
+                            : () => _showCameraOptions(true),
+                        child: Container(
+                          width: 140,
+                          height: 140,
+                          decoration: BoxDecoration(
+                            color: Colors.grey[100],
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: idImage != null
+                                  ? (isFaceMatched ? Colors.green : Colors.blue)
+                                  : Colors.grey[400]!,
+                              width: idImage != null ? 2 : 1,
+                            ),
+                          ),
+                          child: idImage != null
+                              ? ClipRRect(
+                                  borderRadius: BorderRadius.circular(12),
+                                  child:
+                                      Image.file(idImage!, fit: BoxFit.cover),
+                                )
+                              : const Center(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(Icons.credit_card,
+                                          size: 40, color: Colors.grey),
+                                      SizedBox(height: 8),
+                                      Text("Take ID Photo",
+                                          style: TextStyle(
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w500)),
+                                      SizedBox(height: 4),
+                                      Text("Tap to capture",
+                                          style: TextStyle(
+                                              fontSize: 10,
+                                              color: Colors.grey)),
+                                    ],
+                                  ),
+                                ),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        "Government or School ID",
+                        style: TextStyle(
+                            fontSize: 12,
+                            color: idImage != null
+                                ? (isFaceMatched ? Colors.green : Colors.blue)
+                                : Colors.black,
+                            fontWeight: idImage != null
+                                ? FontWeight.w600
+                                : FontWeight.normal),
+                      ),
+                    ],
+                  ),
+                  Column(
+                    children: [
+                      GestureDetector(
+                        onTap: (isFaceMatched ||
+                                isLoadingState ||
+                                _isProcessingVerification)
+                            ? null
+                            : () => _showCameraOptions(false),
+                        child: Container(
+                          width: 140,
+                          height: 140,
+                          decoration: BoxDecoration(
+                            color: Colors.grey[100],
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: selfieImage != null
+                                  ? (isFaceMatched ? Colors.green : Colors.blue)
+                                  : Colors.grey[400]!,
+                              width: selfieImage != null ? 2 : 1,
+                            ),
+                          ),
+                          child: selfieImage != null
+                              ? ClipRRect(
+                                  borderRadius: BorderRadius.circular(12),
+                                  child: Image.file(selfieImage!,
+                                      fit: BoxFit.cover),
+                                )
+                              : const Center(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(Icons.face,
+                                          size: 40, color: Colors.grey),
+                                      SizedBox(height: 8),
+                                      Text("Take Selfie",
+                                          style: TextStyle(
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w500)),
+                                      SizedBox(height: 4),
+                                      Text("Tap to capture",
+                                          style: TextStyle(
+                                              fontSize: 10,
+                                              color: Colors.grey)),
+                                    ],
+                                  ),
+                                ),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        "Live Selfie",
+                        style: TextStyle(
+                            fontSize: 12,
+                            color: selfieImage != null
+                                ? (isFaceMatched ? Colors.green : Colors.blue)
+                                : Colors.black,
+                            fontWeight: selfieImage != null
+                                ? FontWeight.w600
+                                : FontWeight.normal),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 20),
+
+              if (!isFaceMatched) ...[
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        onPressed: (isLoadingState || _isProcessingVerification)
+                            ? null
+                            : () => _showCameraOptions(true),
+                        icon: const Icon(Icons.credit_card, size: 16),
+                        label: const Text("ID Photo"),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blue[50],
+                          foregroundColor: Colors.blue[700],
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        onPressed: (isLoadingState || _isProcessingVerification)
+                            ? null
+                            : () => _showCameraOptions(false),
+                        icon: const Icon(Icons.face, size: 16),
+                        label: const Text("Selfie"),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blue[50],
+                          foregroundColor: Colors.blue[700],
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                Center(
+                  child: ElevatedButton(
+                    onPressed: (idImage != null &&
+                            selfieImage != null &&
+                            !isLoading &&
+                            !isLoadingState &&
+                            !_isProcessingVerification)
+                        ? verifyImages
+                        : null,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: widgetPricolor,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 32, vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(25),
+                      ),
+                    ),
+                    child: isLoading
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2,
+                            ),
+                          )
+                        : const Text(
+                            "Verify Identity",
+                            style: TextStyle(
+                                fontSize: 14, fontWeight: FontWeight.w600),
+                          ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+              ],
+
+              if (!isFaceMatched && resultText != null)
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.orange[50],
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: Colors.orange,
+                    ),
+                  ),
+                  child: Column(
+                    children: [
+                      const Icon(
+                        Icons.warning,
+                        color: Colors.orange,
+                        size: 32,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        resultText!,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.orange[800],
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      const Text(
+                        "Please retake photos and try again",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 12, color: Colors.grey),
+                      ),
+                    ],
+                  ),
+                ),
+
+              if (isFaceMatched)
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.green[50],
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.green),
+                  ),
+                  child: const Column(
+                    children: [
+                      Icon(
+                        Icons.verified_user,
+                        color: Colors.green,
+                        size: 40,
+                      ),
+                      SizedBox(height: 12),
+                      Text(
+                        "Identity Verified Successfully!",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.green,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      SizedBox(height: 8),
+                      Text(
+                        "Your identity has been verified. You can now complete your registration.",
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: Colors.green,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                ),
+
+              const SizedBox(height: 30),
+
+              GestureDetector(
+                onTap: (isFaceMatched && !isLoadingState && !_isProcessingForm)
+                    ? () {
+                        nextStep();
+                      }
+                    : null,
+                child: Container(
+                  height: 55,
+                  margin: const EdgeInsets.only(bottom: 30),
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color:
+                        (isFaceMatched && !isLoadingState && !_isProcessingForm)
+                            ? widgetPricolor
+                            : Colors.grey[400],
+                    borderRadius: BorderRadius.circular(25),
+                    boxShadow:
+                        (isFaceMatched && !isLoadingState && !_isProcessingForm)
+                            ? [
+                                BoxShadow(
+                                  color: widgetPricolor.withOpacity(0.3),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 4),
+                                )
+                              ]
+                            : null,
+                  ),
+                  child: const Center(
+                    child: Text(
+                      'Continue to Form',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -1106,44 +1566,60 @@ class _RegisterMDState extends State<RegisterMD> {
                 ],
               ),
             GestureDetector(
-              onTap: _isButtonDisabled
-                  ? null
-                  : () {
-                      if (firstNameController.text.isEmpty ||
-                          lastNameController.text.isEmpty ||
-                          addressController.text.isEmpty ||
-                          usernameController.text.isEmpty ||
-                          passwordController.text.isEmpty ||
-                          confirmPasswordController.text.isEmpty) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                              content: Text("Please fill in all fields")),
-                        );
-                        return;
-                      }
+              onTap:
+                  (_isButtonDisabled || _isCreatingAccount || _isProcessingForm)
+                      ? null
+                      : () {
+                          if (_isProcessingForm) return;
 
-                      if (passwordController.text !=
-                          confirmPasswordController.text) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                              content: Text("Passwords do not match")),
-                        );
-                        return;
-                      }
+                          setState(() => _isProcessingForm = true);
 
-                      nextStep();
-                    },
+                          if (firstNameController.text.isEmpty ||
+                              lastNameController.text.isEmpty ||
+                              addressController.text.isEmpty ||
+                              usernameController.text.isEmpty ||
+                              passwordController.text.isEmpty ||
+                              confirmPasswordController.text.isEmpty) {
+                            if (_canShowSnackBar()) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content: Text("Please fill in all fields")),
+                              );
+                            }
+                            setState(() => _isProcessingForm = false);
+                            return;
+                          }
+
+                          if (passwordController.text !=
+                              confirmPasswordController.text) {
+                            if (_canShowSnackBar()) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content: Text("Passwords do not match")),
+                              );
+                            }
+                            setState(() => _isProcessingForm = false);
+                            return;
+                          }
+
+                          _createAccount();
+                        },
               child: Container(
                 height: 50,
                 width: double.infinity,
                 margin: const EdgeInsets.only(bottom: 30, top: 20),
                 decoration: BoxDecoration(
-                  color:
-                      widgetPricolor.withOpacity(_isButtonDisabled ? 0.6 : 1),
+                  color: widgetPricolor.withOpacity((_isButtonDisabled ||
+                          _isCreatingAccount ||
+                          _isProcessingForm)
+                      ? 0.6
+                      : 1),
                   borderRadius: BorderRadius.circular(50),
                 ),
                 child: Center(
-                  child: _isButtonDisabled
+                  child: (_isButtonDisabled ||
+                          _isCreatingAccount ||
+                          _isProcessingForm)
                       ? const SizedBox(
                           height: 20,
                           width: 20,
@@ -1153,7 +1629,7 @@ class _RegisterMDState extends State<RegisterMD> {
                           ),
                         )
                       : const Text(
-                          'Continue to Face Verification',
+                          'Create Account',
                           style: TextStyle(
                             fontSize: 12,
                             color: Colors.white,
@@ -1165,376 +1641,6 @@ class _RegisterMDState extends State<RegisterMD> {
           ],
         ),
       ),
-    );
-  }
-
-  Widget _buildFaceVerificationStep(BuildContext context) {
-    return BlocBuilder<AuthenticationBloc, AuthenticationState>(
-      builder: (context, state) {
-        final isLoadingState = state is SignUpnLoading || _isCreatingAccount;
-
-        return SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const CategoryText(
-                text: "Face Verification",
-              ),
-              const SizedBox(height: 5),
-              const CategoryDescripText(
-                text:
-                    'Verify your identity by taking photos of your ID and a live selfie.',
-              ),
-              const SizedBox(height: 30),
-
-              // Instructions
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.blue[50],
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.blue[200]!),
-                ),
-                child: const Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "📸 Important Instructions:",
-                      style:
-                          TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
-                    ),
-                    SizedBox(height: 8),
-                    Text(
-                      "• Ensure good lighting\n"
-                      "• Hold your ID steady\n"
-                      "• Remove any covers/cases from ID\n"
-                      "• Take a clear, recent selfie\n"
-                      "• Face should be clearly visible",
-                      style: TextStyle(fontSize: 12),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 20),
-
-              const Text(
-                "Take Photos Using Camera",
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-              ),
-              const SizedBox(height: 16),
-
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Column(
-                    children: [
-                      GestureDetector(
-                        onTap: (isFaceMatched || isLoadingState)
-                            ? null
-                            : () => _showCameraOptions(true),
-                        child: Container(
-                          width: 140,
-                          height: 140,
-                          decoration: BoxDecoration(
-                            color: Colors.grey[100],
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: idImage != null
-                                  ? (isFaceMatched ? Colors.green : Colors.blue)
-                                  : Colors.grey[400]!,
-                              width: idImage != null ? 2 : 1,
-                            ),
-                          ),
-                          child: idImage != null
-                              ? ClipRRect(
-                                  borderRadius: BorderRadius.circular(12),
-                                  child:
-                                      Image.file(idImage!, fit: BoxFit.cover),
-                                )
-                              : const Center(
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(Icons.credit_card,
-                                          size: 40, color: Colors.grey),
-                                      SizedBox(height: 8),
-                                      Text("Take ID Photo",
-                                          style: TextStyle(
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.w500)),
-                                      SizedBox(height: 4),
-                                      Text("Tap to capture",
-                                          style: TextStyle(
-                                              fontSize: 10,
-                                              color: Colors.grey)),
-                                    ],
-                                  ),
-                                ),
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        "Government ID",
-                        style: TextStyle(
-                            fontSize: 12,
-                            color: idImage != null
-                                ? (isFaceMatched ? Colors.green : Colors.blue)
-                                : Colors.black,
-                            fontWeight: idImage != null
-                                ? FontWeight.w600
-                                : FontWeight.normal),
-                      ),
-                    ],
-                  ),
-                  Column(
-                    children: [
-                      GestureDetector(
-                        onTap: (isFaceMatched || isLoadingState)
-                            ? null
-                            : () => _showCameraOptions(false),
-                        child: Container(
-                          width: 140,
-                          height: 140,
-                          decoration: BoxDecoration(
-                            color: Colors.grey[100],
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: selfieImage != null
-                                  ? (isFaceMatched ? Colors.green : Colors.blue)
-                                  : Colors.grey[400]!,
-                              width: selfieImage != null ? 2 : 1,
-                            ),
-                          ),
-                          child: selfieImage != null
-                              ? ClipRRect(
-                                  borderRadius: BorderRadius.circular(12),
-                                  child: Image.file(selfieImage!,
-                                      fit: BoxFit.cover),
-                                )
-                              : const Center(
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(Icons.face,
-                                          size: 40, color: Colors.grey),
-                                      SizedBox(height: 8),
-                                      Text("Take Selfie",
-                                          style: TextStyle(
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.w500)),
-                                      SizedBox(height: 4),
-                                      Text("Tap to capture",
-                                          style: TextStyle(
-                                              fontSize: 10,
-                                              color: Colors.grey)),
-                                    ],
-                                  ),
-                                ),
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        "Live Selfie",
-                        style: TextStyle(
-                            fontSize: 12,
-                            color: selfieImage != null
-                                ? (isFaceMatched ? Colors.green : Colors.blue)
-                                : Colors.black,
-                            fontWeight: selfieImage != null
-                                ? FontWeight.w600
-                                : FontWeight.normal),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 20),
-
-              if (!isFaceMatched) ...[
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Expanded(
-                      child: ElevatedButton.icon(
-                        onPressed: isLoadingState
-                            ? null
-                            : () => _showCameraOptions(true),
-                        icon: const Icon(Icons.credit_card, size: 16),
-                        label: const Text("ID Photo"),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blue[50],
-                          foregroundColor: Colors.blue[700],
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: ElevatedButton.icon(
-                        onPressed: isLoadingState
-                            ? null
-                            : () => _showCameraOptions(false),
-                        icon: const Icon(Icons.face, size: 16),
-                        label: const Text("Selfie"),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blue[50],
-                          foregroundColor: Colors.blue[700],
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 20),
-                Center(
-                  child: ElevatedButton(
-                    onPressed: (idImage != null &&
-                            selfieImage != null &&
-                            !isLoading &&
-                            !isLoadingState)
-                        ? verifyImages
-                        : null,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: widgetPricolor,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 32, vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(25),
-                      ),
-                    ),
-                    child: isLoading
-                        ? const SizedBox(
-                            height: 20,
-                            width: 20,
-                            child: CircularProgressIndicator(
-                              color: Colors.white,
-                              strokeWidth: 2,
-                            ),
-                          )
-                        : const Text(
-                            "Verify Identity",
-                            style: TextStyle(
-                                fontSize: 14, fontWeight: FontWeight.w600),
-                          ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-              ],
-
-              if (!isFaceMatched && resultText != null)
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.orange[50],
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: Colors.orange,
-                    ),
-                  ),
-                  child: Column(
-                    children: [
-                      const Icon(
-                        Icons.warning,
-                        color: Colors.orange,
-                        size: 32,
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        resultText!,
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.orange[800],
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      const Text(
-                        "Please retake photos and try again",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 12, color: Colors.grey),
-                      ),
-                    ],
-                  ),
-                ),
-
-              if (isFaceMatched)
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: Colors.green[50],
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.green),
-                  ),
-                  child: const Column(
-                    children: [
-                      Icon(
-                        Icons.verified_user,
-                        color: Colors.green,
-                        size: 40,
-                      ),
-                      SizedBox(height: 12),
-                      Text(
-                        "Identity Verified Successfully!",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.green,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      SizedBox(height: 8),
-                      Text(
-                        "Your identity has been verified. You can now create your account.",
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: Colors.green,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ],
-                  ),
-                ),
-
-              const SizedBox(height: 30),
-
-              GestureDetector(
-                onTap:
-                    (isFaceMatched && !isLoadingState) ? _createAccount : null,
-                child: Container(
-                  height: 55,
-                  margin: const EdgeInsets.only(bottom: 30),
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: (isFaceMatched && !isLoadingState)
-                        ? widgetPricolor
-                        : Colors.grey[400],
-                    borderRadius: BorderRadius.circular(25),
-                    boxShadow: (isFaceMatched && !isLoadingState)
-                        ? [
-                            BoxShadow(
-                              color: widgetPricolor.withOpacity(0.3),
-                              blurRadius: 8,
-                              offset: const Offset(0, 4),
-                            )
-                          ]
-                        : null,
-                  ),
-                  child: Center(
-                    child: _buildAccountButtonContent(),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
-      },
     );
   }
 
@@ -1670,13 +1776,15 @@ class _RegisterMDState extends State<RegisterMD> {
         }
       });
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content:
-              Text('${isID ? 'ID' : 'Selfie'} photo captured successfully'),
-          backgroundColor: Colors.green,
-        ),
-      );
+      if (_canShowSnackBar()) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content:
+                Text('${isID ? 'ID' : 'Selfie'} photo captured successfully'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
     }
   }
 
@@ -1688,9 +1796,12 @@ class _RegisterMDState extends State<RegisterMD> {
 
     final agreed = await _showTermsDialog(context);
     if (agreed != true) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("You must agree to continue.")),
-      );
+      if (_canShowSnackBar()) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("You must agree to continue.")),
+        );
+      }
+      setState(() => _isProcessingForm = false);
       return;
     }
 
@@ -1719,41 +1830,16 @@ class _RegisterMDState extends State<RegisterMD> {
         longitude: position.longitude,
       ));
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Failed to get location: ${e.toString()}")),
-      );
+      if (_canShowSnackBar()) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Failed to get location: ${e.toString()}")),
+        );
+      }
       setState(() {
         _isCreatingAccount = false;
         _isButtonDisabled = false;
+        _isProcessingForm = false;
       });
     }
-  }
-
-  Widget _buildAccountButtonContent() {
-    return BlocBuilder<AuthenticationBloc, AuthenticationState>(
-      builder: (context, state) {
-        final isLoading = state is SignUpnLoading || _isCreatingAccount;
-
-        if (isLoading) {
-          return const SizedBox(
-            height: 20,
-            width: 20,
-            child: CircularProgressIndicator(
-              color: Colors.white,
-              strokeWidth: 2,
-            ),
-          );
-        } else {
-          return const Text(
-            'Create Account',
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.white,
-              fontWeight: FontWeight.w600,
-            ),
-          );
-        }
-      },
-    );
   }
 }
